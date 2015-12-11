@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Start Page</title>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <script src="http://code.jquery.com/jquery-latest.min.js"></script>
+        <script src="js/lib/angular/angular.min.js"></script>
+        <script src="js/lib/bootstrap/bootstrap.min.js"></script>
+        <script src="js/app.js"></script>
+        <script src="js/services.js"></script>
+        <script src="js/controllers.js"></script>
+        <script src="js/filters.js"></script>
+        <script src="js/directives.js"></script>
+        
+        <script>
+            
+            $(document).ready(function() {
+                               
+               var result = $.getJSON(
+                       "url" : "discover",
+                       "data" : "",
+                       "success" : function( el )$("#search_results").text("hello world"); 
+                       );
+               var table = $('<table/>').appendTo($('#search_result'));
+
+
+                result.each(function(i, res) {
+                    $('<tr/>').appendTo(table)
+                        .append($('<td/>').text(res.hits.total))
+                        .append($('<td/>').text(res.hits.hits._source));
+                });
+            });
+        </script>
+    </head>
+
+   
+    <body>
+        <h1>Marcus Søk</h1>
+
+           <input id="search_box" type="text" placeholder="Search here" />
+           <button class="btn btn-large btn-danger" onclick="showOutputs"> Search</button>
+         
+
+           <div id="search_results"> </div>
+    </body>
+</html>
