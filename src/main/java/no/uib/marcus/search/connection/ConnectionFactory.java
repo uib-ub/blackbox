@@ -8,8 +8,14 @@ import org.elasticsearch.common.settings.ImmutableSettings;
 import org.elasticsearch.common.transport.InetSocketTransportAddress;
 
 /**
- * Connect to Elasticsearch through Transport client
+ * Connect to Elasticsearch cluster through Transport client
+ * <br>
+ * Note that you should define the same clustername as the one you defined on your running nodes. 
+ * Otherwise, your Transport Client won't connect to the node.
+ * Note also that you must define the transport client port (9300-9399) and not the REST port (9200-9299). 
+ * Transport client does not use REST API.
  */
+ 
 public class ConnectionFactory {
     
     private static Client client = null; 
