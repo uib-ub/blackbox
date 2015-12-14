@@ -20,6 +20,10 @@
             <version>7.0</version>
             <scope>provided</scope>
         </dependency>
+        <!--
+          Note that the Java client must be from the same major version of Elasticsearch as the nodes; 
+          otherwise, they may not be able to understand each other.
+        -->
         <dependency>
            <groupId>org.elasticsearch</groupId>
            <artifactId>elasticsearch</artifactId>
