@@ -65,7 +65,7 @@ public class SearchService {
      //Method for easy debugging
      public static void main(String [] args){
         //System.out.println(getAll("admin", null));
-        System.out.println(getAllDocuments("Marianne", "admin" , "invoice", null));
+        System.out.println(getAllDocuments("admin" , "invoice", null));
         
     }
     

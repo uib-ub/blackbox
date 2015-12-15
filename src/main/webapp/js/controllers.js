@@ -7,9 +7,27 @@ function AppCtrl($scope, $http) {
 }
 AppCtrl.$inject = ['$scope', '$http'];
 
+    function showResultsController ($scope, $http){
+        $scope.searchMarcus = function() {
+            
+            $http({method: 'GET', url: '/discover' })
+              .success(function(data, status, headers, config) {
+                $scope.results = data;
+                console.log(data);
+                })
+                .error(function(data, status, headers, config) {
+                    $scope.log = 'Error occured while querying'
+                    console.log("Error babu");
+                });
+        };
 
-function NavBarController($scope) {
-}
+        $scope.searchMarcus();
+    }
+
+
+
+
+function NavBarController($scope) {}
 NavBarController.$inject = ['$scope'];
 
 function SearchCtrl($scope, $http) {
@@ -25,7 +43,7 @@ function SearchCtrl($scope, $http) {
             })
             .success(function(data, status, headers, config){
                 $scope.result = data;
-
+               
                 // Group data every 10 years (facets don't support it yet)
                 $scope.dates = new Array();
 

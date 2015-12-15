@@ -1,4 +1,3 @@
-
 package no.uib.marcus.search.servlet;
 
 import java.io.IOException;
@@ -8,6 +7,7 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import no.uib.marcus.search.SearchService;
 
 @WebServlet(name = "SearchServlet", urlPatterns = {"/search"})
 public class SearchServlet extends HttpServlet {
@@ -24,17 +24,19 @@ public class SearchServlet extends HttpServlet {
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         response.setContentType("text/html;charset=UTF-8");
+        
+        String queryString = request.getParameter("q");
+        
         try (PrintWriter out = response.getWriter()) {
-            /* TODO output your page here. You may use following sample code. */
-            out.println("<!DOCTYPE html>");
-            out.println("<html>");
-            out.println("<head>");
-            out.println("<title>Servlet SearchServlet</title>");            
-            out.println("</head>");
-            out.println("<body>");
-            out.println("<h1>Servlet SearchServlet at " + request.getContextPath() + "</h1>");
-            out.println("</body>");
-            out.println("</html>");
+                  System.out.println("Vale of q " + queryString);
+                  
+            if (queryString == null || queryString.isEmpty()) {
+                 //Match all
+                  out.write(SearchService.getAllDocuments("admin", "invoice", null));
+            } 
+            else {
+                out.write(SearchService.getAllDocuments(queryString, "admin", "invoice", null));
+            }
         }
     }
 
@@ -50,7 +52,7 @@ public class SearchServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        
+
         processRequest(request, response);
     }
 
