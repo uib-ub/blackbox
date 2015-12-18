@@ -3,8 +3,10 @@
  */
 package no.uib.marcus.search;
 
+import com.google.gson.Gson;
 import java.util.Map;
 import no.uib.marcus.search.client.ClientFactory;
+import no.uib.marcus.search.servlet.SuggestionServlet;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.index.mapper.object.ObjectMapper;
 import org.elasticsearch.index.query.QueryBuilders;
@@ -28,7 +30,6 @@ public class SearchService {
                     //.addAggregation(AggregationBuilders.terms("by_status").field("status"))
                     //.addFacet(FacetBuilders.termsFacet("by_status").field("status"))
                     .addAggregation(AggregationBuilders.terms("by_status").field("status"))
-                    .addHighlightedField("status")
                     .setQuery(QueryBuilders.matchAllQuery())
                     .execute()
                     .actionGet();
@@ -94,9 +95,12 @@ public class SearchService {
         
      //Method for easy debugging
      public static void main(String [] args){
+         Gson gson = new Gson();
         //System.out.println(getAll("admin", null));
-        System.out.println(getAllDocuments("admin" , "invoice", null));
+        //System.out.println(getAllDocuments("admin" , "invoice", null));
         //System.out.println("List of suggestion :" + Suggestion.getSuggestionsFor("m", "admin").toString());
+         String jsonString = gson.toJson(Suggestion.getSuggestionsFor("m", "admin"));
+        System.out.println("List of suggestion :" + jsonString );
         
     }
     

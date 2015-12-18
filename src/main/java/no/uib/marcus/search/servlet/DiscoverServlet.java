@@ -35,7 +35,7 @@ public class DiscoverServlet extends HttpServlet {
         Client client = ClientFactory.getTransportClient();
         Map<String,String> facetMap = null;
         
-        try (PrintWriter out = response.getWriter()) {  
+        try (PrintWriter out = response.getWriter()) { 
             out.write(SearchService.getAllDocuments(indexName, typeName, facetMap));
         }
     }

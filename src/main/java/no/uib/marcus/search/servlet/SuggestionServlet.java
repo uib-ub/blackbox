@@ -1,13 +1,9 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
+
 package no.uib.marcus.search.servlet;
 
+import com.google.gson.Gson;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.math.BigDecimal;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -35,18 +31,20 @@ public class SuggestionServlet extends HttpServlet {
      */
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        response.setContentType("text/html;charset=UTF-8");
+        //response.setContentType("text/html;charset=UTF-8");
         String queryString = request.getParameter("q");
-        
+        response.setContentType("application/json;charset=UTF-8");
         try (PrintWriter out = response.getWriter()) {
+            Gson gson = new Gson();
+            
             XContentBuilder jsonObj = XContentFactory
                     .jsonBuilder()
                     .startObject()
                     .field("suggest_list", Suggestion.getSuggestionsFor(queryString, "admin"))
                     .endObject();
-                 
-            out.write(jsonObj.string()); 
-            
+           
+              String jsonString = gson.toJson(Suggestion.getSuggestionsFor(queryString, "admin"));
+              out.write(jsonString);
         }
     }
 

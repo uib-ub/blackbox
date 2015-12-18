@@ -42,7 +42,7 @@ app.controller('freeTextSearch', function ($scope, $http) {
                 .success(function (data, status, headers, config) {
                     $scope.suggestion_list = data;
                      
-                    // new Awesomplete(document.querySelector("#search_box"), {list: data.suggest_list});
+                    //new Awesomplete(document.getElementById("search_box"), {list: data.suggest_list});
                 })
 
                 .error(function (data, status, headers, config) {

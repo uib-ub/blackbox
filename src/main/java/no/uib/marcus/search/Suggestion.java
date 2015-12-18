@@ -37,6 +37,7 @@ public class Suggestion {
                     .next()
                     .getOptions()
                     .iterator();
+            //System.out.println(suggestResponse.toString());
 
             while (iterator.hasNext()) {
                 Suggest.Suggestion.Entry.Option next = iterator.next();
