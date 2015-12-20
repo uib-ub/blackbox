@@ -1,43 +1,49 @@
 package no.uib.marcus.search;
 
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Set;
 import no.uib.marcus.search.client.ClientFactory;
-import org.elasticsearch.action.suggest.SuggestRequestBuilder;
 import org.elasticsearch.action.suggest.SuggestResponse;
 import org.elasticsearch.search.suggest.Suggest;
 import org.elasticsearch.search.suggest.completion.CompletionSuggestionBuilder;
 
 /**
- * Hemed
+ * Hemed Ali
  */
 public class Suggestion {
 
-    public static Set<String> getSuggestionsFor(String text, String indexType) {
-        Set<String> items = new HashSet<>();
-        CompletionSuggestionBuilder suggestionsBuilder = new CompletionSuggestionBuilder("completeMe");
-
+    public static SuggestResponse getSuggestResponse(String text, String indexType, String suggestField) {
+        CompletionSuggestionBuilder suggestionsBuilder = new CompletionSuggestionBuilder("suggest_me");
+        SuggestResponse suggestResponse = null;
+        
         try {
             suggestionsBuilder.text(text);
-            suggestionsBuilder.field("suggest");
+            suggestionsBuilder.field(suggestField);
 
-            SuggestRequestBuilder suggestRequestBuilder = ClientFactory.getTransportClient()
+             suggestResponse = ClientFactory.getTransportClient()
                     .prepareSuggest(indexType)
-                    .addSuggestion(suggestionsBuilder);
+                    .addSuggestion(suggestionsBuilder)
+                    .execute()
+                    .actionGet();
 
-            SuggestResponse suggestResponse = suggestRequestBuilder.execute().actionGet();
+        } catch (Exception e) {
+            e.getLocalizedMessage();
+        }
+        return suggestResponse;
+    }
 
+    public static Set<String> getSuggestions(String text, String indexType, String suggestField) {
+        Set<String> items = new HashSet<>();
+        try {
+            SuggestResponse suggestResponse = getSuggestResponse(text, indexType, suggestField);
             Iterator<? extends Suggest.Suggestion.Entry.Option> iterator = suggestResponse
                     .getSuggest()
-                    .getSuggestion("completeMe")
+                    .getSuggestion("suggest_me")
                     .iterator()
                     .next()
                     .getOptions()
                     .iterator();
-            //System.out.println(suggestResponse.toString());
 
             while (iterator.hasNext()) {
                 Suggest.Suggestion.Entry.Option next = iterator.next();
@@ -48,5 +54,5 @@ public class Suggestion {
         }
         return items;
     }
-    
+
 }

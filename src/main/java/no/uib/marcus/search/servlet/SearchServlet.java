@@ -8,6 +8,8 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import no.uib.marcus.search.SearchService;
+import no.uib.marcus.search.MarcusSearchService;
+import org.elasticsearch.action.search.SearchResponse;
 
 @WebServlet(name = "SearchServlet", urlPatterns = {"/search"})
 public class SearchServlet extends HttpServlet {
@@ -26,17 +28,20 @@ public class SearchServlet extends HttpServlet {
         response.setContentType("text/html;charset=UTF-8");
         
         String queryString = request.getParameter("q");
+        SearchService service = new MarcusSearchService();
+        SearchResponse searchResponse;
         
         try (PrintWriter out = response.getWriter()) {
-                  System.out.println("Vale of q " + queryString);
                   
             if (queryString == null || queryString.isEmpty()) {
                  //Match all
-                  out.write(SearchService.getAllDocuments("admin", "invoice", null));
+                  searchResponse = service.getAllDocuments("admin", "invoice", null);
             } 
             else {
-                out.write(SearchService.getAllDocuments(queryString, "admin", "invoice", null));
+                 searchResponse = service.getAllDocuments(queryString, "admin", "invoice", null);
             }
+            
+            out.write(searchResponse.toString());
         }
     }
 

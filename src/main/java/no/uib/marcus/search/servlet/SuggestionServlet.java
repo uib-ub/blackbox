@@ -40,10 +40,10 @@ public class SuggestionServlet extends HttpServlet {
             XContentBuilder jsonObj = XContentFactory
                     .jsonBuilder()
                     .startObject()
-                    .field("suggest_list", Suggestion.getSuggestionsFor(queryString, "admin"))
+                    .field("suggest_list", Suggestion.getSuggestions(queryString, "admin" , "suggest"))
                     .endObject();
            
-              String jsonString = gson.toJson(Suggestion.getSuggestionsFor(queryString, "admin"));
+              String jsonString = gson.toJson(Suggestion.getSuggestions(queryString, "admin" , "suggest"));
               out.write(jsonString);
         }
     }

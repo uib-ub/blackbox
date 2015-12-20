@@ -10,7 +10,9 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import no.uib.marcus.search.SearchService;
+import no.uib.marcus.search.MarcusSearchService;
 import no.uib.marcus.search.client.ClientFactory;
+import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.client.Client;
 
 
@@ -28,15 +30,17 @@ public class DiscoverServlet extends HttpServlet {
      */
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        response.setContentType("text/html;charset=UTF-8");
+        response.setContentType("application/json;charset=UTF-8");
         String indexName = "admin";
         String typeName = "invoice";
         String searchString = "Øyvind";
         Client client = ClientFactory.getTransportClient();
+        SearchService service = new MarcusSearchService();
         Map<String,String> facetMap = null;
         
         try (PrintWriter out = response.getWriter()) { 
-            out.write(SearchService.getAllDocuments(indexName, typeName, facetMap));
+            SearchResponse searchResponse = service.getAllDocuments(indexName, typeName, facetMap); 
+            out.write(searchResponse.toString());
         }
     }
 

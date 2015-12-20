@@ -32,7 +32,7 @@ html {
 /* ----------- */
 
 html {
-  background-color: white /**#f2f9ff**/;
+  background-color: whitesmoke /**#f2f9ff**/;
   font: normal normal normal 18px/1.2 "Helvetica Neue", Roboto, "Segoe UI", Calibri, sans-serif;
   color: #292f33;
 }
@@ -367,5 +367,6 @@ input[type=text]::-ms-clear {
   font-size: 24px;
   line-height: 30px;
   text-align: center;
+
 
 }

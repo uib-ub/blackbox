@@ -21,8 +21,7 @@ app.controller('freeTextSearch', function ($scope, $http) {
     $scope.query_search = function () {
         var q = "";
         $scope.query_string === undefined ? q = "" : q = $scope.query_string + "*";
-        //$scope.results = "";
-        //alert($scope.query_string);
+        
         $http({method: 'POST', url: 'search?q=' + q})
 
                 .success(function (data, status, headers, config) {
@@ -41,10 +40,7 @@ app.controller('freeTextSearch', function ($scope, $http) {
         $http({method: 'POST', url: 'suggest?q=' + q})
                 .success(function (data, status, headers, config) {
                     $scope.suggestion_list = data;
-                     
-                    //new Awesomplete(document.getElementById("search_box"), {list: data.suggest_list});
                 })
-
                 .error(function (data, status, headers, config) {
                     $scope.log = 'Error occured while querying';
                 });

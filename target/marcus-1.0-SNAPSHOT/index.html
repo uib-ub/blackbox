@@ -1,118 +1,74 @@
 <!DOCTYPE html>
-<html>
+<html lang="no">
     <head>
-        <title>Marcus Search </title>
-        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-        <script src="http://code.jquery.com/jquery-latest.min.js"></script>
-        <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.4.8/angular.min.js"></script>
-        <!-- Latest compiled and minified CSS -->
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+        <title>Marcus Search</title>
+        <meta name="description" content="Search Marcus data">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link rel="shortcut icon" type="image/x-icon" href="http://marcus.uib.no/img/favicon.ico">
+        <link rel="stylesheet" href="js/lib/typeahead/css/normalize.min.css">
+        <link rel="stylesheet" href="js/lib/typeahead/css/main.css">
         <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" />
-        <!-- Optional theme -->
         <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap-theme.min.css" />
-        <!-- Latest compiled and minified JavaScript -->
-        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
-        <script src="js/marcus-controller.js"></script>
-        <script src="js/lib/awesomplete/awesomplete.js"></script>
-        <link rel="stylesheet" href="js/lib/awesomplete/awesomplete.css"/>
-
-        <!-- Type ahead -->
-        <!--script src="js/lib/typeahead/handlebars.js"></script-->
-        <script src="js/lib/typeahead/bloodhound.js"></script>
-        <script src="js/lib/typeahead/typeahead.jquery.min.js"></script>
-        <!--script src="js/lib/typeahead/jquery.xdomainrequest.min.js"></script-->
-        <script src="js/lib/typeahead/typeahead.bundle.js"></script>
-        <!--script src="js/marcus-typeahead.js"></script-->
-
-
-        <!-- Local files 
-        <script src="js/app.js"></script>
-        <script src="js/services.js"></script>
-        <script src="js/marcus-controller.js"></script>
-        <script src="js/filters.js"></script>
-        <script src="js/directives.js"></script>
-        -->
-
-        <script type="text/javascript">
-
-            $(document).ready(function () {
-                var list = ["Hemed", "Ali", "Hemed"];
-
-                var engine = new Bloodhound({
-                    //queryTokenizer: Bloodhound.tokenizers.whitespace,
-                    //datumTokenizer: Bloodhound.tokenizers.obj.whitespace,
-                    prefetch: list,
-                    remote: {
-                        url: 'suggest?q=%QUERY',
-                        wildcard: '%QUERY'
-                    }
-                });
-                
-
-                $('#search_box').typeahead(null, {
-                    name: 'marcus-search',
-                    //display: 'value',
-                    source: engine
-                });
-
-            });
-
-
-
-            /**var input = document.querySelector("#search_box");
-             var awesomplete = new Awesomplete(document.querySelector("#search_box"));
-             
-             awesomplete.list = ["Ada", "Java", "JavaScript", "Brainfuck", "LOLCODE", "Node.js", "Ruby on Rails"];
-             **/
-
-            /** var ajaxReq;
-             ajaxReq = new XMLHttpRequest();
-             ajaxReq.open("GET", "suggest", true);
-             ajaxReq.onload = function () {
-             {
-             var list = JSON.parse(ajaxReq.responseText).suggest_list;
-             //var list =  $scope.suggestion_list;
-             
-             /**var list = JSON.parse(ajaxReq.responseText.suggest_list);
-             .map(function (i) {
-             //alert(i);
-             //return i.name;
-             });
-             new Awesomplete(document.querySelector("#search_box"), {list: list});
-             }
-             };
-             ajaxReq.send();**/
-        </script>
+        <!--base target="_blank"-->
     </head>
-
     <body ng-app="marcus">
-        <div class="container container-fluid" style="margin: 0 auto">
-            <h1>Marcus Søk</h1>
-            <div ng-controller="freeTextSearch">
-                
-                <input id="search_box"
-                       name ="q"
-                       class="typeahead"
-                       ng-model="query_string" 
-                       type="text" placeholder="Search here" 
-                       style="width:400px; height:40px;"
-                       ng-submit="query_search()" 
-                       ng-keyup="auto_complete()"/>
-                <button class="btn btn-large btn-primary" style="height:40px;" ng-click="query_search()">Search</button>
-
-                <br>
-                <h3>Total hits : {{results.hits.total}}</h3>
-
+        <div id="searchController" class="sticky-footer-wrapper" ng-controller="freeTextSearch">
+            <div class="masthead">
+                <h1 class="title">Marcus Søk</h1>
+                <div class="Demo">
+                    <form action="" method="GET">
+                        <input type="hidden" name="index" value="admin">
+                        <div class="Typeahead Typeahead--twitterUsers">
+                            <div class="u-posRelative">
+                                <input class="Typeahead-hint" type="text" tabindex="-1" readonly>
+                                <input class="Typeahead-input" id="search-input" type="text" name="q" ng-model="query_string" ng-change="query_search();"  placeholder="Search Marcus...">
+                                <img class="Typeahead-spinner" src="js/lib/typeahead/img/spinner.gif" alt="">
+                            </div>
+                            <div class="Typeahead-menu"></div>
+                        </div>
+                        <!--button type="submit" class="u-hidden" ng-submit="query_search()">Go</button-->
+                    </form>
+                </div>
+                <span class="links links-examples">
+                    <a href="">Advanced search</a>
+                </span>
+            </div>
+            <div class="sticky-footer-push"></div>
+            <div class="search-results">
+                <h4 ng-show="results.hits.total > 0"> Total hits : {{results.hits.total}}</h4>
                 <ul>
                     <li ng-repeat="x in results.hits.hits">
                         {{x._source}}
                     </li>
-
-                    <li>
-                        {{suggestion_list.suggest_list}}
-                    </li>
                 </ul>
-                <span>{{log}}</span>
             </div>
         </div>
+
+
+        <script id="result-template" type="text/x-handlebars-template">
+            <div class="ProfileCard u-cf">
+            <div class="ProfileCard-details">
+            <div class="ProfileCard-realName">{{value}}</div>
+            <div class="ProfileCard-screenName"></div>
+            <div class="ProfileCard-description">{{value}}</div>
+            </div>
+            </div>
+        </script>
+
+        <script id="empty-template" type="text/x-handlebars-template">
+            <div class="EmptyMessage">Your search turned up 0 results.</div>
+        </script>
+        
+        <!--JavaScript files  -->
+        <script src="js/lib/typeahead/js/handlebars.js"></script>
+        <script src="https://code.jquery.com/jquery-1.11.3.min.js"></script>
+        <script src="js/lib/typeahead/js/jquery.xdomainrequest.min.js"></script>
+        <script src="js/lib/typeahead/js/typeahead.bundle.js"></script>
+        <script src="js/lib/typeahead/js/main.js"></script>
+        <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.4.8/angular.min.js"></script>
+        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
+        <script src="js/marcus-controller.js"></script>
     </body>
 </html>
