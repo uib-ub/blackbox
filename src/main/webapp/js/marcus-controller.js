@@ -26,9 +26,12 @@ app.controller('freeTextSearch', function ($scope, $http) {
 
                 .success(function (data, status, headers, config) {
                     $scope.results = data;
-                    //alert(JSON.stringify(data));
+            
+                // If we have aggregations, store them in the scope.
+                if (data.aggregations) {
+                     $scope.aggregations = data.aggregations;
+                 }
                 })
-
                 .error(function (data, status, headers, config) {
                     $scope.log = 'Error occured while querying';
                 });

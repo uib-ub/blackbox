@@ -31,6 +31,8 @@ public class SearchServlet extends HttpServlet {
         SearchService service = new MarcusSearchService();
         SearchResponse searchResponse;
         
+        //String jsonString = "[{"field" : "status",  }]";
+        
         try (PrintWriter out = response.getWriter()) {
                   
             if (queryString == null || queryString.isEmpty()) {

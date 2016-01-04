@@ -5,6 +5,7 @@ import java.util.Map;
 import no.uib.marcus.search.client.ClientFactory;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.index.query.QueryBuilders;
+import org.elasticsearch.search.aggregations.AbstractAggregationBuilder;
 import org.elasticsearch.search.aggregations.AggregationBuilders;
 import org.elasticsearch.search.builder.SearchSourceBuilderException;
 
@@ -24,7 +25,8 @@ public class MarcusSearchService implements SearchService {
                     .setTypes(typeName)
                     //.addAggregation(AggregationBuilders.terms("by_status").field("status"))
                     //.addFacet(FacetBuilders.termsFacet("by_status").field("status"))
-                    .addAggregation(AggregationBuilders.terms("by_status").field("status"))
+                    .addAggregation(AggregationBuilders.terms("Status").field("status"))
+                    .addAggregation(AggregationBuilders.terms("Assignee").field("assigned_to"))
                     .setQuery(QueryBuilders.matchAllQuery())
                     .execute()
                     .actionGet();
@@ -69,6 +71,8 @@ public class MarcusSearchService implements SearchService {
                     .prepareSearch(indexName)
                     .setTypes(typeName)
                     .setQuery(QueryBuilders.queryStringQuery(queryStr))
+                    .addAggregation(AggregationBuilders.terms("Status").field("status"))
+                    .addAggregation(AggregationBuilders.terms("Assignee").field("assigned_to"))
                     .execute()
                     .actionGet();
         } catch (SearchSourceBuilderException se) {
