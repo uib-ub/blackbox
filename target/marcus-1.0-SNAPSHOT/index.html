@@ -13,6 +13,10 @@
         <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" />
         <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap-theme.min.css" />
         <!--base target="_blank"-->
+        <!--script>
+            angular.module('marcus', [])
+           .constant('predefined_aggs','[{"field": "status", "size": 15} , {"field" : "assigned_to"}]'); 
+        </script-->
     </head>
     <body>
         <div id="searchController"  ng-controller="freeTextSearch">
@@ -35,7 +39,7 @@
                 <span class="links links-examples">
                     <a href="">Advanced search</a>
                 </span>
-                <b>Selected Facets: </b>{{selected_facets}}
+                <b>Selected Facets: </b>{{selected_aggregations}}
             </div>
             <!--div class="sticky-footer-push"></div-->
             <div class="search-results container-fluid">
@@ -43,18 +47,18 @@
                 <div class="facets">
                    <h4>Status</h4>
                    <ul class="nav nav-list">
-                        <li ng-repeat="bucket in results.aggregations.Status.buckets">
+                        <li ng-repeat="bucket in results.aggregations.status.buckets">
                             <label class="checkbox">
-                                <input type="checkbox" checklist-model="selected_facets" checklist-value="bucket.key">
+                                <input type="checkbox" checklist-model="selected_aggregations" checklist-value="bucket.key" ng-click="query_search()">
                                 {{bucket.key}} ({{bucket.doc_count}})
                             </label>
                         </li>
                     </ul>
                    <h4>Assignee</h4>
                    <ul class="nav nav-list">
-                        <li ng-repeat="bucket in results.aggregations.Assignee.buckets">
+                        <li ng-repeat="bucket in results.aggregations.assigned_to.buckets">
                             <label class="checkbox">
-                               <input type="checkbox" checklist-model="selected_facets" checklist-value="bucket.key">
+                                <input type="checkbox" checklist-model="selected_aggregations" checklist-value="bucket.key" ng-click="query_search()">
                                 {{bucket.key}} ({{bucket.doc_count}})
                             </label>
                         </li>

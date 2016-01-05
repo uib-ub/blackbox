@@ -1,7 +1,9 @@
 'use strict';
 //Contoller file for Marcus-search system
 
-var app = angular.module('marcus', ["checklist-model"]);
+var app = angular.module('marcus', ["checklist-model"]) 
+        //Predefined aggregations
+        .constant('predefined_aggs' , '[{"field": "status", "size": 15} , {"field" : "assigned_to"}]'); 
 
 /**app.controller('showAllResults',
  function ($scope, $http) {
@@ -29,15 +31,15 @@ var app = angular.module('marcus', ["checklist-model"]);
 });**/
 
 
-app.controller('freeTextSearch', function ($scope, $http) {
+app.controller('freeTextSearch' , function ($scope , $http , predefined_aggs) {
    //See here: <http://vitalets.github.io/checklist-model/>
-    $scope.selected_facets = [];
-    
+    $scope.selected_aggregations = [];
+    console.log(predefined_aggs);
     $scope.query_search = function () {
         var q = "";
         $scope.query_string === undefined ? q = "" : q = $scope.query_string + "*";
         
-        $http({method: 'POST', url: 'search?q=' + q})
+        $http({method: 'POST', url: 'search?q=' + q +"&selected_aggs=" + $scope.selected_aggregations})
 
                 .success(function (data, status, headers, config) {
                     $scope.results = data;
@@ -64,8 +66,8 @@ app.controller('freeTextSearch', function ($scope, $http) {
                 });
     };
     
+    $scope.add_aggregations = function(){
+      $scope.selected_aggregations = [];//Get Values from users
+      $scope.query_search();
+    };
 });
-
-
-
-    

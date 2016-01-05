@@ -1,6 +1,6 @@
-no/uib/marcus/search/servlet/DiscoverServlet.class
-no/uib/marcus/search/servlet/SearchServlet.class
-no/uib/marcus/search/Suggestion.class
-no/uib/marcus/search/client/ClientFactory.class
-no/uib/marcus/search/SearchService.class
-no/uib/marcus/search/servlet/SuggestionServlet.class
+no\uib\marcus\search\servlet\DiscoverServlet.class
+no\uib\marcus\search\SearchService.class
+no\uib\marcus\search\servlet\SearchServlet.class
+no\uib\marcus\search\Suggestion.class
+no\uib\marcus\search\client\ClientFactory.class
+no\uib\marcus\search\servlet\SuggestionServlet.class
