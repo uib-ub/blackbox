@@ -1,7 +1,7 @@
 'use strict';
 //Contoller file for Marcus-search system
 
-var app = angular.module('marcus', []);
+var app = angular.module('marcus', ["checklist-model"]);
 
 /**app.controller('showAllResults',
  function ($scope, $http) {
@@ -17,7 +17,22 @@ var app = angular.module('marcus', []);
  });
  });**/
 
+/**app.controller('checkBoxCtrl', function ($scope) {
+    $scope.selected_facets = [];
+    if($scope.selected_facets.length > 0){
+      alert($scope.selected_facets[0]);
+    }
+    
+    $scope.uncheckAll = function () {
+        $scope.selected_facets = [];
+    };
+});**/
+
+
 app.controller('freeTextSearch', function ($scope, $http) {
+   //See here: <http://vitalets.github.io/checklist-model/>
+    $scope.selected_facets = [];
+    
     $scope.query_search = function () {
         var q = "";
         $scope.query_string === undefined ? q = "" : q = $scope.query_string + "*";
