@@ -61,6 +61,8 @@ public class MarcusSearchService implements SearchService {
                     .prepareSearch(indexName)
                     .setTypes(typeName)
                     .setQuery(QueryBuilders.matchAllQuery())
+                    .addAggregation(AggregationBuilders.terms("status").field("status"))
+                    .addAggregation(AggregationBuilders.terms("assigned_to").field("assigned_to"))
                     .execute()
                     .actionGet();
         } catch (SearchSourceBuilderException se) {
@@ -74,9 +76,9 @@ public class MarcusSearchService implements SearchService {
      * Get All Documents using query string. 
      */
     @Override
-    public SearchResponse getAllDocuments(String queryStr, String indexName, String typeName, Map<String, String> aggMap) {
+    public SearchResponse getAllDocuments(String queryStr, String indexName, String typeName) {
         SearchResponse response = null;
-        //See this: http://stackoverflow.com/questions/23807314/multiple-filters-and-an-aggregate-in-elasticsearch
+             //See this: http://stackoverflow.com/questions/23807314/multiple-filters-and-an-aggregate-in-elasticsearch
               BoolFilterBuilder fb = (BoolFilterBuilder)FilterBuilders
                 .boolFilter()
                 //.must(FilterBuilders.boolFilter()
@@ -92,12 +94,31 @@ public class MarcusSearchService implements SearchService {
                 response = ClientFactory.getTransportClient()
                     .prepareSearch(indexName)
                     .setTypes(typeName)
-                    //.setQuery(QueryBuilders.filteredQuery(QueryBuilders.queryStringQuery(queryStr), fb))
-                    .setPostFilter(fb)
                     .setQuery(QueryBuilders.queryStringQuery(queryStr))
                     .addAggregation(AggregationBuilders.terms("status").field("status"))
                     .addAggregation(AggregationBuilders.terms("assigned_to").field("assigned_to"))
-                    //.addAggregation(AggregationBuilders.filter("filtered").filter(fb))
+                    .execute()
+                    .actionGet();
+        } catch (SearchSourceBuilderException se) {
+            se.getDetailedMessage();
+        }
+        return response;
+    }
+    
+    
+     /**
+     * Get All Documents using query string. 
+     */
+    public SearchResponse getAllDocuments(String queryStr, String indexName, String typeName, FilterBuilder filterBuilder) {
+        SearchResponse response = null;
+        try {
+                response = ClientFactory.getTransportClient()
+                    .prepareSearch(indexName)
+                    .setTypes(typeName)
+                    .setQuery(QueryBuilders.queryStringQuery(queryStr))
+                    .setPostFilter(filterBuilder)
+                    .addAggregation(AggregationBuilders.terms("status").field("status"))
+                    .addAggregation(AggregationBuilders.terms("assigned_to").field("assigned_to"))
                     .execute()
                     .actionGet();
         } catch (SearchSourceBuilderException se) {

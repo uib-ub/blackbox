@@ -39,7 +39,8 @@
                 <span class="links links-examples">
                     <a href="">Advanced search</a>
                 </span>
-                <b>Selected Facets: </b>{{selected_aggregations}}
+                  <b>Status  Facets: </b>{{status_aggs}}
+                  <b>Assignee Facets: </b>{{assignee_aggs}}
             </div>
             <!--div class="sticky-footer-push"></div-->
             <div class="search-results container-fluid">
@@ -49,7 +50,7 @@
                    <ul class="nav nav-list">
                         <li ng-repeat="bucket in results.aggregations.status.buckets">
                             <label class="checkbox">
-                                <input type="checkbox" checklist-model="selected_aggregations" checklist-value="bucket.key" ng-click="query_search()">
+                                <input type="checkbox" checklist-model="status_aggs" checklist-value="bucket.key" ng-click="query_search()">
                                 {{bucket.key}} ({{bucket.doc_count}})
                             </label>
                         </li>
@@ -58,7 +59,7 @@
                    <ul class="nav nav-list">
                         <li ng-repeat="bucket in results.aggregations.assigned_to.buckets">
                             <label class="checkbox">
-                                <input type="checkbox" checklist-model="selected_aggregations" checklist-value="bucket.key" ng-click="query_search()">
+                                <input type="checkbox" checklist-model="assignee_aggs" checklist-value="bucket.key" ng-click="query_search()">
                                 {{bucket.key}} ({{bucket.doc_count}})
                             </label>
                         </li>

@@ -33,13 +33,26 @@ var app = angular.module('marcus', ["checklist-model"])
 
 app.controller('freeTextSearch' , function ($scope , $http , predefined_aggs) {
    //See here: <http://vitalets.github.io/checklist-model/>
-    $scope.selected_aggregations = [];
-    console.log(predefined_aggs);
+    $scope.status_aggs = [];
+    $scope.assignee_aggs = [];
+    
+    var selected_aggs = "status:" + JSON.stringify($scope.status_aggs) + "assignee:" + $scope.assignee_aggs;
+    
+    
+    $scope.getCheckedValue = function(field, aggValue) {
+        return field + ":" + aggValue;
+    };
+    console.log("Predefined aggregations:" + predefined_aggs);
+    
     $scope.query_search = function () {
         var q = "";
-        $scope.query_string === undefined ? q = "" : q = $scope.query_string + "*";
+        $scope.query_string === undefined ? q = "*" : q = $scope.query_string + "*";
         
-        $http({method: 'POST', url: 'search?q=' + q +"&selected_aggs=" + $scope.selected_aggregations})
+        $http({method: 'POST', 
+            url: 'search?q='+ q +
+                    "&status=" + $scope.status_aggs + 
+                    "&assignee=" + $scope.assignee_aggs 
+             })
 
                 .success(function (data, status, headers, config) {
                     $scope.results = data;

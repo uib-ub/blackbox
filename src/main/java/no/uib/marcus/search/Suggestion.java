@@ -9,7 +9,8 @@ import org.elasticsearch.search.suggest.Suggest;
 import org.elasticsearch.search.suggest.completion.CompletionSuggestionBuilder;
 
 /**
- * Hemed Ali
+ * Hemed Ali (hemed.ruwehy@uib.no)
+ * University of Bergen Library
  */
 public class Suggestion {
 

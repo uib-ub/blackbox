@@ -3,6 +3,7 @@ package no.uib.marcus.search;
 
 import java.util.Map;
 import org.elasticsearch.action.search.SearchResponse;
+import org.elasticsearch.index.query.FilterBuilder;
 
 /**
  *
@@ -23,6 +24,11 @@ public interface SearchService {
     /**
      * Get All Documents using query string. 
      */
-    public SearchResponse getAllDocuments(String queryStr, String indexName, String typeName, Map<String, String> aggMap);
+     public SearchResponse getAllDocuments(String queryStr, String indexName, String typeName);
+     
+    /**
+     * Add Post Filters
+     **/
+     public SearchResponse getAllDocuments(String queryStr, String indexName, String typeName, FilterBuilder filterBuilder);
 
 }
