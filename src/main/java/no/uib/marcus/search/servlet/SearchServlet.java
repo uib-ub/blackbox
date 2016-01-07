@@ -3,6 +3,7 @@ package no.uib.marcus.search.servlet;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -40,7 +41,9 @@ public class SearchServlet extends HttpServlet {
         SearchService service = new MarcusSearchService();
         SearchResponse searchResponse;
         FilterBuilder fb = null;
-
+        System.out.println("Parameter Aggs: " + Arrays.toString(request.getParameterValues("id")));
+        
+                
         try (PrintWriter out = response.getWriter()) {
 
             if (queryString == null || queryString.isEmpty()) {

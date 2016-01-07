@@ -85,6 +85,7 @@ public class MarcusSearchService implements SearchService {
                //.should(FilterBuilders.termFilter("status", "Draft"))
                //  .should(FilterBuilders.termsFilter("assigned_to", "Marianne Paasche", "Morten Heiselberg"))
                  .must(FilterBuilders.termsFilter("status", "Estimate" , "Draft"))
+                 
                //.must(FilterBuilders.termFilter("assigned_to", "Marianne Paasche"))
                 ;
          

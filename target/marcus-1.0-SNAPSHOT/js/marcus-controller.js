@@ -1,9 +1,9 @@
 'use strict';
 //Contoller file for Marcus-search system
 
-var app = angular.module('marcus', ["checklist-model"]) 
+var app = angular.module('marcus', ["checklist-model"])
         //Predefined aggregations
-        .constant('predefined_aggs' , '[{"field": "status", "size": 15} , {"field" : "assigned_to"}]'); 
+        .constant('predefined_aggs', '[{"field": "status", "size": 15} , {"field" : "assigned_to"}]');
 
 /**app.controller('showAllResults',
  function ($scope, $http) {
@@ -20,53 +20,58 @@ var app = angular.module('marcus', ["checklist-model"])
  });**/
 
 /**app.controller('checkBoxCtrl', function ($scope) {
-    $scope.selected_facets = [];
-    if($scope.selected_facets.length > 0){
-      alert($scope.selected_facets[0]);
-    }
-    
-    $scope.uncheckAll = function () {
-        $scope.selected_facets = [];
-    };
-});**/
+ $scope.selected_facets = [];
+ if($scope.selected_facets.length > 0){
+ alert($scope.selected_facets[0]);
+ }
+ 
+ $scope.uncheckAll = function () {
+ $scope.selected_facets = [];
+ };
+ });**/
 
 
-app.controller('freeTextSearch' , function ($scope , $http , predefined_aggs) {
-   //See here: <http://vitalets.github.io/checklist-model/>
+app.controller('freeTextSearch', function ($scope, $http, predefined_aggs) {
+    //See here: <http://vitalets.github.io/checklist-model/>
     $scope.status_aggs = [];
     $scope.assignee_aggs = [];
+
+    var selected_aggs = {};
+    //Build aggregation map
+    selected_aggs.status = $scope.status_aggs;
+    selected_aggs.assignee = $scope.assignee_aggs;
     
-    var selected_aggs = "status:" + JSON.stringify($scope.status_aggs) + "assignee:" + $scope.assignee_aggs;
-    
-    
-    $scope.getCheckedValue = function(field, aggValue) {
+    $scope.getCheckedValue = function (field, aggValue) {
         return field + ":" + aggValue;
     };
     console.log("Predefined aggregations:" + predefined_aggs);
-    
+    //Search query
     $scope.query_search = function () {
         var q = "";
         $scope.query_string === undefined ? q = "*" : q = $scope.query_string + "*";
-        
-        $http({method: 'POST', 
-            url: 'search?q='+ q +
-                    "&status=" + $scope.status_aggs + 
-                    "&assignee=" + $scope.assignee_aggs 
-             })
+
+        $http({method: 'POST',
+            url: 'search?id=1&id=2&status=' + $scope.status_aggs,
+            params: {
+                q: q,
+                //status: $scope.status_aggs,
+                aggs: JSON.stringify(selected_aggs)
+            }
+        })
 
                 .success(function (data, status, headers, config) {
                     $scope.results = data;
-            
-                // If we have aggregations, store them in the scope.
-                if (data.aggregations) {
-                     $scope.aggregations = data.aggregations;
-                 }
+
+                    // If we have aggregations, store them in the scope.
+                    if (data.aggregations) {
+                        $scope.aggregations = data.aggregations;
+                    }
                 })
                 .error(function (data, status, headers, config) {
                     $scope.log = 'Error occured while querying';
                 });
     };
-
+    //Suggest endpoint
     $scope.auto_complete = function () {
         var q = "";
         $scope.query_string === undefined ? q = "" : q = $scope.query_string;
@@ -78,9 +83,9 @@ app.controller('freeTextSearch' , function ($scope , $http , predefined_aggs) {
                     $scope.log = 'Error occured while querying';
                 });
     };
-    
-    $scope.add_aggregations = function(){
-      $scope.selected_aggregations = [];//Get Values from users
-      $scope.query_search();
+
+    $scope.add_aggregations = function () {
+        $scope.selected_aggregations = [];//Get Values from users
+        $scope.query_search();
     };
 });

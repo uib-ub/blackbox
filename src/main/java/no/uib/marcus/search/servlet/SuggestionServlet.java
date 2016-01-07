@@ -32,7 +32,7 @@ public class SuggestionServlet extends HttpServlet {
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         //response.setContentType("text/html;charset=UTF-8");
-        String queryString = request.getParameter("q");
+        String queryString = request.getParameter("q");        
         response.setContentType("application/json;charset=UTF-8");
         try (PrintWriter out = response.getWriter()) {
             Gson gson = new Gson();
