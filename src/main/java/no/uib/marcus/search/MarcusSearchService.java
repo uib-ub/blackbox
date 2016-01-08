@@ -1,9 +1,16 @@
 package no.uib.marcus.search;
 
 import com.google.gson.Gson;
+import com.sun.org.apache.xalan.internal.lib.ExsltStrings;
+import com.sun.org.apache.xalan.internal.xsltc.compiler.Constants;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import no.uib.marcus.search.client.ClientFactory;
 import org.elasticsearch.action.search.SearchRequest;
 import org.elasticsearch.action.search.SearchRequestBuilder;
@@ -131,7 +138,7 @@ public class MarcusSearchService implements SearchService {
     
     
     //Testing Aggregations
-    public static void testAggRes() throws IOException{
+    public static void testAggRes(BoolFilterBuilder fb1) throws IOException{
         //http://stackoverflow.com/questions/23807314/multiple-filters-and-an-aggregate-in-elasticsearch
         BoolFilterBuilder fb = (BoolFilterBuilder)FilterBuilders
                 .boolFilter()
@@ -151,28 +158,58 @@ public class MarcusSearchService implements SearchService {
                  SearchRequestBuilder req = ClientFactory.getTransportClient()
                 .prepareSearch("admin")
                 .setTypes("eddie")
-                .setQuery(QueryBuilders.filteredQuery(QueryBuilders.queryStringQuery("mari"), fb))
-                //.setPostFilter()
+                .setQuery(QueryBuilders.queryStringQuery("*"))
+                //.setQuery(QueryBuilders.filteredQuery(QueryBuilders.queryStringQuery("*"))
+                .setPostFilter(fb1)
                 ;
                 //.addAggregation(aggregation)
                 //.addAggregation(AggregationBuilders.filter("filtered").filter(fb))
                 //.addAggregation(AggregationBuilders.terms("status").field("status"))
                 //.addAggregation(AggregationBuilders.terms("assigned_to").field("assigned_to"));
                      
-        System.out.println(req);
-         System.out.println(aggregation);
+         System.out.println("Request: " + req);
+         //System.out.println(aggregation);
     }
 
     //Main method for easy debugging
     public static void main(String[] args) throws IOException {
         Gson gson = new Gson();
+        
+        //Configure this!
+        String s = "status.Sent,status.Draft,assignee.Oyvind,eddie.Diddei,status.Hab , statusOrder";
+        String[] s1 = s.split(",");
+        Map<String, List<String>> map = new HashMap<>();
+        Set keys = new HashSet();
+
+        for (String s4 : s1)
+        {
+         keys.add(s4.replaceAll("^([^\\.]+)\\..+$", "$1").trim());
+        
+        }
+        for(Iterator iter = keys.iterator(); iter.hasNext();){
+          
+            String s6 = (String)iter.next();
+          String key = s6.replaceAll("^([^\\.]+)\\..+$", "$1");
+          
+          List<String> values = new ArrayList();
+          for ( String s3 : s1) {
+              if (s3.replaceAll("^([^\\.]+)\\..+$","$1").trim().equals(key)){
+               values.add(s3.replaceAll("^[^\\.]+\\.(.+)$","$1"));
+                map.put(key,values);       
+              }
+          }
+        }
+        
+        System.out.println("Map baby: " + map.toString());
+         
+      
         //System.out.println(getAll("admin", null));
         //System.out.println(getAllDocuments("ma", "admin" , "invoice", null));
         //System.out.println("List of suggestion :" + Suggestion.getSuggestionsFor("m", "admin").toString());
         String jsonString = gson.toJson(Suggestion.getSuggestions("m", "admin" , "suggest"));
         //System.out.println("List of suggestion :" + jsonString);
        //System.out.println("List of suggestion :" + Suggestion.getSuggestResponse("m", "admin" , "suggest"));
-       testAggRes();
+       //testAggRes();
     }
 
 }

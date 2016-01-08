@@ -1,5 +1,7 @@
 package no.uib.marcus.search.servlet;
 
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
@@ -15,6 +17,7 @@ import javax.servlet.http.HttpServletResponse;
 import no.uib.marcus.search.SearchService;
 import no.uib.marcus.search.MarcusSearchService;
 import org.elasticsearch.action.search.SearchResponse;
+import org.elasticsearch.index.mapper.object.ObjectMapper;
 import org.elasticsearch.index.query.BoolFilterBuilder;
 import org.elasticsearch.index.query.FilterBuilder;
 import org.elasticsearch.index.query.FilterBuilders;
@@ -40,25 +43,53 @@ public class SearchServlet extends HttpServlet {
         String selectedAggregations = request.getParameter("selected_aggs");
         SearchService service = new MarcusSearchService();
         SearchResponse searchResponse;
-        FilterBuilder fb = null;
-        System.out.println("Parameter Aggs: " + Arrays.toString(request.getParameterValues("id")));
+        BoolFilterBuilder fb = null;
         
+        System.out.println("Parameter Aggs: " + Arrays.toString(request.getParameterValues("id")));
+        String aggs = request.getParameter("aggs");
+        Gson gson = new Gson();
+        Map<String,String[]> aggMap = null;
+        
+        //Only for testing.
+        if(aggs.length() > 4){
+        //Convert JSON String to Map
+            aggMap= gson.fromJson(aggs, new TypeToken<HashMap<String,String[]>>(){}.getType());
+          }
+        
+        
+        //System.out.print("Map from JSON: " + Arrays.toString(aggMap.get("status")));
                 
         try (PrintWriter out = response.getWriter()) {
+            
+            
 
-            if (queryString == null || queryString.isEmpty()) {
+            if (queryString == null || queryString.isEmpty() || aggs.length() > 4) {
                 //Match all
                 searchResponse = service.getAllDocuments("admin", "invoice");
             }
             else {
-                    if (statusAgg == null || statusAgg.isEmpty()) 
+                    if (aggs== null || aggs.isEmpty() || aggMap.get("assignee").length == 0) 
                     {  
                        System.out.println("NUll and Empty: " + statusAgg );
                        searchResponse = service.getAllDocuments(queryString, "admin", "invoice"); 
                     } 
-                 else {
-                            System.out.println("Not NULL?: " + statusAgg);
-                            if (statusAgg.contains(",")) 
+                 else {   
+                           if (!aggMap.isEmpty()){
+                               
+                               //FilterBuilder fb = buildBoolORFilter(aggMap);
+                               fb = FilterBuilders.boolFilter();
+                               //OR Query
+                               for(Map.Entry<String,String[]> entry : aggMap.entrySet()){
+                                    if(entry.getValue().length > 0){
+                                      fb.must(FilterBuilders.termsFilter(entry.getKey() , entry.getValue()));
+                                    //System.out.println("Key: " + entry.getKey() +"Value: " + Arrays.toString(entry.getValue()));
+                                    }
+                               }
+                               
+                               MarcusSearchService.testAggRes(fb);
+                           }
+                           
+                            /**if (statusAgg.contains(",")) 
                             {
                                 String[] values = statusAgg.split(",");
                                 fb = FilterBuilders
@@ -69,8 +100,9 @@ public class SearchServlet extends HttpServlet {
                                 fb = FilterBuilders
                                         .boolFilter()
                                         .must(FilterBuilders.termsFilter("status", statusAgg));
-                            }
+                            }**/
                             searchResponse = service.getAllDocuments(queryString, "admin", "invoice", fb);
+                           
                       }
 
             }

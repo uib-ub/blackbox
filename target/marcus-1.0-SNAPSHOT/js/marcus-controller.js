@@ -36,22 +36,25 @@ app.controller('freeTextSearch', function ($scope, $http, predefined_aggs) {
     $scope.status_aggs = [];
     $scope.assignee_aggs = [];
 
-    var selected_aggs = {};
-    //Build aggregation map
-    selected_aggs.status = $scope.status_aggs;
-    selected_aggs.assignee = $scope.assignee_aggs;
-    
     $scope.getCheckedValue = function (field, aggValue) {
         return field + ":" + aggValue;
     };
     console.log("Predefined aggregations:" + predefined_aggs);
     //Search query
     $scope.query_search = function () {
+      var selected_aggs = {};
+      //Build aggregation map
+      if($scope.status_aggs.length > 0){
+        selected_aggs.status = $scope.status_aggs;
+      }
+      if($scope.status_aggs.length > 0){
+        selected_aggs.assignee = $scope.assignee_aggs;
+      }
+    
         var q = "";
         $scope.query_string === undefined ? q = "*" : q = $scope.query_string + "*";
-
         $http({method: 'POST',
-            url: 'search?id=1&id=2&status=' + $scope.status_aggs,
+            url: 'search?status=' + $scope.status_aggs,
             params: {
                 q: q,
                 //status: $scope.status_aggs,
