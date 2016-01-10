@@ -39,32 +39,31 @@
                 <span class="links links-examples">
                     <a href="">Advanced search</a>
                 </span>
-                  <b>Status  Facets: </b>{{status_aggs}}
-                  <b>Assignee Facets: </b>{{assignee_aggs}}
+                  <!--b>Selected Facets: </b>{{selected_aggs}} -->
             </div>
             <!--div class="sticky-footer-push"></div-->
             <div class="search-results container-fluid">
                 <div class='row row-fluid'>
-                <div class="facets">
-                   <h4>Status</h4>
-                   <ul class="nav nav-list">
-                        <li ng-repeat="bucket in results.aggregations.status.buckets">
-                            <label class="checkbox">
-                                <input type="checkbox" checklist-model="status_aggs" checklist-value="bucket.key" ng-click="query_search()">
-                                {{bucket.key}} ({{bucket.doc_count}})
-                            </label>
-                        </li>
-                    </ul>
-                   <h4>Assignee</h4>
-                   <ul class="nav nav-list">
-                        <li ng-repeat="bucket in results.aggregations.assigned_to.buckets">
-                            <label class="checkbox">
-                                <input type="checkbox" checklist-model="assignee_aggs" checklist-value="bucket.key" ng-click="query_search()">
-                                {{bucket.key}} ({{bucket.doc_count}})
-                            </label>
-                        </li>
-                    </ul>
-                </div>
+                    <div class="facets" ng-show="results.hasOwnProperty('aggregations')">
+                       <h4>Status</h4>
+                       <ul class="nav nav-list">
+                            <li ng-repeat="bucket in results.aggregations.status.buckets">
+                                <label class="checkbox">
+                                    <input type="checkbox" checklist-model="selected_filters" checklist-value="getCheckedValue('status', bucket.key)" ng-click="query_search()">
+                                    {{bucket.key}} ({{bucket.doc_count}})
+                                </label>
+                            </li>
+                        </ul>
+                       <h4>Assignee</h4>
+                       <ul class="nav nav-list">
+                            <li ng-repeat="bucket in results.aggregations.assigned_to.buckets">
+                                <label class="checkbox">
+                                    <input type="checkbox" checklist-model="selected_filters" checklist-value="getCheckedValue('assigned_to', bucket.key)" ng-click="query_search()">
+                                    {{bucket.key}} ({{bucket.doc_count}})
+                                </label>
+                            </li>
+                        </ul>
+                    </div>
                 
                 <div class="search-hits">
                     <h4 ng-show="results.hits.total > 0"> Total hits : {{results.hits.total}}</h4>

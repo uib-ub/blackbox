@@ -31,37 +31,33 @@ var app = angular.module('marcus', ["checklist-model"])
  });**/
 
 
-app.controller('freeTextSearch', function ($scope, $http, predefined_aggs) {
+app.controller('freeTextSearch', function ($scope, $http, $location, predefined_aggs) {
     //See here: <http://vitalets.github.io/checklist-model/>
-    $scope.status_aggs = [];
-    $scope.assignee_aggs = [];
 
-    $scope.getCheckedValue = function (field, aggValue) {
-        return field + ":" + aggValue;
+    
+    $scope.selected_filters = [];
+    $scope.getCheckedValue = function (field, filterValue) {
+        return field + "." + filterValue;
     };
     console.log("Predefined aggregations:" + predefined_aggs);
-    //Search query
-    $scope.query_search = function () {
-      var selected_aggs = {};
-      //Build aggregation map
-      if($scope.status_aggs.length > 0){
-        selected_aggs.status = $scope.status_aggs;
-      }
-      if($scope.status_aggs.length > 0){
-        selected_aggs.assignee = $scope.assignee_aggs;
-      }
     
+    
+    //Testing for location
+   // var s = $location.search();
+   // $scope.selected_aggs.push(s.agg);
+    
+    //Send requests to search servlet
+    $scope.query_search = function () {    
         var q = "";
         $scope.query_string === undefined ? q = "*" : q = $scope.query_string + "*";
-        $http({method: 'POST',
-            url: 'search?status=' + $scope.status_aggs,
+        $http({
+            method: 'POST',
+            url: 'search',
             params: {
                 q: q,
-                //status: $scope.status_aggs,
-                aggs: JSON.stringify(selected_aggs)
+                filter: $scope.selected_filters
             }
         })
-
                 .success(function (data, status, headers, config) {
                     $scope.results = data;
 
@@ -71,24 +67,24 @@ app.controller('freeTextSearch', function ($scope, $http, predefined_aggs) {
                     }
                 })
                 .error(function (data, status, headers, config) {
-                    $scope.log = 'Error occured while querying';
+                    $scope.log = 'Error occured while querying' + data;
                 });
     };
     //Suggest endpoint
     $scope.auto_complete = function () {
         var q = "";
         $scope.query_string === undefined ? q = "" : q = $scope.query_string;
-        $http({method: 'POST', url: 'suggest?q=' + q})
+        $http({
+            method: 'POST', 
+            url: 'suggest?q=' + q
+         })
                 .success(function (data, status, headers, config) {
                     $scope.suggestion_list = data;
                 })
                 .error(function (data, status, headers, config) {
                     $scope.log = 'Error occured while querying';
                 });
-    };
-
-    $scope.add_aggregations = function () {
-        $scope.selected_aggregations = [];//Get Values from users
-        $scope.query_search();
-    };
-});
+     };     
+            //Call this function on pageload
+            $scope.query_search();
+  });
