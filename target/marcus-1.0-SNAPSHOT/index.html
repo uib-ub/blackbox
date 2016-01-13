@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html ng-app="marcus" lang="no">
+<html  ng-app="marcus" lang="no">
     <head>
         <meta charset="utf-8">
         <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
@@ -12,11 +12,6 @@
         <link rel="stylesheet" href="js/lib/typeahead/css/main.css">
         <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" />
         <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap-theme.min.css" />
-        <!--base target="_blank"-->
-        <!--script>
-            angular.module('marcus', [])
-           .constant('predefined_aggs','[{"field": "status", "size": 15} , {"field" : "assigned_to"}]'); 
-        </script-->
     </head>
     <body>
         <div id="searchController"  ng-controller="freeTextSearch">
@@ -92,7 +87,7 @@
             <div class="EmptyMessage">Your search turned up 0 results.</div>
         </script>
         
-        <!--JavaScript files  -->
+        <!--JavaScript files -->
         <script src="js/lib/typeahead/js/handlebars.js"></script>
         <script src="https://code.jquery.com/jquery-1.11.3.min.js"></script>
         <script src="js/lib/typeahead/js/jquery.xdomainrequest.min.js"></script>
@@ -102,5 +97,16 @@
         <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
         <script src="js/marcus-controller.js"></script>
         <script src="js/checklist-directive.js"></script>
+        
+        <!--These are constants for this particular page-->
+        <script>
+                   angular.module("settings", [])
+                   .constant("mySetting",{
+                       index: ["admin", "ska"],
+                       type : ["invoice"],
+                       facets: [{"field": "status", "size": 15},{"field" : "assigned_to"}]
+           });
+        </script>
+    
     </body>
 </html>

@@ -1,9 +1,9 @@
 'use strict';
 //Contoller file for Marcus-search system
 
-var app = angular.module('marcus', ["checklist-model"])
+var app = angular.module('marcus', ["checklist-model", "settings"]);
         //Predefined aggregations
-        .constant('predefined_aggs', '[{"field": "status", "size": 15} , {"field" : "assigned_to"}]');
+        //.constant('aggs', '[{"field": "status", "size": 15} , {"field" : "assigned_to"}]');
 
 /**app.controller('showAllResults',
  function ($scope, $http) {
@@ -31,7 +31,7 @@ var app = angular.module('marcus', ["checklist-model"])
  });**/
 
 
-app.controller('freeTextSearch', function ($scope, $http, $location, predefined_aggs) {
+app.controller('freeTextSearch', function ($scope, $http, $location, mySetting) {
     //See here: <http://vitalets.github.io/checklist-model/>
 
     
@@ -39,7 +39,7 @@ app.controller('freeTextSearch', function ($scope, $http, $location, predefined_
     $scope.getCheckedValue = function (field, filterValue) {
         return field + "." + filterValue;
     };
-    console.log("Predefined aggregations:" + predefined_aggs);
+    //alert("Predefined settings:" + JSON.stringify(mySettings));
     
     
     //Testing for location
@@ -52,10 +52,12 @@ app.controller('freeTextSearch', function ($scope, $http, $location, predefined_
         $scope.query_string === undefined ? q = "*" : q = $scope.query_string + "*";
         $http({
             method: 'POST',
-            url: 'search',
+            url: 'search?aggs=' + JSON.stringify(mySetting.facets),
             params: {
                 q: q,
-                filter: $scope.selected_filters
+                filter: $scope.selected_filters,
+                index : mySetting.index,
+                type : mySetting.type
             }
         })
                 .success(function (data, status, headers, config) {
@@ -76,7 +78,10 @@ app.controller('freeTextSearch', function ($scope, $http, $location, predefined_
         $scope.query_string === undefined ? q = "" : q = $scope.query_string;
         $http({
             method: 'POST', 
-            url: 'suggest?q=' + q
+            url: 'suggest',
+            params:{
+                q: q
+            }
          })
                 .success(function (data, status, headers, config) {
                     $scope.suggestion_list = data;

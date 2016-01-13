@@ -29,6 +29,6 @@ public interface SearchService {
     /**
      * Add Post Filters
      **/
-     public SearchResponse getAllDocuments(String queryStr, String indexName, String typeName, FilterBuilder filterBuilder);
+     public SearchResponse getAllDocuments(String queryStr, String[] indices, String[] types, FilterBuilder filterBuilder, String json);
 
 }
