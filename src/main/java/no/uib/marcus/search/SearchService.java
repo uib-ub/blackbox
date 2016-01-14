@@ -1,34 +1,32 @@
-
 package no.uib.marcus.search;
 
-import java.util.Map;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.index.query.FilterBuilder;
 
 /**
  *
- * @author  Hemed Ali
+ * @author Hemed Ali
  */
 public interface SearchService {
 
     /**
-     * Match all documents given the facet values
+     * Get all documents through all indices in the cluster
      */
-    public SearchResponse getAllDocuments(String indexName, String typeName, Map<String, String> facetMap);
+    public SearchResponse getAllDocuments();
 
     /**
      * Match all documents
      */
-    public SearchResponse getAllDocuments(String indexName, String typeName);
+    public SearchResponse getDocuments(String[] indices, String[] types, String aggs);
 
     /**
-     * Get All Documents using query string. 
+     * Get all Documents based on the query string.
      */
-     public SearchResponse getAllDocuments(String queryStr, String indexName, String typeName);
-     
+    public SearchResponse getDocuments(String queryStr, String[] indices, String[] types, String aggs);
+
     /**
-     * Add Post Filters
-     **/
-     public SearchResponse getAllDocuments(String queryStr, String[] indices, String[] types, FilterBuilder filterBuilder, String json);
+     *Get all documents based on the given parameters and then add post filters.
+     */
+    public SearchResponse getDocuments(String queryStr, String[] indices, String[] types, FilterBuilder filterBuilder, String json);
 
 }

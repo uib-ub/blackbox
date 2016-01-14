@@ -18,13 +18,15 @@ import org.elasticsearch.common.xcontent.XContentFactory;
  * @author Hemed Ali
  */
 @WebServlet(name = "SuggestionServlet", urlPatterns = {"/suggest"})
-public class SuggestionServlet extends HttpServlet {
+public class SuggestServlet extends HttpServlet {
 
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
-        String queryString = request.getParameter("q");        
+        request.setCharacterEncoding("UTF-8"); 
         response.setContentType("application/json;charset=UTF-8");
+        String queryString = request.getParameter("q");   
+        
         try (PrintWriter out = response.getWriter()) {
             Gson gson = new Gson();
             

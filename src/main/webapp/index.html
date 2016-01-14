@@ -34,13 +34,13 @@
                 <span class="links links-examples">
                     <a href="">Advanced search</a>
                 </span>
-                  <!--b>Selected Facets: </b>{{selected_aggs}} -->
+                  <b>Selected Facets: </b>{{selected_filters}} 
             </div>
             <!--div class="sticky-footer-push"></div-->
             <div class="search-results container-fluid">
                 <div class='row row-fluid'>
                     <div class="facets" ng-show="results.hasOwnProperty('aggregations')">
-                       <h4>Status</h4>
+                       <h3>Status</h3>
                        <ul class="nav nav-list">
                             <li ng-repeat="bucket in results.aggregations.status.buckets">
                                 <label class="checkbox">
@@ -49,11 +49,20 @@
                                 </label>
                             </li>
                         </ul>
-                       <h4>Assignee</h4>
+                       <h3>Assignee</h3>
                        <ul class="nav nav-list">
                             <li ng-repeat="bucket in results.aggregations.assigned_to.buckets">
                                 <label class="checkbox">
                                     <input type="checkbox" checklist-model="selected_filters" checklist-value="getCheckedValue('assigned_to', bucket.key)" ng-click="query_search()">
+                                    {{bucket.key}} ({{bucket.doc_count}})
+                                </label>
+                            </li>
+                        </ul>
+                       <h3>Customers</h3>
+                       <ul class="nav nav-list">
+                            <li ng-repeat="bucket in results.aggregations.customer_name.buckets">
+                                <label class="checkbox">
+                                    <input type="checkbox" checklist-model="selected_filters" checklist-value="getCheckedValue('customer_name', bucket.key)" ng-click="query_search()">
                                     {{bucket.key}} ({{bucket.doc_count}})
                                 </label>
                             </li>
@@ -102,9 +111,12 @@
         <script>
                    angular.module("settings", [])
                    .constant("mySetting",{
-                       index: ["admin", "ska"],
+                       index: ["admin"],
                        type : ["invoice"],
-                       facets: [{"field": "status", "size": 15},{"field" : "assigned_to"}]
+                       facets: [
+                           {"field": "status", "size": 15},
+                           {"field" : "assigned_to"}, 
+                           {"field": "customer_name" , "size" : 15}]
            });
         </script>
     

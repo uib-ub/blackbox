@@ -19,15 +19,17 @@ import org.elasticsearch.common.logging.ESLogger;
 import org.elasticsearch.common.logging.Loggers;
 import org.elasticsearch.index.query.BoolFilterBuilder;
 import org.elasticsearch.index.query.FilterBuilders;
-import org.elasticsearch.search.aggregations.AggregationBuilder;
-import org.elasticsearch.search.aggregations.AggregationBuilders;
 
-@WebServlet(name = "SearchServlet", urlPatterns = {"/search"})
+@WebServlet(
+        name = "SearchServlet", 
+        urlPatterns = {"/search"}
+)
 public class SearchServlet extends HttpServlet {
 private static final ESLogger logger = Loggers.getLogger(SearchServlet.class);
 
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+        request.setCharacterEncoding("UTF-8");
         response.setContentType("text/html;charset=UTF-8");
         String queryString = request.getParameter("q");
         String[] selectedFilters = request.getParameterValues("filter");
@@ -42,19 +44,15 @@ private static final ESLogger logger = Loggers.getLogger(SearchServlet.class);
         
         try (PrintWriter out = response.getWriter()) 
         {   
-            
-            logger.info("JSON string: " + aggs);
-            
-            
             if (queryString == null || queryString.isEmpty()) 
             {
                 logger.info("Sending match_all query");
-                searchResponse = service.getAllDocuments("admin", "invoice");
+                searchResponse = service.getDocuments(indices, types, aggs);
             }
             else if (selectedFilters == null || selectedFilters.length == 0) 
             {  
                logger.info("No selected filters, sending only query_string");
-               searchResponse = service.getAllDocuments(queryString, "admin", "invoice"); 
+               searchResponse = service.getDocuments(queryString, indices, types, aggs); 
             } 
             else 
             {   
@@ -68,9 +66,7 @@ private static final ESLogger logger = Loggers.getLogger(SearchServlet.class);
                        postFilter.must(FilterBuilders.termsFilter(entry.getKey() , entry.getValue()));
                     }
                 } 
-                //Print what has been sent, only for testing.
-                //MarcusSearchService.testAggRes(postFilter);
-                searchResponse = service.getAllDocuments(queryString, indices, types, postFilter,aggs);
+                searchResponse = service.getDocuments(queryString, indices, types, postFilter, aggs);
             }
             out.write(searchResponse.toString());
         }

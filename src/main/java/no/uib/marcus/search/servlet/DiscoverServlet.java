@@ -3,7 +3,6 @@ package no.uib.marcus.search.servlet;
 
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.util.Map;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -11,35 +10,21 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import no.uib.marcus.search.SearchService;
 import no.uib.marcus.search.MarcusSearchService;
-import no.uib.marcus.search.client.ClientFactory;
 import org.elasticsearch.action.search.SearchResponse;
-import org.elasticsearch.client.Client;
 
 
 @WebServlet(name = "DiscoverServlet", urlPatterns = {"/discover"})
 public class DiscoverServlet extends HttpServlet {
 
-    /**
-     * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
-     * methods.
-     *
-     * @param request servlet request
-     * @param response servlet response
-     * @throws ServletException if a servlet-specific error occurs
-     * @throws IOException if an I/O error occurs
-     */
+
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+        request.setCharacterEncoding("UTF-8");
         response.setContentType("application/json;charset=UTF-8");
-        String indexName = "admin";
-        String typeName = "invoice";
-        String searchString = "Øyvind";
-        Client client = ClientFactory.getTransportClient();
         SearchService service = new MarcusSearchService();
-        Map<String,String> facetMap = null;
-        
+
         try (PrintWriter out = response.getWriter()) { 
-            SearchResponse searchResponse = service.getAllDocuments(indexName, typeName, facetMap); 
+            SearchResponse searchResponse = service.getAllDocuments(); 
             out.write(searchResponse.toString());
         }
     }
