@@ -114,7 +114,7 @@
                        index: ["admin"],
                        type : ["invoice"],
                        facets: [
-                           {"field": "status", "size": 15},
+                           {"field": "status", "size": 15, "filter_type": "post_filter", "operator" : "OR"},
                            {"field" : "assigned_to"}, 
                            {"field": "customer_name" , "size" : 15}]
            });

@@ -23,7 +23,8 @@ import org.elasticsearch.search.builder.SearchSourceBuilderException;
 
 public class MarcusSearchService implements SearchService {
 
-    static final ESLogger logger = Loggers.getLogger(MarcusSearchService.class);
+    private static final ESLogger logger = Loggers.getLogger(MarcusSearchService.class);
+    private static boolean flag = true;
      
     
     @Override
@@ -119,10 +120,11 @@ public class MarcusSearchService implements SearchService {
     /**
      * Get All Documents using query string.
      */
-    public SearchResponse getDocuments(String queryStr, String[] indices, String[] types, FilterBuilder postFilter, String aggs) {
+    public SearchResponse getDocuments(String queryStr, String[] indices, String[] types, FilterBuilder filter, String aggs) {
         SearchResponse response = null;
         SearchRequestBuilder searchRequest;
-        BoolFilterBuilder boolPostFilter = (BoolFilterBuilder)postFilter;
+        BoolFilterBuilder boolFilter = (BoolFilterBuilder)filter;
+
         try {
                 //Prepare search request
                 searchRequest = ClientFactory
@@ -132,15 +134,22 @@ public class MarcusSearchService implements SearchService {
                 if (types.length > 0) {
                     searchRequest.setTypes(types);
                 }
-
                 searchRequest
                         .setQuery(QueryBuilders
-                                .queryStringQuery(queryStr));
+                        .filteredQuery(QueryBuilders
+                                .queryStringQuery(queryStr), boolFilter));
                 
-                if (boolPostFilter.hasClauses()) {
+               /** 
+                //Post filter
+                searchRequest.setQuery(QueryBuilders.queryStringQuery(queryStr));
+                if (boolFilter.hasClauses()) {
                     searchRequest
-                            .setPostFilter(boolPostFilter);
+                            .setPostFilter(boolFilter);
                 }
+                * **/
+
+               
+                
                 //Append term aggregations to this request builder
                 appendTermsAggregation(searchRequest, aggs);
                  
@@ -211,7 +220,8 @@ public class MarcusSearchService implements SearchService {
         SearchRequestBuilder req = ClientFactory.getTransportClient()
                 .prepareSearch("_all")
                 //.setTypes("eddie")
-                .setQuery(QueryBuilders.matchAllQuery()) //.setQuery(QueryBuilders.filteredQuery(QueryBuilders.queryStringQuery("*"))
+               // .setQuery(QueryBuilders.matchAllQuery()) 
+                .setQuery(QueryBuilders.filteredQuery(QueryBuilders.queryStringQuery("ali"), fb))
                 //.setPostFilter(fb1)
                 ;
 
@@ -220,7 +230,7 @@ public class MarcusSearchService implements SearchService {
         //.addAggregation(AggregationBuilders.filter("filtered").filter(fb))
         //.addAggregation(AggregationBuilders.terms("status").field("status"))
         //.addAggregation(AggregationBuilders.terms("assigned_to").field("assigned_to"));
-        System.out.println("Request: " + req.execute().actionGet());
+        System.out.println("Request: " + req.toString());
         //System.out.println(aggregation);
     }
 

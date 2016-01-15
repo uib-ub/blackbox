@@ -1,7 +1,7 @@
 D:\Development\marcus-blackbox\src\main\java\no\uib\marcus\search\SearchService.java
-D:\Development\marcus-blackbox\src\main\java\no\uib\marcus\search\servlet\SuggestionServlet.java
 D:\Development\marcus-blackbox\src\main\java\no\uib\marcus\search\servlet\SearchServlet.java
 D:\Development\marcus-blackbox\src\main\java\no\uib\marcus\search\MarcusSearchService.java
+D:\Development\marcus-blackbox\src\main\java\no\uib\marcus\search\servlet\SuggestServlet.java
 D:\Development\marcus-blackbox\src\main\java\no\uib\marcus\search\client\ClientFactory.java
 D:\Development\marcus-blackbox\src\main\java\no\uib\marcus\search\servlet\DiscoverServlet.java
 D:\Development\marcus-blackbox\src\main\java\no\uib\marcus\search\Suggestion.java

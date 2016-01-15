@@ -19,14 +19,14 @@ public class Suggestion {
         SuggestResponse suggestResponse = null;
         
         try {
-            suggestionsBuilder.text(text);
-            suggestionsBuilder.field(suggestField);
+                suggestionsBuilder.text(text);
+                suggestionsBuilder.field(suggestField);
 
-             suggestResponse = ClientFactory.getTransportClient()
-                    .prepareSuggest(indexType)
-                    .addSuggestion(suggestionsBuilder)
-                    .execute()
-                    .actionGet();
+                 suggestResponse = ClientFactory.getTransportClient()
+                        .prepareSuggest(indexType)
+                        .addSuggestion(suggestionsBuilder)
+                        .execute()
+                        .actionGet();
 
         } catch (Exception e) {
             e.getLocalizedMessage();
@@ -37,18 +37,18 @@ public class Suggestion {
     public static Set<String> getSuggestions(String text, String indexType, String suggestField) {
         Set<String> items = new HashSet<>();
         try {
-            SuggestResponse suggestResponse = getSuggestResponse(text, indexType, suggestField);
-            Iterator<? extends Suggest.Suggestion.Entry.Option> iterator = suggestResponse
-                    .getSuggest()
-                    .getSuggestion("suggest_me")
-                    .iterator()
-                    .next()
-                    .getOptions()
-                    .iterator();
+                SuggestResponse suggestResponse = getSuggestResponse(text, indexType, suggestField);
+                Iterator<? extends Suggest.Suggestion.Entry.Option> iterator = suggestResponse
+                        .getSuggest()
+                        .getSuggestion("suggest_me")
+                        .iterator()
+                        .next()
+                        .getOptions()
+                        .iterator();
 
-            while (iterator.hasNext()) {
-                Suggest.Suggestion.Entry.Option next = iterator.next();
-                items.add(next.getText().string());
+                while (iterator.hasNext()) {
+                    Suggest.Suggestion.Entry.Option next = iterator.next();
+                    items.add(next.getText().string());
             }
         } catch (Exception e) {
             e.getLocalizedMessage();

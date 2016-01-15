@@ -18,6 +18,7 @@ import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.common.logging.ESLogger;
 import org.elasticsearch.common.logging.Loggers;
 import org.elasticsearch.index.query.BoolFilterBuilder;
+import org.elasticsearch.index.query.FilterBuilder;
 import org.elasticsearch.index.query.FilterBuilders;
 
 @WebServlet(
@@ -58,12 +59,14 @@ private static final ESLogger logger = Loggers.getLogger(SearchServlet.class);
             {   
                 filterMap = getFilterMap(selectedFilters);
                 postFilter = FilterBuilders.boolFilter();
+                FilterBuilder b = null;
 
                 for(Map.Entry<String,List> entry : filterMap.entrySet())
                 {
                     if(!entry.getValue().isEmpty())
                     {
                        postFilter.must(FilterBuilders.termsFilter(entry.getKey() , entry.getValue()));
+                       //b = FilterBuilders.boolFilter().should(FilterBuilders.termsFilter(entry.getKey() , entry.getValue()));
                     }
                 } 
                 searchResponse = service.getDocuments(queryString, indices, types, postFilter, aggs);
