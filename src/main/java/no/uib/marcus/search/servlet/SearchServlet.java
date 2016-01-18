@@ -40,7 +40,7 @@ private static final ESLogger logger = Loggers.getLogger(SearchServlet.class);
         SearchService service = new MarcusSearchService();
         Gson gson = new Gson();
         SearchResponse searchResponse;
-        BoolFilterBuilder postFilter;
+        BoolFilterBuilder boolFilter;
         Map<String,List> filterMap;
         
         try (PrintWriter out = response.getWriter()) 
@@ -58,18 +58,18 @@ private static final ESLogger logger = Loggers.getLogger(SearchServlet.class);
             else 
             {   
                 filterMap = getFilterMap(selectedFilters);
-                postFilter = FilterBuilders.boolFilter();
+                boolFilter = FilterBuilders.boolFilter();
                 FilterBuilder b = null;
 
                 for(Map.Entry<String,List> entry : filterMap.entrySet())
                 {
                     if(!entry.getValue().isEmpty())
                     {
-                       postFilter.must(FilterBuilders.termsFilter(entry.getKey() , entry.getValue()));
+                       boolFilter.must(FilterBuilders.termsFilter(entry.getKey(),entry.getValue()));
                        //b = FilterBuilders.boolFilter().should(FilterBuilders.termsFilter(entry.getKey() , entry.getValue()));
                     }
                 } 
-                searchResponse = service.getDocuments(queryString, indices, types, postFilter, aggs);
+                searchResponse = service.getDocuments(queryString, indices, types, boolFilter, aggs);
             }
             out.write(searchResponse.toString());
         }
@@ -105,6 +105,31 @@ private static final ESLogger logger = Loggers.getLogger(SearchServlet.class);
         }
         return filters;
     }
+        
+        //Build AND filter
+        private BoolFilterBuilder getAND (String[] selectedFilters) {
+        BoolFilterBuilder andFilter = FilterBuilders.boolFilter();
+        try{
+            for (String entry : selectedFilters) 
+            {
+                if (entry.lastIndexOf(".") != -1) 
+                {
+                    //Get the index for the last occurence of a dot
+                    int lastIndex = entry.lastIndexOf(".");
+                    String key = entry.substring(0, lastIndex).trim();
+                    String value = entry.substring(lastIndex + 1, entry.length()).trim();
+                    andFilter.must(FilterBuilders.termFilter(key, value));
+                    
+                }
+            }
+        }
+        catch(Exception ex)
+        {
+            logger.error("Exception occured on processing selected aggregations: " + ex.getLocalizedMessage());
+        }
+        return andFilter;
+    }
+    
     
 
     @Override

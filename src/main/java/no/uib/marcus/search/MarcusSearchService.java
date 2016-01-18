@@ -19,6 +19,7 @@ import org.elasticsearch.index.query.FilterBuilders;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.search.aggregations.AggregationBuilder;
 import org.elasticsearch.search.aggregations.AggregationBuilders;
+import org.elasticsearch.search.aggregations.bucket.terms.Terms.Order;
 import org.elasticsearch.search.builder.SearchSourceBuilderException;
 
 public class MarcusSearchService implements SearchService {
@@ -102,6 +103,7 @@ public class MarcusSearchService implements SearchService {
             //Set query
             searchRequest.setQuery(QueryBuilders
                     .queryStringQuery(queryStr));
+            
             //Append term aggregations to this request builder
             appendTermsAggregation(searchRequest, aggs);
 
@@ -135,9 +137,7 @@ public class MarcusSearchService implements SearchService {
                     searchRequest.setTypes(types);
                 }
                 searchRequest
-                        .setQuery(QueryBuilders
-                        .filteredQuery(QueryBuilders
-                                .queryStringQuery(queryStr), boolFilter));
+                        .setQuery(QueryBuilders.filteredQuery(QueryBuilders.queryStringQuery(queryStr), boolFilter));
                 
                /** 
                 //Post filter
@@ -172,20 +172,35 @@ public class MarcusSearchService implements SearchService {
     private SearchRequestBuilder appendTermsAggregation(SearchRequestBuilder req, String json) throws Exception {
         JsonElement el = new JsonParser().parse(json);
         for (JsonElement je : el.getAsJsonArray()) {
-            JsonObject o = je.getAsJsonObject();
-
-            if (o.has("field")) {
-                int size = 10;
-                String field = o.get("field").getAsString();
-
-                if (o.has("size")) {
-                    size = o.get("size").getAsInt();
+            JsonObject facet = je.getAsJsonObject();
+            if (facet.has("field")) {
+                    //Default size
+                    int size = 10;
+                    //Default order: count descending
+                    Order order = Order.count(false);
+                    String field = facet.get("field").getAsString();
+                    //Set size
+                    if (facet.has("size")) {
+                        size = facet.get("size").getAsInt();
+                    }
+                
+                //Set order
+                if(facet.has("order")){
+                      if(facet.get("order").getAsString().equalsIgnoreCase("count_asc")){
+                          order = Order.count(true);
+                       }
+                      else if(facet.get("order").getAsString().equalsIgnoreCase("term_asc")){
+                          order = Order.term(true);
+                       }
+                       else if(facet.get("order").getAsString().equalsIgnoreCase("term_desc")){
+                              order = Order.term(false);
+                       }
                 }
                 req.addAggregation(AggregationBuilders
                         .terms(field)
                         .field(field)
                         .size(size)
-                        //.order(Order.term(true))
+                        .order(order)
                         .minDocCount(0));
             }
 
