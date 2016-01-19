@@ -1,6 +1,8 @@
 package no.uib.marcus.search.servlet;
 
-import com.google.gson.Gson;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
@@ -38,7 +40,6 @@ private static final ESLogger logger = Loggers.getLogger(SearchServlet.class);
         String[] indices = request.getParameterValues("index");
         String[] types = request.getParameterValues("type");
         SearchService service = new MarcusSearchService();
-        Gson gson = new Gson();
         SearchResponse searchResponse;
         BoolFilterBuilder boolFilter;
         Map<String,List> filterMap;
@@ -57,18 +58,7 @@ private static final ESLogger logger = Loggers.getLogger(SearchServlet.class);
             } 
             else 
             {   
-                filterMap = getFilterMap(selectedFilters);
-                boolFilter = FilterBuilders.boolFilter();
-                FilterBuilder b = null;
-
-                for(Map.Entry<String,List> entry : filterMap.entrySet())
-                {
-                    if(!entry.getValue().isEmpty())
-                    {
-                       boolFilter.must(FilterBuilders.termsFilter(entry.getKey(),entry.getValue()));
-                       //b = FilterBuilders.boolFilter().should(FilterBuilders.termsFilter(entry.getKey() , entry.getValue()));
-                    }
-                } 
+                boolFilter = (BoolFilterBuilder)getBoolFilter(selectedFilters, aggs);
                 searchResponse = service.getDocuments(queryString, indices, types, boolFilter, aggs);
             }
             out.write(searchResponse.toString());
@@ -86,6 +76,7 @@ private static final ESLogger logger = Loggers.getLogger(SearchServlet.class);
                     int lastIndex = entry.lastIndexOf(".");
                     String key = entry.substring(0, lastIndex).trim();
                     String value = entry.substring(lastIndex + 1, entry.length()).trim();
+                    //Should we allow empty values? maybe :) 
                     if (!filters.containsKey(key)) 
                     {
                         List<String> valuesList = new ArrayList<>();
@@ -101,36 +92,77 @@ private static final ESLogger logger = Loggers.getLogger(SearchServlet.class);
         }
         catch(Exception ex)
         {
-            logger.error("Exception occured on processing selected aggregations: " + ex.getLocalizedMessage());
+            logger.error("Exception occured while constructing a map from selected filters: " + ex.getMessage());
         }
         return filters;
     }
         
-        //Build AND filter
-        private BoolFilterBuilder getAND (String[] selectedFilters) {
-        BoolFilterBuilder andFilter = FilterBuilders.boolFilter();
+        /**
+         * A method for building BoolFilter based on the aggregation settings.
+        **/
+        private FilterBuilder getBoolFilter (String[] selectedFilters , String aggregations) {
+        Map<String,List> filterMap = getFilterMap(selectedFilters);
+        BoolFilterBuilder boolFilter = FilterBuilders.boolFilter();
         try{
-            for (String entry : selectedFilters) 
+            for(Map.Entry<String,List> entry : filterMap.entrySet())
             {
-                if (entry.lastIndexOf(".") != -1) 
-                {
-                    //Get the index for the last occurence of a dot
-                    int lastIndex = entry.lastIndexOf(".");
-                    String key = entry.substring(0, lastIndex).trim();
-                    String value = entry.substring(lastIndex + 1, entry.length()).trim();
-                    andFilter.must(FilterBuilders.termFilter(key, value));
-                    
+                if(!entry.getValue().isEmpty())
+                {    
+                   if(hasAND(entry.getKey(),aggregations))
+                   {
+                      logger.info("Constructing AND query for facet: "  + entry.getKey());
+                      for(Object value : entry.getValue())//Perform AND
+                      {  
+                          //A filter based on a term. If it is inside a must, it acts as "AND" filter
+                          boolFilter.must(FilterBuilders.termFilter(entry.getKey(), value));
+                      }
+                   }
+                   else//Perform OR filter
+                   {
+                    //Using "terms" filter based on several terms, matching on any of them
+                    //This acts as OR filter, when it is inside the must clause.
+                    boolFilter.must(FilterBuilders.termsFilter(entry.getKey(), entry.getValue()));
+                   }
                 }
-            }
+            } 
         }
         catch(Exception ex)
         {
-            logger.error("Exception occured on processing selected aggregations: " + ex.getLocalizedMessage());
+            logger.error("Exception occured on processing OR filter: " + ex.getLocalizedMessage());
         }
-        return andFilter;
+        return boolFilter;
     }
-    
-    
+       
+        /**
+         *  The method checks if the facets/aggregations contain AND operator.
+         *  If not specified, OR operator is used as a default.
+         * <b>
+         *  Note that the facets must be valid JSON array. For example 
+         *  [ {"field": "status", "size": 15, "operator" : "AND", "order": "term_asc"}, 
+         *  {"field" : "assigned_to" , "order" : "term_asc"}]
+         **/       
+        private boolean hasAND(String field, String aggregations){
+            try{
+                JsonElement facets = new JsonParser().parse(aggregations);
+                for (JsonElement e : facets.getAsJsonArray()) 
+                {
+                    JsonObject facet = e.getAsJsonObject();
+                    String currentField = facet.get("field").getAsString();
+                    String operator = facet.get("operator").getAsString();
+                    
+                    if(currentField.equals(field) && operator.equalsIgnoreCase("AND")){
+                      return true;
+                    }
+                }
+            }
+            catch(Exception e){
+                logger.error("Facets could not be processed. "
+                             + "Please check the syntax. "
+                             + "It should be a valid JSON array " + e.getMessage());
+                return false;
+            }
+           return false;
+        }
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)

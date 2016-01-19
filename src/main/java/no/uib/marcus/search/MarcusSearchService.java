@@ -202,6 +202,11 @@ public class MarcusSearchService implements SearchService {
                         .size(size)
                         .order(order)
                         .minDocCount(0));
+                
+                       /**req.addAggregation(AggregationBuilders
+                        .filter("agg")
+                        .filter(FilterBuilders.matchAllFilter()));
+                       **/
             }
 
         }
@@ -248,11 +253,27 @@ public class MarcusSearchService implements SearchService {
         System.out.println("Request: " + req.toString());
         //System.out.println(aggregation);
     }
+    
+    
+            private static boolean hasANDOperator(String field, String aggregations){
+
+                JsonElement facets = new JsonParser().parse(aggregations);
+                for (JsonElement e : facets.getAsJsonArray()) 
+                {
+                    JsonObject facet = e.getAsJsonObject();
+                    if(facet.get("field").getAsString().equals(field) && facet.get("operator").getAsString().equalsIgnoreCase("AND"))
+                    {
+                      return true;
+                    }
+                }
+            
+           return false;
+        }
 
     //Main method for easy debugging
     public static void main(String[] args) throws IOException, Exception {
-
-      
+         
+        String s = "[{\"field\": \"status\", \"size\": 15, \"operator\" : \"AND\", \"order\": \"term_asc\"}]";
         // System.out.println("Map baby: " + facetMap.toString());
         //System.out.println(getAll("admin", null));
         //System.out.println(getDocuments("ma", "admin" , "invoice", null));
@@ -260,7 +281,8 @@ public class MarcusSearchService implements SearchService {
         // String jsonString = gson.toJson(Suggestion.getSuggestions("m", "admin" , "suggest"));
         //System.out.println("List of suggestion :" + jsonString);
         //System.out.println("List of suggestion :" + Suggestion.getSuggestResponse("m", "admin" , "suggest"));
-        testAggRes(null);
+        //testAggRes(null);
+        System.out.println(hasANDOperator("status", s));
     }
 
 }
