@@ -18,8 +18,6 @@ import no.uib.marcus.search.SearchService;
 import no.uib.marcus.search.MarcusSearchService;
 import org.apache.log4j.Logger;
 import org.elasticsearch.action.search.SearchResponse;
-import org.elasticsearch.common.logging.ESLogger;
-import org.elasticsearch.common.logging.Loggers;
 import org.elasticsearch.index.query.BoolFilterBuilder;
 import org.elasticsearch.index.query.FilterBuilder;
 import org.elasticsearch.index.query.FilterBuilders;
@@ -61,7 +59,15 @@ private static final Logger logger = Logger.getLogger(SearchServlet.class);
             else 
             {   
                 boolFilter = (BoolFilterBuilder)getBoolFilter(selectedFilters, aggs);
-                searchResponse = service.getDocuments(queryString, indices, types, boolFilter, aggs);
+                
+                if(boolFilter.hasClauses())
+                {
+                  searchResponse = service.getDocuments(queryString, indices, types, boolFilter, aggs);
+                }
+                else
+                {
+                  searchResponse = service.getDocuments(queryString, indices, types, aggs);   
+                }
             }
             out.write(searchResponse.toString());
         }
@@ -110,7 +116,7 @@ private static final Logger logger = Logger.getLogger(SearchServlet.class);
             {
                 if(!entry.getValue().isEmpty())
                 {    
-                   if(hasAND(entry.getKey(),aggregations))
+                   if(hasAND(entry.getKey(), aggregations))
                    {
                       logger.info("Constructing AND query for facet: "  + entry.getKey());
                       for(Object value : entry.getValue())//Perform AND
@@ -130,7 +136,7 @@ private static final Logger logger = Logger.getLogger(SearchServlet.class);
         }
         catch(Exception ex)
         {
-            logger.error("Exception occured on processing OR filter: " + ex.getLocalizedMessage());
+            logger.error("Exception occured on constructing OR filter" + ex.getLocalizedMessage());
         }
         return boolFilter;
     }
@@ -144,25 +150,28 @@ private static final Logger logger = Logger.getLogger(SearchServlet.class);
          *  {"field" : "assigned_to" , "order" : "term_asc"}]
          **/       
         private boolean hasAND(String field, String aggregations){
-            try{
+           try{
                 JsonElement facets = new JsonParser().parse(aggregations);
                 for (JsonElement e : facets.getAsJsonArray()) 
                 {
                     JsonObject facet = e.getAsJsonObject();
-                    String currentField = facet.get("field").getAsString();
-                    String operator = facet.get("operator").getAsString();
-                    
-                    if(currentField.equals(field) && operator.equalsIgnoreCase("AND")){
-                      return true;
+                    if(facet.has("field") && facet.has("operator"))
+                    {   
+                        String currentField = facet.get("field").getAsString();
+                        String operator = facet.get("operator").getAsString();
+                        if(currentField.equals(field) && operator.equalsIgnoreCase("AND"))
+                        {
+                          return true;
+                        }
                     }
                 }
-            }
+           }
             catch(Exception e){
                 logger.error("Facets could not be processed. "
                              + "Please check the syntax. "
-                             + "It should be a valid JSON array " + e.getMessage());
+                             + "It should be a valid JSON array: " + aggregations);
                 return false;
-            }
+           }
            return false;
         }
 

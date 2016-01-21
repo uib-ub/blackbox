@@ -116,8 +116,8 @@
                        type : ["invoice"],
                        facets: [
                            {"field": "status", "size": 15, "filter_type": "post_filter", "operator" : "AND", "order": "count_asc"},
-                           {"field" : "assigned_to" , "order" : "term_asc", "operator": "OR"}, 
-                           {"field": "customer_name" , "size" : 5, "order" : "count_desc"}]
+                           {"field" : "assigned_to" , "order" : "term_asc"}, 
+                           {"field": "customer_name" , "size" : 5, "operator": "OR", "order" : "count_desc"}]
            });
         </script>
     

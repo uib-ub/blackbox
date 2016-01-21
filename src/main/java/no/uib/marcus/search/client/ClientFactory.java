@@ -2,6 +2,8 @@
 package no.uib.marcus.search.client;
 
 import java.net.InetAddress;
+import org.apache.log4j.Logger;
+import org.elasticsearch.action.admin.cluster.health.ClusterHealthResponse;
 import org.elasticsearch.client.Client;
 import org.elasticsearch.client.transport.TransportClient;
 import org.elasticsearch.common.settings.ImmutableSettings;
@@ -19,9 +21,10 @@ import org.elasticsearch.common.transport.InetSocketTransportAddress;
  
 public class ClientFactory {
     
+    private static final Logger logger = Logger.getLogger(ClientFactory.class);
     private static Client client; 
     
-       /** We want to prevent direct instantiation of this class **/   
+       /** We want to prevent direct instantiation of this class, thus we create private constructor **/   
         private ClientFactory(){}
     
         private static Client createTransportClient(){
@@ -37,10 +40,12 @@ public class ClientFactory {
                        */
                       .addTransportAddress(
                               new InetSocketTransportAddress(InetAddress.getLocalHost(), 9300));
-                      //ClusterHealthResponse hr = client.admin().cluster().prepareHealth().get();  
+                    
+                      ClusterHealthResponse hr = client.admin().cluster().prepareHealth().get();  
+                      logger.info("Elasticsearch detected. " + hr.toString());
             }
             catch(Exception e){
-                e.getLocalizedMessage();
+                logger.error("Unable to communicate with Elasticsearch. Is it running? " + e.getLocalizedMessage());
             }
 
             return client;

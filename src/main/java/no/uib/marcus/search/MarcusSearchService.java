@@ -16,6 +16,7 @@ import org.elasticsearch.common.xcontent.XContentFactory;
 import org.elasticsearch.index.query.BoolFilterBuilder;
 import org.elasticsearch.index.query.FilterBuilder;
 import org.elasticsearch.index.query.FilterBuilders;
+import org.elasticsearch.index.query.FilteredQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.search.aggregations.AggregationBuilder;
 import org.elasticsearch.search.aggregations.AggregationBuilders;
@@ -136,8 +137,11 @@ public class MarcusSearchService implements SearchService {
                 if (types.length > 0) {
                     searchRequest.setTypes(types);
                 }
+                
                 searchRequest
-                        .setQuery(QueryBuilders.filteredQuery(QueryBuilders.queryStringQuery(queryStr), boolFilter));
+                        .setQuery(QueryBuilders
+                                .filteredQuery(QueryBuilders
+                                        .queryStringQuery(queryStr), boolFilter));
                 
                /** 
                 //Post filter
@@ -253,22 +257,7 @@ public class MarcusSearchService implements SearchService {
         System.out.println("Request: " + req.toString());
         //System.out.println(aggregation);
     }
-    
-    
-            private static boolean hasANDOperator(String field, String aggregations){
 
-                JsonElement facets = new JsonParser().parse(aggregations);
-                for (JsonElement e : facets.getAsJsonArray()) 
-                {
-                    JsonObject facet = e.getAsJsonObject();
-                    if(facet.get("field").getAsString().equals(field) && facet.get("operator").getAsString().equalsIgnoreCase("AND"))
-                    {
-                      return true;
-                    }
-                }
-            
-           return false;
-        }
 
     //Main method for easy debugging
     public static void main(String[] args) throws IOException, Exception {
@@ -282,7 +271,7 @@ public class MarcusSearchService implements SearchService {
         //System.out.println("List of suggestion :" + jsonString);
         //System.out.println("List of suggestion :" + Suggestion.getSuggestResponse("m", "admin" , "suggest"));
         //testAggRes(null);
-        System.out.println(hasANDOperator("status", s));
+        //System.out.println(hasANDOperator("status", s));
     }
 
 }
