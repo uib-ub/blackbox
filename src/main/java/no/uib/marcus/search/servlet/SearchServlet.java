@@ -16,6 +16,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import no.uib.marcus.search.SearchService;
 import no.uib.marcus.search.MarcusSearchService;
+import org.apache.log4j.Logger;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.common.logging.ESLogger;
 import org.elasticsearch.common.logging.Loggers;
@@ -28,7 +29,8 @@ import org.elasticsearch.index.query.FilterBuilders;
         urlPatterns = {"/search"}
 )
 public class SearchServlet extends HttpServlet {
-private static final ESLogger logger = Loggers.getLogger(SearchServlet.class);
+//private static final ESLogger logger = Loggers.getLogger(SearchServlet.class);
+private static final Logger logger = Logger.getLogger(SearchServlet.class);
 
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
