@@ -2,13 +2,16 @@
 package no.uib.marcus.search.client;
 
 import java.net.InetAddress;
+import java.net.UnknownHostException;
 import org.apache.log4j.Logger;
+import org.elasticsearch.ElasticsearchException;
 import org.elasticsearch.action.admin.cluster.health.ClusterHealthResponse;
 import org.elasticsearch.client.Client;
 import org.elasticsearch.client.transport.TransportClient;
 import org.elasticsearch.common.settings.ImmutableSettings;
 import org.elasticsearch.common.settings.Settings;
 import org.elasticsearch.common.transport.InetSocketTransportAddress;
+import org.elasticsearch.transport.ConnectTransportException;
 
 /**
  * A singleton class that connect to Elasticsearch cluster through Transport client
@@ -42,10 +45,10 @@ public class ClientFactory {
                               new InetSocketTransportAddress(InetAddress.getLocalHost(), 9300));
                     
                       ClusterHealthResponse hr = client.admin().cluster().prepareHealth().get();  
-                      logger.info("Elasticsearch detected. " + hr.toString());
+                      logger.info("Connected to Elasticsearch : " + hr);
             }
-            catch(Exception e){
-                logger.error("Unable to communicate with Elasticsearch. Is it running? " + e.getLocalizedMessage());
+            catch(UnknownHostException | ConnectTransportException e){
+                logger.error("Unable to connect to Elasticsearch. Is it running? " + e.getLocalizedMessage());
             }
 
             return client;
