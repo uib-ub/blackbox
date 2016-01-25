@@ -1,33 +1,46 @@
 package no.uib.marcus.search.servlet;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import no.uib.marcus.search.SearchService;
-import no.uib.marcus.search.MarcusSearchService;
+
 import org.apache.log4j.Logger;
+import org.elasticsearch.action.count.CountResponse;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.index.query.BoolFilterBuilder;
 import org.elasticsearch.index.query.FilterBuilder;
 import org.elasticsearch.index.query.FilterBuilders;
+import org.elasticsearch.index.query.QueryBuilders;
+
+import no.uib.marcus.search.SearchService;
+import no.uib.marcus.search.MarcusSearchService;
+import no.uib.marcus.search.client.ClientFactory;
+
+/**
+ * @author Hemed Al Ruwehy (hemed.ruwehy@uib.no)
+ * 2016-01-24, University of Bergen Library
+ **/
 
 @WebServlet(
         name = "SearchServlet", 
         urlPatterns = {"/search"}
 )
 public class SearchServlet extends HttpServlet {
-//private static final ESLogger logger = Loggers.getLogger(SearchServlet.class);
 private static final Logger logger = Logger.getLogger(SearchServlet.class);
 
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
@@ -69,10 +82,15 @@ private static final Logger logger = Logger.getLogger(SearchServlet.class);
                   searchResponse = service.getDocuments(queryString, indices, types, aggs);   
                 }
             }
-            out.write(searchResponse.toString());
+            //After getting the response, add extra field to every bucket in the aggregations
+            String  responseJson = processAggregations(searchResponse, indices, types);
+            out.write(responseJson);
         }
     }
     
+    /**
+     * A method to get a map based on the selected filters.
+     **/
     private Map getFilterMap(String[] selectedFilters) {
         Map<String, List<String>> filters = new HashMap<>();
         try{
@@ -173,6 +191,46 @@ private static final Logger logger = Logger.getLogger(SearchServlet.class);
                 return false;
            }
            return false;
+        }
+        
+        /**
+         * A method to add extra field to every bucket in the terms aggregations.
+         * The extra field is queried independently from the Elasticsearch.
+         * <b>
+         * This method is in experimentation phase and maybe removed in the future releases.
+         **/
+        private String processAggregations(SearchResponse response, String [] indices, String... types){
+            JsonElement responseJson = new JsonParser().parse(response.toString());
+            Gson gson = new GsonBuilder().setPrettyPrinting().create();
+            
+            JsonObject aggs = responseJson.getAsJsonObject().get("aggregations").getAsJsonObject();
+            //Iterate throgh all the terms
+            for (Map.Entry<String, JsonElement> entry : aggs.entrySet()) 
+            {
+                //Get term 
+                String term = entry.getKey();
+                //Get value
+                JsonObject terms = entry.getValue().getAsJsonObject();
+                //Iterate throgh array of buckets of this term.
+                for (JsonElement element : terms.getAsJsonArray("buckets")) 
+                {
+                    JsonObject bucket = element.getAsJsonObject();
+                    String value = bucket.get("key").getAsString();
+
+                    //Query Elasticsearch independently for count of the specified term.
+                    CountResponse countResponse = ClientFactory
+                            .getTransportClient()
+                            .prepareCount()
+                            .setIndices(indices)
+                            .setTypes(types)
+                            .setQuery(QueryBuilders.termQuery(term, value))
+                            .execute()
+                            .actionGet();
+                    bucket.addProperty("total_doc_count", countResponse.getCount());
+                }
+
+            }
+           return  gson.toJson(responseJson);
         }
 
     @Override

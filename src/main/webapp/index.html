@@ -34,7 +34,7 @@
                 <span class="links links-examples">
                     <a href="">Advanced search</a>
                 </span>
-                  <!--b>Selected Facets: </b>{{selected_filters}} --> 
+                  <!--b>Aggregations: </b>{{aggregations}} -->
             </div>
             <!--div class="sticky-footer-push"></div-->
             <div class="search-results container-fluid">
@@ -45,7 +45,7 @@
                             <li ng-repeat="bucket in results.aggregations.status.buckets">
                                 <label class="checkbox">
                                     <input type="checkbox" checklist-model="selected_filters" checklist-value="getCheckedValue('status', bucket.key)" ng-click="query_search()">
-                                    {{bucket.key}} ({{bucket.doc_count}})
+                                    {{bucket.key}} ({{bucket.doc_count}}/{{bucket.total_doc_count}})
                                 </label>
                             </li>
                         </ul>
@@ -54,7 +54,7 @@
                             <li ng-repeat="bucket in results.aggregations.assigned_to.buckets">
                                 <label class="checkbox">
                                     <input type="checkbox" checklist-model="selected_filters" checklist-value="getCheckedValue('assigned_to', bucket.key)" ng-click="query_search()">
-                                    {{bucket.key}} ({{bucket.doc_count}})
+                                    {{bucket.key}} ({{bucket.doc_count}}/{{bucket.total_doc_count}})
                                 </label>
                             </li>
                         </ul>
@@ -63,7 +63,7 @@
                             <li ng-repeat="bucket in results.aggregations.customer_name.buckets">
                                 <label class="checkbox">
                                     <input type="checkbox" checklist-model="selected_filters" checklist-value="getCheckedValue('customer_name', bucket.key)" ng-click="query_search()">
-                                    {{bucket.key}} ({{bucket.doc_count}})
+                                    {{bucket.key}} ({{bucket.doc_count}}/{{bucket.total_doc_count}})
                                 </label>
                                  <!--input type="hidden" name="bucket " value="bucket.doc_count"-->
                             </li>
@@ -115,9 +115,9 @@
                        index: ["admin"],
                        type : ["invoice"],
                        facets: [
-                           {"field": "status", "size": 15, "filter_type": "post_filter", "operator" : "AND", "order": "count_asc"},
+                           {"field": "status", "size": 15, "filter_type": "post_filter", "operator" : "AND", "order": "term_asc"},
                            {"field" : "assigned_to" , "order" : "term_asc"}, 
-                           {"field": "customer_name" , "size" : 5, "operator": "OR", "order" : "count_desc"}]
+                           {"field": "customer_name" , "size" : 10, "operator": "OR", "order" : "count_desc"}]
            });
         </script>
     

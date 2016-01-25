@@ -1,5 +1,7 @@
 package no.uib.marcus.search;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
@@ -7,6 +9,8 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import no.uib.marcus.search.client.ClientFactory;
+import org.elasticsearch.action.count.CountRequestBuilder;
+import org.elasticsearch.action.count.CountResponse;
 import org.elasticsearch.action.search.SearchRequestBuilder;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.common.logging.ESLogger;
@@ -16,7 +20,6 @@ import org.elasticsearch.common.xcontent.XContentFactory;
 import org.elasticsearch.index.query.BoolFilterBuilder;
 import org.elasticsearch.index.query.FilterBuilder;
 import org.elasticsearch.index.query.FilterBuilders;
-import org.elasticsearch.index.query.FilteredQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.search.aggregations.AggregationBuilder;
 import org.elasticsearch.search.aggregations.AggregationBuilders;
@@ -36,7 +39,7 @@ public class MarcusSearchService implements SearchService {
             //Prepare search request across all indices
            response = ClientFactory
                     .getTransportClient()
-                    .prepareSearch("_all")
+                    .prepareSearch()
                     .execute()
                     .actionGet();
 
@@ -60,9 +63,13 @@ public class MarcusSearchService implements SearchService {
             //Prepare search request
             searchRequest = ClientFactory
                     .getTransportClient()
-                    .prepareSearch(indices);
+                    .prepareSearch();
+            //Set indices
+            if (indices != null && indices.length > 0) {
+                searchRequest.setIndices(indices);
+            }
             //Set types
-            if (types.length > 0) {
+            if (types != null && types.length > 0) {
                 searchRequest.setTypes(types);
             }
             //Set query
@@ -76,7 +83,7 @@ public class MarcusSearchService implements SearchService {
                     .actionGet();
 
         } catch (SearchSourceBuilderException se) {
-            logger.error("Exception on preparing the request: " + se.getDetailedMessage());
+            logger.error("Exception while building search request: " + se.getDetailedMessage());
         } catch (Exception ex) {
             logger.error("Exception: " + ex.getLocalizedMessage());
         }
@@ -87,6 +94,13 @@ public class MarcusSearchService implements SearchService {
     /**
      * Get All Documents using query string. See this:
      * See http://stackoverflow.com/questions/23807314/multiple-filters-and-an-aggregate-in-elasticsearch
+     * <b />
+     * @param queryStr - a query string 
+     * @param indices - one or more indices
+     * @param types - one or more types
+     * @param aggs - predefined aggregations as a JSON string 
+     * @return a SearchResponse
+     * 
      */
     @Override
     public SearchResponse getDocuments(String queryStr, String[] indices, String[] types, String aggs) {
@@ -96,9 +110,13 @@ public class MarcusSearchService implements SearchService {
             //Prepare search request
             searchRequest = ClientFactory
                     .getTransportClient()
-                    .prepareSearch(indices);
+                    .prepareSearch();
+            //Set indices
+            if (indices != null && indices.length > 0) {
+                searchRequest.setIndices(indices);
+            }
             //Set types
-            if (types.length > 0) {
+            if (types != null && types.length > 0) {
                 searchRequest.setTypes(types);
             }
             //Set query
@@ -123,18 +141,23 @@ public class MarcusSearchService implements SearchService {
     /**
      * Get All Documents using query string.
      */
+    @Override
     public SearchResponse getDocuments(String queryStr, String[] indices, String[] types, FilterBuilder filter, String aggs) {
         SearchResponse response = null;
         SearchRequestBuilder searchRequest;
         BoolFilterBuilder boolFilter = (BoolFilterBuilder)filter;
-
         try {
                 //Prepare search request
                 searchRequest = ClientFactory
                         .getTransportClient()
-                        .prepareSearch(indices);
+                        .prepareSearch();
 
-                if (types.length > 0) {
+                //Set indices
+                if (indices != null && indices.length > 0) {
+                    searchRequest.setIndices(indices);
+                }
+                //Set types
+                if (types != null && types.length > 0) {
                     searchRequest.setTypes(types);
                 }
                 
@@ -151,9 +174,6 @@ public class MarcusSearchService implements SearchService {
                             .setPostFilter(boolFilter);
                 }
                 * **/
-
-               
-                
                 //Append term aggregations to this request builder
                 appendTermsAggregation(searchRequest, aggs);
                  
@@ -173,49 +193,51 @@ public class MarcusSearchService implements SearchService {
         return response;
     }
 
-    private SearchRequestBuilder appendTermsAggregation(SearchRequestBuilder req, String json) throws Exception {
-        JsonElement el = new JsonParser().parse(json);
-        for (JsonElement je : el.getAsJsonArray()) {
-            JsonObject facet = je.getAsJsonObject();
-            if (facet.has("field")) {
-                    //Default size
-                    int size = 10;
-                    //Default order: count descending
-                    Order order = Order.count(false);
-                    String field = facet.get("field").getAsString();
-                    //Set size
-                    if (facet.has("size")) {
-                        size = facet.get("size").getAsInt();
-                    }
+    /**
+     * A method to append terms aggregations to the search request builder.
+     **/
+    private SearchRequestBuilder appendTermsAggregation(SearchRequestBuilder searchRequest, String aggregations) 
+            throws Exception {
+        JsonElement jsonElement = new JsonParser().parse(aggregations);
+        for (JsonElement facets : jsonElement.getAsJsonArray()) {
+            JsonObject currentFacet = facets.getAsJsonObject();
+            if (currentFacet.has("field")) {
+                String field = currentFacet.get("field").getAsString();
+                    
+                //Default size
+                int size = 10;
+                //Default order: count descending
+                Order order = Order.count(false);
+
+                //Set size
+                if (currentFacet.has("size")) {
+                    size = currentFacet.get("size").getAsInt();
+                }
                 
                 //Set order
-                if(facet.has("order")){
-                      if(facet.get("order").getAsString().equalsIgnoreCase("count_asc")){
+                if(currentFacet.has("order")){
+                      if(currentFacet.get("order").getAsString().equalsIgnoreCase("count_asc")){
                           order = Order.count(true);
                        }
-                      else if(facet.get("order").getAsString().equalsIgnoreCase("term_asc")){
+                      else if(currentFacet.get("order").getAsString().equalsIgnoreCase("term_asc")){
                           order = Order.term(true);
                        }
-                       else if(facet.get("order").getAsString().equalsIgnoreCase("term_desc")){
+                       else if(currentFacet.get("order").getAsString().equalsIgnoreCase("term_desc")){
                               order = Order.term(false);
                        }
                 }
-                req.addAggregation(AggregationBuilders
+                //Add aggregations to the search request builder
+                searchRequest.addAggregation(AggregationBuilders
                         .terms(field)
                         .field(field)
                         .size(size)
                         .order(order)
                         .minDocCount(0));
-                
-                       /**req.addAggregation(AggregationBuilders
-                        .filter("agg")
-                        .filter(FilterBuilders.matchAllFilter()));
-                       **/
             }
 
         }
 
-        return req;
+        return searchRequest;
     }
 
     //Testing Aggregations
@@ -228,8 +250,8 @@ public class MarcusSearchService implements SearchService {
         map.put("status", "go_to_gate");
         BoolFilterBuilder fb = (BoolFilterBuilder) FilterBuilders
                 .boolFilter()
-                .must(FilterBuilders.termFilter("status", "Sent"))
-                .must(FilterBuilders.termFilter("assigned_to", "Marianne Paasche"));
+                .must(FilterBuilders.termsFilter("status", "Estimate", "Draft"));
+                //.must(FilterBuilders.termFilter("assigned_to", "Marianne Paasche"));
 
         AggregationBuilder aggregation = AggregationBuilders
                 .filters("agg")
@@ -242,20 +264,63 @@ public class MarcusSearchService implements SearchService {
                 .endObject();
 
         SearchRequestBuilder req = ClientFactory.getTransportClient()
-                .prepareSearch("_all")
+                .prepareSearch()
                 //.setTypes("eddie")
                // .setQuery(QueryBuilders.matchAllQuery()) 
-                .setQuery(QueryBuilders.filteredQuery(QueryBuilders.queryStringQuery("ali"), fb))
+                .setQuery(QueryBuilders.filteredQuery(QueryBuilders.queryStringQuery("*"), fb))
                 //.setPostFilter(fb1)
-                ;
+               // .addAggregation(AggregationBuilders.global("_aggs")
+                .addAggregation((AggregationBuilders
+                   .terms("status")
+                   .field("status")))
+                
+                 .addAggregation(AggregationBuilders
+                   .terms("assigned_to")
+                   .field("assigned_to")
+                   );
+        
+        CountRequestBuilder cr = ClientFactory
+                .getTransportClient()
+                .prepareCount()
+                .setQuery(QueryBuilders.termQuery("status", "Sent"));
+        
+        SearchResponse res = req.execute().actionGet();
+        
+        JsonElement responseJson = new JsonParser().parse(res.toString());
+        Gson gson = new GsonBuilder().setPrettyPrinting().create();
+        JsonObject aggs = responseJson.getAsJsonObject().get("aggregations").getAsJsonObject();
+        //Iterate throgh all the terms
+        for (Map.Entry<String, JsonElement> entry : aggs.entrySet()) {
+            //Get the term's key
+            String field = entry.getKey();
+            //Get the value
+            JsonObject terms = entry.getValue().getAsJsonObject();
+            //Iterate throgh the array of bucket of this term.
+            for (JsonElement element : terms.getAsJsonArray("buckets")) {
+                JsonObject bucket = element.getAsJsonObject();
+                String value = bucket.get("key").getAsString();
 
+                //Query Elasticsearch independently
+                CountResponse countResponse = ClientFactory
+                        .getTransportClient()
+                        .prepareCount()
+                        .setQuery(QueryBuilders.termQuery(field, value))
+                        .execute()
+                        .actionGet();
+
+                bucket.addProperty("total_doc_count", countResponse.getCount());
+            }
+
+        }
+ 
         // appendTermsAggregation(req, json);
         //.addAggregation(aggregation)
         //.addAggregation(AggregationBuilders.filter("filtered").filter(fb))
         //.addAggregation(AggregationBuilders.terms("status").field("status"))
         //.addAggregation(AggregationBuilders.terms("assigned_to").field("assigned_to"));
-        System.out.println("Request: " + req.toString());
-        //System.out.println(aggregation);
+        //System.out.println("JSON Response: " +  gson.toJson(responseJson));
+        System.out.println("Response: " + cr.toString());
+        //System.out.println("Count: " + countRes.getCount());
     }
 
 
@@ -270,7 +335,7 @@ public class MarcusSearchService implements SearchService {
         // String jsonString = gson.toJson(Suggestion.getSuggestions("m", "admin" , "suggest"));
         //System.out.println("List of suggestion :" + jsonString);
         //System.out.println("List of suggestion :" + Suggestion.getSuggestResponse("m", "admin" , "suggest"));
-        //testAggRes(null);
+        testAggRes(null);
         //System.out.println(hasANDOperator("status", s));
     }
 

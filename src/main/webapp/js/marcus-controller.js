@@ -65,11 +65,21 @@ app.controller('freeTextSearch', function ($scope, $http, $location, mySetting) 
         })
                 .success(function (data, status, headers, config) {
                     $scope.results = data;
-
                     // If we have aggregations, store them in the scope.
-                    if (data.aggregations) {
-                        $scope.aggregations = data.aggregations;
-                    }
+                   /**if ($scope.results.hasOwnProperty('aggregations')) {
+                       //Append extra field to aggregations
+                       //var field = ["status" , "assigned_to"];
+                        var aggs = $scope.results.aggregations;
+                        var buckets = aggs.status.buckets;
+                        angular.forEach(buckets, function(value, key){
+                           var t = value.doc_count;
+                           if(value.doc_count > 0){
+                             t = value.doc_count 
+                           }
+                           value.total_doc_count = t;
+                        });
+                        $scope.aggregations = aggs;    
+                    }**/
                 })
                 .error(function (data, status, headers, config) {
                     $scope.log = 'Error occured while querying' + data;
