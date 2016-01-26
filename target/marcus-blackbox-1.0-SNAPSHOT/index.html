@@ -40,36 +40,41 @@
             <div class="search-results container-fluid">
                 <div class='row row-fluid'>
                     <div class="facets" ng-show="results.hasOwnProperty('aggregations')">
-                       <h3>Status</h3>
+                       <h3>Document Types</h3>
                        <ul class="nav nav-list">
-                            <li ng-repeat="bucket in results.aggregations.status.buckets">
-                                <label class="checkbox">
-                                    <input type="checkbox" checklist-model="selected_filters" checklist-value="getCheckedValue('status', bucket.key)" ng-click="query_search()">
-                                    {{bucket.key}} ({{bucket.doc_count}}/{{bucket.total_doc_count}})
+                            <li ng-repeat="bucket in results['aggregations']['type.exact']['buckets']">
+                                <label>
+                                    <input type="checkbox" checklist-model="selected_filters" checklist-value="getCheckedValue('type.exact', bucket.key)" ng-click="query_search()">
+                                    {{bucket.key}}
                                 </label>
+                                ({{bucket.doc_count}} of {{bucket.total_doc_count}})
                             </li>
                         </ul>
-                       <h3>Assignee</h3>
+                       <h3>Subjects</h3>
                        <ul class="nav nav-list">
-                            <li ng-repeat="bucket in results.aggregations.assigned_to.buckets">
-                                <label class="checkbox">
-                                    <input type="checkbox" checklist-model="selected_filters" checklist-value="getCheckedValue('assigned_to', bucket.key)" ng-click="query_search()">
-                                    {{bucket.key}} ({{bucket.doc_count}}/{{bucket.total_doc_count}})
+                            <li ng-repeat="bucket in results['aggregations']['subject.exact']['buckets']">
+                                <label>
+                                    <input type="checkbox" checklist-model="selected_filters" checklist-value="getCheckedValue('subject.exact', bucket.key)" ng-click="query_search()">
+                                    {{bucket.key}} 
                                 </label>
+                                ({{bucket.doc_count}} of {{bucket.total_doc_count}})
                             </li>
                         </ul>
                        <h3>Customers</h3>
                        <ul class="nav nav-list">
-                            <li ng-repeat="bucket in results.aggregations.customer_name.buckets">
-                                <label class="checkbox">
+                            <li ng-repeat="bucket in results['aggregations']['customer_name']['buckets']">
+                                <label>
                                     <input type="checkbox" checklist-model="selected_filters" checklist-value="getCheckedValue('customer_name', bucket.key)" ng-click="query_search()">
-                                    {{bucket.key}} ({{bucket.doc_count}}/{{bucket.total_doc_count}})
+                                    {{bucket.key}}
                                 </label>
+                                ({{bucket.doc_count}} of {{bucket.total_doc_count}})
                                  <!--input type="hidden" name="bucket " value="bucket.doc_count"-->
                             </li>
                         </ul>
                     </div>
-                
+                    <div>
+                       
+                    </div>
                 <div class="search-hits">
                     <h4 ng-show="results.hits.total > 0"> Total hits : {{results.hits.total}}</h4>
                     <ul>
@@ -81,8 +86,7 @@
                 </div>
             </div>
         </div>
-
-
+        
         <script id="result-template" type="text/x-handlebars-template">
             <div class="ProfileCard u-cf">
             <div class="ProfileCard-details">
@@ -113,10 +117,11 @@
                    angular.module("settings", [])
                    .constant("mySetting",{
                        index: ["admin"],
-                       type : ["invoice"],
+                       type : ["document", "invoice"],
                        facets: [
-                           {"field": "status", "size": 15, "filter_type": "post_filter", "operator" : "AND", "order": "term_asc"},
+                           {"field": "type.exact", "size": 5, "operator" : "OR", "order": "count_desc"},
                            {"field" : "assigned_to" , "order" : "term_asc"}, 
+                           {"field" : "subject.exact"},
                            {"field": "customer_name" , "size" : 10, "operator": "OR", "order" : "count_desc"}]
            });
         </script>

@@ -67,6 +67,7 @@ private static final Logger logger = Logger.getLogger(SearchServlet.class);
             else if (selectedFilters == null || selectedFilters.length == 0) 
             {  
                logger.info("No selected filters, sending only query_string");
+               logger.info("Index: " + indices + " types " + types);
                searchResponse = service.getDocuments(queryString, indices, types, aggs); 
             } 
             else 

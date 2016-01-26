@@ -250,7 +250,28 @@ public class MarcusSearchService implements SearchService {
         map.put("status", "go_to_gate");
         BoolFilterBuilder fb = (BoolFilterBuilder) FilterBuilders
                 .boolFilter()
-                .must(FilterBuilders.termsFilter("status", "Estimate", "Draft"));
+                //.must(FilterBuilders.termFilter("status", "Draft"))
+                .should(FilterBuilders
+                        .rangeFilter("created")
+                        .from("1915-01-01")
+                        .to(null)
+                        .includeLower(true)
+                        .includeUpper(true))
+                
+                 .should(FilterBuilders
+                        .rangeFilter("madeafter")
+                        .from("1915-01-01")
+                        .to(null)
+                        .includeLower(true)
+                        .includeUpper(true))
+                
+                 .should(FilterBuilders
+                        .rangeFilter("madebefore")
+                        .from(null)
+                        .to("2016-01-01")
+                        .includeLower(true)
+                        .includeUpper(true));
+        
                 //.must(FilterBuilders.termFilter("assigned_to", "Marianne Paasche"));
 
         AggregationBuilder aggregation = AggregationBuilders
@@ -265,19 +286,26 @@ public class MarcusSearchService implements SearchService {
 
         SearchRequestBuilder req = ClientFactory.getTransportClient()
                 .prepareSearch()
-                //.setTypes("eddie")
-               // .setQuery(QueryBuilders.matchAllQuery()) 
+                .setIndices("admin")
+                //.setTypes("invoice")
+                //.setQuery(QueryBuilders.matchAllQuery()) 
                 .setQuery(QueryBuilders.filteredQuery(QueryBuilders.queryStringQuery("*"), fb))
                 //.setPostFilter(fb1)
                // .addAggregation(AggregationBuilders.global("_aggs")
                 .addAggregation((AggregationBuilders
                    .terms("status")
                    .field("status")))
-                
+                   //.subAggregation(AggregationBuilders.terms("by_assignee").field("assigned_to"))))               
                  .addAggregation(AggregationBuilders
+                         .dateRange("created")
+                         .field("created")
+                         .addRange("created" , "2010", null)   
+                 );
+                 /**.addAggregation(AggregationBuilders
                    .terms("assigned_to")
-                   .field("assigned_to")
-                   );
+                   .field("assigned_to") 
+                   .subAggregation(AggregationBuilders.terms("by_status").field("status"))
+                 );**/
         
         CountRequestBuilder cr = ClientFactory
                 .getTransportClient()
@@ -319,8 +347,9 @@ public class MarcusSearchService implements SearchService {
         //.addAggregation(AggregationBuilders.terms("status").field("status"))
         //.addAggregation(AggregationBuilders.terms("assigned_to").field("assigned_to"));
         //System.out.println("JSON Response: " +  gson.toJson(responseJson));
-        System.out.println("Response: " + cr.toString());
-        //System.out.println("Count: " + countRes.getCount());
+     
+        System.out.println("Request: " + req.toString());
+        System.out.println("Response: " + gson.toJson(responseJson));
     }
 
 

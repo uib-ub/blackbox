@@ -4,7 +4,7 @@
 
     <groupId>no.uib.marcus</groupId>
     <artifactId>marcus-blackbox</artifactId>
-    <name>Marcus-Sok</name>
+    <name>Marcus Blackbox</name>
     <version>1.0-SNAPSHOT</version>
     <packaging>war</packaging>
 
@@ -40,17 +40,17 @@
            <groupId>org.elasticsearch</groupId>
            <artifactId>elasticsearch</artifactId>
            <version>1.7.3</version>
-      </dependency> 
-      <dependency>
-	<groupId>com.google.code.gson</groupId>
-	<artifactId>gson</artifactId>
-	<version>2.5</version>
-      </dependency>
-      <dependency>
-	<groupId>log4j</groupId>
-	<artifactId>log4j</artifactId>
-	<version>1.2.17</version>
-     </dependency>
+        </dependency> 
+        <dependency>
+            <groupId>com.google.code.gson</groupId>
+            <artifactId>gson</artifactId>
+            <version>2.5</version>
+        </dependency>
+          <dependency>
+            <groupId>log4j</groupId>
+            <artifactId>log4j</artifactId>
+            <version>1.2.17</version>
+         </dependency>
     </dependencies>
 
     <build>
@@ -102,5 +102,4 @@
             </plugin>
         </plugins>
     </build>
-
 </project>

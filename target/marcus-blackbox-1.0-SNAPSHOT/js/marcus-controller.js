@@ -54,7 +54,7 @@ app.controller('freeTextSearch', function ($scope, $http, $location, mySetting) 
         var q = "";
         $scope.query_string === undefined ? q = "*" : q = $scope.query_string + "*";
         $http({
-            method: 'POST',
+            method: 'GET',
             url: 'search?aggs=' + JSON.stringify(mySetting.facets),
             params: {
                 q: q,
@@ -90,7 +90,7 @@ app.controller('freeTextSearch', function ($scope, $http, $location, mySetting) 
         var q = "";
         $scope.query_string === undefined ? q = "" : q = $scope.query_string;
         $http({
-            method: 'POST',
+            method: 'GET',
             url: 'suggest',
             params: {
                 q: q
