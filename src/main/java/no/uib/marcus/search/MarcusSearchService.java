@@ -253,14 +253,14 @@ public class MarcusSearchService implements SearchService {
                 //.must(FilterBuilders.termFilter("status", "Draft"))
                 .should(FilterBuilders
                         .rangeFilter("created")
-                        .from("1915-01-01")
+                        .from("1920")
                         .to(null)
                         .includeLower(true)
                         .includeUpper(true))
                 
                  .should(FilterBuilders
                         .rangeFilter("madeafter")
-                        .from("1915-01-01")
+                        .from("1920-01-01")
                         .to(null)
                         .includeLower(true)
                         .includeUpper(true))
@@ -268,7 +268,7 @@ public class MarcusSearchService implements SearchService {
                  .should(FilterBuilders
                         .rangeFilter("madebefore")
                         .from(null)
-                        .to("2016-01-01")
+                        .to("1920-01-01")
                         .includeLower(true)
                         .includeUpper(true));
         

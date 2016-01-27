@@ -1,7 +1,8 @@
 /**
  * Checklist-model
  * AngularJS directive for list of checkboxes
- * https://github.com/vitalets/checklist-model
+ * https://github.com/vitalets/checklist-model,    
+ * See here: <http://vitalets.github.io/checklist-model/>
  * License: MIT http://opensource.org/licenses/MIT
  */
 angular.module('checklist-model', [])

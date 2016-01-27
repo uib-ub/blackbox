@@ -60,7 +60,7 @@
                                 ({{bucket.doc_count}} of {{bucket.total_doc_count}})
                             </li>
                         </ul>
-                       <h3>Customers</h3>
+                       <!---h3>Customers</h3>
                        <ul class="nav nav-list">
                             <li ng-repeat="bucket in results['aggregations']['customer_name']['buckets']">
                                 <label>
@@ -68,13 +68,15 @@
                                     {{bucket.key}}
                                 </label>
                                 ({{bucket.doc_count}} of {{bucket.total_doc_count}})
-                                 <!--input type="hidden" name="bucket " value="bucket.doc_count"-->
                             </li>
-                        </ul>
+                        </ul-->
+                                              
+                        <h3>Date Search</h3>
+                        <label>Fra:</label> <input type="text" ng-model="from_date"><br>
+                        <label>Til: </label> <input type="text" ng-model="to_date"><br><br>
+                        <button class="btn btn-large btn-block btn-primary" ng-click="query_search()"><strong>Update Search</strong></button>
                     </div>
-                    <div>
-                       
-                    </div>
+
                 <div class="search-hits">
                     <h4 ng-show="results.hits.total > 0"> Total hits : {{results.hits.total}}</h4>
                     <ul>
