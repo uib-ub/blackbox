@@ -12,6 +12,7 @@
         <link rel="stylesheet" href="js/lib/typeahead/css/main.css">
         <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" />
         <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap-theme.min.css" />
+        <link rel="stylesheet" href="//code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css" />
     </head>
     <body>
         <div id="searchController"  ng-controller="freeTextSearch">
@@ -72,9 +73,10 @@
                         </ul-->
                                               
                         <h3>Date Search</h3>
-                        <label>Fra:</label> <input type="text" ng-model="from_date"><br>
-                        <label>Til: </label> <input type="text" ng-model="to_date"><br><br>
-                        <button class="btn btn-large btn-block btn-primary" ng-click="query_search()"><strong>Update Search</strong></button>
+                        <label for="from_date">Fra:</label> <input type="text" id="from_date" ng-model="from_date"><br>
+                        <label for="to_date">Til: </label> <input type="text" id="to_date" ng-model="to_date" ><br><br>
+                        <button class="btn btn-block btn-primary" ng-click="getDateValues()"><strong>Update Search</strong></button>
+                        <button class="btn btn-block btn-danger" ng-click="clearDates()">Clear dates</button>
                     </div>
 
                 <div class="search-hits">
@@ -109,6 +111,7 @@
         <script src="js/lib/typeahead/js/jquery.xdomainrequest.min.js"></script>
         <script src="js/lib/typeahead/js/typeahead.bundle.js"></script>
         <script src="js/lib/typeahead/js/main.js"></script>
+        <script src="//code.jquery.com/ui/1.11.4/jquery-ui.js"></script>
         <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.4.8/angular.min.js"></script>
         <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
         <script src="js/marcus-controller.js"></script>
@@ -127,6 +130,32 @@
                            {"field": "customer_name" , "size" : 10, "operator": "OR", "order" : "count_desc"}]
            });
         </script>
+          <script>
+              $(function(){
+                $("#from_date").datepicker({
+                      defaultDate: "+1w",
+                      dateFormat:'yy-mm-dd',
+                      changeMonth: true,
+                      changeYear: true,
+                      yearRange: "-150:+0",
+                      numberOfMonths: 1,
+                      onClose: function( selectedDate ) {
+                        $( "#to_date" ).datepicker( "option", "minDate", selectedDate );
+                  }
+                 });
+                $("#to_date").datepicker({
+                      defaultDate: "+1w",
+                      dateFormat:'yy-mm-dd',
+                      changeMonth: true,
+                      changeYear : true,
+                      yearRange: "-150:+0",
+                      numberOfMonths: 1,
+                      onClose: function(selectedDate) {
+                        $("#from_date" ).datepicker( "option", "maxDate", selectedDate );
+                  }
+                });
+              });
+      </script>
     
     </body>
 </html>

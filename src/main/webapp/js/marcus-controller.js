@@ -93,17 +93,28 @@ app.controller('Datepicker', function ($scope) {
 /*========= Search Controller ===========**/
 app.controller('freeTextSearch', function ($scope, $http, $location, mySetting) {
     $scope.selected_filters = [];
+    $scope.from_date = "";
+    $scope.to_date = "";
+    
     $scope.getCheckedValue = function (field, filterValue) {
         if (field !== undefined && filterValue !== undefined) {
             return field + "." + filterValue;
         }
         return null;
     };
-    //alert("Predefined settings:" + JSON.stringify(mySettings));
 
-    //Testing for location
-    // var s = $location.search();
-    // $scope.selected_aggs.push(s.agg);
+     $scope.getDateValues = function (){
+         //var from_date = $("#from_date").val();
+         //var to_date = $("#to_date").val();
+         alert($scope.from_date + ": " + $scope.to_date);
+     }
+     
+     
+    $scope.clearDates = function () {
+        $scope.from_date = null;
+        $scope.to_date = null;
+    };
+     
 
     //Send requests to search servlet
     $scope.query_search = function () {
