@@ -1,92 +1,85 @@
 <!DOCTYPE html>
 <html  ng-app="marcus" lang="no">
     <head>
-        <meta charset="utf-8">
-        <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-        <title>Blackbox</title>
-        <meta name="description" content="Search Marcus data">
-        <meta name="viewport" content="width=device-width, initial-scale=1">
-        <link rel="shortcut icon" type="image/x-icon" href="http://marcus.uib.no/img/favicon.ico">
-        <link rel="stylesheet" href="css/marcus.css">
-        <link rel="stylesheet" href="js/lib/typeahead/css/normalize.min.css">
-        <link rel="stylesheet" href="js/lib/typeahead/css/main.css">
-        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" />
-        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap-theme.min.css" />
-        <link rel="stylesheet" href="//code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css" />
+        <meta charset="utf-8"/>
+            <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+                <title>Blackbox</title>
+                <meta name="description" content="Search Marcus data" />
+                    <meta name="viewport" content="width=device-width, initial-scale=1" />
+                        <link rel="shortcut icon" type="image/x-icon" href="http://marcus.uib.no/img/favicon.ico" />
+                            <link rel="stylesheet" href="css/marcus.css" />
+                                <link rel="stylesheet" href="js/lib/typeahead/css/normalize.min.css"/>
+                                    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" />
+                                    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap-theme.min.css" />
+                                    <link rel="stylesheet" href="//code.jquery.com/ui/1.11.4/themes/ui-darkness/jquery-ui.css" />
+                                    <link rel="stylesheet" href="js/lib/typeahead/css/main.css"/>
     </head>
     <body>
         <div id="searchController"  ng-controller="freeTextSearch">
             <div class="masthead">
-                <h1 class="title">Blackbox</h1>
-                <div class="Demo">
+               <h1 class="title">Blackbox</h1>
+                 <div class="Demo">
                     <form action="" method="GET">
-                        <input type="hidden" name="index" value="admin">
-                        <div class="Typeahead Typeahead--twitterUsers">
-                            <div class="u-posRelative">
-                                <input class="Typeahead-hint" type="text" tabindex="-1" readonly>
-                                <input class="Typeahead-input" id="search-input" type="text" name="q" ng-model="query_string" ng-change="query_search();"  placeholder="Search Marcus...">
-                                <img class="Typeahead-spinner" src="js/lib/typeahead/img/spinner.gif" alt="">
+                        <input type="hidden" name="index" value="admin" />
+                            <div class="Typeahead Typeahead--twitterUsers">
+                                <div class="u-posRelative">
+                                    <input class="Typeahead-hint" type="text" tabindex="-1" readonly="readonly"/>
+                                        <input class="Typeahead-input" id="search-input" type="text" name="q" ng-model="query_string" ng-change="search();"  placeholder="Search Marcus..."/>
+                                            <img class="Typeahead-spinner" src="js/lib/typeahead/img/spinner.gif" alt=""/>
+                                </div>
+                                <div class="Typeahead-menu"></div>
                             </div>
-                            <div class="Typeahead-menu"></div>
-                        </div>
-                        <!--button type="submit" class="u-hidden" ng-submit="query_search()">Go</button-->
+                            <!--button type="submit" class="u-hidden" ng-submit="search()">Go</button-->
                     </form>
                 </div>
                 <span class="links links-examples">
                     <a href="">Advanced search</a>
                 </span>
-                  <!--b>Aggregations: </b>{{aggregations}} -->
+                <!--b>Aggregations: </b>{{aggregations}} -->
             </div>
             <!--div class="sticky-footer-push"></div-->
+            <!--div ng-show="loading" class="loading"><img src="">LOADING </div-->
+            <!--uib-progressbar class="progress-striped active" value="dynamic">hello world</uib-progressbar-->
             <div class="search-results container-fluid">
                 <div class='row row-fluid'>
-                    <div class="facets" ng-show="results.hasOwnProperty('aggregations')">
-                       <h3>Document Types</h3>
-                       <ul class="nav nav-list">
-                            <li ng-repeat="bucket in results['aggregations']['type.exact']['buckets']">
-                                <label>
-                                    <input type="checkbox" checklist-model="selected_filters" checklist-value="getCheckedValue('type.exact', bucket.key)" ng-click="query_search()">
-                                    {{bucket.key}}
-                                </label>
-                                ({{bucket.doc_count}} of {{bucket.total_doc_count}})
-                            </li>
-                        </ul>
-                       <h3>Subjects</h3>
-                       <ul class="nav nav-list">
-                            <li ng-repeat="bucket in results['aggregations']['subject.exact']['buckets']">
-                                <label>
-                                    <input type="checkbox" checklist-model="selected_filters" checklist-value="getCheckedValue('subject.exact', bucket.key)" ng-click="query_search()">
-                                    {{bucket.key}} 
-                                </label>
-                                ({{bucket.doc_count}} of {{bucket.total_doc_count}})
-                            </li>
-                        </ul>
-                       <!---h3>Customers</h3>
-                       <ul class="nav nav-list">
-                            <li ng-repeat="bucket in results['aggregations']['customer_name']['buckets']">
-                                <label>
-                                    <input type="checkbox" checklist-model="selected_filters" checklist-value="getCheckedValue('customer_name', bucket.key)" ng-click="query_search()">
-                                    {{bucket.key}}
-                                </label>
-                                ({{bucket.doc_count}} of {{bucket.total_doc_count}})
-                            </li>
-                        </ul-->
-                                              
-                        <h3>Date Search</h3>
-                        <label for="from_date">Fra:</label> <input type="text" id="from_date" ng-model="from_date"><br>
-                        <label for="to_date">Til: </label> <input type="text" id="to_date" ng-model="to_date" ><br><br>
-                        <button class="btn btn-block btn-primary" ng-click="getDateValues()"><strong>Update Search</strong></button>
-                        <button class="btn btn-block btn-danger" ng-click="clearDates()">Clear dates</button>
+                    <div class="facets">
+                               <h3>Dato</h3>
+                                <input id="from_date" class="datePicker" type="text"  ng-model="from_date" ng-change="search()" readonly="readonly" placeholder="FRA" title="Fra dato">
+                               <!--buttton class="btn btn-mini" style="margin-left:-30%"><span class="glyphicon glyphicon-remove" ng-click="clearDates();"></span></buttton--><br/><br/>
+                                <input id="to_date" class="datePicker" type="text"  ng-model="to_date" ng-change="search()" readonly="readonly" placeholder="TIL" title="Til dato"><br/><br/>
+                                <button class="btn btn-block btn-primary" ng-click="search()"><strong>OPPDATER SØKET</strong></button>
+                                <button class="btn btn-block btn-danger" ng-click="clearDates()"><strong>NULLSTILL DATOENE</strong></button>
+                                
+                                 <h3>Dokument typer</h3>
+                                <ul class="nav nav-list">
+                                    <li ng-repeat="bucket in results['aggregations']['type.exact']['buckets']">
+                                        <label>
+                                            <input type="checkbox" checklist-model="selected_filters" checklist-value="getCheckedValue('type.exact', bucket.key)" ng-click="search()">
+                                                {{bucket.key}}
+                                        </label>
+                                        ({{bucket.doc_count}} of {{bucket.total_doc_count}})
+                                    </li>
+                                </ul>
+                                
+                                <h3>Emne</h3>
+                                <ul class="nav nav-list">
+                                    <li ng-repeat="bucket in results['aggregations']['subject.exact']['buckets']">
+                                        <label>
+                                            <input type="checkbox" checklist-model="selected_filters" checklist-value="getCheckedValue('subject.exact', bucket.key)" ng-click="search()">
+                                                {{bucket.key}} 
+                                        </label>
+                                        ({{bucket.doc_count}} of {{bucket.total_doc_count}})
+                                    </li>
+                                </ul>                 
                     </div>
-
-                <div class="search-hits">
-                    <h4 ng-show="results.hits.total > 0"> Total hits : {{results.hits.total}}</h4>
-                    <ul>
-                        <li ng-repeat="x in results.hits.hits">
-                            {{x._source}}
-                        </li>
-                    </ul>
-                </div>
+                    <div class="search-hits">
+                        <h4 ng-show="results.hits.total > 0"> Total hits : {{results.hits.total}}</h4>
+                        <ul>
+                            <li ng-repeat="x in results.hits.hits">
+                                {{x._source}}
+                            </li>
+                        </ul>
+                    </div>
                 </div>
             </div>
         </div>
@@ -100,7 +93,7 @@
             </div>
             </div>
         </script>
-
+        
         <script id="empty-template" type="text/x-handlebars-template">
             <div class="EmptyMessage">Your search turned up 0 results.</div>
         </script>
@@ -116,6 +109,8 @@
         <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
         <script src="js/marcus-controller.js"></script>
         <script src="js/checklist-directive.js"></script>
+        <script src="js/ui-bootstrap-1.1.1.js"></script>
+        <script src="js/jquery-datepicker.js"></script>
         
         <!--These are constants for this particular page-->
         <script>
@@ -130,32 +125,5 @@
                            {"field": "customer_name" , "size" : 10, "operator": "OR", "order" : "count_desc"}]
            });
         </script>
-          <script>
-              $(function(){
-                $("#from_date").datepicker({
-                      defaultDate: "+1w",
-                      dateFormat:'yy-mm-dd',
-                      changeMonth: true,
-                      changeYear: true,
-                      yearRange: "-150:+0",
-                      numberOfMonths: 1,
-                      onClose: function( selectedDate ) {
-                        $( "#to_date" ).datepicker( "option", "minDate", selectedDate );
-                  }
-                 });
-                $("#to_date").datepicker({
-                      defaultDate: "+1w",
-                      dateFormat:'yy-mm-dd',
-                      changeMonth: true,
-                      changeYear : true,
-                      yearRange: "-150:+0",
-                      numberOfMonths: 1,
-                      onClose: function(selectedDate) {
-                        $("#from_date" ).datepicker( "option", "maxDate", selectedDate );
-                  }
-                });
-              });
-      </script>
-    
     </body>
 </html>

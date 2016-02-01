@@ -24,7 +24,7 @@ $(document).ready(function () {
     });
 
     // ensure default users are read on initialization
-    engine.get('1090217586', '58502284', '10273252', '24477185')
+    engine.get('1090217586', '58502284', '10273252', '24477185');
 
     function engineWithDefaults(q, sync, async) {
         if (q === '') {
@@ -99,7 +99,7 @@ $(document).ready(function () {
               .on('typeahead:select', function(event, suggestionValue){
                  var angularScope = angular.element($('#searchController')).scope();
                      angularScope.query_string = suggestionValue;
-                     angularScope.query_search();
+                     angularScope.search();
                 angularScope.$apply();
             })
             //When Enter key is clicked, close the suggestion box.
