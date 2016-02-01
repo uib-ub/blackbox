@@ -261,16 +261,12 @@ public class MarcusSearchService implements SearchService {
                  .should(FilterBuilders
                         .rangeFilter("madeafter")
                         .from("1920-01-01")
-                        .to(null)
-                        .includeLower(true)
-                        .includeUpper(true))
+                        .to(null))
                 
                  .should(FilterBuilders
                         .rangeFilter("madebefore")
                         .from(null)
-                        .to("1920-01-01")
-                        .includeLower(true)
-                        .includeUpper(true));
+                        .to("1920-01-01"));
         
                 //.must(FilterBuilders.termFilter("assigned_to", "Marianne Paasche"));
 

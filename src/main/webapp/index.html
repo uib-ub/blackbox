@@ -43,12 +43,14 @@
             <div class="search-results container-fluid">
                 <div class='row row-fluid'>
                     <div class="facets">
-                               <h3>Dato</h3>
-                                <input id="from_date" class="datePicker" type="text"  ng-model="from_date" ng-change="search()" readonly="readonly" placeholder="FRA" title="Fra dato">
+                               <h3>Opprettet dato</h3>
+                                <input id="from_date" class="datePicker" type="text"  ng-model="from_date" ng-change="search()" placeholder="FRA" title="Fra dato">
                                <!--buttton class="btn btn-mini" style="margin-left:-30%"><span class="glyphicon glyphicon-remove" ng-click="clearDates();"></span></buttton--><br/><br/>
-                                <input id="to_date" class="datePicker" type="text"  ng-model="to_date" ng-change="search()" readonly="readonly" placeholder="TIL" title="Til dato"><br/><br/>
-                                <button class="btn btn-block btn-primary" ng-click="search()"><strong>OPPDATER SØKET</strong></button>
-                                <button class="btn btn-block btn-danger" ng-click="clearDates()"><strong>NULLSTILL DATOENE</strong></button>
+                                <input id="to_date" class="datePicker" type="text"  ng-model="to_date" ng-change="search()" placeholder="TIL" title="Til dato"><br/><br/>
+                                
+                                <!--button class="btn btn-small btn-primary" ng-click="search()"><strong>OPPDATER SØKET</strong></button><br/><br/-->
+                                <button class="btn btn-block btn-primary" ng-click="clearDates()"><strong><b>NULLSTILL DATOENE</b></strong></button>
+                                
                                 
                                  <h3>Dokument typer</h3>
                                 <ul class="nav nav-list">
@@ -109,7 +111,6 @@
         <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
         <script src="js/marcus-controller.js"></script>
         <script src="js/checklist-directive.js"></script>
-        <script src="js/ui-bootstrap-1.1.1.js"></script>
         <script src="js/jquery-datepicker.js"></script>
         
         <!--These are constants for this particular page-->
@@ -119,7 +120,7 @@
                        index: ["admin"],
                        type : ["document", "invoice"],
                        facets: [
-                           {"field": "type.exact", "size": 5, "operator" : "OR", "order": "count_desc"},
+                           {"field": "type.exact", "size": 5, "operator" : "AND", "order": "count_desc"},
                            {"field" : "assigned_to" , "order" : "term_asc"}, 
                            {"field" : "subject.exact"},
                            {"field": "customer_name" , "size" : 10, "operator": "OR", "order" : "count_desc"}]
