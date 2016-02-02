@@ -9,6 +9,7 @@ import com.google.gson.JsonParser;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -77,13 +78,13 @@ public class SearchServlet extends HttpServlet {
 
     /**
      * A method to get a map based on the selected filters.
-     *
+     * If no filter is selected, return an empty map.
      */
     private Map getFilterMap(String[] selectedFilters) {
         Map<String, List<String>> filters = new HashMap<>();
         try {
             if (selectedFilters == null) {
-                return null;
+                return Collections.emptyMap();
             }
             for (String entry : selectedFilters) {
                 if (entry.lastIndexOf(".") != -1) {
@@ -133,19 +134,31 @@ public class SearchServlet extends HttpServlet {
                                 .to(toDate));
             }**/
             if(fromDate != null || toDate != null) {
-                  boolFilter.should(FilterBuilders
-                                   .rangeFilter("created")
-                                   .from(fromDate)
-                                   .to(toDate));
-                            /**.should(FilterBuilders
-                                   .rangeFilter("madeafter")
-                                   .from(fromDate))
-                            .should(FilterBuilders
-                                   .rangeFilter("madebefore")
-                                   .to(toDate));**/
+                            boolFilter
+                                   //Created, within a range.
+                                  .should(FilterBuilders.rangeFilter("created").gte(fromDate).lte(toDate))
+                                    
+                                  /**.should(FilterBuilders.boolFilter()
+                                          .must((FilterBuilders.rangeFilter("madeafter").gte(fromDate)))
+                                          .must(FilterBuilders.rangeFilter("madebefore").lte(toDate)));
+                                   **/
+                                   
+                                  .should(FilterBuilders.boolFilter()
+                                          //madeafter >= from and madebefore >=from
+                                           .should(FilterBuilders.boolFilter()
+                                                   .must(FilterBuilders.rangeFilter("madeafter").gte(fromDate)))
+                                                   .must(FilterBuilders.rangeFilter("madebefore").gte(fromDate))
+
+                                           //madebefore =< to and madeafter <= to
+                                           .should(FilterBuilders.boolFilter()
+                                                   .must(FilterBuilders.rangeFilter("madebefore").lte(toDate)))
+                                                   .must(FilterBuilders.rangeFilter("madeafter").lte(toDate)));
+                
+                            
+                            
                 
             }
-            if (filterMap != null) {
+            if (!filterMap.isEmpty()) {
                 for (Map.Entry<String, List> entry : filterMap.entrySet()) {
                     if (!entry.getValue().isEmpty()) {
                         if (hasAND(entry.getKey(), aggregations)) {
