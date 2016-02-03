@@ -28,7 +28,7 @@ $(function () {
         onClose: function (selectedDate) {
             $("#from_date").datepicker("option", "maxDate", selectedDate);
         }
-    })
+    });
 
     //Set defaults for Norwegian Calender
     var defaults = {

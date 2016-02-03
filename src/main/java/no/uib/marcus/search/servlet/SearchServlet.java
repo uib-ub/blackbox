@@ -13,6 +13,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.OptionalInt;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -31,6 +32,10 @@ import org.elasticsearch.index.query.QueryBuilders;
 import no.uib.marcus.search.SearchService;
 import no.uib.marcus.search.MarcusSearchService;
 import no.uib.marcus.search.client.ClientFactory;
+import org.elasticsearch.action.count.CountRequestBuilder;
+import org.elasticsearch.common.Nullable;
+import org.elasticsearch.common.Strings;
+import org.elasticsearch.common.base.Optional;
 
 /**
  * @author Hemed Al Ruwehy (hemed.ruwehy@uib.no) 2016-01-24, University of
@@ -53,6 +58,8 @@ public class SearchServlet extends HttpServlet {
         String aggs = request.getParameter("aggs");
         String[] indices = request.getParameterValues("index");
         String[] types = request.getParameterValues("type");
+        String from = request.getParameter("from");
+        String size = request.getParameter("size");
         String fromDate = request.getParameter("from_date");
         String toDate = request.getParameter("to_date");
         SearchService service = new MarcusSearchService();
@@ -60,19 +67,18 @@ public class SearchServlet extends HttpServlet {
         BoolFilterBuilder boolFilter;
 
         try (PrintWriter out = response.getWriter()) {
-            boolFilter = (BoolFilterBuilder)getBoolFilter(selectedFilters, aggs, fromDate, toDate);
-            if (queryString == null || queryString.isEmpty()) {
-                logger.info("Sending match_all query");
-                searchResponse = service.getDocuments(indices, types, aggs);
-            }
-            if (boolFilter.hasClauses()) {
-                searchResponse = service.getDocuments(queryString, indices, types, boolFilter, aggs);
-            } else {
-                searchResponse = service.getDocuments(queryString, indices, types, aggs);
-            }
-            //After getting the response, add extra field to every bucket in the aggregations
-            String responseJson = addExtraFieldToBucketAggregations(searchResponse, indices, types);
-            out.write(responseJson);
+                int _from = Strings.hasText(from)? Integer.parseInt(from) : 0;
+                int _size = Strings.hasText(size)? Integer.parseInt(size) : 10;
+                
+                boolFilter = (BoolFilterBuilder)buildBoolFilter(selectedFilters, aggs, fromDate, toDate);
+                if (boolFilter.hasClauses()) {
+                    searchResponse = service.getDocuments(queryString, indices, types, boolFilter, aggs, _from, _size);
+                } else {
+                    searchResponse = service.getDocuments(queryString, indices, types, aggs, _from, _size);
+                }
+                //After getting the response, add extra field "total_doc_count" to every bucket in the aggregations
+                String responseJson = addExtraFieldToBucketAggregations(searchResponse, indices, types);
+                out.write(responseJson);
         }
     }
 
@@ -112,7 +118,7 @@ public class SearchServlet extends HttpServlet {
      * A method for building BoolFilter based on the aggregation settings.
      *
      */
-    private FilterBuilder getBoolFilter(String[] selectedFilters, String aggregations, String fromDate, String toDate) {
+    private FilterBuilder buildBoolFilter(String[] selectedFilters, String aggregations, String fromDate, String toDate) {
         //In this map, keys are "fields" and values are "terms"
         Map<String, List> filterMap = getFilterMap(selectedFilters);
         BoolFilterBuilder boolFilter = FilterBuilders.boolFilter();
@@ -134,46 +140,45 @@ public class SearchServlet extends HttpServlet {
                                 .to(toDate));
             }**/
             if(fromDate != null || toDate != null) {
-                            boolFilter
-                                   //Created, within a range.
-                                  .should(FilterBuilders.rangeFilter("created").gte(fromDate).lte(toDate))
-                                    
-                                  /**.should(FilterBuilders.boolFilter()
-                                          .must((FilterBuilders.rangeFilter("madeafter").gte(fromDate)))
-                                          .must(FilterBuilders.rangeFilter("madebefore").lte(toDate)));
-                                   **/
-                                   
-                                  .should(FilterBuilders.boolFilter()
-                                          //madeafter >= from and madebefore >=from
-                                           .should(FilterBuilders.boolFilter()
-                                                   .must(FilterBuilders.rangeFilter("madeafter").gte(fromDate)))
-                                                   .must(FilterBuilders.rangeFilter("madebefore").gte(fromDate))
+                boolFilter
+                          //Range within "created" field
+                          .should(FilterBuilders.rangeFilter("created").gte(fromDate).lte(toDate))
 
-                                           //madebefore =< to and madeafter <= to
-                                           .should(FilterBuilders.boolFilter()
-                                                   .must(FilterBuilders.rangeFilter("madebefore").lte(toDate)))
-                                                   .must(FilterBuilders.rangeFilter("madeafter").lte(toDate)));
-                
-                            
-                            
-                
+                          //AND query
+                          /**.should(FilterBuilders.boolFilter()
+                              .must((FilterBuilders.rangeFilter("madeafter").gte(fromDate)))
+                              .must(FilterBuilders.rangeFilter("madebefore").lte(fromDate)));
+                           **/
+
+                          //madeafter >= from_date and madeafter <= to_date
+                           .should(FilterBuilders.boolFilter()
+                                   .must(FilterBuilders.rangeFilter("madeafter").gte(fromDate))
+                                   .must(FilterBuilders.rangeFilter("madeafter").lte(toDate)))
+
+                           //madebefore >= from_date and madebefore <= to_date
+                           .should(FilterBuilders.boolFilter()
+                                   .must(FilterBuilders.rangeFilter("madebefore").gte(fromDate))
+                                   .must(FilterBuilders.rangeFilter("madebefore").lte(toDate))); 
             }
-            if (!filterMap.isEmpty()) {
-                for (Map.Entry<String, List> entry : filterMap.entrySet()) {
-                    if (!entry.getValue().isEmpty()) {
-                        if (hasAND(entry.getKey(), aggregations)) {
-                            logger.info("Constructing AND query for facet: " + entry.getKey());
-                            for (Object value : entry.getValue()) {
-                                //A filter based on a term. If it is inside a must, it acts as "AND" filter
-                                boolFilter.must(FilterBuilders.termFilter(entry.getKey(), value));
-                            }
-                        } else {
-                                /**
-                                 * Using "terms" filter based on several terms, matching on any of them
-                                 * This acts as OR filter, when it is inside the must clause.
-                                 **/
-                                boolFilter.must(FilterBuilders.termsFilter(entry.getKey(), entry.getValue()));
+            /** Building the BoolFilter based on user selected facets**/
+            for (Map.Entry<String, List> entry : filterMap.entrySet()) {
+                if (!entry.getValue().isEmpty()) {
+                    if (hasAND(entry.getKey(), aggregations)) {
+                        logger.info("Constructing AND query for facet: " + entry.getKey());
+                        for (Object value : entry.getValue()) {
+                            /**
+                             * Building "AND" filter.
+                             * A filter based on a term. If it is inside a must, it acts as "AND" filter
+                             **/ 
+                            boolFilter.must(FilterBuilders.termFilter(entry.getKey(), value));
                         }
+                    } else {
+                            /**
+                             * Building "OR" filter.
+                             * Using "terms" filter based on several terms, matching on any of them
+                             * This acts as OR filter, when it is inside the must clause.
+                             **/
+                            boolFilter.must(FilterBuilders.termsFilter(entry.getKey(), entry.getValue()));
                     }
                 }
             }
@@ -198,11 +203,11 @@ public class SearchServlet extends HttpServlet {
             for (JsonElement e : facets.getAsJsonArray()) {
                 JsonObject facet = e.getAsJsonObject();
                 if (facet.has("field") && facet.has("operator")) {
-                    String currentField = facet.get("field").getAsString();
-                    String operator = facet.get("operator").getAsString();
-                    if (currentField.equals(field) && operator.equalsIgnoreCase("AND")) {
-                        return true;
-                    }
+                        String currentField = facet.get("field").getAsString();
+                        String operator = facet.get("operator").getAsString();
+                        if (currentField.equals(field) && operator.equalsIgnoreCase("AND")) {
+                               return true;
+                            }
                 }
             }
         } catch (Exception e) {
@@ -222,7 +227,7 @@ public class SearchServlet extends HttpServlet {
      * releases.
      *
      */
-    private String addExtraFieldToBucketAggregations(SearchResponse response, String[] indices, String... types) {
+    private String addExtraFieldToBucketAggregations(SearchResponse response, @Nullable String[] indices, @Nullable String... types) {
             JsonElement responseJson = new JsonParser().parse(response.toString());
             Gson gson = new GsonBuilder().setPrettyPrinting().create();
 
@@ -237,12 +242,20 @@ public class SearchServlet extends HttpServlet {
                 for (JsonElement element : terms.getAsJsonArray("buckets")) {
                         JsonObject bucket = element.getAsJsonObject();
                         String value = bucket.get("key").getAsString();
-                        //Query Elasticsearch independently for count of the specified term.
-                        CountResponse countResponse = ClientFactory
+                        
+                        /**Query Elasticsearch independently for count of the specified term.**/
+                        CountRequestBuilder countRequestBuilder = ClientFactory
                                 .getTransportClient()
-                                .prepareCount()
-                                .setIndices(indices)
-                                .setTypes(types)
+                                .prepareCount();
+                        
+                        if(indices != null && indices.length > 0){
+                            countRequestBuilder.setIndices(indices);
+                        }
+                        if(types != null && types.length > 0){
+                            countRequestBuilder.setTypes(types);
+                        }
+                        /** Build a count response**/
+                        CountResponse countResponse = countRequestBuilder
                                 .setQuery(QueryBuilders.termQuery(term, value))
                                 .execute()
                                 .actionGet();

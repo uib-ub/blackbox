@@ -7,6 +7,7 @@ var app = angular.module('marcus', ["checklist-model", "settings"]);
 app.controller('freeTextSearch', function ($scope, $http, $location, mySetting) {
     
     //Initialize variables
+    $scope.query_string = "";
     $scope.selected_filters = [];
     $scope.from_date = null;
     $scope.to_date = null;
@@ -31,8 +32,8 @@ app.controller('freeTextSearch', function ($scope, $http, $location, mySetting) 
 
     //Send requests to search servlet
     $scope.search = function () {
-        var q = "";
-        $scope.query_string === undefined ? q = "*" : q = $scope.query_string + "*";
+        var q;
+        $scope.query_string === "" ? q = null : q = $scope.query_string + "*";
         $http({
             method: 'GET',
             url: 'search?aggs=' + JSON.stringify(mySetting.facets),
@@ -42,7 +43,9 @@ app.controller('freeTextSearch', function ($scope, $http, $location, mySetting) 
                 type: mySetting.type,
                 from_date: $scope.from_date,
                 to_date: $scope.to_date,
-                filter: $scope.selected_filters
+                filter: $scope.selected_filters,
+                from : 0,
+                size: 12
               }
            })
             .success(function (data, status, headers, config) {

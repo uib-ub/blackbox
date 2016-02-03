@@ -11,7 +11,7 @@
                                 <link rel="stylesheet" href="js/lib/typeahead/css/normalize.min.css"/>
                                     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" />
                                     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap-theme.min.css" />
-                                    <link rel="stylesheet" href="//code.jquery.com/ui/1.11.4/themes/ui-darkness/jquery-ui.css" />
+                                    <link rel="stylesheet" href="//code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css" />
                                     <link rel="stylesheet" href="js/lib/typeahead/css/main.css"/>
     </head>
     <body>
@@ -48,8 +48,8 @@
                                <!--buttton class="btn btn-mini" style="margin-left:-30%"><span class="glyphicon glyphicon-remove" ng-click="clearDates();"></span></buttton--><br/><br/>
                                 <input id="to_date" class="datePicker" type="text"  ng-model="to_date" ng-change="search()" placeholder="TIL" title="Til dato"><br/><br/>
                                 
-                                <!--button class="btn btn-small btn-primary" ng-click="search()"><strong>OPPDATER SØKET</strong></button><br/><br/-->
-                                <button class="btn btn-block btn-primary" ng-click="clearDates()"><strong><b>NULLSTILL DATOENE</b></strong></button>
+                                <button class="btn btn-small btn-primary" ng-click="search()"><strong>OPPDATER SØKET</strong></button><br/><br/>
+                                <button class="btn btn-small btn-danger" ng-click="clearDates()"><strong><b>NULLSTILL DATOENE</b></strong></button>
                                 
                                 
                                  <h3>Dokument typer</h3>
@@ -120,7 +120,7 @@
                        index: ["admin"],
                        type : ["document", "invoice"],
                        facets: [
-                           {"field": "type.exact", "size": 5, "operator" : "AND", "order": "count_desc"},
+                           {"field": "type.exact", "size": 10, "operator" : "AND", "order": "term_asc"},
                            {"field" : "assigned_to" , "order" : "term_asc"}, 
                            {"field" : "subject.exact"},
                            {"field": "customer_name" , "size" : 10, "operator": "OR", "order" : "count_desc"}]

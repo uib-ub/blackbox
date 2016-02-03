@@ -13,6 +13,8 @@ import org.elasticsearch.action.count.CountRequestBuilder;
 import org.elasticsearch.action.count.CountResponse;
 import org.elasticsearch.action.search.SearchRequestBuilder;
 import org.elasticsearch.action.search.SearchResponse;
+import org.elasticsearch.common.Nullable;
+import org.elasticsearch.common.Strings;
 import org.elasticsearch.common.logging.ESLogger;
 import org.elasticsearch.common.logging.Loggers;
 import org.elasticsearch.common.xcontent.XContentBuilder;
@@ -20,6 +22,8 @@ import org.elasticsearch.common.xcontent.XContentFactory;
 import org.elasticsearch.index.query.BoolFilterBuilder;
 import org.elasticsearch.index.query.FilterBuilder;
 import org.elasticsearch.index.query.FilterBuilders;
+import org.elasticsearch.index.query.MatchAllQueryBuilder;
+import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.search.aggregations.AggregationBuilder;
 import org.elasticsearch.search.aggregations.AggregationBuilders;
@@ -53,45 +57,6 @@ public class MarcusSearchService implements SearchService {
     }
     
     /**
-     * Match all documents
-     */
-    @Override
-    public SearchResponse getDocuments(String[] indices, String[] types, String aggs) {
-        SearchResponse response = null;
-        SearchRequestBuilder searchRequest;
-        try {
-            //Prepare search request
-            searchRequest = ClientFactory
-                    .getTransportClient()
-                    .prepareSearch();
-            //Set indices
-            if (indices != null && indices.length > 0) {
-                searchRequest.setIndices(indices);
-            }
-            //Set types
-            if (types != null && types.length > 0) {
-                searchRequest.setTypes(types);
-            }
-            //Set query
-            searchRequest.setQuery(QueryBuilders.matchAllQuery());
-            
-            //Append term aggregations to this request builder
-            appendTermsAggregation(searchRequest, aggs);
-            
-            response = searchRequest
-                    .execute()
-                    .actionGet();
-
-        } catch (SearchSourceBuilderException se) {
-            logger.error("Exception while building search request: " + se.getDetailedMessage());
-        } catch (Exception ex) {
-            logger.error("Exception: " + ex.getLocalizedMessage());
-        }
-        return response;
-
-    }
-
-    /**
      * Get All Documents using query string. See this:
      * See http://stackoverflow.com/questions/23807314/multiple-filters-and-an-aggregate-in-elasticsearch
      * <b />
@@ -103,9 +68,10 @@ public class MarcusSearchService implements SearchService {
      * 
      */
     @Override
-    public SearchResponse getDocuments(String queryStr, String[] indices, String[] types, String aggs) {
+    public SearchResponse getDocuments(@Nullable String queryStr, @Nullable String[] indices, @Nullable String[] types, String aggs, int from, int size) {
         SearchResponse response = null;
         SearchRequestBuilder searchRequest;
+        QueryBuilder query;
         try {
             //Prepare search request
             searchRequest = ClientFactory
@@ -119,10 +85,21 @@ public class MarcusSearchService implements SearchService {
             if (types != null && types.length > 0) {
                 searchRequest.setTypes(types);
             }
+            if (Strings.hasText(queryStr)){
+                //Set query string
+                query = QueryBuilders.queryStringQuery(queryStr);
+            } else {
+                //Match all query
+                query = QueryBuilders.matchAllQuery();
+            }
+
             //Set query
-            searchRequest.setQuery(QueryBuilders
-                    .queryStringQuery(queryStr));
+            searchRequest.setQuery(query);
             
+            //from & size
+            searchRequest.setFrom(from); 
+            searchRequest.setSize(size);
+
             //Append term aggregations to this request builder
             appendTermsAggregation(searchRequest, aggs);
 
@@ -142,47 +119,56 @@ public class MarcusSearchService implements SearchService {
      * Get All Documents using query string.
      */
     @Override
-    public SearchResponse getDocuments(String queryStr, String[] indices, String[] types, FilterBuilder filter, String aggs) {
+    public SearchResponse getDocuments(@Nullable String queryStr, @Nullable String[] indices, @Nullable String[] types, FilterBuilder filter, String aggs, int from, int size) {
         SearchResponse response = null;
         SearchRequestBuilder searchRequest;
-        BoolFilterBuilder boolFilter = (BoolFilterBuilder)filter;
+        BoolFilterBuilder boolFilter = (BoolFilterBuilder) filter;
+        QueryBuilder query;
         try {
-                //Prepare search request
-                searchRequest = ClientFactory
-                        .getTransportClient()
-                        .prepareSearch();
+            //Prepare search request
+            searchRequest = ClientFactory
+                    .getTransportClient()
+                    .prepareSearch();
 
-                //Set indices
-                if (indices != null && indices.length > 0) {
-                    searchRequest.setIndices(indices);
-                }
-                //Set types
-                if (types != null && types.length > 0) {
-                    searchRequest.setTypes(types);
-                }
-                
-                searchRequest
-                        .setQuery(QueryBuilders
-                                .filteredQuery(QueryBuilders
-                                        .queryStringQuery(queryStr), boolFilter));
-                
-               /** 
-                //Post filter
-                searchRequest.setQuery(QueryBuilders.queryStringQuery(queryStr));
-                if (boolFilter.hasClauses()) {
-                    searchRequest
-                            .setPostFilter(boolFilter);
-                }
-                * **/
-                //Append term aggregations to this request builder
-                appendTermsAggregation(searchRequest, aggs);
-                 
-                //Show Search builder for debugging purpose
-               logger.info(searchRequest.toString());
-               
-                response = searchRequest
-                        .execute()
-                        .actionGet();
+            //Set indices
+            if (indices != null && indices.length > 0) {
+                searchRequest.setIndices(indices);
+            }
+            //Set types
+            if (types != null && types.length > 0) {
+                searchRequest.setTypes(types);
+            }
+         
+            if (Strings.hasText(queryStr)) {
+                //Use query_string query
+                query = QueryBuilders.queryStringQuery(queryStr);
+            } else {
+                //Use match_all query
+                query = QueryBuilders.matchAllQuery();
+            }
+
+            searchRequest.setQuery(QueryBuilders
+                            .filteredQuery(query, boolFilter));
+            
+            searchRequest.setFrom(from); 
+            searchRequest.setSize(size);
+            
+            /**
+             * //Post filter
+             * searchRequest.setQuery(QueryBuilders.queryStringQuery(queryStr));
+             * if (boolFilter.hasClauses()) { searchRequest
+             * .setPostFilter(boolFilter); }
+                * *
+             */
+            //Append term aggregations to this request builder
+            appendTermsAggregation(searchRequest, aggs);
+
+            //Show Search builder for debugging purpose
+            logger.info(searchRequest.toString());
+
+            response = searchRequest
+                    .execute()
+                    .actionGet();
         } catch (SearchSourceBuilderException se) {
             logger.error("Exception on preparing the request: "
                     + se.getDetailedMessage());
