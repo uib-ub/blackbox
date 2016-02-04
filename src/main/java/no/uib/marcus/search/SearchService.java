@@ -14,14 +14,11 @@ public interface SearchService {
      * Get all documents through all indices in the cluster
      */
     public SearchResponse getAllDocuments();
-
+    
     /**
-     * Match all documents
-     */
-    //public SearchResponse getDocuments(String[] indices, String[] types, String aggs, int from, int size);
-
-    /**
-     * Get all documents based on the query string. If the queryString is <code> null </code>, then all documents will be matched.
+     * Get all documents based on the query string. 
+     * If the queryString is <code> null </code>, then all documents will be matched.
+     * return a search response.
      */
     public SearchResponse getDocuments(@Nullable String queryString, String[] indices, String[] types, String aggs, int from, int size);
 

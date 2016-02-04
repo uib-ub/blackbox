@@ -13,7 +13,6 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.OptionalInt;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -35,7 +34,6 @@ import no.uib.marcus.search.client.ClientFactory;
 import org.elasticsearch.action.count.CountRequestBuilder;
 import org.elasticsearch.common.Nullable;
 import org.elasticsearch.common.Strings;
-import org.elasticsearch.common.base.Optional;
 
 /**
  * @author Hemed Al Ruwehy (hemed.ruwehy@uib.no) 2016-01-24, University of
@@ -144,7 +142,7 @@ public class SearchServlet extends HttpServlet {
                           //Range within "created" field
                           .should(FilterBuilders.rangeFilter("created").gte(fromDate).lte(toDate))
 
-                          //AND query
+                          //AND filter
                           /**.should(FilterBuilders.boolFilter()
                               .must((FilterBuilders.rangeFilter("madeafter").gte(fromDate)))
                               .must(FilterBuilders.rangeFilter("madebefore").lte(fromDate)));
@@ -194,22 +192,22 @@ public class SearchServlet extends HttpServlet {
      * <b>
      * Note that the facets must be valid JSON array. For example [ {"field":
      * "status", "size": 15, "operator" : "AND", "order": "term_asc"}, {"field"
-     * : "assigned_to" , "order" : "term_asc"}]
+     * :"assigned_to" , "order" : "term_asc"}]
      *
      */
     private boolean hasAND(String field, String aggregations) {
         try {
-            JsonElement facets = new JsonParser().parse(aggregations);
-            for (JsonElement e : facets.getAsJsonArray()) {
-                JsonObject facet = e.getAsJsonObject();
-                if (facet.has("field") && facet.has("operator")) {
-                        String currentField = facet.get("field").getAsString();
-                        String operator = facet.get("operator").getAsString();
-                        if (currentField.equals(field) && operator.equalsIgnoreCase("AND")) {
-                               return true;
-                            }
+                JsonElement facets = new JsonParser().parse(aggregations);
+                for (JsonElement e : facets.getAsJsonArray()) {
+                    JsonObject facet = e.getAsJsonObject();
+                    if (facet.has("field") && facet.has("operator")) {
+                            String currentField = facet.get("field").getAsString();
+                            String operator = facet.get("operator").getAsString();
+                            if (currentField.equals(field) && operator.equalsIgnoreCase("AND")) {
+                                   return true;
+                             }
+                    }
                 }
-            }
         } catch (Exception e) {
             logger.error("Facets could not be processed. "
                     + "Please check the syntax. "
