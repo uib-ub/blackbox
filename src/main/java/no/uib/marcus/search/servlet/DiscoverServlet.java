@@ -13,10 +13,13 @@ import no.uib.marcus.search.MarcusSearchService;
 import org.elasticsearch.action.search.SearchResponse;
 
 
-@WebServlet(name = "DiscoverServlet", urlPatterns = {"/discover"})
+@WebServlet(
+        name = "DiscoverServlet", 
+        urlPatterns = {"/discover"}
+)
 public class DiscoverServlet extends HttpServlet {
-
-
+    private static final long serialVersionUID = 3L;
+    
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         request.setCharacterEncoding("UTF-8");

@@ -31,13 +31,14 @@ import org.elasticsearch.index.query.QueryBuilders;
 import no.uib.marcus.search.SearchService;
 import no.uib.marcus.search.MarcusSearchService;
 import no.uib.marcus.search.client.ClientFactory;
+import org.elasticsearch.ElasticsearchException;
 import org.elasticsearch.action.count.CountRequestBuilder;
 import org.elasticsearch.common.Nullable;
 import org.elasticsearch.common.Strings;
 
 /**
- * @author Hemed Al Ruwehy (hemed.ruwehy@uib.no) 2016-01-24, University of
- * Bergen Library
+ * @author Hemed Al Ruwehy (hemed.ruwehy@uib.no) 
+ * 2016-01-24, University of Bergen Library
  */
 @WebServlet(
         name = "SearchServlet",
@@ -46,6 +47,7 @@ import org.elasticsearch.common.Strings;
 public class SearchServlet extends HttpServlet {
 
     private static final Logger logger = Logger.getLogger(SearchServlet.class);
+    private static final long serialVersionUID = 1L;
 
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
@@ -91,9 +93,9 @@ public class SearchServlet extends HttpServlet {
                 return Collections.emptyMap();
             }
             for (String entry : selectedFilters) {
-                if (entry.lastIndexOf(".") != -1) {
+                if (entry.lastIndexOf('.') != -1) {
                     //Get the index for the last occurence of a dot
-                    int lastIndex = entry.lastIndexOf(".");
+                    int lastIndex = entry.lastIndexOf('.');
                     String key = entry.substring(0, lastIndex).trim();
                     String value = entry.substring(lastIndex + 1, entry.length()).trim();
                     //Should we allow empty values? maybe :) 
@@ -208,7 +210,11 @@ public class SearchServlet extends HttpServlet {
                              }
                     }
                 }
-        } catch (Exception e) {
+        }
+        catch(ElasticsearchException e){
+            throw e;
+        }
+        catch (Exception e) {
             logger.error("Facets could not be processed. "
                     + "Please check the syntax. "
                     + "It should be a valid JSON array: " + aggregations);

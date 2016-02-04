@@ -28,6 +28,9 @@ import org.elasticsearch.search.aggregations.AggregationBuilder;
 import org.elasticsearch.search.aggregations.AggregationBuilders;
 import org.elasticsearch.search.aggregations.bucket.terms.Terms.Order;
 import org.elasticsearch.search.builder.SearchSourceBuilderException;
+import org.elasticsearch.search.sort.SortBuilder;
+import org.elasticsearch.search.sort.SortBuilders;
+import org.elasticsearch.search.sort.SortOrder;
 
 public class MarcusSearchService implements SearchService {
 
@@ -56,7 +59,7 @@ public class MarcusSearchService implements SearchService {
     /**
      * Get All Documents using query string. See this: See
      * http://stackoverflow.com/questions/23807314/multiple-filters-and-an-aggregate-in-elasticsearch
-     * <b />
+     * <br />
      *
      * @param queryStr - a query string
      * @param indices - one or more indices
@@ -71,39 +74,42 @@ public class MarcusSearchService implements SearchService {
         SearchRequestBuilder searchRequest;
         QueryBuilder query;
         try {
-            //Prepare search request
-            searchRequest = ClientFactory
-                    .getTransportClient()
-                    .prepareSearch();
-            //Set indices
-            if (indices != null && indices.length > 0) {
-                searchRequest.setIndices(indices);
-            }
-            //Set types
-            if (types != null && types.length > 0) {
-                searchRequest.setTypes(types);
-            }
-            if (Strings.hasText(queryStr)) {
-                //Set query string
-                query = QueryBuilders.queryStringQuery(queryStr);
-            } else {
-                //Match all query
-                query = QueryBuilders.matchAllQuery();
-            }
+                //Prepare search request
+                searchRequest = ClientFactory
+                        .getTransportClient()
+                        .prepareSearch();
+                
+                //Set indices
+                if (indices != null && indices.length > 0) {
+                    searchRequest.setIndices(indices);
+                }
+                //Set types
+                if (types != null && types.length > 0) {
+                    searchRequest.setTypes(types);
+                }
+                if (Strings.hasText(queryStr)) {
+                    //Set query string
+                    query = QueryBuilders.queryStringQuery(queryStr);
+                } else {
+                    //Match all query
+                    query = QueryBuilders.matchAllQuery();
+                }
 
-            //Set query
-            searchRequest.setQuery(query);
+                //Set query
+                searchRequest.setQuery(query);
 
-            //from & size
-            searchRequest.setFrom(from);
-            searchRequest.setSize(size);
+                //from & size
+                searchRequest.setFrom(from);
+                searchRequest.setSize(size);
+                    
+                searchRequest.addSort("available", SortOrder.DESC);
+                
+                //Append term aggregations to this request builder
+                appendTermsAggregation(searchRequest, aggs);
 
-            //Append term aggregations to this request builder
-            appendTermsAggregation(searchRequest, aggs);
-
-            response = searchRequest
-                    .execute()
-                    .actionGet();
+                response = searchRequest
+                        .execute()
+                        .actionGet();
 
         } catch (SearchSourceBuilderException se) {
             logger.error("Exception on preparing the request: " + se.getDetailedMessage());
@@ -226,7 +232,7 @@ public class MarcusSearchService implements SearchService {
         //http://stackoverflow.com/questions/23807314/multiple-filters-and-an-aggregate-in-elasticsearch
         Map map = new HashMap();
         String json = "[{\"field\": \"status\", \"size\": 25},{\"field\" : \"assigned_to\"}]";
-        JsonElement el = new JsonParser().parse(json);
+        //JsonElement el = new JsonParser().parse(json);
 
         map.put("status", "go_to_gate");
         BoolFilterBuilder fb = (BoolFilterBuilder) FilterBuilders
@@ -248,7 +254,7 @@ public class MarcusSearchService implements SearchService {
                         .to("1920-01-01"));
 
         //.must(FilterBuilders.termFilter("assigned_to", "Marianne Paasche"));
-        AggregationBuilder aggregation = AggregationBuilders
+       /** AggregationBuilder aggregation = AggregationBuilders
                 .filters("agg")
                 .filter("men", FilterBuilders.termFilter("gender", "male"))
                 .filter("women", FilterBuilders.termFilter("gender", "female"));
@@ -257,6 +263,7 @@ public class MarcusSearchService implements SearchService {
                 .startObject()
                 .field("filtered", XContentFactory.jsonBuilder().field("filter", fb))
                 .endObject();
+                ***/ 
 
         SearchRequestBuilder req = ClientFactory.getTransportClient()
                 .prepareSearch()
@@ -280,12 +287,13 @@ public class MarcusSearchService implements SearchService {
          * .field("assigned_to")
          * .subAggregation(AggregationBuilders.terms("by_status").field("status"))
                  );*
-         */
+        
 
         CountRequestBuilder cr = ClientFactory
                 .getTransportClient()
                 .prepareCount()
                 .setQuery(QueryBuilders.termQuery("status", "Sent"));
+                **/ 
 
         SearchResponse res = req.execute().actionGet();
 

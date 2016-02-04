@@ -19,6 +19,7 @@ import org.elasticsearch.common.xcontent.XContentFactory;
  */
 @WebServlet(name = "SuggestionServlet", urlPatterns = {"/suggest"})
 public class SuggestServlet extends HttpServlet {
+      private static final long serialVersionUID = 2L;
 
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
@@ -30,11 +31,12 @@ public class SuggestServlet extends HttpServlet {
         try (PrintWriter out = response.getWriter()) {
             Gson gson = new Gson();
             
-            XContentBuilder jsonObj = XContentFactory
+            /**XContentBuilder jsonObj = XContentFactory
                     .jsonBuilder()
                     .startObject()
                     .field("suggest_list", Suggestion.getSuggestions(queryString, "admin" , "suggest"))
                     .endObject();
+            **/
            
               String jsonString = gson.toJson(Suggestion.getSuggestions(queryString, "admin" , "suggest"));
               out.write(jsonString);

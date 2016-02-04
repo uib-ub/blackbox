@@ -4,6 +4,7 @@ package no.uib.marcus.search.client;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import org.apache.log4j.Logger;
+import org.elasticsearch.ElasticsearchException;
 import org.elasticsearch.action.admin.cluster.health.ClusterHealthResponse;
 import org.elasticsearch.client.Client;
 import org.elasticsearch.client.transport.TransportClient;
@@ -46,10 +47,12 @@ public class ClientFactory {
                       ClusterHealthResponse hr = client.admin().cluster().prepareHealth().get();  
                       logger.info("Connected to Elasticsearch : " + hr);
             }
-            catch(Exception  e){
-                logger.error("Unable to connect to Elasticsearch. Is it running? " + e.getMessage());
+            catch(UnknownHostException ue){
+               logger.error("Unknown host: " + ue.getMessage()); 
             }
-
+            catch(ElasticsearchException e){
+                logger.error("Unable to connect to Elasticsearch. Is it running? " + e.getDetailedMessage());
+            }
             return client;
         }
     

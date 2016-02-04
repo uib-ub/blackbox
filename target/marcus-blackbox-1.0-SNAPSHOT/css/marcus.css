@@ -3,22 +3,21 @@
     background: white;
 }
 .search-results .facets {
-    width: 20%;
+    width: 23%;
     float: left;
     display: inline-block;
-    padding: 30px;
     overflow-x: hidden;
     overflow-y: auto;
     background: whitesmoke;
+    padding-left: 35px;
 }
 
 .search-results .search-hits {
     display: block;
     margin: 0 auto;
     float: left;
-    width: 75%;
+    width: 100%;
 }
-
 
 .datePicker {
     width: 45%;
@@ -30,3 +29,10 @@
         background: black;
         color : orange;
 }
+.single-select {
+    width: 40%;
+    background: white;
+    border-color : orange;
+    color: #07e;
+}
+

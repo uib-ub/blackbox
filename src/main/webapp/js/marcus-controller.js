@@ -11,10 +11,17 @@ app.controller('freeTextSearch', function ($scope, $http, $location, mySetting) 
     $scope.selected_filters = [];
     $scope.from_date = null;
     $scope.to_date = null;
+    $scope.sort_by = null;
     
-    //Get values from checkboxes
+    /**
+     * Get values from checkboxes. 
+     * The method returns a string concatenation of a field and the selected value.
+     * Note that, a field and it's selected value must be seperated by a dot ('.'), 
+     * otherwise the server will not know which is which and aggregations will fail.
+     **/
     $scope.getCheckedValue = function (field, filterValue) {
         if (field !== undefined && filterValue !== undefined) {
+           /**Seperate a field and the selected value by a dot.**/
             return field + "." + filterValue;
         }
         return null;
@@ -45,7 +52,7 @@ app.controller('freeTextSearch', function ($scope, $http, $location, mySetting) 
                 to_date: $scope.to_date,
                 filter: $scope.selected_filters,
                 from : 0,
-                size: 12
+                size: 10
               }
            })
             .success(function (data, status, headers, config) {
