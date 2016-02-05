@@ -1,38 +1,58 @@
-
-.search-results {
-    background: white;
+html {
+  background-color: #f2f9ff;
+  font: normal normal normal 18px/1.2 "Helvetica Neue", Roboto, "Segoe UI", Calibri, sans-serif;
+  color: #292f33;
 }
+
+.main-container {
+     background-color: #f2f9ff;
+     width: 100%;
+     
+}
+.main-container .content {
+    margin: auto;
+    width: 96%;
+    background: #f2f9ff;
+}
+
+
 .search-results .facets {
     width: 23%;
     float: left;
     display: inline-block;
     overflow-x: hidden;
     overflow-y: auto;
-    background: whitesmoke;
-    padding-left: 35px;
+    background: white;
+    padding-left: 10px;
+    border: 1px dotted whitesmoke;
+    margin-right: 25px;
+    margin-top: 10px;
 }
 
 .search-results .search-hits {
-    display: block;
-    margin: 0 auto;
-    float: left;
+    display: inline-block;
+    margin: auto;
+    /**float: right;**/
+    background: white;
     width: 100%;
+    margin-top: 10px;
+    border: 1px dotted whitesmoke;
 }
 
 .datePicker {
-    width: 45%;
+    width: 55%;
     margin-left: 4px;
 }
 
 .ui-datepicker select.ui-datepicker-month, .ui-datepicker select.ui-datepicker-year {
 	width: 45%;
-        background: black;
-        color : orange;
+        /**background: black;
+        color : orange;**/
 }
 .single-select {
     width: 40%;
-    background: white;
-    border-color : orange;
+    background: whitesmoke;
+    /**border-color : orange;**/
     color: #07e;
 }
 

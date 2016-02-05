@@ -102,7 +102,7 @@ public class MarcusSearchService implements SearchService {
                 searchRequest.setFrom(from);
                 searchRequest.setSize(size);
                     
-                searchRequest.addSort("available", SortOrder.DESC);
+                //searchRequest.addSort("available", SortOrder.DESC);
                 
                 //Append term aggregations to this request builder
                 appendTermsAggregation(searchRequest, aggs);

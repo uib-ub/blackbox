@@ -7,15 +7,17 @@
                 <meta name="description" content="Search Marcus data" />
                     <meta name="viewport" content="width=device-width, initial-scale=1" />
                         <link rel="shortcut icon" type="image/x-icon" href="http://marcus.uib.no/img/favicon.ico" />
+                                              <link rel="stylesheet" href="js/lib/typeahead/css/main.css"/>
                                 <link rel="stylesheet" href="js/lib/typeahead/css/normalize.min.css"/>
                                     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" />
                                     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap-theme.min.css" />
                                     <link rel="stylesheet" href="//code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css" />
-                                    <link rel="stylesheet" href="js/lib/typeahead/css/main.css"/>
                                      <link rel="stylesheet" href="css/marcus.css" />
+                       
     </head>
     <body>
         <div id="searchController"  ng-controller="freeTextSearch">
+           <div class="main-container">
             <div class="masthead">
                <h1 class="title">Blackbox</h1>
                  <div class="Demo">
@@ -41,18 +43,19 @@
             <!--div ng-show="loading" class="loading"><img src="">LOADING </div-->
             <!--uib-progressbar class="progress-striped active" value="dynamic">hello world</uib-progressbar-->
             <div class="search-results container-fluid">
-                <div class='row row-fluid'>
+                <div class="content row row-fluid">
                     <div class="facets col-lg-3 col-md-3 hidden-sm hidden-xs">
-                               <h3>Opprettet dato</h3>
+                               <h3>Dato</h3>
+                               <hr>
                                 <input id="from_date" class="datePicker" type="text"  ng-model="from_date" ng-change="search()" placeholder="FRA" title="Fra dato">
                                <!--buttton class="btn btn-mini" style="margin-left:-30%"><span class="glyphicon glyphicon-remove" ng-click="clearDates();"></span></buttton--><br/><br/>
                                 <input id="to_date" class="datePicker" type="text"  ng-model="to_date" ng-change="search()" placeholder="TIL" title="Til dato"><br/><br/>
                                 
                                 <button class="btn btn-small btn-primary" ng-click="search()"><strong>OPPDATER SØKET</strong></button><br/><br/>
-                                <button class="btn btn-small btn-danger" ng-click="clearDates()"><strong><b>NULLSTILL DATOENE</b></strong></button>
-                                
-                                
+                                <!--button class="btn btn-small btn-danger" ng-click="clearDates()"><strong><b>NULLSTILL DATOENE</b></strong></button-->
+
                                  <h3>Dokument typer</h3>
+                                 <hr>
                                 <ul class="nav nav-list">
                                     <li ng-repeat="bucket in results['aggregations']['type.exact']['buckets']">
                                         <label>
@@ -64,6 +67,7 @@
                                 </ul>
                                 
                                 <h3>Emne</h3>
+                                <hr>
                                 <ul class="nav nav-list">
                                     <li ng-repeat="bucket in results['aggregations']['subject.exact']['buckets']">
                                         <label>
@@ -75,31 +79,33 @@
                                 </ul>                 
                     </div>
 
-                    <div class="container container-fluid search-hits">
+                    <div class="search-hits container container-fluid">
                         <div>
-                            <label for="sort_by">Sort by: </label> 
+                            <label for="sort_by"> Sort by: </label> 
                             <select class="form-control single-select" id="sort_by" ng-model="sort_by">
                                 <option value="">Relevance</option>
-                                <option value="available:asc">Availability Ascending</option>
-                                <option value="available,desc">Availability Descending</option>
-                                <option value="title,asc">Title Ascending</option>
-                                <option value="title,desc">Title Descending</option>
-                                <option value="id,asc">Identifier Ascending</option>
-                                <option value="id,desc">Identifier Descending</option>
+                                <option value="available,asc">Availability ASC</option>
+                                <option value="available,desc">Availability DESC</option>
+                                <option value="title,asc">Title ASC</option>
+                                <option value="title,desc">Title DESC</option>
+                                <option value="id,asc">ID ASC</option>
+                                <option value="id,desc">ID DESC</option>
                             </select>
                                 {{sort_by}}
                         </div><br/>
                         
-                        <h4 ng-show="results.hits.total > 0"> Total hits : {{results.hits.total}}</h4>
-                        <ul>
-                            <li ng-repeat="x in results.hits.hits">
-                                {{x._source}}
-                            </li>
-                        </ul>
+                        <div>
+                            <h4 ng-show="results.hits.total > 0"> Total hits : {{results.hits.total}}</h4>
+                            <ul>
+                                <li ng-repeat="x in results.hits.hits">
+                                    {{x._source}}
+                                </li>
+                            </ul>
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
+    
         
         <script id="result-template" type="text/x-handlebars-template">
             <div class="ProfileCard u-cf">
@@ -133,7 +139,7 @@
                    angular.module("settings", [])
                    .constant("mySetting",{
                        index: ["admin"],
-                       type : ["document", "invoice"],
+                       type : ["invoice"],
                        facets: [
                            {"field": "type.exact", "size": 10, "operator" : "AND", "order": "term_asc"},
                            {"field" : "assigned_to" , "order" : "term_asc"}, 
@@ -141,5 +147,7 @@
                            {"field": "customer_name" , "size" : 10, "operator": "OR", "order" : "count_desc"}]
            });
         </script>
+            </div>
+        </div>
     </body>
 </html>
