@@ -8,10 +8,10 @@ app.controller('freeTextSearch', function ($scope, $http, $location, mySetting) 
     
     //Initialize variables
     $scope.query_string = "";
+    $scope.sort_by = "";
     $scope.selected_filters = [];
     $scope.from_date = null;
     $scope.to_date = null;
-    $scope.sort_by = null;
     
     /**
      * Get values from checkboxes. 
@@ -36,11 +36,12 @@ app.controller('freeTextSearch', function ($scope, $http, $location, mySetting) 
         $scope.search();
     };
      
-
     //Send requests to search servlet
     $scope.search = function () {
-        var q;
-        $scope.query_string === "" ? q = null : q = $scope.query_string + "*";
+       /**We are assigning null to these values so that they should not appear in query string**/
+        var q = $scope.query_string === "" ? null : $scope.query_string + "*";
+        var sort = $scope.sort_by === ""? null : $scope.sort_by;
+        
         $http({
             method: 'GET',
             url: 'search?aggs=' + JSON.stringify(mySetting.facets),
@@ -52,7 +53,8 @@ app.controller('freeTextSearch', function ($scope, $http, $location, mySetting) 
                 to_date: $scope.to_date,
                 filter: $scope.selected_filters,
                 from : 0,
-                size: 10
+                size: 10,
+                sort: sort 
               }
            })
             .success(function (data, status, headers, config) {

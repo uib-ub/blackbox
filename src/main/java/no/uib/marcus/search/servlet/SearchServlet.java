@@ -35,6 +35,11 @@ import org.elasticsearch.ElasticsearchException;
 import org.elasticsearch.action.count.CountRequestBuilder;
 import org.elasticsearch.common.Nullable;
 import org.elasticsearch.common.Strings;
+import org.elasticsearch.common.base.Optional;
+import org.elasticsearch.search.sort.FieldSortBuilder;
+import org.elasticsearch.search.sort.SortBuilder;
+import org.elasticsearch.search.sort.SortBuilders;
+import org.elasticsearch.search.sort.SortOrder;
 
 /**
  * @author Hemed Al Ruwehy (hemed.ruwehy@uib.no) 
@@ -62,6 +67,7 @@ public class SearchServlet extends HttpServlet {
         String size = request.getParameter("size");
         String fromDate = request.getParameter("from_date");
         String toDate = request.getParameter("to_date");
+        String sortString = request.getParameter("sort");
         SearchService service = new MarcusSearchService();
         SearchResponse searchResponse;
         BoolFilterBuilder boolFilter;
@@ -69,12 +75,13 @@ public class SearchServlet extends HttpServlet {
         try (PrintWriter out = response.getWriter()) {
                 int _from = Strings.hasText(from)? Integer.parseInt(from) : 0;
                 int _size = Strings.hasText(size)? Integer.parseInt(size) : 10;
+                SortBuilder fieldSort = Strings.hasText(sortString)? getFieldSort(sortString) : null;
                 
                 boolFilter = (BoolFilterBuilder)buildBoolFilter(selectedFilters, aggs, fromDate, toDate);
                 if (boolFilter.hasClauses()) {
-                    searchResponse = service.getDocuments(queryString, indices, types, boolFilter, aggs, _from, _size);
+                    searchResponse = service.getDocuments(queryString, indices, types, boolFilter, aggs, _from, _size, fieldSort);
                 } else {
-                    searchResponse = service.getDocuments(queryString, indices, types, aggs, _from, _size);
+                    searchResponse = service.getDocuments(queryString, indices, types, aggs, _from, _size, fieldSort);
                 }
                 //After getting the response, add extra field "total_doc_count" to every bucket in the aggregations
                 String responseJson = addExtraFieldToBucketAggregations(searchResponse, indices, types);
@@ -85,6 +92,7 @@ public class SearchServlet extends HttpServlet {
     /**
      * A method to get a map based on the selected filters.
      * If no filter is selected, return an empty map.
+     * @param selectedFilters, a string of selected filters in the form of "field.value"
      */
     private Map getFilterMap(String[] selectedFilters) {
         Map<String, List<String>> filters = new HashMap<>();
@@ -187,6 +195,41 @@ public class SearchServlet extends HttpServlet {
         }
         return boolFilter;
     }
+    
+    /**
+     * Building a fieldSort. TODO: Validation required.
+     * @param sortString, a string that contains a field and sort type in the form of "field.asc" or "field.desc"
+     */
+    private SortBuilder getFieldSort(String sortString) {
+        SortBuilder sortBuilder = null;
+        SortOrder sortOrder = null;
+        try {
+                int lastIndex = sortString.lastIndexOf('_');
+                String field = sortString.substring(0, lastIndex).trim();
+                String order = sortString.substring(lastIndex + 1, sortString.length()).trim();
+                
+                //Validation comes here (If either one is empty, return null=?)
+                if (order.equalsIgnoreCase("asc")) {
+                    sortOrder = SortOrder.ASC;
+                }
+                if (order.equalsIgnoreCase("desc")) {
+                    sortOrder = SortOrder.DESC;
+                }
+                //Build sort
+                sortBuilder = SortBuilders
+                        .fieldSort(field)
+                        .missing("_last");
+
+                if (sortBuilder != null) {
+                    sortBuilder.order(sortOrder);
+                }
+
+        } catch (ElasticsearchException e) {
+            logger.error("Sorting cannot be constructed. "
+                    + "Either the field does exist or the sort order is not known " + e.getDetailedMessage());
+        }
+        return sortBuilder;
+    }
 
     /**
      * The method checks if the facets/aggregations contain AND operator. If not
@@ -232,9 +275,12 @@ public class SearchServlet extends HttpServlet {
      *
      */
     private String addExtraFieldToBucketAggregations(SearchResponse response, @Nullable String[] indices, @Nullable String... types) {
+            if(response == null){
+                throw new NullPointerException("Search response is empty."
+                        + " Cannot process aggregations. This means search response failed to execute");
+            }
             JsonElement responseJson = new JsonParser().parse(response.toString());
             Gson gson = new GsonBuilder().setPrettyPrinting().create();
-
             JsonObject aggs = responseJson.getAsJsonObject().get("aggregations").getAsJsonObject();
             //Iterate throgh all the terms
             for (Map.Entry<String, JsonElement> entry : aggs.entrySet()) {
@@ -268,6 +314,7 @@ public class SearchServlet extends HttpServlet {
                 }
 
             }
+            
             return gson.toJson(responseJson);
     }
 

@@ -9,39 +9,39 @@ html {
      width: 100%;
      
 }
-.main-container .content {
-    margin: auto;
-    width: 96%;
-    background: #f2f9ff;
-}
+
+/**@media (min-width: 320px) {**/
+    .main-container .content{
+        width: 1000px;
+        margin: 30px auto 0 auto;
+        overflow: hidden;
+    }
+/**}**/
 
 
 .search-results .facets {
-    width: 23%;
+    width: 26%;
     float: left;
     display: inline-block;
     overflow-x: hidden;
     overflow-y: auto;
     background: white;
     padding-left: 10px;
-    border: 1px dotted whitesmoke;
+    border : 1px solid lightgrey;
     margin-right: 25px;
-    margin-top: 10px;
 }
 
 .search-results .search-hits {
     display: inline-block;
-    margin: auto;
-    /**float: right;**/
     background: white;
-    width: 100%;
-    margin-top: 10px;
-    border: 1px dotted whitesmoke;
+    margin: 0 auto;
+    width: 70%;
+    border : 1px solid lightgrey;
 }
 
 .datePicker {
     width: 55%;
-    margin-left: 4px;
+    /**margin-left: 4px;**/
 }
 
 .ui-datepicker select.ui-datepicker-month, .ui-datepicker select.ui-datepicker-year {
@@ -54,5 +54,10 @@ html {
     background: whitesmoke;
     /**border-color : orange;**/
     color: #07e;
+}
+
+.results-hit {
+    width: 100%;
+    margin: 0 0 0 0;
 }
 

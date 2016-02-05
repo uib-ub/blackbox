@@ -4,8 +4,8 @@ $(function () {
     //Configure from_date
     $("#from_date").datepicker({
         showOn: "both",
-        buttonImage: "img/calendar.gif",
-        //buttonText: '<span class="glyphicon glyphicon-calendar" style="border:0px;"></span>',
+        //buttonImage: "img/calendar.gif",
+        buttonText: '<span class="glyphicon glyphicon-calendar" style="border:0px;"></span>',
         changeMonth: true,
         changeYear: true,
         yearRange: "1700:+1",
@@ -19,7 +19,8 @@ $(function () {
     //Configure to_date
     $("#to_date").datepicker({
         showOn: "both",
-        buttonImage: "img/calendar.gif",
+        //buttonImage: "img/calendar.gif",
+        buttonText: '<span class="glyphicon glyphicon-calendar" style="border:0px;"></span>',
         changeMonth: true,
         changeYear: true,
         yearRange: "1700:+1",

@@ -69,7 +69,8 @@ public class MarcusSearchService implements SearchService {
      *
      */
     @Override
-    public SearchResponse getDocuments(@Nullable String queryStr, @Nullable String[] indices, @Nullable String[] types, String aggs, int from, int size) {
+    public SearchResponse getDocuments(@Nullable String queryStr, @Nullable String[] indices, @Nullable 
+            String[] types, String aggs, int from, int size, SortBuilder sort) {
         SearchResponse response = null;
         SearchRequestBuilder searchRequest;
         QueryBuilder query;
@@ -101,11 +102,15 @@ public class MarcusSearchService implements SearchService {
                 //from & size
                 searchRequest.setFrom(from);
                 searchRequest.setSize(size);
-                    
-                //searchRequest.addSort("available", SortOrder.DESC);
                 
+                if(sort != null){
+                    searchRequest.addSort(sort);
+                }
                 //Append term aggregations to this request builder
                 appendTermsAggregation(searchRequest, aggs);
+                
+                //Show what has been sent to ES, for debugging..
+                logger.info(searchRequest.toString());
 
                 response = searchRequest
                         .execute()
@@ -123,7 +128,8 @@ public class MarcusSearchService implements SearchService {
      * Get All Documents using query string.
      */
     @Override
-    public SearchResponse getDocuments(@Nullable String queryStr, @Nullable String[] indices, @Nullable String[] types, FilterBuilder filter, String aggs, int from, int size) {
+    public SearchResponse getDocuments(@Nullable String queryStr, @Nullable String[] indices, 
+            @Nullable String[] types, FilterBuilder filter, String aggs, int from, int size, SortBuilder sort) {
         SearchResponse response = null;
         SearchRequestBuilder searchRequest;
         BoolFilterBuilder boolFilter = (BoolFilterBuilder) filter;
@@ -156,6 +162,10 @@ public class MarcusSearchService implements SearchService {
 
                 searchRequest.setFrom(from);
                 searchRequest.setSize(size);
+                
+                if(sort != null){
+                    searchRequest.addSort(sort);
+                }
 
                 /**
                  * //Post filter
