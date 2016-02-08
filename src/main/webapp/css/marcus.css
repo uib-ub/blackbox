@@ -1,14 +1,12 @@
-html {
+html, body {
     background-color: #f2f9ff;
-    font: normal normal normal 18px/1.2 "Helvetica Neue", Roboto, "Segoe UI", Calibri, sans-serif;
-    color: #292f33;
 }
 
 .main-container {
-    background-color: #f2f9ff;
+    /**background-color: #f2f9ff;**/
     width: 100%;
-
 }
+
 
 /**@media (min-width: 320px) {**/
 .main-container .content{
@@ -37,6 +35,7 @@ html {
     margin: 0 auto;
     width: 70%;
     border : 1px solid #eee;
+    margin-bottom: 50px;
 }
 
 .datePicker {
@@ -63,5 +62,8 @@ html {
 .results-hit {
     width: 100%;
     margin: 0 0 0 0;
+}
+.pagination {
+    font-weight: bolder;
 }
 

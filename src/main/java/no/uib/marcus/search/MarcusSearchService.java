@@ -10,6 +10,7 @@ import java.util.HashMap;
 import java.util.Map;
 import no.uib.marcus.search.client.ClientFactory;
 import org.apache.log4j.Logger;
+import org.elasticsearch.ElasticsearchException;
 import org.elasticsearch.action.count.CountRequestBuilder;
 import org.elasticsearch.action.count.CountResponse;
 import org.elasticsearch.action.search.SearchRequestBuilder;
@@ -24,7 +25,6 @@ import org.elasticsearch.index.query.FilterBuilder;
 import org.elasticsearch.index.query.FilterBuilders;
 import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
-import org.elasticsearch.search.aggregations.AggregationBuilder;
 import org.elasticsearch.search.aggregations.AggregationBuilders;
 import org.elasticsearch.search.aggregations.bucket.terms.Terms.Order;
 import org.elasticsearch.search.aggregations.bucket.terms.TermsBuilder;
@@ -51,7 +51,6 @@ public class MarcusSearchService implements SearchService {
                 this.size = size;
                 this.sort = sort;
         }
-
         public String[] getIndices() {
                 return indices;
         }
@@ -176,8 +175,8 @@ public class MarcusSearchService implements SearchService {
                                 .actionGet();
                 } catch (SearchSourceBuilderException se) {
                         logger.error("Exception on preparing the request: " + se.getDetailedMessage());
-                } catch (Exception ex) {
-                        logger.error("Exception: " + ex.getMessage());
+                } catch (ElasticsearchException ex) {
+                        logger.error("Exception: " + ex.getDetailedMessage());
                 }
                 return response;
         }
@@ -243,38 +242,40 @@ public class MarcusSearchService implements SearchService {
                 } catch (SearchSourceBuilderException se) {
                         logger.error("Exception on preparing the request: "
                                 + se.getDetailedMessage());
-                } catch (Exception ex) {
-                        logger.error("Exception: "
-                                + ex.getMessage());
+                } catch (ElasticsearchException ex) {
+                        logger.error(ex.getDetailedMessage());
                 }
                 return response;
         }
 
         /**
          * A method to append terms aggregations to the search request builder.
+         *
          * @param a search request
-         * 
-         * @return the same search request where aggregations have been added to it.
+         *
+         * @return the same search request where aggregations have been added to
+         * it.
          */
-        private SearchRequestBuilder addTermsAggregation(SearchRequestBuilder searchRequest) throws Exception {
+        private SearchRequestBuilder addTermsAggregation(SearchRequestBuilder searchRequest) 
+                throws ElasticsearchException {
+                
                 JsonElement jsonElement = new JsonParser().parse(aggregations);
                 for (JsonElement facets : jsonElement.getAsJsonArray()) {
                         JsonObject currentFacet = facets.getAsJsonObject();
                         if (currentFacet.has("field")) {
                                 String field = currentFacet.get("field").getAsString();
-                                
-                                 TermsBuilder termsBuilder = AggregationBuilders
-                                         .terms(field)
-                                         .field(field)
-                                         .minDocCount(0);
-                                 
+                                TermsBuilder termsBuilder = AggregationBuilders
+                                        .terms(field)
+                                        .field(field)
+                                        .minDocCount(0);
+
                                 //Set size
                                 if (currentFacet.has("size")) {
-                                       int  size = currentFacet.get("size").getAsInt();
-                                       termsBuilder.size(size);
-                                       
+                                        int size = currentFacet.get("size").getAsInt();
+                                        termsBuilder.size(size);
+
                                 }
-                                
+
                                 //Set order
                                 if (currentFacet.has("order")) {
                                         Order order = Order.count(false);
@@ -287,7 +288,7 @@ public class MarcusSearchService implements SearchService {
                                         }
                                         termsBuilder.order(order);
                                 }
-                              
+
                                 //Add aggregations to the search request builder
                                 searchRequest.addAggregation(termsBuilder);
                         }
@@ -295,18 +296,20 @@ public class MarcusSearchService implements SearchService {
                 }
                 return searchRequest;
         }
-        
-         /**
+
+        /**
          * A method to add extra field to every bucket in the terms
          * aggregations. The field value is queried independently from the
          * Elasticsearch.
          * <br />
-         * 
+         *
          * This method is in experimentation phase and maybe removed in the
          * future releases.
-         * @param  a search response
-         * 
-         * @return a JSON string of response where the extra field is added to each bucket aggregation.
+         *
+         * @param a search response
+         *
+         * @return a JSON string of response where the extra field has been added to
+         * each bucket aggregation.
          *
          */
         public String addExtraFieldToBucketsAggregation(SearchResponse response) {
@@ -316,39 +319,43 @@ public class MarcusSearchService implements SearchService {
                 }
                 JsonElement responseJson = new JsonParser().parse(response.toString());
                 Gson gson = new GsonBuilder().setPrettyPrinting().create();
-                JsonObject aggs = responseJson.getAsJsonObject().get("aggregations").getAsJsonObject();
-                //Iterate throgh all the terms
-                for (Map.Entry<String, JsonElement> entry : aggs.entrySet()) {
-                        //Get term 
-                        String term = entry.getKey();
-                        //Get value
-                        JsonObject terms = entry.getValue().getAsJsonObject();
-                        //Iterate throgh array of buckets of this term.
-                        for (JsonElement element : terms.getAsJsonArray("buckets")) {
-                                JsonObject bucket = element.getAsJsonObject();
-                                String value = bucket.get("key").getAsString();
+                if (responseJson.getAsJsonObject().has("aggregations")) {
+                        JsonObject aggs = responseJson.getAsJsonObject().get("aggregations").getAsJsonObject();
+                        //Iterate throgh all the terms
+                        for (Map.Entry<String, JsonElement> entry : aggs.entrySet()) {
+                                //Get term 
+                                String term = entry.getKey();
+                                //Get value
+                                JsonObject terms = entry.getValue().getAsJsonObject();
+                                //Iterate throgh array of buckets of this term.
+                                for (JsonElement element : terms.getAsJsonArray("buckets")) {
+                                        JsonObject bucket = element.getAsJsonObject();
+                                        String value = bucket.get("key").getAsString();
 
-                                /**
-                                 * Query Elasticsearch independently for count
-                                 * of the specified term.
-                                 */
-                                CountRequestBuilder countRequestBuilder = ClientFactory
-                                        .getTransportClient()
-                                        .prepareCount();
+                                        /**
+                                         * Query Elasticsearch independently for
+                                         * count of the specified term.
+                                         */
+                                        CountRequestBuilder countRequestBuilder = ClientFactory
+                                                .getTransportClient()
+                                                .prepareCount();
 
-                                if (indices != null && indices.length > 0) {
-                                        countRequestBuilder.setIndices(indices);
+                                        if (indices != null && indices.length > 0) {
+                                                countRequestBuilder.setIndices(indices);
+                                        }
+                                        if (types != null && types.length > 0) {
+                                                countRequestBuilder.setTypes(types);
+                                        }
+                                        /**
+                                         * Build a count response*
+                                         */
+                                        CountResponse countResponse = countRequestBuilder
+                                                .setQuery(QueryBuilders.termQuery(term, value))
+                                                .execute()
+                                                .actionGet();
+                                        //Add this extra field "total_doc_count" to bucket aggregations
+                                        bucket.addProperty("total_doc_count", countResponse.getCount());
                                 }
-                                if (types != null && types.length > 0) {
-                                        countRequestBuilder.setTypes(types);
-                                }
-                                /**Build a count response**/
-                                CountResponse countResponse = countRequestBuilder
-                                        .setQuery(QueryBuilders.termQuery(term, value))
-                                        .execute()
-                                        .actionGet();
-                                //Add this extra field "total_doc_count" to bucket aggregations
-                                bucket.addProperty("total_doc_count", countResponse.getCount());
                         }
 
                 }

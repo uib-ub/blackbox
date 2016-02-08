@@ -17,6 +17,7 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import no.uib.marcus.common.AggregationUtil;
 
 import org.apache.log4j.Logger;
 import org.elasticsearch.action.search.SearchResponse;
@@ -43,7 +44,12 @@ public class SearchServlet extends HttpServlet {
 
         private static final Logger logger = Logger.getLogger(SearchServlet.class);
         private static final long serialVersionUID = 1L;
+        MarcusSearchService service;
 
+        public SearchServlet() {
+                //Share this object amongst all requests.
+                this.service = new MarcusSearchService();
+        }
         protected void processRequest(HttpServletRequest request, HttpServletResponse response)
                 throws ServletException, IOException {
                 request.setCharacterEncoding("UTF-8");
@@ -58,7 +64,6 @@ public class SearchServlet extends HttpServlet {
                 String fromDate = request.getParameter("from_date");
                 String toDate = request.getParameter("to_date");
                 String sortString = request.getParameter("sort");
-                MarcusSearchService service;
                 SearchResponse searchResponse;
                 BoolFilterBuilder boolFilter;
 
@@ -67,7 +72,7 @@ public class SearchServlet extends HttpServlet {
                         int _size = Strings.hasText(size) ? Integer.parseInt(size) : 10;
                         SortBuilder fieldSort = Strings.hasText(sortString) ? getFieldSort(sortString) : null;
                         
-                        service = new MarcusSearchService();
+                        /**Override service properties from previous request**/
                         service.setIndices(indices);
                         service.setTypes(types);
                         service.setAggregations(aggs);
@@ -81,46 +86,15 @@ public class SearchServlet extends HttpServlet {
                         } else {
                                 searchResponse = service.getDocuments(queryString);
                         }
-                        //After getting the response, add extra field "total_doc_count" to every bucket in the aggregations
-                        String responseJson = service.addExtraFieldToBucketsAggregation(searchResponse);
-                        logger.info("Marcus service: " + service.toJsonString());
-                        out.write(responseJson);
-                }
-        }
-
-        /**
-         * A method to get a map based on the selected filters. If no filter is
-         * selected, return an empty map.
-         *
-         * @param selectedFilters, a string of selected filters in the form of
-         * "field.value"
-         */
-        private Map getFilterMap(String[] selectedFilters) {
-                Map<String, List<String>> filters = new HashMap<>();
-                try {
-                        if (selectedFilters == null) {
-                                return Collections.emptyMap();
+                        String searchResponseString = searchResponse.toString();
+                        if(searchResponse != null){
+                                //After getting the response, add extra field "total_doc_count" 
+                                //to every bucket in the aggregations
+                                searchResponseString = service.addExtraFieldToBucketsAggregation(searchResponse);
                         }
-                        for (String entry : selectedFilters) {
-                                if (entry.lastIndexOf('.') != -1) {
-                                        //Get the index for the last occurence of a dot
-                                        int lastIndex = entry.lastIndexOf('.');
-                                        String key = entry.substring(0, lastIndex).trim();
-                                        String value = entry.substring(lastIndex + 1, entry.length()).trim();
-                                        //Should we allow empty values? maybe :) 
-                                        if (!filters.containsKey(key)) {
-                                                List<String> valuesList = new ArrayList<>();
-                                                valuesList.add(value);
-                                                filters.put(key, valuesList);
-                                        } else {
-                                                filters.get(key).add(value);
-                                        }
-                                }
-                        }
-                } catch (Exception ex) {
-                        logger.error("Exception occured while constructing a map from selected filters: " + ex.getMessage());
+                        //logger.info("Marcus service: " + service.toString() + "\n" + service.toJsonString());
+                        out.write(searchResponseString);
                 }
-                return filters;
         }
 
         /**
@@ -129,7 +103,7 @@ public class SearchServlet extends HttpServlet {
          */
         private FilterBuilder buildBoolFilter(String[] selectedFilters, String aggregations, String fromDate, String toDate) {
                 //In this map, keys are "fields" and values are "terms"
-                Map<String, List> filterMap = getFilterMap(selectedFilters);
+                Map<String, List> filterMap = AggregationUtil.getFilterMap(selectedFilters);
                 BoolFilterBuilder boolFilter = FilterBuilders.boolFilter();
                 try {
                         if (fromDate != null || toDate != null) {
@@ -159,7 +133,7 @@ public class SearchServlet extends HttpServlet {
                          */
                         for (Map.Entry<String, List> entry : filterMap.entrySet()) {
                                 if (!entry.getValue().isEmpty()) {
-                                        if (hasAND(entry.getKey(), aggregations)) {
+                                        if (AggregationUtil.contains(aggregations, "operator", "AND")) {
                                                 logger.info("Constructing AND query for facet: " + entry.getKey());
                                                 for (Object value : entry.getValue()) {
                                                         //Building "AND" filter. A filter based on a term. 
@@ -168,13 +142,8 @@ public class SearchServlet extends HttpServlet {
                                                 }
                                         } else {
                                                 /**
-                                                 * Building "OR" filter. Using
-                                                 * "terms" filter based on
-                                                 * several terms, matching on
-                                                 * any of them This acts as OR
-                                                 * filter, when it is inside the
-                                                 * must clause.
-                                                 *
+                                                 *Building "OR" filter. Using "terms" filter based on several terms, matching on
+                                                 *any of them This acts as OR filter, when it is inside the must clause.
                                                  */
                                                 boolFilter.must(FilterBuilders.termsFilter(entry.getKey(), entry.getValue()));
                                         }
@@ -225,37 +194,6 @@ public class SearchServlet extends HttpServlet {
                 return sortBuilder;
         }
 
-        /**
-         * The method checks if the facets/aggregations contain AND operator. If
-         * not specified, OR operator is used as a default.
-         * <b>
-         * Note that the facets must be valid JSON array. For example [
-         * {"field": "status", "size": 15, "operator" : "AND", "order":
-         * "term_asc"}, {"field" :"assigned_to" , "order" : "term_asc"}]
-         *
-         */
-        private boolean hasAND(String field, String aggregations) {
-                try {
-                        JsonElement facets = new JsonParser().parse(aggregations);
-                        for (JsonElement e : facets.getAsJsonArray()) {
-                                JsonObject facet = e.getAsJsonObject();
-                                if (facet.has("field") && facet.has("operator")) {
-                                        String currentField = facet.get("field").getAsString();
-                                        String operator = facet.get("operator").getAsString();
-                                        if (currentField.equals(field) && operator.equalsIgnoreCase("AND")) {
-                                                return true;
-                                        }
-                                }
-                        }
-                } catch (ElasticsearchException e) {
-                        throw e;
-                } catch (Exception e) {
-                        logger.error("Facets could not be processed. Please check the syntax."
-                                + "Facets need to be valid JSON array: " + aggregations);
-                        return false;
-                }
-                return false;
-        }
 
        
         @Override

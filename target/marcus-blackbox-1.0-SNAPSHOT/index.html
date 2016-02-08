@@ -83,18 +83,20 @@
                                 <label for="sort_by"> Sort by: </label> 
                                 <select class="form-control" id="sort_by" ng-model="sort_by" ng-change="search()">
                                     <option value="">Relevance</option>
-                                    <option value="available.ali.asc">Availability ASC</option>
+                                    <option value="available.asc">Availability ASC</option>
                                     <option value="available.desc">Availability DESC</option>
                                     <option value="title.asc">Title ASC</option>
                                     <option value="title.desc">Title DESC</option>
-                                    <option value="id.asc">ID ASC</option>
-                                    <option value="id.desc">ID DESC</option>
+                                    <option value="identifier.asc">ID ASC</option>
+                                    <option value="identifier.desc">ID DESC</option>
                                 </select>
                             </div><br/>
                             
                             <div class="results-hit">
-                                <h4 ng-show="results.hits.total > 0"> Total hits: {{results.hits.total}}</h4>    
-                                
+                                <h4 ng-show="results.hits.total > 0"> Total hits: {{results.hits.total}}</h4> 
+                                <div ng-show="results.hits.total == 0" class="alert alert-info" style="text-align:center;border-color:#bdbdbd; margin-top:10%;">
+                                    <h4>Ingen treff</h4>
+                                </div>
                                 <uib-pagination class="pagination" total-items="results.hits.total" 
                                         items-per-page="page_size" 
                                         ng-model="current_page" 
@@ -103,13 +105,15 @@
                                         previous-text="Forrige"
                                         max-size="5"
                                         force-ellipses="true"
-                                        >    
-                            </uib-pagination>
-                                <ul>
-                                    <li ng-repeat="x in results.hits.hits">
-                                        {{x._source}}
-                                    </li>
-                                </ul>
+                                        style="margin-left: 25%">    
+                                </uib-pagination>
+                                <div>
+                                    <ul>
+                                        <li ng-repeat="doc in results.hits.hits">
+                                            {{doc._source}}
+                                        </li>
+                                    </ul>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -146,16 +150,16 @@
 
         <!--These are constants for this particular page-->
         <script>
-                                        angular.module("settings", [])
-                                                .constant("mySetting", {
-                                                    index: ["admin"],
-                                                    type: ["invoice", "document"],
-                                                    facets: [
-                                                        {"field": "type.exact", "size": 10, "operator": "AND", "order": "term_asc"},
-                                                        {"field": "assigned_to", "order": "term_asc"},
-                                                        {"field": "subject.exact"},
-                                                        {"field": "customer_name", "size": 10, "operator": "OR", "order": "count_desc"}]
-                                                });
+                angular.module("settings", [])
+                        .constant("mySetting", {
+                            index: ["admin"],
+                            type: ["document","invoice"],
+                            facets: [
+                                {"field": "type.exact", "size": 10, "operator": "AND", "order": "term_asc"},
+                                {"field": "assigned_to", "order": "term_asc"},
+                                {"field": "subject.exact"},
+                                {"field": "customer_name", "size": 10, "operator": "OR", "order": "count_desc"}]
+                        });
         </script>
     </body>
 </html>
