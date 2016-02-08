@@ -9,51 +9,51 @@ import org.elasticsearch.search.suggest.Suggest;
 import org.elasticsearch.search.suggest.completion.CompletionSuggestionBuilder;
 
 /**
- * Hemed Ali (hemed.ruwehy@uib.no)
+ * Hemed Ali (hemed.ruwehy@uib.no) 
  * University of Bergen Library
  */
 public class Suggestion {
 
-    public static SuggestResponse getSuggestResponse(String text, String indexType, String suggestField) {
-        CompletionSuggestionBuilder suggestionsBuilder = new CompletionSuggestionBuilder("suggest_me");
-        SuggestResponse suggestResponse = null;
-        
-        try {
-                suggestionsBuilder.text(text);
-                suggestionsBuilder.field(suggestField);
+        public static SuggestResponse getSuggestResponse(String text, String indexType, String suggestField) {
+                CompletionSuggestionBuilder suggestionsBuilder = new CompletionSuggestionBuilder("suggest_me");
+                SuggestResponse suggestResponse = null;
 
-                 suggestResponse = ClientFactory.getTransportClient()
-                        .prepareSuggest(indexType)
-                        .addSuggestion(suggestionsBuilder)
-                        .execute()
-                        .actionGet();
+                try {
+                        suggestionsBuilder.text(text);
+                        suggestionsBuilder.field(suggestField);
 
-        } catch (Exception e) {
-            e.getLocalizedMessage();
+                        suggestResponse = ClientFactory.getTransportClient()
+                                .prepareSuggest(indexType)
+                                .addSuggestion(suggestionsBuilder)
+                                .execute()
+                                .actionGet();
+
+                } catch (Exception e) {
+                        e.getLocalizedMessage();
+                }
+                return suggestResponse;
         }
-        return suggestResponse;
-    }
 
-    public static Set<String> getSuggestions(String text, String indexType, String suggestField) {
-        Set<String> items = new HashSet<>();
-        try {
-                SuggestResponse suggestResponse = getSuggestResponse(text, indexType, suggestField);
-                Iterator<? extends Suggest.Suggestion.Entry.Option> iterator = suggestResponse
-                        .getSuggest()
-                        .getSuggestion("suggest_me")
-                        .iterator()
-                        .next()
-                        .getOptions()
-                        .iterator();
+        public static Set<String> getSuggestions(String text, String indexType, String suggestField) {
+                Set<String> items = new HashSet<>();
+                try {
+                        SuggestResponse suggestResponse = getSuggestResponse(text, indexType, suggestField);
+                        Iterator<? extends Suggest.Suggestion.Entry.Option> iterator = suggestResponse
+                                .getSuggest()
+                                .getSuggestion("suggest_me")
+                                .iterator()
+                                .next()
+                                .getOptions()
+                                .iterator();
 
-                while (iterator.hasNext()) {
-                    Suggest.Suggestion.Entry.Option next = iterator.next();
-                    items.add(next.getText().string());
-            }
-        } catch (Exception e) {
-            e.getLocalizedMessage();
+                        while (iterator.hasNext()) {
+                                Suggest.Suggestion.Entry.Option next = iterator.next();
+                                items.add(next.getText().string());
+                        }
+                } catch (Exception e) {
+                        e.getLocalizedMessage();
+                }
+                return items;
         }
-        return items;
-    }
 
 }

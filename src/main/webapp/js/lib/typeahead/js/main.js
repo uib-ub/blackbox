@@ -30,18 +30,17 @@ $(document).ready(function () {
         if (q === '') {
             sync(engine.get('1090217586', '58502284', '10273252', '24477185'));
             async([]);
-        }
-        else {
+        } else {
             engine.search(q, sync, async);
         }
     }
-    
+
     /**
      *===============================================================
      *Typeahead and Bloodhound settings for Marcus suggestion engine
      *=============================================================== 
      */
-    
+
     //Initialize suggestion engine
     var marcusEngine = new Bloodhound({
         name: 'suggest',
@@ -51,22 +50,21 @@ $(document).ready(function () {
         limit: 10,
         remote: {
             url: 'suggest?q=%QUERY',
-            wildcard:'%QUERY',
-        rateLimitWait: 20
+            wildcard: '%QUERY',
+            rateLimitWait: 20
         }
-     });
-     
+    });
+
     //Set default suggestion
     function marcusEngineWithDefaults(q, sync, async) {
-     if (q === '') {
-       sync(['Hemed Ali', 'Tarje Lævik', 'Øyvind Gjesdal' , 'Biledsamlingen','Manuskripter','Dokumenter','Personer']);
-       async([]);
-     }
-     else {
-        marcusEngine.search(q, sync, async);
-       }
-     }
-    
+        if (q === '') {
+            sync(['Hemed Ali', 'Tarje Lævik', 'Øyvind Gjesdal', 'Biledsamlingen', 'Manuskripter', 'Dokumenter', 'Personer']);
+            async([]);
+        } else {
+            marcusEngine.search(q, sync, async);
+        }
+    }
+
     //Put settings to Typeahead
     $('#search-input').typeahead({
         hint: $('.Typeahead-hint'),
@@ -80,62 +78,62 @@ $(document).ready(function () {
             suggestion: 'Typeahead-suggestion ProfileCard',
             selectable: 'Typeahead-selectable'
         }
-     }, 
-        {
-            name: 'suggest',
-            source: marcusEngineWithDefaults,
-            limit: 5
-            /**templates: {
-             suggestion: '<div>{{value}}</div>'
-            }**/
-        })
+    },
+            {
+                name: 'suggest',
+                source: marcusEngineWithDefaults,
+                limit: 5
+                        /**templates: {
+                         suggestion: '<div>{{value}}</div>'
+                         }**/
+            })
             .on('typeahead:asyncrequest', function () {
                 $('.Typeahead-spinner').show();
-        })
+            })
             .on('typeahead:asynccancel typeahead:asyncreceive', function () {
                 $('.Typeahead-spinner').hide();
             })
-              //When suggestion value is selected, update angular contoller with new value
-              .on('typeahead:select', function(event, suggestionValue){
-                 var angularScope = angular.element($('#searchController')).scope();
-                     angularScope.query_string = suggestionValue;
-                     angularScope.search();
+            //When suggestion value is selected, update angular contoller with new value
+            .on('typeahead:select', function (event, suggestionValue) {
+                var angularScope = angular.element($('#searchController')).scope();
+                angularScope.query_string = suggestionValue;
+                angularScope.search();
                 angularScope.$apply();
             })
             //When Enter key is clicked, close the suggestion box.
             .on('keyup', function (event) {
                 if (event.which === 13) {
-                  $('#search-input').typeahead('close');
+                    $('#search-input').typeahead('close');
                 }
             });
 
 
-            /**$('#demo-input').typeahead({
-             hint: $('.Typeahead-hint'),
-             menu: $('.Typeahead-menu'),
-             minLength: 0,
-             highlight: true,
-             classNames: {
-             open: 'is-open',
-             empty: 'is-empty',
-             cursor: 'is-active',
-             suggestion: 'Typeahead-suggestion',
-             selectable: 'Typeahead-selectable'
-             }
-             }, {
-             source: engineWithDefaults
-             displayKey: 'screen_name',
-             templates: {
-             suggestion: template,
-             empty: empty
-             }
-             })
-             .on('typeahead:asyncrequest', function () {
-             $('.Typeahead-spinner').show();
-             })
-             .on('typeahead:asynccancel typeahead:asyncreceive', function () {
-             $('.Typeahead-spinner').hide();
-             });**/
+    /**$('#demo-input').typeahead({
+     hint: $('.Typeahead-hint'),
+     menu: $('.Typeahead-menu'),
+     minLength: 0,
+     highlight: true,
+     classNames: {
+     open: 'is-open',
+     empty: 'is-empty',
+     cursor: 'is-active',
+     suggestion: 'Typeahead-suggestion',
+     selectable: 'Typeahead-selectable'
+     }
+     }, {
+     source: engineWithDefaults
+     displayKey: 'screen_name',
+     templates: {
+     suggestion: template,
+     empty: empty
+     }
+     })
+     .on('typeahead:asyncrequest', function () {
+     $('.Typeahead-spinner').show();
+     })
+     .on('typeahead:asynccancel typeahead:asyncreceive', function () {
+     $('.Typeahead-spinner').hide();
+     });**/
 
 
 });

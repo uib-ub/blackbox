@@ -34,14 +34,14 @@
                 <span class="links links-examples">
                     <a href="">Advanced search</a>
                 </span>
-                  <!--b>Selected Facets: </b>{{selected_aggs}} -->
+                <!--b>Selected Facets: </b>{{selected_aggs}} -->
             </div>
             <!--div class="sticky-footer-push"></div-->
             <div class="search-results container-fluid">
                 <div class="content row row-fluid">
                     <div class="facets" ng-show="results.hasOwnProperty('aggregations')">
-                       <h4>Status</h4>
-                       <ul class="nav nav-list">
+                        <h4>Status</h4>
+                        <ul class="nav nav-list">
                             <li ng-repeat="bucket in results.aggregations.status.buckets">
                                 <label class="checkbox">
                                     <input type="checkbox" checklist-model="selected_filters" checklist-value="getCheckedValue('status', bucket.key)" ng-click="query_search()">
@@ -49,8 +49,8 @@
                                 </label>
                             </li>
                         </ul>
-                       <h4>Assignee</h4>
-                       <ul class="nav nav-list">
+                        <h4>Assignee</h4>
+                        <ul class="nav nav-list">
                             <li ng-repeat="bucket in results.aggregations.assigned_to.buckets">
                                 <label class="checkbox">
                                     <input type="checkbox" checklist-model="selected_filters" checklist-value="getCheckedValue('assigned_to', bucket.key)" ng-click="query_search()">
@@ -59,15 +59,15 @@
                             </li>
                         </ul>
                     </div>
-                
-                <div class="search-hits">
-                    <h4 ng-show="results.hits.total > 0"> Total hits : {{results.hits.total}}</h4>
-                    <ul>
-                        <li ng-repeat="x in results.hits.hits">
-                            {{x._source}}
-                        </li>
-                    </ul>
-                </div>
+
+                    <div class="search-hits">
+                        <h4 ng-show="results.hits.total > 0"> Total hits : {{results.hits.total}}</h4>
+                        <ul>
+                            <li ng-repeat="x in results.hits.hits">
+                                {{x._source}}
+                            </li>
+                        </ul>
+                    </div>
                 </div>
             </div>
         </div>
@@ -86,7 +86,7 @@
         <script id="empty-template" type="text/x-handlebars-template">
             <div class="EmptyMessage">Your search turned up 0 results.</div>
         </script>
-        
+
         <!--JavaScript files -->
         <script src="js/lib/typeahead/js/handlebars.js"></script>
         <script src="https://code.jquery.com/jquery-1.11.3.min.js"></script>
@@ -97,16 +97,16 @@
         <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
         <script src="js/marcus-controller.js"></script>
         <script src="js/checklist-directive.js"></script>
-        
+
         <!--These are constants for this particular page-->
         <script>
-                   angular.module("settings", [])
-                   .constant("mySettings", {
-                       index: ["admin"],
-                       type : ["invoice"],
-                       facets: [{"field": "status", "size": 15}]
-           });
+                                    angular.module("settings", [])
+                                            .constant("mySettings", {
+                                                index: ["admin"],
+                                                type: ["invoice"],
+                                                facets: [{"field": "status", "size": 15}]
+                                            });
         </script>
-    
+
     </body>
 </html>

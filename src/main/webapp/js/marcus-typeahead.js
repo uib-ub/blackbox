@@ -30,9 +30,7 @@ $(document).ready(function () {
         if (q === '') {
             sync(engine.get('1090217586', '58502284', '10273252', '24477185'));
             async([]);
-        }
-
-        else {
+        } else {
             engine.search(q, sync, async);
         }
     }

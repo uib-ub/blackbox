@@ -28,18 +28,18 @@
 
 
     <div class="row">
-		<div class="span12">
-		      <table class="table" >
-		        <thead>  
-		          <tr>
-                      <th>Id</th>
-                      <th>Name</th>
-                      <th>Date Of Birth</th>
-                      <th>City</th>
-                      <th>Country</th>
-		          </tr>
-			     </thead>  
-		        <tbody>
+        <div class="span12">
+            <table class="table" >
+                <thead>  
+                    <tr>
+                        <th>Id</th>
+                        <th>Name</th>
+                        <th>Date Of Birth</th>
+                        <th>City</th>
+                        <th>Country</th>
+                    </tr>
+                </thead>  
+                <tbody>
                     <tr ng-repeat="entry in result.hits.hits" >
                         <td>{{entry._source.reference}}</td>
                         <td><a href="#/person/{{entry._source.reference}}">{{entry._source.name}}</a></td>
@@ -47,11 +47,11 @@
                         <td>{{entry._source.address.city}}</td>
                         <td>{{entry._source.address.country}}</td>
                     </tr>
-		
-		        <tbody>
-			</table>
-		</div>
-	</div>
+
+                <tbody>
+            </table>
+        </div>
+    </div>
 
 </div>
 

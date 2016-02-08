@@ -1,6 +1,6 @@
 
 $(function () {
-    
+
     //Configure from_date
     $("#from_date").datepicker({
         showOn: "both",
@@ -15,7 +15,7 @@ $(function () {
             $("#to_date").datepicker("option", "minDate", selectedDate);
         }
     });
-    
+
     //Configure to_date
     $("#to_date").datepicker({
         showOn: "both",
@@ -46,20 +46,20 @@ $(function () {
         dateFormat: 'yy-mm-dd',
         firstDay: 1,
         isRTL: false,
-        showOptions: {direction:"up"},
+        showOptions: {direction: "up"},
         //showMonthAfterYear: true,
         yearSuffix: ""
     };
 
     //Apply default settings to all datepicker instances
     $.datepicker.setDefaults(defaults);
-    
-   //This is a workaround for getting "today" button working.
-   var _gotoToday = $.datepicker._gotoToday;
-   $.datepicker._gotoToday = function(a){
+
+    //This is a workaround for getting "today" button working.
+    var _gotoToday = $.datepicker._gotoToday;
+    $.datepicker._gotoToday = function (a) {
         var target = $(a);
         var inst = this._getInst(target[0]);
         _gotoToday.call(this, a);
         $.datepicker._selectDate(a, $.datepicker._formatDate(inst, inst.selectedDay, inst.selectedMonth, inst.selectedYear));
-     };
+    };
 });

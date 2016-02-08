@@ -1,21 +1,21 @@
 html {
-  background-color: #f2f9ff;
-  font: normal normal normal 18px/1.2 "Helvetica Neue", Roboto, "Segoe UI", Calibri, sans-serif;
-  color: #292f33;
+    background-color: #f2f9ff;
+    font: normal normal normal 18px/1.2 "Helvetica Neue", Roboto, "Segoe UI", Calibri, sans-serif;
+    color: #292f33;
 }
 
 .main-container {
-     background-color: #f2f9ff;
-     width: 100%;
-     
+    background-color: #f2f9ff;
+    width: 100%;
+
 }
 
 /**@media (min-width: 320px) {**/
-    .main-container .content{
-        width: 1000px;
-        margin: 30px auto 0 auto;
-        overflow: hidden;
-    }
+.main-container .content{
+    width: 1000px;
+    margin: 30px auto 0 auto;
+    overflow: hidden;
+}
 /**}**/
 
 
@@ -27,7 +27,7 @@ html {
     overflow-y: auto;
     background: white;
     padding-left: 10px;
-    border : 1px solid lightgrey;
+    border : 1px solid #eee;
     margin-right: 25px;
 }
 
@@ -36,7 +36,7 @@ html {
     background: white;
     margin: 0 auto;
     width: 70%;
-    border : 1px solid lightgrey;
+    border : 1px solid #eee;
 }
 
 .datePicker {
@@ -45,17 +45,21 @@ html {
 }
 
 .ui-datepicker select.ui-datepicker-month, .ui-datepicker select.ui-datepicker-year {
-	width: 45%;
-        /**background: black;
-        color : orange;**/
+    width: 45%;
+    /**background: black;
+    color : orange;**/
 }
 .single-select {
-    width: 40%;
-    background: whitesmoke;
-    /**border-color : orange;**/
-    color: #07e;
+    width: 30%;
+    margin-top: 10px;
+    /**background: whitesmoke;**/
+    /**color: #07e;**/
+    float: right;
 }
-
+#sort_by {
+    color: #07e; 
+    background: whitesmoke;
+}
 .results-hit {
     width: 100%;
     margin: 0 0 0 0;
