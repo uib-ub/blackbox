@@ -1,151 +1,91 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<testsuite tests="24" failures="2" name="no.uib.marcus.common.AggregationUtilsTest" time="0.217" errors="0" skipped="0">
+<testsuite tests="24" failures="0" name="no.uib.marcus.common.AggregationUtilsTest" time="0.208" errors="0" skipped="0">
   <properties>
     <property name="java.runtime.name" value="Java(TM) SE Runtime Environment"/>
-    <property name="sun.boot.library.path" value="C:\Program Files\Java\jdk1.8.0_25\jre\bin"/>
-    <property name="java.vm.version" value="25.25-b02"/>
+    <property name="sun.boot.library.path" value="/Library/Java/JavaVirtualMachines/jdk1.8.0_40.jdk/Contents/Home/jre/lib"/>
+    <property name="java.vm.version" value="25.40-b25"/>
     <property name="user.country.format" value="NO"/>
+    <property name="gopherProxySet" value="false"/>
     <property name="java.vm.vendor" value="Oracle Corporation"/>
     <property name="java.vendor.url" value="http://java.oracle.com/"/>
-    <property name="path.separator" value=";"/>
+    <property name="path.separator" value=":"/>
     <property name="guice.disable.misplaced.annotation.check" value="true"/>
     <property name="java.vm.name" value="Java HotSpot(TM) 64-Bit Server VM"/>
     <property name="file.encoding.pkg" value="sun.io"/>
-    <property name="user.script" value=""/>
     <property name="user.country" value="US"/>
     <property name="sun.java.launcher" value="SUN_STANDARD"/>
-    <property name="sun.os.patch.level" value="Service Pack 1"/>
+    <property name="sun.os.patch.level" value="unknown"/>
     <property name="test" value="no.uib.marcus.common.AggregationUtilsTest"/>
     <property name="java.vm.specification.name" value="Java Virtual Machine Specification"/>
-    <property name="user.dir" value="D:\Development\marcus-blackbox"/>
-    <property name="java.runtime.version" value="1.8.0_25-b18"/>
-    <property name="java.awt.graphicsenv" value="sun.awt.Win32GraphicsEnvironment"/>
-    <property name="java.endorsed.dirs" value="C:\Program Files\Java\jdk1.8.0_25\jre\lib\endorsed"/>
-    <property name="os.arch" value="amd64"/>
-    <property name="java.io.tmpdir" value="C:\Users\hru066\AppData\Local\Temp\"/>
+    <property name="user.dir" value="/Users/hemed/Documents/Development/marcus-blackbox"/>
+    <property name="java.runtime.version" value="1.8.0_40-b25"/>
+    <property name="java.awt.graphicsenv" value="sun.awt.CGraphicsEnvironment"/>
+    <property name="java.endorsed.dirs" value="/Library/Java/JavaVirtualMachines/jdk1.8.0_40.jdk/Contents/Home/jre/lib/endorsed"/>
+    <property name="os.arch" value="x86_64"/>
+    <property name="java.io.tmpdir" value="/var/folders/b2/c177gn7j1vqd39b5jk5_q8rr0000gn/T/"/>
     <property name="line.separator" value="
 "/>
     <property name="java.vm.specification.vendor" value="Oracle Corporation"/>
-    <property name="user.variant" value=""/>
-    <property name="os.name" value="Windows 7"/>
-    <property name="maven.ext.class.path" value="D:\NetBeans 8.1\java\maven-nblib\netbeans-eventspy.jar"/>
-    <property name="classworlds.conf" value="D:\NetBeans 8.1\java\maven\bin\m2.conf"/>
-    <property name="sun.jnu.encoding" value="Cp1252"/>
-    <property name="java.library.path" value="C:\Program Files\Java\jdk1.8.0_25\bin;C:\Windows\Sun\Java\bin;C:\Windows\system32;C:\Windows;C:\ProgramData\Oracle\Java\javapath;C:\Windows\system32;C:\Windows;C:\Windows\System32\Wbem;C:\Windows\System32\WindowsPowerShell\v1.0\;%JAVA_HOME%\bin;C:\Program Files\TortoiseSVN\bin;C:\Program Files (x86)\QuickTime\QTSystem\;."/>
+    <property name="os.name" value="Mac OS X"/>
+    <property name="maven.ext.class.path" value="/Applications/NetBeans/NetBeans 8.1.app/Contents/Resources/NetBeans/java/maven-nblib/netbeans-eventspy.jar"/>
+    <property name="classworlds.conf" value="/Applications/NetBeans/NetBeans 8.1.app/Contents/Resources/NetBeans/java/maven/bin/m2.conf"/>
+    <property name="sun.jnu.encoding" value="UTF-8"/>
+    <property name="java.library.path" value="/Applications/NetBeans/NetBeans 8.1.app/Contents/Resources/NetBeans/webcommon/bin::/Users/hemed/Library/Java/Extensions:/Library/Java/Extensions:/Network/Library/Java/Extensions:/System/Library/Java/Extensions:/usr/lib/java:."/>
     <property name="java.specification.name" value="Java Platform API Specification"/>
     <property name="java.class.version" value="52.0"/>
     <property name="sun.management.compiler" value="HotSpot 64-Bit Tiered Compilers"/>
-    <property name="os.version" value="6.1"/>
-    <property name="user.home" value="C:\Users\hru066"/>
-    <property name="user.timezone" value="Europe/Paris"/>
-    <property name="java.awt.printerjob" value="sun.awt.windows.WPrinterJob"/>
+    <property name="os.version" value="10.10.5"/>
+    <property name="http.nonProxyHosts" value="local|*.local|169.254/16|*.169.254/16"/>
+    <property name="user.home" value="/Users/hemed"/>
+    <property name="user.timezone" value="Europe/Oslo"/>
+    <property name="java.awt.printerjob" value="sun.lwawt.macosx.CPrinterJob"/>
     <property name="java.specification.version" value="1.8"/>
     <property name="file.encoding" value="UTF-8"/>
-    <property name="user.name" value="hru066"/>
-    <property name="java.class.path" value="D:\NetBeans 8.1\java\maven\boot\plexus-classworlds-2.4.jar"/>
+    <property name="user.name" value="hemed"/>
+    <property name="java.class.path" value="/Applications/NetBeans/NetBeans 8.1.app/Contents/Resources/NetBeans/java/maven/boot/plexus-classworlds-2.4.jar"/>
     <property name="java.vm.specification.version" value="1.8"/>
     <property name="sun.arch.data.model" value="64"/>
-    <property name="java.home" value="C:\Program Files\Java\jdk1.8.0_25\jre"/>
-    <property name="sun.java.command" value="org.codehaus.plexus.classworlds.launcher.Launcher -Dtest=no.uib.marcus.common.AggregationUtilsTest -Dmaven.ext.class.path=D:\NetBeans 8.1\java\maven-nblib\netbeans-eventspy.jar -Dfile.encoding=UTF-8 surefire:test"/>
+    <property name="java.home" value="/Library/Java/JavaVirtualMachines/jdk1.8.0_40.jdk/Contents/Home/jre"/>
+    <property name="sun.java.command" value="org.codehaus.plexus.classworlds.launcher.Launcher -Dtest=no.uib.marcus.common.AggregationUtilsTest -Dmaven.ext.class.path=/Applications/NetBeans/NetBeans 8.1.app/Contents/Resources/NetBeans/java/maven-nblib/netbeans-eventspy.jar surefire:test"/>
     <property name="java.specification.vendor" value="Oracle Corporation"/>
     <property name="user.language" value="en"/>
-    <property name="user.language.format" value="no"/>
-    <property name="awt.toolkit" value="sun.awt.windows.WToolkit"/>
+    <property name="awt.toolkit" value="sun.lwawt.macosx.LWCToolkit"/>
     <property name="java.vm.info" value="mixed mode"/>
-    <property name="java.version" value="1.8.0_25"/>
-    <property name="java.ext.dirs" value="C:\Program Files\Java\jdk1.8.0_25\jre\lib\ext;C:\Windows\Sun\Java\lib\ext"/>
-    <property name="sun.boot.class.path" value="C:\Program Files\Java\jdk1.8.0_25\jre\lib\resources.jar;C:\Program Files\Java\jdk1.8.0_25\jre\lib\rt.jar;C:\Program Files\Java\jdk1.8.0_25\jre\lib\sunrsasign.jar;C:\Program Files\Java\jdk1.8.0_25\jre\lib\jsse.jar;C:\Program Files\Java\jdk1.8.0_25\jre\lib\jce.jar;C:\Program Files\Java\jdk1.8.0_25\jre\lib\charsets.jar;C:\Program Files\Java\jdk1.8.0_25\jre\lib\jfr.jar;C:\Program Files\Java\jdk1.8.0_25\jre\classes"/>
+    <property name="java.version" value="1.8.0_40"/>
+    <property name="java.ext.dirs" value="/Users/hemed/Library/Java/Extensions:/Library/Java/JavaVirtualMachines/jdk1.8.0_40.jdk/Contents/Home/jre/lib/ext:/Library/Java/Extensions:/Network/Library/Java/Extensions:/System/Library/Java/Extensions:/usr/lib/java"/>
+    <property name="sun.boot.class.path" value="/Library/Java/JavaVirtualMachines/jdk1.8.0_40.jdk/Contents/Home/jre/lib/resources.jar:/Library/Java/JavaVirtualMachines/jdk1.8.0_40.jdk/Contents/Home/jre/lib/rt.jar:/Library/Java/JavaVirtualMachines/jdk1.8.0_40.jdk/Contents/Home/jre/lib/sunrsasign.jar:/Library/Java/JavaVirtualMachines/jdk1.8.0_40.jdk/Contents/Home/jre/lib/jsse.jar:/Library/Java/JavaVirtualMachines/jdk1.8.0_40.jdk/Contents/Home/jre/lib/jce.jar:/Library/Java/JavaVirtualMachines/jdk1.8.0_40.jdk/Contents/Home/jre/lib/charsets.jar:/Library/Java/JavaVirtualMachines/jdk1.8.0_40.jdk/Contents/Home/jre/lib/jfr.jar:/Library/Java/JavaVirtualMachines/jdk1.8.0_40.jdk/Contents/Home/jre/classes"/>
     <property name="java.vendor" value="Oracle Corporation"/>
-    <property name="maven.home" value="D:\NetBeans 8.1\java\maven"/>
-    <property name="file.separator" value="\"/>
+    <property name="maven.home" value="/Applications/NetBeans/NetBeans 8.1.app/Contents/Resources/NetBeans/java/maven"/>
+    <property name="file.separator" value="/"/>
     <property name="java.vendor.url.bug" value="http://bugreport.sun.com/bugreport/"/>
     <property name="sun.cpu.endian" value="little"/>
-    <property name="sun.io.unicode.encoding" value="UnicodeLittle"/>
-    <property name="sun.desktop" value="windows"/>
-    <property name="sun.cpu.isalist" value="amd64"/>
+    <property name="sun.io.unicode.encoding" value="UnicodeBig"/>
+    <property name="socksNonProxyHosts" value="local|*.local|169.254/16|*.169.254/16"/>
+    <property name="ftp.nonProxyHosts" value="local|*.local|169.254/16|*.169.254/16"/>
+    <property name="sun.cpu.isalist" value=""/>
   </properties>
-  <testcase classname="no.uib.marcus.common.AggregationUtilsTest" name="testGetFilterMap03" time="0.051">
-    <failure message="expected same:&lt;{status=[sent, draft, makame, bee]}&gt; was not:&lt;{status=[sent, draft, makame, bee]}&gt;" type="java.lang.AssertionError">java.lang.AssertionError: expected same:&lt;{status=[sent, draft, makame, bee]}&gt; was not:&lt;{status=[sent, draft, makame, bee]}&gt;
-	at __randomizedtesting.SeedInfo.seed([64727F0359A17B8E:A21FC399FA3330FF]:0)
-	at org.junit.Assert.fail(Assert.java:93)
-	at org.junit.Assert.failNotSame(Assert.java:641)
-	at org.junit.Assert.assertSame(Assert.java:580)
-	at org.junit.Assert.assertSame(Assert.java:593)
-	at no.uib.marcus.common.AggregationUtilsTest.testGetFilterMap03(AggregationUtilsTest.java:91)
-	at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
-	at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62)
-	at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
-	at java.lang.reflect.Method.invoke(Method.java:483)
-	at com.carrotsearch.randomizedtesting.RandomizedRunner.invoke(RandomizedRunner.java:1618)
-	at com.carrotsearch.randomizedtesting.RandomizedRunner$6.evaluate(RandomizedRunner.java:827)
-	at com.carrotsearch.randomizedtesting.rules.StatementAdapter.evaluate(StatementAdapter.java:36)
-	at com.carrotsearch.randomizedtesting.ThreadLeakControl$StatementRunner.run(ThreadLeakControl.java:365)
-	at com.carrotsearch.randomizedtesting.ThreadLeakControl.forkTimeoutingTask(ThreadLeakControl.java:798)
-	at com.carrotsearch.randomizedtesting.ThreadLeakControl$3.evaluate(ThreadLeakControl.java:458)
-	at com.carrotsearch.randomizedtesting.RandomizedRunner.runSingleTest(RandomizedRunner.java:836)
-	at com.carrotsearch.randomizedtesting.RandomizedRunner$3.evaluate(RandomizedRunner.java:738)
-	at com.carrotsearch.randomizedtesting.RandomizedRunner$4.evaluate(RandomizedRunner.java:772)
-	at com.carrotsearch.randomizedtesting.RandomizedRunner$5.evaluate(RandomizedRunner.java:783)
-	at com.carrotsearch.randomizedtesting.rules.StatementAdapter.evaluate(StatementAdapter.java:36)
-	at com.carrotsearch.randomizedtesting.ThreadLeakControl$StatementRunner.run(ThreadLeakControl.java:365)
-	at com.carrotsearch.randomizedtesting.ThreadLeakControl.forkTimeoutingTask(ThreadLeakControl.java:798)
-	at com.carrotsearch.randomizedtesting.ThreadLeakControl$2.evaluate(ThreadLeakControl.java:401)
-	at com.carrotsearch.randomizedtesting.RandomizedRunner.runSuite(RandomizedRunner.java:642)
-	at com.carrotsearch.randomizedtesting.RandomizedRunner.access$200(RandomizedRunner.java:129)
-	at com.carrotsearch.randomizedtesting.RandomizedRunner$1.run(RandomizedRunner.java:559)
-</failure>
-  </testcase>
+  <testcase classname="no.uib.marcus.common.AggregationUtilsTest" name="testGetFilterMap03" time="0.05"/>
+  <testcase classname="no.uib.marcus.common.AggregationUtilsTest" name="testContains03 {#0 seed=[7961C9EBE57CD7EA:79A48AE18A1844A8]}" time="0.019"/>
+  <testcase classname="no.uib.marcus.common.AggregationUtilsTest" name="testContains03 {#1 seed=[7961C9EBE57CD7EA:79A48AE18A1844A8]}" time="0.001"/>
+  <testcase classname="no.uib.marcus.common.AggregationUtilsTest" name="testContains03 {#2 seed=[7961C9EBE57CD7EA:79A48AE18A1844A8]}" time="0.001"/>
+  <testcase classname="no.uib.marcus.common.AggregationUtilsTest" name="testContains03 {#3 seed=[7961C9EBE57CD7EA:79A48AE18A1844A8]}" time="0.001"/>
+  <testcase classname="no.uib.marcus.common.AggregationUtilsTest" name="testContains03 {#4 seed=[7961C9EBE57CD7EA:79A48AE18A1844A8]}" time="0.001"/>
+  <testcase classname="no.uib.marcus.common.AggregationUtilsTest" name="testContains03 {#5 seed=[7961C9EBE57CD7EA:79A48AE18A1844A8]}" time="0.001"/>
+  <testcase classname="no.uib.marcus.common.AggregationUtilsTest" name="testContains03 {#6 seed=[7961C9EBE57CD7EA:79A48AE18A1844A8]}" time="0.001"/>
+  <testcase classname="no.uib.marcus.common.AggregationUtilsTest" name="testContains03 {#7 seed=[7961C9EBE57CD7EA:79A48AE18A1844A8]}" time="0.001"/>
+  <testcase classname="no.uib.marcus.common.AggregationUtilsTest" name="testContains03 {#8 seed=[7961C9EBE57CD7EA:79A48AE18A1844A8]}" time="0.002"/>
+  <testcase classname="no.uib.marcus.common.AggregationUtilsTest" name="testContains03 {#9 seed=[7961C9EBE57CD7EA:79A48AE18A1844A8]}" time="0.002"/>
+  <testcase classname="no.uib.marcus.common.AggregationUtilsTest" name="testGetFilterMap01" time="0.001"/>
+  <testcase classname="no.uib.marcus.common.AggregationUtilsTest" name="testContains01" time="0.002"/>
+  <testcase classname="no.uib.marcus.common.AggregationUtilsTest" name="testContains02 {#0 seed=[7961C9EBE57CD7EA:FDE38EA487414C18]}" time="0.001"/>
+  <testcase classname="no.uib.marcus.common.AggregationUtilsTest" name="testContains02 {#1 seed=[7961C9EBE57CD7EA:49B53258B3838734]}" time="0.001"/>
+  <testcase classname="no.uib.marcus.common.AggregationUtilsTest" name="testContains02 {#2 seed=[7961C9EBE57CD7EA:C75CA484E247CFFF]}" time="0.001"/>
+  <testcase classname="no.uib.marcus.common.AggregationUtilsTest" name="testContains02 {#3 seed=[7961C9EBE57CD7EA:F6B20F618EB994D6]}" time="0.001"/>
+  <testcase classname="no.uib.marcus.common.AggregationUtilsTest" name="testContains02 {#4 seed=[7961C9EBE57CD7EA:BA738ACC2FB1546D]}" time="0.001"/>
+  <testcase classname="no.uib.marcus.common.AggregationUtilsTest" name="testContains02 {#5 seed=[7961C9EBE57CD7EA:2B895993520D196D]}" time="0"/>
+  <testcase classname="no.uib.marcus.common.AggregationUtilsTest" name="testContains02 {#6 seed=[7961C9EBE57CD7EA:15573D15403D096B]}" time="0"/>
+  <testcase classname="no.uib.marcus.common.AggregationUtilsTest" name="testContains02 {#7 seed=[7961C9EBE57CD7EA:89E4A76F63299DC5]}" time="0.001"/>
+  <testcase classname="no.uib.marcus.common.AggregationUtilsTest" name="testContains02 {#8 seed=[7961C9EBE57CD7EA:BB48420114E28A9F]}" time="0.001"/>
+  <testcase classname="no.uib.marcus.common.AggregationUtilsTest" name="testContains02 {#9 seed=[7961C9EBE57CD7EA:6CC314BB70B5BDCD]}" time="0"/>
   <testcase classname="no.uib.marcus.common.AggregationUtilsTest" name="testGetFilterMap02" time="0"/>
-  <testcase classname="no.uib.marcus.common.AggregationUtilsTest" name="testContains03 {#0 seed=[64727F0359A17B8E:79A48AE18A1844A8]}" time="0.025"/>
-  <testcase classname="no.uib.marcus.common.AggregationUtilsTest" name="testContains03 {#1 seed=[64727F0359A17B8E:79A48AE18A1844A8]}" time="0.001"/>
-  <testcase classname="no.uib.marcus.common.AggregationUtilsTest" name="testContains03 {#2 seed=[64727F0359A17B8E:79A48AE18A1844A8]}" time="0.001"/>
-  <testcase classname="no.uib.marcus.common.AggregationUtilsTest" name="testContains03 {#3 seed=[64727F0359A17B8E:79A48AE18A1844A8]}" time="0.002"/>
-  <testcase classname="no.uib.marcus.common.AggregationUtilsTest" name="testContains03 {#4 seed=[64727F0359A17B8E:79A48AE18A1844A8]}" time="0.002"/>
-  <testcase classname="no.uib.marcus.common.AggregationUtilsTest" name="testContains03 {#5 seed=[64727F0359A17B8E:79A48AE18A1844A8]}" time="0.001"/>
-  <testcase classname="no.uib.marcus.common.AggregationUtilsTest" name="testContains03 {#6 seed=[64727F0359A17B8E:79A48AE18A1844A8]}" time="0.001"/>
-  <testcase classname="no.uib.marcus.common.AggregationUtilsTest" name="testContains03 {#7 seed=[64727F0359A17B8E:79A48AE18A1844A8]}" time="0.001"/>
-  <testcase classname="no.uib.marcus.common.AggregationUtilsTest" name="testContains03 {#8 seed=[64727F0359A17B8E:79A48AE18A1844A8]}" time="0.001"/>
-  <testcase classname="no.uib.marcus.common.AggregationUtilsTest" name="testContains03 {#9 seed=[64727F0359A17B8E:79A48AE18A1844A8]}" time="0.001"/>
-  <testcase classname="no.uib.marcus.common.AggregationUtilsTest" name="testContains01" time="0.003"/>
-  <testcase classname="no.uib.marcus.common.AggregationUtilsTest" name="testGetFilterMap01" time="0.001">
-    <failure message="expected same:&lt;{hemed=[ali], status=[sent, draft]}&gt; was not:&lt;{hemed=[ali], status=[sent, draft]}&gt;" type="java.lang.AssertionError">java.lang.AssertionError: expected same:&lt;{hemed=[ali], status=[sent, draft]}&gt; was not:&lt;{hemed=[ali], status=[sent, draft]}&gt;
-	at __randomizedtesting.SeedInfo.seed([64727F0359A17B8E:E4FD254CAE61FD8B]:0)
-	at org.junit.Assert.fail(Assert.java:93)
-	at org.junit.Assert.failNotSame(Assert.java:641)
-	at org.junit.Assert.assertSame(Assert.java:580)
-	at org.junit.Assert.assertSame(Assert.java:593)
-	at no.uib.marcus.common.AggregationUtilsTest.testGetFilterMap01(AggregationUtilsTest.java:66)
-	at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
-	at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62)
-	at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
-	at java.lang.reflect.Method.invoke(Method.java:483)
-	at com.carrotsearch.randomizedtesting.RandomizedRunner.invoke(RandomizedRunner.java:1618)
-	at com.carrotsearch.randomizedtesting.RandomizedRunner$6.evaluate(RandomizedRunner.java:827)
-	at com.carrotsearch.randomizedtesting.rules.StatementAdapter.evaluate(StatementAdapter.java:36)
-	at com.carrotsearch.randomizedtesting.ThreadLeakControl$StatementRunner.run(ThreadLeakControl.java:365)
-	at com.carrotsearch.randomizedtesting.ThreadLeakControl.forkTimeoutingTask(ThreadLeakControl.java:798)
-	at com.carrotsearch.randomizedtesting.ThreadLeakControl$3.evaluate(ThreadLeakControl.java:458)
-	at com.carrotsearch.randomizedtesting.RandomizedRunner.runSingleTest(RandomizedRunner.java:836)
-	at com.carrotsearch.randomizedtesting.RandomizedRunner$3.evaluate(RandomizedRunner.java:738)
-	at com.carrotsearch.randomizedtesting.RandomizedRunner$4.evaluate(RandomizedRunner.java:772)
-	at com.carrotsearch.randomizedtesting.RandomizedRunner$5.evaluate(RandomizedRunner.java:783)
-	at com.carrotsearch.randomizedtesting.rules.StatementAdapter.evaluate(StatementAdapter.java:36)
-	at com.carrotsearch.randomizedtesting.ThreadLeakControl$StatementRunner.run(ThreadLeakControl.java:365)
-	at com.carrotsearch.randomizedtesting.ThreadLeakControl.forkTimeoutingTask(ThreadLeakControl.java:798)
-	at com.carrotsearch.randomizedtesting.ThreadLeakControl$2.evaluate(ThreadLeakControl.java:401)
-	at com.carrotsearch.randomizedtesting.RandomizedRunner.runSuite(RandomizedRunner.java:642)
-	at com.carrotsearch.randomizedtesting.RandomizedRunner.access$200(RandomizedRunner.java:129)
-	at com.carrotsearch.randomizedtesting.RandomizedRunner$1.run(RandomizedRunner.java:559)
-</failure>
-  </testcase>
-  <testcase classname="no.uib.marcus.common.AggregationUtilsTest" name="testContains02 {#0 seed=[64727F0359A17B8E:E0F0384C3B9CE07C]}" time="0.002"/>
-  <testcase classname="no.uib.marcus.common.AggregationUtilsTest" name="testContains02 {#1 seed=[64727F0359A17B8E:54A684B00F5E2B50]}" time="0.001"/>
-  <testcase classname="no.uib.marcus.common.AggregationUtilsTest" name="testContains02 {#2 seed=[64727F0359A17B8E:DA4F126C5E9A639B]}" time="0.003"/>
-  <testcase classname="no.uib.marcus.common.AggregationUtilsTest" name="testContains02 {#3 seed=[64727F0359A17B8E:EBA1B989326438B2]}" time="0"/>
-  <testcase classname="no.uib.marcus.common.AggregationUtilsTest" name="testContains02 {#4 seed=[64727F0359A17B8E:A7603C24936CF809]}" time="0.001"/>
-  <testcase classname="no.uib.marcus.common.AggregationUtilsTest" name="testContains02 {#5 seed=[64727F0359A17B8E:369AEF7BEED0B509]}" time="0.002"/>
-  <testcase classname="no.uib.marcus.common.AggregationUtilsTest" name="testContains02 {#6 seed=[64727F0359A17B8E:8448BFDFCE0A50F]}" time="0.007"/>
-  <testcase classname="no.uib.marcus.common.AggregationUtilsTest" name="testContains02 {#7 seed=[64727F0359A17B8E:94F71187DFF431A1]}" time="0.006"/>
-  <testcase classname="no.uib.marcus.common.AggregationUtilsTest" name="testContains02 {#8 seed=[64727F0359A17B8E:A65BF4E9A83F26FB]}" time="0"/>
-  <testcase classname="no.uib.marcus.common.AggregationUtilsTest" name="testContains02 {#9 seed=[64727F0359A17B8E:71D0A253CC6811A9]}" time="0"/>
 </testsuite>

@@ -43,7 +43,7 @@ public class MarcusSearchService implements SearchService {
                
         public MarcusSearchService (){}
         
-        public MarcusSearchService(String[] indices, String [] types, String aggregations, 
+        /**public MarcusSearchService(String[] indices, String [] types, String aggregations, 
                 int from, int size, SortBuilder sort) {
                 this.indices = indices;
                 this.types = types;
@@ -51,7 +51,7 @@ public class MarcusSearchService implements SearchService {
                 this.from = from;
                 this.size = size;
                 this.sort = sort;
-        }
+        }**/
         public String[] getIndices() {
                 return indices;
         }
