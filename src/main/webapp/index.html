@@ -39,10 +39,10 @@
                     </span>
                     <!--b>Aggregations: </b>{{aggregations}} -->
                 </div>
+                <!--div class="loading" ng-show="show_loading"><img src="img/loading.gif" alt="Loading..." width="120"/></div-->
                 <!--div class="sticky-footer-push"></div-->
-                <!--div ng-show="loading" class="loading"><img src="">LOADING </div-->
-                <!--uib-progressbar class="progress-striped active" value="dynamic">hello world</uib-progressbar-->
-                <div class="search-results container-fluid">
+                <uib-progressbar class="progress-striped active loading" ng-show="show_loading" value="dynamic" >Loading...</uib-progressbar>
+                <div class="search-results container-fluid" ng-show="ready">
                     <div class="content row row-fluid">
                         <div class="facets col-lg-3 col-md-3 hidden-sm hidden-xs">
                             <h3>Dato</h3>
@@ -79,8 +79,8 @@
                         </div>
 
                         <div class="search-hits container container-fluid">
-                            <div class="form-horizontal single-select" role="form">
-                                <label for="sort_by"> Sort by: </label> 
+                            <div class="form-group single-select" role="form">
+                                <label class="control-label" for="sort_by">Sortér på: </label> 
                                 <select class="form-control" id="sort_by" ng-model="sort_by" ng-change="search()">
                                     <option value="">Relevance</option>
                                     <option value="available.asc">Availability ASC</option>
@@ -94,9 +94,9 @@
                             
                             <div class="results-hit">
                                 <h4 ng-show="results.hits.total > 0"> Total hits: {{results.hits.total}}</h4> 
-                                <div ng-show="results.hits.total == 0" class="alert alert-info" style="text-align:center;border-color:#bdbdbd; margin-top:10%;">
+                                <!--div ng-show="results.hits.total == 0" class="alert alert-info" style="text-align:center;border-color:#bdbdbd; margin-top:10%;">
                                     <h4>Ingen treff</h4>
-                                </div>
+                                </div-->
                                 <uib-pagination class="pagination" total-items="results.hits.total" 
                                         items-per-page="page_size" 
                                         ng-model="current_page" 

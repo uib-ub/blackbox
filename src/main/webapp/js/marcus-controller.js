@@ -7,6 +7,8 @@ var app = angular.module('marcus', ["checklist-model", "ui.bootstrap", "settings
 app.controller('freeTextSearch', function ($scope, $http, $location, mySetting) {
 
     //Initialize variables
+    $scope.show_loading = true;
+    $scope.show_search_results = false;
     $scope.query_string = "";
     $scope.sort_by = "";
     $scope.selected_filters = [];
@@ -14,6 +16,7 @@ app.controller('freeTextSearch', function ($scope, $http, $location, mySetting) 
     $scope.to_date = null;
     $scope.current_page = 0;
     $scope.page_size = 10;
+    
 
     /**
      * Get values from checkboxes. 
@@ -40,8 +43,8 @@ app.controller('freeTextSearch', function ($scope, $http, $location, mySetting) 
 
     //Send requests to search servlet
     $scope.search = function () {
-        /**We are assigning null to these values so that they should not appear in query string**/
-        var q = $scope.query_string === "" ? null : $scope.query_string + "*";
+        /**We are assigning null to these values so that, if empty, they should not appear in query string**/
+        var q = $scope.query_string === "" ? null : fuzzify($scope.query_string , "*");
         var sort = $scope.sort_by === "" ? null : $scope.sort_by;
 
         $http({
@@ -61,9 +64,13 @@ app.controller('freeTextSearch', function ($scope, $http, $location, mySetting) 
         })
                 .success(function (data, status, headers, config) {
                     $scope.results = data;
+                    $scope.show_loading = false;
+                    $scope.ready = true;
                 })
                 .error(function (data, status, headers, config) {
                     $scope.log = 'Error occured while querying' + data;
+                    $scope.show_loading = false;
+                    $scope.ready = true;
                 });
     };
 
@@ -85,8 +92,41 @@ app.controller('freeTextSearch', function ($scope, $http, $location, mySetting) 
                 .error(function (data, status, headers, config) {
                     $scope.log = 'Error occured while querying';
                 });
-    };
+    };    
 
     //Call this function on pageload
     $scope.search();
 });
+
+
+    /** 
+     * A method to apped * or ~ in the query string.
+     * 
+      @param descriptiondefault_freetext_fuzzify - should be either * or ~, 
+      if *, * will be prepended and appended to each string in the freetext search term
+      if ~, then ~ will be appended to each string in the freetext search term. 
+      If * or ~ or : are already in the freetext search term, no action will be taken. 
+      @param querystr - a query string.
+     **/
+    function fuzzify(querystr, default_freetext_fuzzify) {
+        var rqs = querystr;
+        if (default_freetext_fuzzify !== undefined) {
+            if (default_freetext_fuzzify === "*" || default_freetext_fuzzify === "~") {
+                if (querystr.indexOf('*') === -1 && querystr.indexOf('~') === -1 && querystr.indexOf(':') === -1) {
+                    var optparts = querystr.split(' ');
+                    var pq = "";
+                    for (var oi = 0; oi < optparts.length; oi++) {
+                        var oip = optparts[oi];
+                        if (oip.length > 0) {
+                            oip = oip + default_freetext_fuzzify;
+                            default_freetext_fuzzify === "*" ? oip : false;
+                            //default_freetext_fuzzify == "*" ? oip = "*" + oip : false;
+                            pq += oip + " ";
+                        }
+                    }
+                    rqs = pq;
+                }
+            }
+        }
+        return rqs;
+    }
