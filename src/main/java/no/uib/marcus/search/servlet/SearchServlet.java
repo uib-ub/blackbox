@@ -1,33 +1,24 @@
 package no.uib.marcus.search.servlet;
 
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
 
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import no.uib.marcus.common.AggregationUtil;
-
+import no.uib.marcus.common.AggregationUtils;
+import no.uib.marcus.search.MarcusSearchService;
 import org.apache.log4j.Logger;
+import org.elasticsearch.ElasticsearchException;
 import org.elasticsearch.action.search.SearchResponse;
+import org.elasticsearch.common.Strings;
 import org.elasticsearch.index.query.BoolFilterBuilder;
 import org.elasticsearch.index.query.FilterBuilder;
 import org.elasticsearch.index.query.FilterBuilders;
-
-import no.uib.marcus.search.MarcusSearchService;
-import org.elasticsearch.ElasticsearchException;
-import org.elasticsearch.common.Strings;
 import org.elasticsearch.search.sort.SortBuilder;
 import org.elasticsearch.search.sort.SortBuilders;
 import org.elasticsearch.search.sort.SortOrder;
@@ -66,6 +57,7 @@ public class SearchServlet extends HttpServlet {
                 String sortString = request.getParameter("sort");
                 SearchResponse searchResponse;
                 BoolFilterBuilder boolFilter;
+                String searchResponseString;
 
                 try (PrintWriter out = response.getWriter()) {
                         int _from = Strings.hasText(from) ? Integer.parseInt(from) : 0;
@@ -86,13 +78,12 @@ public class SearchServlet extends HttpServlet {
                         } else {
                                 searchResponse = service.getDocuments(queryString);
                         }
-                        String searchResponseString = searchResponse.toString();
-                        if(searchResponse != null){
-                                //After getting the response, add extra field "total_doc_count" 
-                                //to every bucket in the aggregations
-                                searchResponseString = service.addExtraFieldToBucketsAggregation(searchResponse);
-                        }
-                        //logger.info("Marcus service: " + service.toString() + "\n" + service.toJsonString());
+                        
+                        //After getting the response, add extra field "total_doc_count" 
+                        //to every bucket in the aggregations
+                        searchResponseString = service.addExtraFieldToBucketsAggregation(searchResponse);
+                        
+                        logger.info("Marcus service: " + service.toString() + "\n" + service.toJsonString());
                         out.write(searchResponseString);
                 }
         }
@@ -103,7 +94,7 @@ public class SearchServlet extends HttpServlet {
          */
         private FilterBuilder buildBoolFilter(String[] selectedFilters, String aggregations, String fromDate, String toDate) {
                 //In this map, keys are "fields" and values are "terms"
-                Map<String, List> filterMap = AggregationUtil.getFilterMap(selectedFilters);
+                Map<String, List> filterMap = AggregationUtils.getFilterMap(selectedFilters);
                 BoolFilterBuilder boolFilter = FilterBuilders.boolFilter();
                 try {
                         if (fromDate != null || toDate != null) {
@@ -119,21 +110,20 @@ public class SearchServlet extends HttpServlet {
                                                 .must(FilterBuilders.rangeFilter("madebefore").gte(fromDate))
                                                 .must(FilterBuilders.rangeFilter("madebefore").lte(toDate)));
 
-                                /**
-                                 * AND filter.
-                                 * .should(FilterBuilders.boolFilter()
-                                 * .must((FilterBuilders.rangeFilter("madeafter").gte(fromDate)))
-                                 * .must(FilterBuilders.rangeFilter("madebefore").lte(fromDate)));
-                                 *
-                                 */
+                                                /**
+                                                  //AND filter.
+                                                  .should(FilterBuilders.boolFilter()
+                                                  .must((FilterBuilders.rangeFilter("madeafter").gte(fromDate)))
+                                                  .must(FilterBuilders.rangeFilter("madebefore").lte(fromDate)));
+                                                 
+                                                 */
                         }
                         /**
-                         * Building the BoolFilter based on user selected
-                         * facets
+                         * Building the BoolFilter based on user selected facets
                          */
                         for (Map.Entry<String, List> entry : filterMap.entrySet()) {
                                 if (!entry.getValue().isEmpty()) {
-                                        if (AggregationUtil.contains(aggregations, "operator", "AND")) {
+                                        if (AggregationUtils.contains(aggregations, entry.getKey(), "operator", "AND")) {
                                                 logger.info("Constructing AND query for facet: " + entry.getKey());
                                                 for (Object value : entry.getValue()) {
                                                         //Building "AND" filter. A filter based on a term. 

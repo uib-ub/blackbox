@@ -34,16 +34,17 @@ import org.elasticsearch.search.sort.SortBuilder;
 public class MarcusSearchService implements SearchService {
 
         private static final Logger logger = Logger.getLogger(MarcusSearchService.class);
-        private @Nullable String[] indices;
+        private @Nullable String[] indices; 
         private @Nullable String[] types;
         private String aggregations;
         private SortBuilder sort;
         private int from = -1;
         private int size = -1;
-        
+               
         public MarcusSearchService (){}
         
-        public MarcusSearchService(String[] indices, String [] types, String aggregations, int from, int size, SortBuilder sort) {
+        public MarcusSearchService(String[] indices, String [] types, String aggregations, 
+                int from, int size, SortBuilder sort) {
                 this.indices = indices;
                 this.types = types;
                 this.aggregations = aggregations;
@@ -313,12 +314,13 @@ public class MarcusSearchService implements SearchService {
          *
          */
         public String addExtraFieldToBucketsAggregation(SearchResponse response) {
+               Gson gson = new GsonBuilder().setPrettyPrinting().create();
                 if (response == null) {
                         throw new NullPointerException("Search response is NULL."
-                                + " Cannot process aggregations. This means search response failed to execute");
+                                + " Cannot process aggregations. "
+                                + "This means search response failed to execute");
                 }
                 JsonElement responseJson = new JsonParser().parse(response.toString());
-                Gson gson = new GsonBuilder().setPrettyPrinting().create();
                 if (responseJson.getAsJsonObject().has("aggregations")) {
                         JsonObject aggs = responseJson.getAsJsonObject().get("aggregations").getAsJsonObject();
                         //Iterate throgh all the terms
@@ -363,19 +365,24 @@ public class MarcusSearchService implements SearchService {
                 return gson.toJson(responseJson);
         }
 
-        
+        /**
+         * Print out properties of this instance as a JSON string
+         **/
         public String toJsonString() throws IOException {
                 XContentBuilder jsonObj = XContentFactory.jsonBuilder().prettyPrint()
                         .startObject()
-                        .field("indices", this.getIndices())
-                        .field("type", this.getTypes())
+                        .field("indices", this.getIndices()==null? Strings.EMPTY_ARRAY : getIndices())
+                        .field("type", this.getTypes()==null? Strings.EMPTY_ARRAY : getTypes())
                         .field("from", this.getFrom())
                         .field("size", this.getSize())
-                        .field("aggregations",this.getAggregations())
+                        .field("aggregations", this.getAggregations()==null? Strings.EMPTY_ARRAY : getAggregations())
                         .endObject();
                 
                 return jsonObj.string();
         }
+        
+        
+        
         //Testing Aggregations
         public static void testAggRes(BoolFilterBuilder fb1) throws IOException, Exception {
                 Map map = new HashMap();

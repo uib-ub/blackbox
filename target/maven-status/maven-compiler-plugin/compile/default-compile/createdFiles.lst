@@ -1,9 +1,8 @@
-no\uib\marcus\search\servlet\DiscoverServlet.class
-no\uib\marcus\search\SearchService.class
-no\uib\marcus\search\servlet\SearchServlet.class
-no\uib\marcus\search\MarcusSearchService.class
-no\uib\marcus\search\Suggestion.class
-no\uib\marcus\search\client\ClientFactory.class
-no\uib\marcus\search\servlet\SuggestServlet.class
-.netbeans_automatic_build
-no\uib\marcus\common\AggregationUtil.class
+no/uib/marcus/search/servlet/DiscoverServlet.class
+no/uib/marcus/common/AggregationUtils.class
+no/uib/marcus/search/servlet/SearchServlet.class
+no/uib/marcus/search/Suggestion.class
+no/uib/marcus/search/servlet/SuggestServlet.class
+no/uib/marcus/search/client/ClientFactory.class
+no/uib/marcus/search/SearchService.class
+no/uib/marcus/search/MarcusSearchService.class
