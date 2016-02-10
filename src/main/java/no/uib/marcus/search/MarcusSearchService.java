@@ -6,6 +6,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import java.io.IOException;
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 import no.uib.marcus.search.client.ClientFactory;
@@ -31,19 +32,20 @@ import org.elasticsearch.search.aggregations.bucket.terms.TermsBuilder;
 import org.elasticsearch.search.builder.SearchSourceBuilderException;
 import org.elasticsearch.search.sort.SortBuilder;
 
-public class MarcusSearchService implements SearchService {
-
+public class MarcusSearchService implements SearchService, Serializable {
+        private static final long serialVersionUID = 4L;
+        
         private static final Logger logger = Logger.getLogger(MarcusSearchService.class);
         private @Nullable String[] indices; 
         private @Nullable String[] types;
         private String aggregations;
         private SortBuilder sort;
         private int from = -1;
-        private int size = -1;
+        private int size = -1; 
                
         public MarcusSearchService (){}
         
-        /**public MarcusSearchService(String[] indices, String [] types, String aggregations, 
+        public MarcusSearchService(String[] indices, String [] types, String aggregations, 
                 int from, int size, SortBuilder sort) {
                 this.indices = indices;
                 this.types = types;
@@ -51,7 +53,8 @@ public class MarcusSearchService implements SearchService {
                 this.from = from;
                 this.size = size;
                 this.sort = sort;
-        }**/
+        }
+        
         public String[] getIndices() {
                 return indices;
         }
@@ -184,7 +187,6 @@ public class MarcusSearchService implements SearchService {
 
         /**
          * Get all documents. 
-         * <br />
          *
          * @param queryStr - a query string, can be <code>NULL</code> which means match_all query.
          * @param filter  - a filter that will be embedded to the query
@@ -349,7 +351,7 @@ public class MarcusSearchService implements SearchService {
                                                 countRequestBuilder.setTypes(types);
                                         }
                                         /**
-                                         * Build a count response*
+                                         * Build a count response
                                          */
                                         CountResponse countResponse = countRequestBuilder
                                                 .setQuery(QueryBuilders.termQuery(term, value))
@@ -371,11 +373,11 @@ public class MarcusSearchService implements SearchService {
         public String toJsonString() throws IOException {
                 XContentBuilder jsonObj = XContentFactory.jsonBuilder().prettyPrint()
                         .startObject()
-                        .field("indices", this.getIndices()==null? Strings.EMPTY_ARRAY : getIndices())
-                        .field("type", this.getTypes()==null? Strings.EMPTY_ARRAY : getTypes())
-                        .field("from", this.getFrom())
-                        .field("size", this.getSize())
-                        .field("aggregations", this.getAggregations()==null? Strings.EMPTY_ARRAY : getAggregations())
+                        .field("indices", indices==null? Strings.EMPTY_ARRAY : indices)
+                        .field("type", types==null? Strings.EMPTY_ARRAY : types)
+                        .field("from", from)
+                        .field("size", from)
+                        .field("aggregations", aggregations==null? Strings.EMPTY_ARRAY : aggregations)
                         .endObject();
                 
                 return jsonObj.string();

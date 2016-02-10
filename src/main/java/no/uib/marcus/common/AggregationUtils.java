@@ -9,7 +9,9 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import javax.validation.constraints.NotNull;
 import org.apache.log4j.Logger;
+import org.elasticsearch.common.Nullable;
 
 /**
  * @author Hemed Ali Al Ruwehy
@@ -62,7 +64,8 @@ public class AggregationUtils {
          * "field.value"
          * @return  a map of selected filters as field-value pair
          */
-        public static Map getFilterMap(String[] selectedFilters) {
+        @NotNull
+        public static Map getFilterMap(@Nullable String[] selectedFilters) {
                 Map<String, List<String>> filters = new HashMap<>();
                 try {
                         if (selectedFilters == null) {

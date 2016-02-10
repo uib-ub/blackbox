@@ -3,7 +3,6 @@ package no.uib.marcus.search;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.common.Nullable;
 import org.elasticsearch.index.query.FilterBuilder;
-import org.elasticsearch.search.sort.SortBuilder;
 
 /**
  *
