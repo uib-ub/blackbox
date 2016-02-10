@@ -41,18 +41,21 @@ public class ClientFactory {
                         client = new TransportClient(settings)
                                 /**
                                  * You can add more than one addresses here,
-                                 * depending on the number of your servers For
+                                 * depending on the number of your servers. For
                                  * now, we are connecting locally.
                                  */
                                 .addTransportAddress(
                                         new InetSocketTransportAddress(InetAddress.getLocalHost(), 9300));
 
                         ClusterHealthResponse hr = client.admin().cluster().prepareHealth().get();
-                        logger.info("Connected to Elasticsearch : " + hr);
+                        logger.info("Connected to Elasticsearch cluster: " + hr);
                 } catch (UnknownHostException ue) {
                         logger.error("Unknown host: " + ue.getMessage());
                 } catch (ElasticsearchException e) {
-                        logger.error("Unable to connect to Elasticsearch. Is it running? " + e.getDetailedMessage());
+                        if(e instanceof ConnectTransportException){
+                            logger.warn("Unable to connect to Elasticsearch. Is it running? ");
+                        }
+                        logger.error(e.getDetailedMessage());
                 }
                 return client;
         }

@@ -33,19 +33,23 @@ import org.elasticsearch.search.builder.SearchSourceBuilderException;
 import org.elasticsearch.search.sort.SortBuilder;
 
 public class MarcusSearchService implements SearchService, Serializable {
+
         private static final long serialVersionUID = 4L;
-        
+
         private static final Logger logger = Logger.getLogger(MarcusSearchService.class);
-        private @Nullable String[] indices; 
-        private @Nullable String[] types;
+        private @Nullable
+        String[] indices;
+        private @Nullable
+        String[] types;
         private String aggregations;
         private SortBuilder sort;
         private int from = -1;
-        private int size = -1; 
-               
-        public MarcusSearchService (){}
-        
-        public MarcusSearchService(String[] indices, String [] types, String aggregations, 
+        private int size = -1;
+
+        public MarcusSearchService() {
+        }
+
+        public MarcusSearchService(String[] indices, String[] types, String aggregations,
                 int from, int size, SortBuilder sort) {
                 this.indices = indices;
                 this.types = types;
@@ -54,12 +58,12 @@ public class MarcusSearchService implements SearchService, Serializable {
                 this.size = size;
                 this.sort = sort;
         }
-        
+
         public String[] getIndices() {
                 return indices;
         }
 
-        public void setIndices(String[] indices) {
+        public void setIndices(String... indices) {
                 this.indices = indices;
         }
 
@@ -67,7 +71,7 @@ public class MarcusSearchService implements SearchService, Serializable {
                 return types;
         }
 
-        public void setTypes(String[] types) {
+        public void setTypes(String... types) {
                 this.types = types;
         }
 
@@ -102,35 +106,25 @@ public class MarcusSearchService implements SearchService, Serializable {
         public void setSort(SortBuilder sort) {
                 this.sort = sort;
         }
-        
-        /** Get all documents**/
+
+        /**
+         * Get all documents.
+         * <br />
+         *
+         * @return a SearchResponse
+         */
         @Override
         public SearchResponse getAllDocuments() {
-                SearchResponse response = null;
-                try {
-                        //Prepare search request across all indices
-                        response = ClientFactory
-                                .getTransportClient()
-                                .prepareSearch()
-                                .setIndices(indices)
-                                .setTypes(types)
-                                .execute()
-                                .actionGet();
-
-                } catch (SearchSourceBuilderException se) {
-                        logger.error("Exception on preparing the request: " + se.getDetailedMessage());
-                } catch (Exception ex) {
-                        logger.error("Exception: " + ex.getLocalizedMessage());
-                }
-                return response;
-
+                return getDocuments(null);
         }
 
         /**
-         * Get all documents. 
+         * Get all documents that match a query string.
          * <br />
-         * @param queryStr - a query string, can be <code>NULL</code> which means match_all query.
-         * 
+         *
+         * @param queryStr a query string, can be <code>NULL</code> which means
+         * match all documents.
+         *
          * @return a SearchResponse
          */
         @Override
@@ -163,11 +157,11 @@ public class MarcusSearchService implements SearchService, Serializable {
                         //from & size
                         searchRequest.setFrom(from);
                         searchRequest.setSize(size);
-                        
+
                         if (sort != null) {
                                 searchRequest.addSort(sort);
                         }
-                        
+
                         if (Strings.hasText(aggregations)) {
                                 //Append term aggregations to this request builder
                                 this.addTermsAggregation(searchRequest);
@@ -186,11 +180,12 @@ public class MarcusSearchService implements SearchService, Serializable {
         }
 
         /**
-         * Get all documents. 
+         * Get all documents.
          *
-         * @param queryStr - a query string, can be <code>NULL</code> which means match_all query.
-         * @param filter  - a filter that will be embedded to the query
-         * 
+         * @param queryStr a query string, can be <code>NULL</code> which means
+         * match all documents.
+         * @param filter a filter that will be embedded to the query
+         *
          * @return a SearchResponse
          */
         @Override
@@ -231,10 +226,10 @@ public class MarcusSearchService implements SearchService, Serializable {
                         if (sort != null) {
                                 searchRequest.addSort(sort);
                         }
-                        
+
                         if (Strings.hasText(aggregations)) {
                                 //Append term aggregations to this request builder
-                               this.addTermsAggregation(searchRequest);
+                                this.addTermsAggregation(searchRequest);
                         }
                         //Show Search builder for debugging purpose
                         logger.info(searchRequest.toString());
@@ -259,9 +254,9 @@ public class MarcusSearchService implements SearchService, Serializable {
          * @return the same search request where aggregations have been added to
          * it.
          */
-        private SearchRequestBuilder addTermsAggregation(SearchRequestBuilder searchRequest) 
+        private SearchRequestBuilder addTermsAggregation(SearchRequestBuilder searchRequest)
                 throws ElasticsearchException {
-                
+
                 JsonElement jsonElement = new JsonParser().parse(aggregations);
                 for (JsonElement facets : jsonElement.getAsJsonArray()) {
                         JsonObject currentFacet = facets.getAsJsonObject();
@@ -292,7 +287,7 @@ public class MarcusSearchService implements SearchService, Serializable {
                                         termsBuilder.order(order);
                                 }
 
-                                //Add aggregations to the search request builder
+                                //Add term aggregations to the search request builder
                                 searchRequest.addAggregation(termsBuilder);
                         }
 
@@ -311,12 +306,12 @@ public class MarcusSearchService implements SearchService, Serializable {
          *
          * @param a search response
          *
-         * @return a JSON string of response where the extra field has been added to
-         * each bucket aggregation.
+         * @return a JSON string of response where the extra field has been
+         * added to each bucket aggregation.
          *
          */
         public String addExtraFieldToBucketsAggregation(SearchResponse response) {
-               Gson gson = new GsonBuilder().setPrettyPrinting().create();
+                Gson gson = new GsonBuilder().setPrettyPrinting().create();
                 if (response == null) {
                         throw new NullPointerException("Search response is NULL."
                                 + " Cannot process aggregations. "
@@ -369,22 +364,21 @@ public class MarcusSearchService implements SearchService, Serializable {
 
         /**
          * Print out properties of this instance as a JSON string
-         **/
+         *
+         */
         public String toJsonString() throws IOException {
                 XContentBuilder jsonObj = XContentFactory.jsonBuilder().prettyPrint()
                         .startObject()
-                        .field("indices", indices==null? Strings.EMPTY_ARRAY : indices)
-                        .field("type", types==null? Strings.EMPTY_ARRAY : types)
+                        .field("indices", indices == null ? Strings.EMPTY_ARRAY : indices)
+                        .field("type", types == null ? Strings.EMPTY_ARRAY : types)
                         .field("from", from)
                         .field("size", from)
-                        .field("aggregations", aggregations==null? Strings.EMPTY_ARRAY : aggregations)
+                        .field("aggregations", aggregations == null ? Strings.EMPTY_ARRAY : aggregations)
                         .endObject();
-                
+
                 return jsonObj.string();
         }
-        
-        
-        
+
         //Testing Aggregations
         public static void testAggRes(BoolFilterBuilder fb1) throws IOException, Exception {
                 Map map = new HashMap();
