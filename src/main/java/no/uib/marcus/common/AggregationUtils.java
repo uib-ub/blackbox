@@ -3,7 +3,9 @@ package no.uib.marcus.common;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import com.google.gson.JsonParseException;
 import com.google.gson.JsonParser;
+import com.google.gson.JsonSyntaxException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -48,7 +50,7 @@ public class AggregationUtils {
                                         }
                                 }
                         }
-                } catch (Exception e) {
+                } catch (JsonParseException e) {
                         logger.error("Facets could not be processed. Please check the syntax."
                                     + "Facets need to be valid JSON array:" + aggregations );
                         return false;

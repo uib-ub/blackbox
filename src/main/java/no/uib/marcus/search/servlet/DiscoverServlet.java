@@ -7,9 +7,12 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import no.uib.marcus.common.SortUtils;
 import no.uib.marcus.search.SearchService;
 import no.uib.marcus.search.MarcusSearchService;
 import org.elasticsearch.action.search.SearchResponse;
+import org.elasticsearch.common.Strings;
+import org.elasticsearch.search.sort.SortBuilder;
 
 @WebServlet(
         name = "DiscoverServlet",
@@ -23,7 +26,22 @@ public class DiscoverServlet extends HttpServlet {
                 throws ServletException, IOException {
                 request.setCharacterEncoding("UTF-8");
                 response.setContentType("application/json;charset=UTF-8");
-                SearchService service = new MarcusSearchService();
+                String[] indices = request.getParameterValues("index");
+                String[] types = request.getParameterValues("type");
+                String from = request.getParameter("from");
+                String size = request.getParameter("size");
+                String sortString = request.getParameter("sort");
+
+                int _from = Strings.hasText(from) ? Integer.parseInt(from) : 0;
+                int _size = Strings.hasText(size) ? Integer.parseInt(size) : 10;
+                SortBuilder fieldSort = Strings.hasText(sortString) ? SortUtils.getFieldSort(sortString) : null;
+
+                MarcusSearchService service = new MarcusSearchService();
+                service.setIndices(indices);
+                service.setTypes(types);
+                service.setFrom(_from);
+                service.setSize(_size);
+                service.setSort(fieldSort);
 
                 try (PrintWriter out = response.getWriter()) {
                         SearchResponse searchResponse = service.getAllDocuments();

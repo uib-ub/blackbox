@@ -57,23 +57,21 @@
                             <hr>
                             <ul class="nav nav-list">
                                 <li ng-repeat="bucket in results['aggregations']['type.exact']['buckets']">
-                                    <label>
-                                        <input type="checkbox" checklist-model="selected_filters" checklist-value="getCheckedValue('type.exact', bucket.key)" ng-click="search()">
-                                        {{bucket.key}}
-                                    </label>
-                                    ({{bucket.doc_count}} of {{bucket.total_doc_count}})
+                                    <input type="checkbox" checklist-model="selected_filters" checklist-value="getCheckedValue('type.exact', bucket.key)" ng-click="search()">
+                                        <label> {{bucket.key}}</label>
+                                        <span style="color:grey"> ({{bucket.doc_count}} of {{bucket.total_doc_count}})</span>
+                                        <br>
                                 </li>
                             </ul>
-
+                            
                             <h3>Emne</h3>
                             <hr>
                             <ul class="nav nav-list">
                                 <li ng-repeat="bucket in results['aggregations']['subject.exact']['buckets']">
-                                    <label>
                                         <input type="checkbox" checklist-model="selected_filters" checklist-value="getCheckedValue('subject.exact', bucket.key)" ng-click="search()">
-                                        {{bucket.key}} 
-                                    </label>
-                                    ({{bucket.doc_count}} of {{bucket.total_doc_count}})
+                                        <label class="row-fluid"> {{bucket.key}} </label>
+                                        <span style="color:gray">({{bucket.doc_count}} of {{bucket.total_doc_count}})</span>
+                                        <br>
                                 </li>
                             </ul>                 
                         </div>
@@ -83,12 +81,12 @@
                                 <label class="control-label" for="sort_by">Sortér på: </label> 
                                 <select class="form-control" id="sort_by" ng-model="sort_by" ng-change="search()">
                                     <option value="">Relevance</option>
-                                    <option value="available.asc">Availability ASC</option>
-                                    <option value="available.desc">Availability DESC</option>
-                                    <option value="title.asc">Title ASC</option>
-                                    <option value="title.desc">Title DESC</option>
-                                    <option value="identifier.asc">ID ASC</option>
-                                    <option value="identifier.desc">ID DESC</option>
+                                    <option value="available:asc">Availability ASC</option>
+                                    <option value="available:desc">Availability DESC</option>
+                                    <option value="title:asc">Title ASC</option>
+                                    <option value="title:desc">Title DESC</option>
+                                    <option value="identifier:asc">ID ASC</option>
+                                    <option value="identifier:desc">ID DESC</option>
                                 </select>
                             </div><br/>
                             
@@ -107,12 +105,18 @@
                                         force-ellipses="true"
                                         style="margin-left: 25%">    
                                 </uib-pagination>
-                                <div>
+                                <div class="row row-fluid" ng-repeat="doc in results.hits.hits">
                                     <ul>
                                         <li ng-repeat="doc in results.hits.hits">
                                             {{doc._source}}
                                         </li>
                                     </ul>
+                                    <!--div class="row" style="display: block;">            
+                                        <h4 style="margin-top:7px;"> 
+                                            <a href='{{doc_source.id}}' target="_blank">{{doc._source.title}}</a>
+                                        </h4>
+                                            <span class="label label-info">{{doc._source.type}}</span>
+                                    </div-->
                                 </div>
                             </div>
                         </div>
@@ -152,7 +156,7 @@
         <script>
                 angular.module("settings", [])
                         .constant("mySetting", {
-                            index: ["admin-test"],
+                            index: ["admin"],
                             type: ["document","invoice"],
                             facets: [
                                 {"field": "type.exact", "size": 10, "operator": "AND", "order": "term_asc"},

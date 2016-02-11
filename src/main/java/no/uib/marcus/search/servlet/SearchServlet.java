@@ -11,6 +11,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import no.uib.marcus.common.AggregationUtils;
+import no.uib.marcus.common.SortUtils;
 import no.uib.marcus.search.MarcusSearchService;
 import org.apache.log4j.Logger;
 import org.elasticsearch.ElasticsearchException;
@@ -62,7 +63,7 @@ public class SearchServlet extends HttpServlet {
                 try (PrintWriter out = response.getWriter()) {
                         int _from = Strings.hasText(from) ? Integer.parseInt(from) : 0;
                         int _size = Strings.hasText(size) ? Integer.parseInt(size) : 10;
-                        SortBuilder fieldSort = Strings.hasText(sortString) ? getFieldSort(sortString) : null;
+                        SortBuilder fieldSort = Strings.hasText(sortString) ? SortUtils.getFieldSort(sortString) : null;
                         
                         /**Override service properties from previous request**/
                         service.setIndices(indices);
@@ -72,7 +73,7 @@ public class SearchServlet extends HttpServlet {
                         service.setSize(_size);
                         service.setSort(fieldSort);
  
-                        boolFilter = (BoolFilterBuilder) buildBoolFilter(selectedFilters, aggs, fromDate, toDate);
+                        boolFilter = buildBoolFilter(selectedFilters, aggs, fromDate, toDate);
                         if (boolFilter.hasClauses()) {
                                 searchResponse = service.getDocuments(queryString, boolFilter);
                         } else {
@@ -92,7 +93,7 @@ public class SearchServlet extends HttpServlet {
          * A method for building BoolFilter based on the aggregation settings.
          *
          */
-        private FilterBuilder buildBoolFilter(String[] selectedFilters, String aggregations, String fromDate, String toDate) {
+        private BoolFilterBuilder buildBoolFilter(String[] selectedFilters, String aggregations, String fromDate, String toDate) {
                 //In this map, keys are "fields" and values are "terms"
                 Map<String, List> filterMap = AggregationUtils.getFilterMap(selectedFilters);
                 BoolFilterBuilder boolFilter = FilterBuilders.boolFilter();
@@ -145,47 +146,7 @@ public class SearchServlet extends HttpServlet {
                 return boolFilter;
         }
 
-        /**
-         * Building a fieldSort.
-         *
-         * @param sortString, a string that contains a field and sort type in
-         * the form of "field_asc" or "field_desc"
-         */
-        private SortBuilder getFieldSort(String sortString) {
-                SortBuilder sortBuilder = null;
-                SortOrder sortOrder = null;
-                try {
-                        int lastIndex = sortString.lastIndexOf('.');
-                        String field = sortString.substring(0, lastIndex).trim();
-                        String order = sortString.substring(lastIndex + 1, sortString.length()).trim();
-
-                        if (order.equalsIgnoreCase("asc")) {
-                                sortOrder = SortOrder.ASC;
-                        }
-                        if (order.equalsIgnoreCase("desc")) {
-                                sortOrder = SortOrder.DESC;
-                        }
-                        //Build sort
-                        sortBuilder = SortBuilders
-                                .fieldSort(field)
-                                .missing("_last");
-
-                        if (sortBuilder != null) {
-                                sortBuilder.order(sortOrder);
-                        }
-
-                } catch (ElasticsearchException e) {
-                        logger.error("Sorting cannot be constructed. " + e.getDetailedMessage());
-                } catch (StringIndexOutOfBoundsException e) {
-                        logger.error("The sort string does not contain a dot, hence cannot be split into field-value pair. "
-                                + "The method expects to find a dot that seperate a field and it's sort type "
-                                + "but found: " + sortString);
-                }
-                return sortBuilder;
-        }
-
-
-       
+      
         @Override
         protected void doGet(HttpServletRequest request, HttpServletResponse response)
                 throws ServletException, IOException {

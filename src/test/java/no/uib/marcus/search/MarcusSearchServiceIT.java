@@ -14,11 +14,15 @@ import org.elasticsearch.common.base.Predicate;
 import org.elasticsearch.common.base.Predicates;
 import org.elasticsearch.common.settings.ImmutableSettings;
 import org.elasticsearch.common.xcontent.XContentFactory;
+import org.elasticsearch.index.query.BoolFilterBuilder;
+import org.elasticsearch.index.query.FilterBuilder;
+import org.elasticsearch.index.query.FilterBuilders;
 import org.elasticsearch.indices.IndexMissingException;
 import org.elasticsearch.test.ElasticsearchIntegrationTest;
 import static org.elasticsearch.test.ElasticsearchIntegrationTest.client;
 import static org.elasticsearch.test.ElasticsearchTestCase.awaitBusy;
 import org.elasticsearch.test.hamcrest.ElasticsearchAssertions;
+import org.elasticsearch.test.junit.annotations.Network;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -34,7 +38,9 @@ import sun.print.resources.serviceui;
  * Make sure you have the same version to that of the other nodes and the same cluster name.
  ***/
 
-//@ElasticsearchIntegrationTest.ClusterScope(scope = ElasticsearchIntegrationTest.Scope.SUITE)
+/**@ElasticsearchIntegrationTest.ClusterScope(
+        scope = ElasticsearchIntegrationTest.Scope.SUITE, transportClientRatio = 0.0)
+**/
 public class MarcusSearchServiceIT extends TestCase {
 
         private static final Logger logger = Logger.getLogger(MarcusSearchServiceIT.class);
@@ -100,7 +106,7 @@ public class MarcusSearchServiceIT extends TestCase {
 
                 //Index 1 document
                 ClientFactory.getTransportClient()
-                        .prepareIndex("test", "doc", "1")
+                        .prepareIndex(indexName, "doc", "1")
                         .setSource(XContentFactory.jsonBuilder()
                                 .startObject()
                                 .field("identifier", "ubb-ms-01")
@@ -121,5 +127,47 @@ public class MarcusSearchServiceIT extends TestCase {
                 }, 2, TimeUnit.SECONDS));
 
         }
+        
+        
+        /**
+         * Test of getDocuments (String queryString) method, of class
+         * MarcusSearchService.
+         *
+         * @throws java.io.IOException
+         * @throws java.lang.InterruptedException
+         */
+        @Test
+        public void testGetDocumentsBoolFilter() throws IOException, InterruptedException {
+                logger.info("************Testing getDocuments(String queryString, FilterBuilder builder)*****************");
+                logger.info("Indexing documents to index: " + indexName);
 
+                final MarcusSearchService service = new MarcusSearchService();
+                service.setIndices(indexName);
+
+                //Index 1 document
+                ClientFactory.getTransportClient()
+                        .prepareIndex(indexName, "doc", "2")
+                        .setSource(XContentFactory.jsonBuilder()
+                                .startObject()
+                                .field("identifier", "ubb-ms-02")
+                                .field("title", "Stone town")
+                                .field("status", "signed")
+                                .endObject())
+                        .execute()
+                        .actionGet();
+
+                //Wait for 2 seconds, then get all documents.
+                assertTrue(awaitBusy(new Predicate<Object>() {
+                        @Override
+                        public boolean apply(Object o) {
+                               
+                                SearchResponse res = service.getDocuments("ballab" , FilterBuilders.matchAllFilter());
+                                logger.info("Total documents found: " + res.getHits().getTotalHits());
+
+                                return res.getHits().getTotalHits() == 1;
+                        }
+                }, 2, TimeUnit.SECONDS));
+
+        }
+        
 }

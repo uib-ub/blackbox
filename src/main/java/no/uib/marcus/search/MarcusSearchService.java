@@ -192,7 +192,6 @@ public class MarcusSearchService implements SearchService, Serializable {
         public SearchResponse getDocuments(@Nullable String queryStr, FilterBuilder filter) {
                 SearchResponse response = null;
                 SearchRequestBuilder searchRequest;
-                BoolFilterBuilder boolFilter = (BoolFilterBuilder) filter;
                 QueryBuilder query;
                 try {
                         //Prepare search request
@@ -216,9 +215,8 @@ public class MarcusSearchService implements SearchService, Serializable {
                                 //Use match_all query
                                 query = QueryBuilders.matchAllQuery();
                         }
-
                         searchRequest.setQuery(QueryBuilders
-                                .filteredQuery(query, boolFilter));
+                                .filteredQuery(query, filter));
 
                         searchRequest.setFrom(from);
                         searchRequest.setSize(size);
@@ -372,7 +370,7 @@ public class MarcusSearchService implements SearchService, Serializable {
                         .field("indices", indices == null ? Strings.EMPTY_ARRAY : indices)
                         .field("type", types == null ? Strings.EMPTY_ARRAY : types)
                         .field("from", from)
-                        .field("size", from)
+                        .field("size", size)
                         .field("aggregations", aggregations == null ? Strings.EMPTY_ARRAY : aggregations)
                         .endObject();
 
@@ -422,7 +420,7 @@ public class MarcusSearchService implements SearchService, Serializable {
                                 .addRange("created", "2010", null)
                         );
 
-                SearchResponse res = req.execute().actionGet();
+                //SearchResponse res = req.execute().actionGet();
 
                 // appendTermsAggregation(req, json);
                 //.addAggregation(aggregation)
