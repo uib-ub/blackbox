@@ -1,91 +1,91 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<testsuite tests="25" failures="0" name="no.uib.marcus.common.AggregationUtilsTest" time="0.252" errors="0" skipped="0">
+<testsuite tests="25" failures="0" name="no.uib.marcus.common.AggregationUtilsTest" time="0.27" errors="0" skipped="0">
   <properties>
     <property name="java.runtime.name" value="Java(TM) SE Runtime Environment"/>
-    <property name="sun.boot.library.path" value="C:\Program Files\Java\jdk1.8.0_25\jre\bin"/>
-    <property name="java.vm.version" value="25.25-b02"/>
+    <property name="sun.boot.library.path" value="/Library/Java/JavaVirtualMachines/jdk1.8.0_40.jdk/Contents/Home/jre/lib"/>
+    <property name="java.vm.version" value="25.40-b25"/>
     <property name="user.country.format" value="NO"/>
+    <property name="gopherProxySet" value="false"/>
     <property name="java.vm.vendor" value="Oracle Corporation"/>
     <property name="java.vendor.url" value="http://java.oracle.com/"/>
-    <property name="path.separator" value=";"/>
+    <property name="path.separator" value=":"/>
     <property name="guice.disable.misplaced.annotation.check" value="true"/>
     <property name="java.vm.name" value="Java HotSpot(TM) 64-Bit Server VM"/>
     <property name="file.encoding.pkg" value="sun.io"/>
-    <property name="user.script" value=""/>
     <property name="user.country" value="US"/>
     <property name="sun.java.launcher" value="SUN_STANDARD"/>
-    <property name="sun.os.patch.level" value="Service Pack 1"/>
+    <property name="sun.os.patch.level" value="unknown"/>
     <property name="java.vm.specification.name" value="Java Virtual Machine Specification"/>
-    <property name="user.dir" value="D:\Development\marcus-blackbox"/>
-    <property name="java.runtime.version" value="1.8.0_25-b18"/>
-    <property name="java.awt.graphicsenv" value="sun.awt.Win32GraphicsEnvironment"/>
-    <property name="java.endorsed.dirs" value="C:\Program Files\Java\jdk1.8.0_25\jre\lib\endorsed"/>
-    <property name="os.arch" value="amd64"/>
-    <property name="java.io.tmpdir" value="C:\Users\hru066\AppData\Local\Temp\"/>
+    <property name="user.dir" value="/Users/hemed/Documents/Development/marcus-blackbox"/>
+    <property name="java.runtime.version" value="1.8.0_40-b25"/>
+    <property name="java.awt.graphicsenv" value="sun.awt.CGraphicsEnvironment"/>
+    <property name="java.endorsed.dirs" value="/Library/Java/JavaVirtualMachines/jdk1.8.0_40.jdk/Contents/Home/jre/lib/endorsed"/>
+    <property name="os.arch" value="x86_64"/>
+    <property name="java.io.tmpdir" value="/var/folders/b2/c177gn7j1vqd39b5jk5_q8rr0000gn/T/"/>
     <property name="line.separator" value="
 "/>
     <property name="java.vm.specification.vendor" value="Oracle Corporation"/>
-    <property name="user.variant" value=""/>
-    <property name="os.name" value="Windows 7"/>
-    <property name="maven.ext.class.path" value="D:\NetBeans 8.1\java\maven-nblib\netbeans-eventspy.jar"/>
-    <property name="classworlds.conf" value="D:\NetBeans 8.1\java\maven\bin\m2.conf"/>
-    <property name="sun.jnu.encoding" value="Cp1252"/>
-    <property name="java.library.path" value="C:\Program Files\Java\jdk1.8.0_25\bin;C:\Windows\Sun\Java\bin;C:\Windows\system32;C:\Windows;C:\ProgramData\Oracle\Java\javapath;C:\Windows\system32;C:\Windows;C:\Windows\System32\Wbem;C:\Windows\System32\WindowsPowerShell\v1.0\;%JAVA_HOME%\bin;C:\Program Files\TortoiseSVN\bin;C:\Program Files (x86)\QuickTime\QTSystem\;."/>
+    <property name="os.name" value="Mac OS X"/>
+    <property name="maven.ext.class.path" value="/Applications/NetBeans/NetBeans 8.1.app/Contents/Resources/NetBeans/java/maven-nblib/netbeans-eventspy.jar"/>
+    <property name="classworlds.conf" value="/Applications/NetBeans/NetBeans 8.1.app/Contents/Resources/NetBeans/java/maven/bin/m2.conf"/>
+    <property name="sun.jnu.encoding" value="UTF-8"/>
+    <property name="java.library.path" value="/Applications/NetBeans/NetBeans 8.1.app/Contents/Resources/NetBeans/webcommon/bin::/Users/hemed/Library/Java/Extensions:/Library/Java/Extensions:/Network/Library/Java/Extensions:/System/Library/Java/Extensions:/usr/lib/java:."/>
     <property name="java.specification.name" value="Java Platform API Specification"/>
     <property name="java.class.version" value="52.0"/>
     <property name="sun.management.compiler" value="HotSpot 64-Bit Tiered Compilers"/>
-    <property name="os.version" value="6.1"/>
-    <property name="user.home" value="C:\Users\hru066"/>
-    <property name="user.timezone" value="Europe/Paris"/>
-    <property name="java.awt.printerjob" value="sun.awt.windows.WPrinterJob"/>
+    <property name="os.version" value="10.10.5"/>
+    <property name="http.nonProxyHosts" value="local|*.local|169.254/16|*.169.254/16"/>
+    <property name="user.home" value="/Users/hemed"/>
+    <property name="user.timezone" value="Europe/Oslo"/>
+    <property name="java.awt.printerjob" value="sun.lwawt.macosx.CPrinterJob"/>
     <property name="java.specification.version" value="1.8"/>
     <property name="file.encoding" value="UTF-8"/>
-    <property name="user.name" value="hru066"/>
-    <property name="java.class.path" value="D:\NetBeans 8.1\java\maven\boot\plexus-classworlds-2.4.jar"/>
+    <property name="user.name" value="hemed"/>
+    <property name="java.class.path" value="/Applications/NetBeans/NetBeans 8.1.app/Contents/Resources/NetBeans/java/maven/boot/plexus-classworlds-2.4.jar"/>
     <property name="java.vm.specification.version" value="1.8"/>
     <property name="sun.arch.data.model" value="64"/>
-    <property name="java.home" value="C:\Program Files\Java\jdk1.8.0_25\jre"/>
-    <property name="sun.java.command" value="org.codehaus.plexus.classworlds.launcher.Launcher -Dmaven.ext.class.path=D:\NetBeans 8.1\java\maven-nblib\netbeans-eventspy.jar -Dfile.encoding=UTF-8 clean install"/>
+    <property name="java.home" value="/Library/Java/JavaVirtualMachines/jdk1.8.0_40.jdk/Contents/Home/jre"/>
+    <property name="sun.java.command" value="org.codehaus.plexus.classworlds.launcher.Launcher -Dmaven.ext.class.path=/Applications/NetBeans/NetBeans 8.1.app/Contents/Resources/NetBeans/java/maven-nblib/netbeans-eventspy.jar install"/>
     <property name="java.specification.vendor" value="Oracle Corporation"/>
     <property name="user.language" value="en"/>
-    <property name="user.language.format" value="no"/>
-    <property name="awt.toolkit" value="sun.awt.windows.WToolkit"/>
+    <property name="awt.toolkit" value="sun.lwawt.macosx.LWCToolkit"/>
     <property name="java.vm.info" value="mixed mode"/>
-    <property name="java.version" value="1.8.0_25"/>
-    <property name="java.ext.dirs" value="C:\Program Files\Java\jdk1.8.0_25\jre\lib\ext;C:\Windows\Sun\Java\lib\ext"/>
-    <property name="sun.boot.class.path" value="C:\Program Files\Java\jdk1.8.0_25\jre\lib\resources.jar;C:\Program Files\Java\jdk1.8.0_25\jre\lib\rt.jar;C:\Program Files\Java\jdk1.8.0_25\jre\lib\sunrsasign.jar;C:\Program Files\Java\jdk1.8.0_25\jre\lib\jsse.jar;C:\Program Files\Java\jdk1.8.0_25\jre\lib\jce.jar;C:\Program Files\Java\jdk1.8.0_25\jre\lib\charsets.jar;C:\Program Files\Java\jdk1.8.0_25\jre\lib\jfr.jar;C:\Program Files\Java\jdk1.8.0_25\jre\classes"/>
+    <property name="java.version" value="1.8.0_40"/>
+    <property name="java.ext.dirs" value="/Users/hemed/Library/Java/Extensions:/Library/Java/JavaVirtualMachines/jdk1.8.0_40.jdk/Contents/Home/jre/lib/ext:/Library/Java/Extensions:/Network/Library/Java/Extensions:/System/Library/Java/Extensions:/usr/lib/java"/>
+    <property name="sun.boot.class.path" value="/Library/Java/JavaVirtualMachines/jdk1.8.0_40.jdk/Contents/Home/jre/lib/resources.jar:/Library/Java/JavaVirtualMachines/jdk1.8.0_40.jdk/Contents/Home/jre/lib/rt.jar:/Library/Java/JavaVirtualMachines/jdk1.8.0_40.jdk/Contents/Home/jre/lib/sunrsasign.jar:/Library/Java/JavaVirtualMachines/jdk1.8.0_40.jdk/Contents/Home/jre/lib/jsse.jar:/Library/Java/JavaVirtualMachines/jdk1.8.0_40.jdk/Contents/Home/jre/lib/jce.jar:/Library/Java/JavaVirtualMachines/jdk1.8.0_40.jdk/Contents/Home/jre/lib/charsets.jar:/Library/Java/JavaVirtualMachines/jdk1.8.0_40.jdk/Contents/Home/jre/lib/jfr.jar:/Library/Java/JavaVirtualMachines/jdk1.8.0_40.jdk/Contents/Home/jre/classes"/>
     <property name="java.vendor" value="Oracle Corporation"/>
-    <property name="maven.home" value="D:\NetBeans 8.1\java\maven"/>
-    <property name="file.separator" value="\"/>
+    <property name="maven.home" value="/Applications/NetBeans/NetBeans 8.1.app/Contents/Resources/NetBeans/java/maven"/>
+    <property name="file.separator" value="/"/>
     <property name="java.vendor.url.bug" value="http://bugreport.sun.com/bugreport/"/>
     <property name="sun.cpu.endian" value="little"/>
-    <property name="sun.io.unicode.encoding" value="UnicodeLittle"/>
-    <property name="sun.desktop" value="windows"/>
-    <property name="sun.cpu.isalist" value="amd64"/>
+    <property name="sun.io.unicode.encoding" value="UnicodeBig"/>
+    <property name="socksNonProxyHosts" value="local|*.local|169.254/16|*.169.254/16"/>
+    <property name="ftp.nonProxyHosts" value="local|*.local|169.254/16|*.169.254/16"/>
+    <property name="sun.cpu.isalist" value=""/>
   </properties>
-  <testcase classname="no.uib.marcus.common.AggregationUtilsTest" name="testGetFilterMap01" time="0.06"/>
-  <testcase classname="no.uib.marcus.common.AggregationUtilsTest" name="testGetFilterMap02" time="0"/>
-  <testcase classname="no.uib.marcus.common.AggregationUtilsTest" name="testContains02 {#0 seed=[A8522C75C3F27521:2CD06B3AA1CFEED3]}" time="0.03"/>
-  <testcase classname="no.uib.marcus.common.AggregationUtilsTest" name="testContains02 {#1 seed=[A8522C75C3F27521:9886D7C6950D25FF]}" time="0"/>
-  <testcase classname="no.uib.marcus.common.AggregationUtilsTest" name="testContains02 {#2 seed=[A8522C75C3F27521:166F411AC4C96D34]}" time="0"/>
-  <testcase classname="no.uib.marcus.common.AggregationUtilsTest" name="testContains02 {#3 seed=[A8522C75C3F27521:2781EAFFA837361D]}" time="0"/>
-  <testcase classname="no.uib.marcus.common.AggregationUtilsTest" name="testContains02 {#4 seed=[A8522C75C3F27521:6B406F52093FF6A6]}" time="0"/>
-  <testcase classname="no.uib.marcus.common.AggregationUtilsTest" name="testContains02 {#5 seed=[A8522C75C3F27521:FABABC0D7483BBA6]}" time="0.01"/>
-  <testcase classname="no.uib.marcus.common.AggregationUtilsTest" name="testContains02 {#6 seed=[A8522C75C3F27521:C464D88B66B3ABA0]}" time="0"/>
-  <testcase classname="no.uib.marcus.common.AggregationUtilsTest" name="testContains02 {#7 seed=[A8522C75C3F27521:58D742F145A73F0E]}" time="0.01"/>
-  <testcase classname="no.uib.marcus.common.AggregationUtilsTest" name="testContains02 {#8 seed=[A8522C75C3F27521:6A7BA79F326C2854]}" time="0"/>
-  <testcase classname="no.uib.marcus.common.AggregationUtilsTest" name="testContains02 {#9 seed=[A8522C75C3F27521:BDF0F125563B1F06]}" time="0"/>
-  <testcase classname="no.uib.marcus.common.AggregationUtilsTest" name="testGetFilterMap03" time="0"/>
-  <testcase classname="no.uib.marcus.common.AggregationUtilsTest" name="testContains03 {#0 seed=[A8522C75C3F27521:79A48AE18A1844A8]}" time="0"/>
-  <testcase classname="no.uib.marcus.common.AggregationUtilsTest" name="testContains03 {#1 seed=[A8522C75C3F27521:79A48AE18A1844A8]}" time="0"/>
-  <testcase classname="no.uib.marcus.common.AggregationUtilsTest" name="testContains03 {#2 seed=[A8522C75C3F27521:79A48AE18A1844A8]}" time="0"/>
-  <testcase classname="no.uib.marcus.common.AggregationUtilsTest" name="testContains03 {#3 seed=[A8522C75C3F27521:79A48AE18A1844A8]}" time="0"/>
-  <testcase classname="no.uib.marcus.common.AggregationUtilsTest" name="testContains03 {#4 seed=[A8522C75C3F27521:79A48AE18A1844A8]}" time="0"/>
-  <testcase classname="no.uib.marcus.common.AggregationUtilsTest" name="testContains03 {#5 seed=[A8522C75C3F27521:79A48AE18A1844A8]}" time="0"/>
-  <testcase classname="no.uib.marcus.common.AggregationUtilsTest" name="testContains03 {#6 seed=[A8522C75C3F27521:79A48AE18A1844A8]}" time="0.01"/>
-  <testcase classname="no.uib.marcus.common.AggregationUtilsTest" name="testContains03 {#7 seed=[A8522C75C3F27521:79A48AE18A1844A8]}" time="0"/>
-  <testcase classname="no.uib.marcus.common.AggregationUtilsTest" name="testContains03 {#8 seed=[A8522C75C3F27521:79A48AE18A1844A8]}" time="0"/>
-  <testcase classname="no.uib.marcus.common.AggregationUtilsTest" name="testContains03 {#9 seed=[A8522C75C3F27521:79A48AE18A1844A8]}" time="0"/>
-  <testcase classname="no.uib.marcus.common.AggregationUtilsTest" name="testContains01" time="0"/>
-  <testcase classname="no.uib.marcus.common.AggregationUtilsTest" name="testGetFilterMap05" time="0"/>
+  <testcase classname="no.uib.marcus.common.AggregationUtilsTest" name="testContains03 {#0 seed=[20B568B80C63B12B:79A48AE18A1844A8]}" time="0.098"/>
+  <testcase classname="no.uib.marcus.common.AggregationUtilsTest" name="testContains03 {#1 seed=[20B568B80C63B12B:79A48AE18A1844A8]}" time="0"/>
+  <testcase classname="no.uib.marcus.common.AggregationUtilsTest" name="testContains03 {#2 seed=[20B568B80C63B12B:79A48AE18A1844A8]}" time="0"/>
+  <testcase classname="no.uib.marcus.common.AggregationUtilsTest" name="testContains03 {#3 seed=[20B568B80C63B12B:79A48AE18A1844A8]}" time="0"/>
+  <testcase classname="no.uib.marcus.common.AggregationUtilsTest" name="testContains03 {#4 seed=[20B568B80C63B12B:79A48AE18A1844A8]}" time="0.001"/>
+  <testcase classname="no.uib.marcus.common.AggregationUtilsTest" name="testContains03 {#5 seed=[20B568B80C63B12B:79A48AE18A1844A8]}" time="0.001"/>
+  <testcase classname="no.uib.marcus.common.AggregationUtilsTest" name="testContains03 {#6 seed=[20B568B80C63B12B:79A48AE18A1844A8]}" time="0.001"/>
+  <testcase classname="no.uib.marcus.common.AggregationUtilsTest" name="testContains03 {#7 seed=[20B568B80C63B12B:79A48AE18A1844A8]}" time="0.001"/>
+  <testcase classname="no.uib.marcus.common.AggregationUtilsTest" name="testContains03 {#8 seed=[20B568B80C63B12B:79A48AE18A1844A8]}" time="0.001"/>
+  <testcase classname="no.uib.marcus.common.AggregationUtilsTest" name="testContains03 {#9 seed=[20B568B80C63B12B:79A48AE18A1844A8]}" time="0.001"/>
+  <testcase classname="no.uib.marcus.common.AggregationUtilsTest" name="testContains02 {#0 seed=[20B568B80C63B12B:A4372FF76E5E2AD9]}" time="0.002"/>
+  <testcase classname="no.uib.marcus.common.AggregationUtilsTest" name="testContains02 {#1 seed=[20B568B80C63B12B:1061930B5A9CE1F5]}" time="0.001"/>
+  <testcase classname="no.uib.marcus.common.AggregationUtilsTest" name="testContains02 {#2 seed=[20B568B80C63B12B:9E8805D70B58A93E]}" time="0.001"/>
+  <testcase classname="no.uib.marcus.common.AggregationUtilsTest" name="testContains02 {#3 seed=[20B568B80C63B12B:AF66AE3267A6F217]}" time="0.001"/>
+  <testcase classname="no.uib.marcus.common.AggregationUtilsTest" name="testContains02 {#4 seed=[20B568B80C63B12B:E3A72B9FC6AE32AC]}" time="0.001"/>
+  <testcase classname="no.uib.marcus.common.AggregationUtilsTest" name="testContains02 {#5 seed=[20B568B80C63B12B:725DF8C0BB127FAC]}" time="0.002"/>
+  <testcase classname="no.uib.marcus.common.AggregationUtilsTest" name="testContains02 {#6 seed=[20B568B80C63B12B:4C839C46A9226FAA]}" time="0.001"/>
+  <testcase classname="no.uib.marcus.common.AggregationUtilsTest" name="testContains02 {#7 seed=[20B568B80C63B12B:D030063C8A36FB04]}" time="0.001"/>
+  <testcase classname="no.uib.marcus.common.AggregationUtilsTest" name="testContains02 {#8 seed=[20B568B80C63B12B:E29CE352FDFDEC5E]}" time="0.001"/>
+  <testcase classname="no.uib.marcus.common.AggregationUtilsTest" name="testContains02 {#9 seed=[20B568B80C63B12B:3517B5E899AADB0C]}" time="0"/>
+  <testcase classname="no.uib.marcus.common.AggregationUtilsTest" name="testGetFilterMap03" time="0.001"/>
+  <testcase classname="no.uib.marcus.common.AggregationUtilsTest" name="testContains01" time="0.003"/>
+  <testcase classname="no.uib.marcus.common.AggregationUtilsTest" name="testGetFilterMap05" time="0.001"/>
+  <testcase classname="no.uib.marcus.common.AggregationUtilsTest" name="testGetFilterMap02" time="0.001"/>
+  <testcase classname="no.uib.marcus.common.AggregationUtilsTest" name="testGetFilterMap01" time="0.001"/>
 </testsuite>

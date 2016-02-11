@@ -147,7 +147,7 @@
         <script src="//code.jquery.com/ui/1.11.4/jquery-ui.js"></script>
         <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.4.8/angular.min.js"></script>
         <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
-        <script src="js/marcus-controller.js"></script>
+        <script src="js/marcus-app.js"></script>
         <script src="js/checklist-directive.js"></script>
         <script src="js/jquery-datepicker.js"></script>
         <script src="js/ui-bootstrap-1.1.2.min.js"></script>
@@ -156,7 +156,7 @@
         <script>
                 angular.module("settings", [])
                         .constant("mySetting", {
-                            index: ["admin"],
+                            index: ["admin-test"],
                             type: ["document","invoice"],
                             facets: [
                                 {"field": "type.exact", "size": 10, "operator": "AND", "order": "term_asc"},
