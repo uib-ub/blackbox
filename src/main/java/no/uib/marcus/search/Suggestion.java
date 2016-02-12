@@ -3,8 +3,11 @@ package no.uib.marcus.search;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
+import javax.validation.constraints.NotNull;
 import no.uib.marcus.search.client.ClientFactory;
+import org.elasticsearch.action.suggest.SuggestRequestBuilder;
 import org.elasticsearch.action.suggest.SuggestResponse;
+import org.elasticsearch.common.Nullable;
 import org.elasticsearch.search.suggest.Suggest;
 import org.elasticsearch.search.suggest.completion.CompletionSuggestionBuilder;
 
@@ -14,17 +17,27 @@ import org.elasticsearch.search.suggest.completion.CompletionSuggestionBuilder;
  */
 public class Suggestion {
 
-        public static SuggestResponse getSuggestResponse(String text, String indexType, String suggestField) {
+        public static SuggestResponse getSuggestResponse(String text, @Nullable String[] indices, @NotNull String suggestField) {
                 CompletionSuggestionBuilder suggestionsBuilder = new CompletionSuggestionBuilder("suggest_me");
                 SuggestResponse suggestResponse = null;
+                SuggestRequestBuilder suggestRequest;
 
                 try {
                         suggestionsBuilder.text(text);
                         suggestionsBuilder.field(suggestField);
+                        
+                        suggestRequest = ClientFactory
+                                .getTransportClient()
+                                .prepareSuggest();
+                        
+                        if(indices != null && indices.length > 0){
+                                suggestRequest.setIndices(indices);
+                        }
+                        
+                        suggestRequest
+                                .addSuggestion(suggestionsBuilder);
 
-                        suggestResponse = ClientFactory.getTransportClient()
-                                .prepareSuggest(indexType)
-                                .addSuggestion(suggestionsBuilder)
+                        suggestResponse = suggestRequest
                                 .execute()
                                 .actionGet();
 
@@ -34,10 +47,10 @@ public class Suggestion {
                 return suggestResponse;
         }
 
-        public static Set<String> getSuggestions(String text, String indexType, String suggestField) {
+        public static Set<String> getSuggestions(String text, @Nullable String[] indices, String suggestField) {
                 Set<String> items = new HashSet<>();
                 try {
-                        SuggestResponse suggestResponse = getSuggestResponse(text, indexType, suggestField);
+                        SuggestResponse suggestResponse = getSuggestResponse(text, indices, suggestField);
                         Iterator<? extends Suggest.Suggestion.Entry.Option> iterator = suggestResponse
                                 .getSuggest()
                                 .getSuggestion("suggest_me")
@@ -45,7 +58,6 @@ public class Suggestion {
                                 .next()
                                 .getOptions()
                                 .iterator();
-
                         while (iterator.hasNext()) {
                                 Suggest.Suggestion.Entry.Option next = iterator.next();
                                 items.add(next.getText().string());

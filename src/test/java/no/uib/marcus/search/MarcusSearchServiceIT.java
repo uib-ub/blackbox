@@ -1,32 +1,19 @@
 package no.uib.marcus.search;
 
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.concurrent.TimeUnit;
 import junit.framework.TestCase;
 import no.uib.marcus.search.client.ClientFactory;
 import org.apache.log4j.Logger;
-import org.elasticsearch.action.index.IndexResponse;
 import org.elasticsearch.action.search.SearchResponse;
-import static org.elasticsearch.cluster.metadata.IndexMetaData.SETTING_NUMBER_OF_REPLICAS;
-import static org.elasticsearch.cluster.metadata.IndexMetaData.SETTING_NUMBER_OF_SHARDS;
 import org.elasticsearch.common.base.Predicate;
-import org.elasticsearch.common.base.Predicates;
-import org.elasticsearch.common.settings.ImmutableSettings;
 import org.elasticsearch.common.xcontent.XContentFactory;
-import org.elasticsearch.index.query.BoolFilterBuilder;
-import org.elasticsearch.index.query.FilterBuilder;
 import org.elasticsearch.index.query.FilterBuilders;
 import org.elasticsearch.indices.IndexMissingException;
-import org.elasticsearch.test.ElasticsearchIntegrationTest;
-import static org.elasticsearch.test.ElasticsearchIntegrationTest.client;
 import static org.elasticsearch.test.ElasticsearchTestCase.awaitBusy;
-import org.elasticsearch.test.hamcrest.ElasticsearchAssertions;
-import org.elasticsearch.test.junit.annotations.Network;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import sun.print.resources.serviceui;
 
 /**
  * @author Hemed Ali Al Ruwehy
@@ -161,7 +148,7 @@ public class MarcusSearchServiceIT extends TestCase {
                         @Override
                         public boolean apply(Object o) {
                                
-                                SearchResponse res = service.getDocuments("ballab" , FilterBuilders.matchAllFilter());
+                                SearchResponse res = service.getDocuments("stone*" , FilterBuilders.matchAllFilter());
                                 logger.info("Total documents found: " + res.getHits().getTotalHits());
 
                                 return res.getHits().getTotalHits() == 1;

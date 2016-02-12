@@ -9,15 +9,19 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import no.uib.marcus.search.Suggestion;
+import org.elasticsearch.common.Strings;
 
 /**
- *
  * @author Hemed Ali
  */
-@WebServlet(name = "SuggestionServlet", urlPatterns = {"/suggest"})
+@WebServlet(
+        name = "SuggestionServlet",
+        urlPatterns = {"/suggest"}
+)
 public class SuggestServlet extends HttpServlet {
 
         private static final long serialVersionUID = 2L;
+        private static final String SUGGEST_FIELD = "suggest";
 
         protected void processRequest(HttpServletRequest request, HttpServletResponse response)
                 throws ServletException, IOException {
@@ -25,18 +29,14 @@ public class SuggestServlet extends HttpServlet {
                 request.setCharacterEncoding("UTF-8");
                 response.setContentType("application/json;charset=UTF-8");
                 String queryString = request.getParameter("q");
+                String[] indices = request.getParameterValues("index");
+                String jsonString;
 
                 try (PrintWriter out = response.getWriter()) {
                         Gson gson = new Gson();
-
-                        /**
-                         * XContentBuilder jsonObj = XContentFactory
-                         * .jsonBuilder() .startObject() .field("suggest_list",
-                         * Suggestion.getSuggestions(queryString, "admin" ,
-                         * "suggest")) .endObject();
-                         *
-                         */
-                        String jsonString = gson.toJson(Suggestion.getSuggestions(queryString, "admin", "suggest"));
+                        jsonString = gson.toJson(
+                                Suggestion
+                                        .getSuggestions(queryString, indices, SUGGEST_FIELD));
                         out.write(jsonString);
                 }
         }

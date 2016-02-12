@@ -33,7 +33,7 @@ public class ClientFactory {
         private ClientFactory() {
         }
 
-        private static Client createTransportClient() {
+        private static Client createTransportClient(){
                 try {
                         Settings settings = ImmutableSettings.settingsBuilder()
                                 .put("cluster.name", "elasticsearch")
@@ -45,7 +45,7 @@ public class ClientFactory {
                                  * now, we are connecting locally.
                                  */
                                 .addTransportAddress(
-                                        new InetSocketTransportAddress(InetAddress.getLocalHost(), 9301));
+                                        new InetSocketTransportAddress(InetAddress.getByName("kirishima.uib.no"), 9300));
 
                         ClusterHealthResponse hr = client.admin().cluster().prepareHealth().get();
                         logger.info("Connected to Elasticsearch cluster: " + hr);
@@ -71,6 +71,11 @@ public class ClientFactory {
         @Override
         protected Object clone() throws CloneNotSupportedException {
                 throw new CloneNotSupportedException("Cloning for this object is not supported");
+        }
+        
+        //Main method for easy debugging..
+        public static void main(String[] args) {
+                createTransportClient();
         }
 
 }

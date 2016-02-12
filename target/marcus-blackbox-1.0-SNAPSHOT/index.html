@@ -107,7 +107,7 @@
                                 </uib-pagination>
                                 <div class="row row-fluid" ng-repeat="doc in results.hits.hits">
                                     <ul>
-                                        <li ng-repeat="doc in results.hits.hits">
+                                        <li>
                                             {{doc._source}}
                                         </li>
                                     </ul>
@@ -156,10 +156,10 @@
         <script>
                 angular.module("settings", [])
                         .constant("mySetting", {
-                            index: ["admin-test"],
-                            type: ["document","invoice"],
+                            index: ["admin"],
+                            type: ["document", "invoice"],
                             facets: [
-                                {"field": "type.exact", "size": 10, "operator": "AND", "order": "term_asc"},
+                                {"field": "type.exact", "size": 20, "operator": "AND", "order": "term_asc"},
                                 {"field": "assigned_to", "order": "term_asc"},
                                 {"field": "subject.exact"},
                                 {"field": "customer_name", "size": 10, "operator": "AND", "order": "count_desc"}]

@@ -11,7 +11,6 @@ import java.util.Map;
 import static no.uib.marcus.common.AggregationUtils.contains;
 import static org.junit.Assert.*;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 
 /**
  * @author Hemed Ali
