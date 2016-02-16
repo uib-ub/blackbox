@@ -26,6 +26,8 @@ import org.elasticsearch.index.query.FilterBuilder;
 import org.elasticsearch.index.query.FilterBuilders;
 import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
+import org.elasticsearch.index.query.QueryStringQueryBuilder;
+import org.elasticsearch.index.query.SimpleQueryStringBuilder;
 import org.elasticsearch.search.aggregations.AggregationBuilders;
 import org.elasticsearch.search.aggregations.bucket.terms.Terms.Order;
 import org.elasticsearch.search.aggregations.bucket.terms.TermsBuilder;
@@ -146,8 +148,9 @@ public class MarcusSearchService implements SearchService, Serializable {
                                 searchRequest.setTypes(types);
                         }
                         if (Strings.hasText(queryStr)) {
-                                //Set query string
-                                query = QueryBuilders.queryStringQuery(queryStr);
+                                //Use simple_query_string query
+                                query = QueryBuilders.simpleQueryStringQuery(queryStr)
+                                        .defaultOperator(SimpleQueryStringBuilder.Operator.AND);
                         } else {
                                 //Match all query
                                 query = QueryBuilders.matchAllQuery();
@@ -209,8 +212,9 @@ public class MarcusSearchService implements SearchService, Serializable {
                         }
 
                         if (Strings.hasText(queryStr)) {
-                                //Use query_string query
-                                query = QueryBuilders.queryStringQuery(queryStr);
+                                //Use simple_query_string query
+                                query = QueryBuilders.simpleQueryStringQuery(queryStr)
+                                        .defaultOperator(SimpleQueryStringBuilder.Operator.AND);
                         } else {
                                 //Use match_all query
                                 query = QueryBuilders.matchAllQuery();

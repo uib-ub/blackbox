@@ -5,7 +5,7 @@
     <groupId>no.uib.marcus</groupId>
     <artifactId>marcus-blackbox</artifactId>
     <name>Marcus Blackbox</name>
-    <version>1.0-SNAPSHOT</version>
+    <version>0.1-SNAPSHOT</version>
     <packaging>war</packaging>
 
     <properties>

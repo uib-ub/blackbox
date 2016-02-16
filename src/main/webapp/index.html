@@ -157,7 +157,7 @@
                 angular.module("settings", [])
                         .constant("mySetting", {
                             index: ["admin"],
-                            type: ["document", "invoice"],
+                            type: [],
                             facets: [
                                 {"field": "type.exact", "size": 20, "operator": "AND", "order": "term_asc"},
                                 {"field": "assigned_to", "order": "term_asc"},

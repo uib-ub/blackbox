@@ -5,6 +5,7 @@ import java.util.Iterator;
 import java.util.Set;
 import javax.validation.constraints.NotNull;
 import no.uib.marcus.search.client.ClientFactory;
+import org.apache.log4j.Logger;
 import org.elasticsearch.action.suggest.SuggestRequestBuilder;
 import org.elasticsearch.action.suggest.SuggestResponse;
 import org.elasticsearch.common.Nullable;
@@ -16,9 +17,11 @@ import org.elasticsearch.search.suggest.completion.CompletionSuggestionBuilder;
  * University of Bergen Library
  */
 public class Suggestion {
-
+        
+        private static final Logger logger = Logger.getLogger(Suggestion.class);
+        
         public static SuggestResponse getSuggestResponse(String text, @Nullable String[] indices, @NotNull String suggestField) {
-                CompletionSuggestionBuilder suggestionsBuilder = new CompletionSuggestionBuilder("suggest_me");
+                CompletionSuggestionBuilder suggestionsBuilder = new CompletionSuggestionBuilder("completionSuggestion");
                 SuggestResponse suggestResponse = null;
                 SuggestRequestBuilder suggestRequest;
 
@@ -53,7 +56,7 @@ public class Suggestion {
                         SuggestResponse suggestResponse = getSuggestResponse(text, indices, suggestField);
                         Iterator<? extends Suggest.Suggestion.Entry.Option> iterator = suggestResponse
                                 .getSuggest()
-                                .getSuggestion("suggest_me")
+                                .getSuggestion("completionSuggestion")
                                 .iterator()
                                 .next()
                                 .getOptions()
@@ -63,7 +66,7 @@ public class Suggestion {
                                 items.add(next.getText().string());
                         }
                 } catch (Exception e) {
-                        e.getLocalizedMessage();
+                        logger.error(e.getLocalizedMessage());
                 }
                 return items;
         }
