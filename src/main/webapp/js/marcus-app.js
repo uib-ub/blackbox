@@ -47,7 +47,7 @@ app.controller('freeTextSearch', function ($scope, $http, $location, mySetting) 
         var q = $scope.query_string === "" ? null : fuzzify($scope.query_string , "*");
         var sort = $scope.sort_by === "" ? null : $scope.sort_by;
         var from = ($scope.current_page - 1) * $scope.page_size;
-
+        
         $http({
             method: 'GET',
             url: 'search?aggs=' + JSON.stringify(mySetting.facets),
@@ -84,7 +84,8 @@ app.controller('freeTextSearch', function ($scope, $http, $location, mySetting) 
             method: 'GET',
             url: 'suggest',
             params: {
-                q: q
+                q: q,
+                index: mySetting.index
             }
         })
                 .success(function (data, status, headers, config) {

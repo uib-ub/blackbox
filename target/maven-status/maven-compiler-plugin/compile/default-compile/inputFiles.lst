@@ -4,6 +4,6 @@
 /Users/hemed/Documents/Development/marcus-blackbox/src/main/java/no/uib/marcus/search/SearchService.java
 /Users/hemed/Documents/Development/marcus-blackbox/src/main/java/no/uib/marcus/search/servlet/SearchServlet.java
 /Users/hemed/Documents/Development/marcus-blackbox/src/main/java/no/uib/marcus/common/SortUtils.java
-/Users/hemed/Documents/Development/marcus-blackbox/src/main/java/no/uib/marcus/search/servlet/SuggestServlet.java
+/Users/hemed/Documents/Development/marcus-blackbox/src/main/java/no/uib/marcus/search/servlet/SuggestionServlet.java
 /Users/hemed/Documents/Development/marcus-blackbox/src/main/java/no/uib/marcus/search/Suggestion.java
 /Users/hemed/Documents/Development/marcus-blackbox/src/main/java/no/uib/marcus/search/MarcusSearchService.java

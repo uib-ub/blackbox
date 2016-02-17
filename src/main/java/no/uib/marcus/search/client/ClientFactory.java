@@ -46,8 +46,8 @@ public class ClientFactory {
                                  * now, we are connecting locally.
                                  */
                                 .addTransportAddress(
-                                        //new InetSocketTransportAddress(InetAddress.getLocalHost(), 9300));
-                                        new InetSocketTransportAddress(InetAddress.getByName("kirishima.uib.no"), 9300));
+                                        new InetSocketTransportAddress(InetAddress.getLocalHost(), 9300));
+                                        //new InetSocketTransportAddress(InetAddress.getByName("kirishima.uib.no"), 9300));
 
                         ClusterHealthResponse hr = client.admin().cluster().prepareHealth().get();
                         logger.info("Connected to Elasticsearch cluster: " + hr);
