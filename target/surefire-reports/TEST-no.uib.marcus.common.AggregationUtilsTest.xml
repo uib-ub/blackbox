@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<testsuite tests="25" failures="0" name="no.uib.marcus.common.AggregationUtilsTest" time="0.201" errors="0" skipped="0">
+<testsuite tests="25" failures="0" name="no.uib.marcus.common.AggregationUtilsTest" time="0.18" errors="0" skipped="0">
   <properties>
     <property name="java.runtime.name" value="Java(TM) SE Runtime Environment"/>
     <property name="sun.boot.library.path" value="C:\Program Files\Java\jdk1.8.0_25\jre\bin"/>
@@ -63,29 +63,29 @@
     <property name="sun.desktop" value="windows"/>
     <property name="sun.cpu.isalist" value="amd64"/>
   </properties>
-  <testcase classname="no.uib.marcus.common.AggregationUtilsTest" name="testContains02 {#0 seed=[23A492BAFB725B2F:A726D5F5994FC0DD]}" time="0.066"/>
-  <testcase classname="no.uib.marcus.common.AggregationUtilsTest" name="testContains02 {#1 seed=[23A492BAFB725B2F:13706909AD8D0BF1]}" time="0"/>
-  <testcase classname="no.uib.marcus.common.AggregationUtilsTest" name="testContains02 {#2 seed=[23A492BAFB725B2F:9D99FFD5FC49433A]}" time="0.001"/>
-  <testcase classname="no.uib.marcus.common.AggregationUtilsTest" name="testContains02 {#3 seed=[23A492BAFB725B2F:AC77543090B71813]}" time="0.002"/>
-  <testcase classname="no.uib.marcus.common.AggregationUtilsTest" name="testContains02 {#4 seed=[23A492BAFB725B2F:E0B6D19D31BFD8A8]}" time="0.001"/>
-  <testcase classname="no.uib.marcus.common.AggregationUtilsTest" name="testContains02 {#5 seed=[23A492BAFB725B2F:714C02C24C0395A8]}" time="0.001"/>
-  <testcase classname="no.uib.marcus.common.AggregationUtilsTest" name="testContains02 {#6 seed=[23A492BAFB725B2F:4F9266445E3385AE]}" time="0.002"/>
-  <testcase classname="no.uib.marcus.common.AggregationUtilsTest" name="testContains02 {#7 seed=[23A492BAFB725B2F:D321FC3E7D271100]}" time="0.001"/>
-  <testcase classname="no.uib.marcus.common.AggregationUtilsTest" name="testContains02 {#8 seed=[23A492BAFB725B2F:E18D19500AEC065A]}" time="0.001"/>
-  <testcase classname="no.uib.marcus.common.AggregationUtilsTest" name="testContains02 {#9 seed=[23A492BAFB725B2F:36064FEA6EBB3108]}" time="0.002"/>
-  <testcase classname="no.uib.marcus.common.AggregationUtilsTest" name="testGetFilterMap02" time="0.001"/>
+  <testcase classname="no.uib.marcus.common.AggregationUtilsTest" name="testContains03 {#0 seed=[B3EB19E4D1360207:79A48AE18A1844A8]}" time="0.067"/>
+  <testcase classname="no.uib.marcus.common.AggregationUtilsTest" name="testContains03 {#1 seed=[B3EB19E4D1360207:79A48AE18A1844A8]}" time="0"/>
+  <testcase classname="no.uib.marcus.common.AggregationUtilsTest" name="testContains03 {#2 seed=[B3EB19E4D1360207:79A48AE18A1844A8]}" time="0.001"/>
+  <testcase classname="no.uib.marcus.common.AggregationUtilsTest" name="testContains03 {#3 seed=[B3EB19E4D1360207:79A48AE18A1844A8]}" time="0.002"/>
+  <testcase classname="no.uib.marcus.common.AggregationUtilsTest" name="testContains03 {#4 seed=[B3EB19E4D1360207:79A48AE18A1844A8]}" time="0.001"/>
+  <testcase classname="no.uib.marcus.common.AggregationUtilsTest" name="testContains03 {#5 seed=[B3EB19E4D1360207:79A48AE18A1844A8]}" time="0.002"/>
+  <testcase classname="no.uib.marcus.common.AggregationUtilsTest" name="testContains03 {#6 seed=[B3EB19E4D1360207:79A48AE18A1844A8]}" time="0.002"/>
+  <testcase classname="no.uib.marcus.common.AggregationUtilsTest" name="testContains03 {#7 seed=[B3EB19E4D1360207:79A48AE18A1844A8]}" time="0.001"/>
+  <testcase classname="no.uib.marcus.common.AggregationUtilsTest" name="testContains03 {#8 seed=[B3EB19E4D1360207:79A48AE18A1844A8]}" time="0.002"/>
+  <testcase classname="no.uib.marcus.common.AggregationUtilsTest" name="testContains03 {#9 seed=[B3EB19E4D1360207:79A48AE18A1844A8]}" time="0.001"/>
+  <testcase classname="no.uib.marcus.common.AggregationUtilsTest" name="testContains01" time="0.002"/>
+  <testcase classname="no.uib.marcus.common.AggregationUtilsTest" name="testGetFilterMap05" time="0.002"/>
+  <testcase classname="no.uib.marcus.common.AggregationUtilsTest" name="testContains02 {#0 seed=[B3EB19E4D1360207:37695EABB30B99F5]}" time="0.001"/>
+  <testcase classname="no.uib.marcus.common.AggregationUtilsTest" name="testContains02 {#1 seed=[B3EB19E4D1360207:833FE25787C952D9]}" time="0.001"/>
+  <testcase classname="no.uib.marcus.common.AggregationUtilsTest" name="testContains02 {#2 seed=[B3EB19E4D1360207:DD6748BD60D1A12]}" time="0.001"/>
+  <testcase classname="no.uib.marcus.common.AggregationUtilsTest" name="testContains02 {#3 seed=[B3EB19E4D1360207:3C38DF6EBAF3413B]}" time="0.002"/>
+  <testcase classname="no.uib.marcus.common.AggregationUtilsTest" name="testContains02 {#4 seed=[B3EB19E4D1360207:70F95AC31BFB8180]}" time="0.001"/>
+  <testcase classname="no.uib.marcus.common.AggregationUtilsTest" name="testContains02 {#5 seed=[B3EB19E4D1360207:E103899C6647CC80]}" time="0"/>
+  <testcase classname="no.uib.marcus.common.AggregationUtilsTest" name="testContains02 {#6 seed=[B3EB19E4D1360207:DFDDED1A7477DC86]}" time="0.001"/>
+  <testcase classname="no.uib.marcus.common.AggregationUtilsTest" name="testContains02 {#7 seed=[B3EB19E4D1360207:436E776057634828]}" time="0.001"/>
+  <testcase classname="no.uib.marcus.common.AggregationUtilsTest" name="testContains02 {#8 seed=[B3EB19E4D1360207:71C2920E20A85F72]}" time="0.002"/>
+  <testcase classname="no.uib.marcus.common.AggregationUtilsTest" name="testContains02 {#9 seed=[B3EB19E4D1360207:A649C4B444FF6820]}" time="0"/>
   <testcase classname="no.uib.marcus.common.AggregationUtilsTest" name="testGetFilterMap03" time="0.002"/>
-  <testcase classname="no.uib.marcus.common.AggregationUtilsTest" name="testContains03 {#0 seed=[23A492BAFB725B2F:79A48AE18A1844A8]}" time="0.001"/>
-  <testcase classname="no.uib.marcus.common.AggregationUtilsTest" name="testContains03 {#1 seed=[23A492BAFB725B2F:79A48AE18A1844A8]}" time="0.001"/>
-  <testcase classname="no.uib.marcus.common.AggregationUtilsTest" name="testContains03 {#2 seed=[23A492BAFB725B2F:79A48AE18A1844A8]}" time="0.004"/>
-  <testcase classname="no.uib.marcus.common.AggregationUtilsTest" name="testContains03 {#3 seed=[23A492BAFB725B2F:79A48AE18A1844A8]}" time="0.007"/>
-  <testcase classname="no.uib.marcus.common.AggregationUtilsTest" name="testContains03 {#4 seed=[23A492BAFB725B2F:79A48AE18A1844A8]}" time="0"/>
-  <testcase classname="no.uib.marcus.common.AggregationUtilsTest" name="testContains03 {#5 seed=[23A492BAFB725B2F:79A48AE18A1844A8]}" time="0"/>
-  <testcase classname="no.uib.marcus.common.AggregationUtilsTest" name="testContains03 {#6 seed=[23A492BAFB725B2F:79A48AE18A1844A8]}" time="0.001"/>
-  <testcase classname="no.uib.marcus.common.AggregationUtilsTest" name="testContains03 {#7 seed=[23A492BAFB725B2F:79A48AE18A1844A8]}" time="0.004"/>
-  <testcase classname="no.uib.marcus.common.AggregationUtilsTest" name="testContains03 {#8 seed=[23A492BAFB725B2F:79A48AE18A1844A8]}" time="0.004"/>
-  <testcase classname="no.uib.marcus.common.AggregationUtilsTest" name="testContains03 {#9 seed=[23A492BAFB725B2F:79A48AE18A1844A8]}" time="0.002"/>
-  <testcase classname="no.uib.marcus.common.AggregationUtilsTest" name="testContains01" time="0.007"/>
-  <testcase classname="no.uib.marcus.common.AggregationUtilsTest" name="testGetFilterMap05" time="0"/>
-  <testcase classname="no.uib.marcus.common.AggregationUtilsTest" name="testGetFilterMap01" time="0"/>
+  <testcase classname="no.uib.marcus.common.AggregationUtilsTest" name="testGetFilterMap02" time="0"/>
+  <testcase classname="no.uib.marcus.common.AggregationUtilsTest" name="testGetFilterMap01" time="0.001"/>
 </testsuite>
