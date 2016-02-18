@@ -14,7 +14,7 @@ app.controller('freeTextSearch', function ($scope, $http, $location, mySetting) 
     $scope.selected_filters = [];
     $scope.from_date = null;
     $scope.to_date = null;
-    $scope.current_page = 0;
+    $scope.current_page = 1;
     $scope.page_size = 10;
     
 
@@ -46,7 +46,8 @@ app.controller('freeTextSearch', function ($scope, $http, $location, mySetting) 
         /**We are assigning null to these values so that, if empty, they should not appear in query string**/
         var q = $scope.query_string === "" ? null : fuzzify($scope.query_string , "*");
         var sort = $scope.sort_by === "" ? null : $scope.sort_by;
-
+        var from = ($scope.current_page - 1) * $scope.page_size;
+        
         $http({
             method: 'GET',
             url: 'search?aggs=' + JSON.stringify(mySetting.facets),
@@ -57,7 +58,7 @@ app.controller('freeTextSearch', function ($scope, $http, $location, mySetting) 
                 from_date: $scope.from_date,
                 to_date: $scope.to_date,
                 filter: $scope.selected_filters,
-                from: $scope.current_page * $scope.page_size,
+                from: from,
                 size: $scope.page_size,
                 sort: sort
             }
@@ -83,7 +84,8 @@ app.controller('freeTextSearch', function ($scope, $http, $location, mySetting) 
             method: 'GET',
             url: 'suggest',
             params: {
-                q: q
+                q: q,
+                index: mySetting.index
             }
         })
                 .success(function (data, status, headers, config) {

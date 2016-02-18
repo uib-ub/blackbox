@@ -37,6 +37,7 @@ public class ClientFactory {
                 try {
                         Settings settings = ImmutableSettings.settingsBuilder()
                                 .put("cluster.name", "elasticsearch")
+                                //.put("client.transport.ping_timeout", "100s")
                                 .build();
                         client = new TransportClient(settings)
                                 /**
@@ -45,6 +46,7 @@ public class ClientFactory {
                                  * now, we are connecting locally.
                                  */
                                 .addTransportAddress(
+                                        //new InetSocketTransportAddress(InetAddress.getLocalHost(), 9300));
                                         new InetSocketTransportAddress(InetAddress.getByName("kirishima.uib.no"), 9300));
 
                         ClusterHealthResponse hr = client.admin().cluster().prepareHealth().get();
@@ -75,7 +77,7 @@ public class ClientFactory {
         
         //Main method for easy debugging..
         public static void main(String[] args) {
-                createTransportClient();
+                getTransportClient();
         }
 
 }

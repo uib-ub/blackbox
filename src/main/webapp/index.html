@@ -236,7 +236,7 @@
                 angular.module("settings", [])
                         .constant("mySetting", {
                             index: ["admin"],
-                            type: ["document", "invoice"],
+                            type: [],
                             facets: [
                                 {"field": "type.exact", "size": 70, "operator": "OR", "order": "desc"},
                                 {"field": "haszoom", "size": 1, "operator": "OR", "order": "term_asc"},

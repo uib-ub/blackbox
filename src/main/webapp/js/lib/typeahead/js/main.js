@@ -1,8 +1,13 @@
+/**
+ * This is a Javascript file for getting completion suggestions.
+ * Please note that, suggestion is executed accross indices, therefore index must be explicitly specified in
+ * the remote URL.
+**/
+
 $(document).ready(function () {
     var engine, remoteHost, template, empty;
-
     $.support.cors = true;
-
+    
     remoteHost = 'https://typeahead-js-twitter-api-proxy.herokuapp.com';
     template = Handlebars.compile($("#result-template").html());
     empty = Handlebars.compile($("#empty-template").html());
@@ -42,26 +47,27 @@ $(document).ready(function () {
      */
 
     //Initialize suggestion engine
-    var marcusEngine = new Bloodhound({
+    var marcusSuggegstionEngine = new Bloodhound({
         name: 'suggest',
         datumTokenizer: Bloodhound.tokenizers.whitespace,
         queryTokenizer: Bloodhound.tokenizers.whitespace,
-        prefetch: 'suggest?q=m',
+        //prefetch: 'suggest?q=m&index=admin',
         limit: 10,
         remote: {
-            url: 'suggest?q=%QUERY',
+            /*You must manually append indices here*/
+            url: 'suggest?q=%QUERY&index=admin', 
             wildcard: '%QUERY',
             rateLimitWait: 20
         }
     });
 
     //Set default suggestion
-    function marcusEngineWithDefaults(q, sync, async) {
+    function marcusSuggestionEngineWithDefaults(q, sync, async) {
         if (q === '') {
             sync(['Hemed Ali', 'Tarje Lævik', 'Øyvind Gjesdal', 'Biledsamlingen', 'Manuskripter', 'Dokumenter', 'Personer']);
             async([]);
         } else {
-            marcusEngine.search(q, sync, async);
+            marcusSuggegstionEngine.search(q, sync, async);
         }
     }
 
@@ -81,7 +87,7 @@ $(document).ready(function () {
     },
             {
                 name: 'suggest',
-                source: marcusEngineWithDefaults,
+                source: marcusSuggestionEngineWithDefaults,
                 limit: 5
                         /**templates: {
                          suggestion: '<div>{{value}}</div>'
@@ -97,6 +103,7 @@ $(document).ready(function () {
             .on('typeahead:select', function (event, suggestionValue) {
                 var angularScope = angular.element($('#searchController')).scope();
                 angularScope.query_string = suggestionValue;
+                //Execute search
                 angularScope.search();
                 angularScope.$apply();
             })

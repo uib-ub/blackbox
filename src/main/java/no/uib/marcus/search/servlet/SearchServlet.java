@@ -14,15 +14,11 @@ import no.uib.marcus.common.AggregationUtils;
 import no.uib.marcus.common.SortUtils;
 import no.uib.marcus.search.MarcusSearchService;
 import org.apache.log4j.Logger;
-import org.elasticsearch.ElasticsearchException;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.common.Strings;
 import org.elasticsearch.index.query.BoolFilterBuilder;
-import org.elasticsearch.index.query.FilterBuilder;
 import org.elasticsearch.index.query.FilterBuilders;
 import org.elasticsearch.search.sort.SortBuilder;
-import org.elasticsearch.search.sort.SortBuilders;
-import org.elasticsearch.search.sort.SortOrder;
 
 /**
  * @author Hemed Al Ruwehy (hemed.ruwehy@uib.no) 2016-01-24, University of
