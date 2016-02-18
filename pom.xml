@@ -15,7 +15,7 @@
           Note that the Elasticsearch Java client must be from the same major version as the nodes; 
           otherwise, they may not be able to communicate each other.
         -->
-        <elasticsearch.version>1.7.4</elasticsearch.version>
+        <elasticsearch.version>1.7.5</elasticsearch.version>
     </properties>
     
     <developers>
