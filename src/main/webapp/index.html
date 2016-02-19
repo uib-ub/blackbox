@@ -9,8 +9,8 @@
         <link rel="shortcut icon" type="image/x-icon" href="http://marcus.uib.no/img/favicon.ico" />
         <link rel="stylesheet" href="js/lib/typeahead/css/main.css"/>
         <link rel="stylesheet" href="js/lib/typeahead/css/normalize.min.css"/>
-        <!--<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" />
-        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap-theme.min.css" />-->
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" />
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap-theme.min.css" />
         <link rel="stylesheet" href="//code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css" />
         <!--<link rel="stylesheet" href="css/marcus.css" />-->
         <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.1.8/semantic.min.css" />
@@ -77,16 +77,36 @@
                                     <input type="checkbox" checklist-model="selected_filters" checklist-value="getCheckedValue('type.exact', bucket.key)" ng-click="search()">
                                         <label> {{bucket.key}}</label>
                                         <span style="color:grey"> ({{bucket.doc_count}} of {{bucket.total_doc_count}})</span>
-                                      
                                 </div>
                             </div>
+                            
+                            <div class="ui multiple dropdown">
+                                <input type="hidden" name="filters">
+                                <i class="filter icon"></i>
+                                <span class="text">Filter Posts</span>
+                                <div class="menu">
+                                  <div class="ui icon search input">
+                                    <i class="search icon"></i>
+                                    <input type="text" placeholder="Search tags...">
+                                  </div>
+                                  <div class="divider"></div>
+                                  <div class="scrolling menu">
+                                    <div class="item" ng-repeat="bucket in results['aggregations']['type.exact']['buckets']" checklist-value="getCheckedValue('type.exact', bucket.key)" data-value="{{bucket.key}}" ng-select="search()">
+                                      <div ng-select="search()" class="ui red empty circular label"></div>
+                                      {{bucket.key}}
+                                    </div>
+                 
+                                  </div>
+                                </div>
+                            </div>
+                            
                            
                             
                             <h3>Emne</h3>
                             <hr>
                             <div class="ui list">
                                 <div class="item" ng-repeat="bucket in results['aggregations']['subject.exact']['buckets']">
-                                        <input type="checkbox" checklist-model="selected_filters" checklist-value="getCheckedValue('subject.exact', bucket.key)" ng-click="search()">
+                                        <input type="checkbox" checklist-model="selected_filters" checklist-model="selected_filters" checklist-value="getCheckedValue('subject.exact', bucket.key)" ng-click="search()">
                                         <label class="row-fluid"> {{bucket.key}} </label>
                                         <span style="color:gray">({{bucket.doc_count}} of {{bucket.total_doc_count}})</span>
                                 </div>
@@ -139,18 +159,43 @@
                                 </uib-pagination>
                                 <div class="row row-fluid ui divided items" ng-repeat="doc in results.hits.hits">
                  
-                                    <div style="page-break-inside: avoid; display: flex;" class="ui item" id="facetview_result">
+                                    <div ng-if='doc._source.type == "Person"' style="page-break-inside: avoid; display: flex;" class="ui item" id="facetview_result">
                                         <div class="ui image">
-                                            <div class="ui blue ribbon label">Fotografi</div>
-                                            <a target="_blank" href="http://admin.marcus.uib.no/instance/photograph/ubb-kk-n-298-137">
-                                                <img class="small image" src="{{doc._source.hasthumbnail}}">
+                                            <div class="ui blue ribbon label">{{doc._source.type}}</div>
+                                            <a target="_blank" href="{{doc._source.uri}}">
+                                                <img alt="{{doc._source.title}}" class="small image" src="{{doc._source.img}}">
                                             </a>
                                             <div class="ui bottom attached label">{{doc._source.identifier}}<br>
                                                 <span class="ui floated right">{{doc._source.available}}</span><br>
                                                 <span class="ui floated right"><i>{{doc._source.cataloguer}}</i></span>
                                             </div>
                                         </div>
-                                        <div class="content">
+                                        <div  class="content">
+                                            <a target="_blank" href="{{doc._source.uri}}" class="header">{{doc._source.name}}</a>
+                                            <div class="meta">
+                                                <span class="ui floated right"><i class="icon wait"></i><span>{{doc._source.birthyear}}</span> - <span>{{doc._source.deathyear}}</span></span>
+                                            </div>
+                                            <div class="description">
+                                                <p>{{doc._source.description}}</p>
+                                            </div>
+                                            <div class="extra">
+
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div ng-if='doc._source.type != "Person"' style="page-break-inside: avoid; display: flex;" class="ui item" id="facetview_result">
+                                        <div class="ui image">
+                                            <div class="ui blue ribbon label">{{doc._source.type}}</div>
+                                            <a target="_blank" href="{{doc._source.uri}}">
+                                                <img alt="{{doc._source.title}}" class="small image" src="{{doc._source.hasthumbnail}}">
+                                            </a>
+                                            <div class="ui bottom attached label">{{doc._source.identifier}}<br>
+                                                <span class="ui floated right">{{doc._source.available}}</span><br>
+                                                <span class="ui floated right"><i>{{doc._source.cataloguer}}</i></span>
+                                            </div>
+                                        </div>
+                                        <div  class="content">
                                             <a target="_blank" href="{{doc._source.uri}}" class="header">{{doc._source.title}}</a>
                                             <div class="meta">
                                                 <div class="ui horizontal list">
@@ -174,12 +219,13 @@
                                                 </div>
                                                 <br>
                                                 <div class="ui horizontal list">
-                                                    <div class="item"><i class="icon marker"></i><div class="content"><span class="header">{{doc._source.spatial}}</span></div></div>
+                                                    <div class="item"><i class="icon marker"></i><div class="content"><span ng-repeat="spatial in doc._source.spatial" class="header">{{spatial}}</span></div></div>
                                                 </div>
                                                 <br>
-                                                <ul>
-                                                    <li class="ui tag label">{{doc._source.subject}}</li>
-                                                </ul>
+                                                <div class="ui basic segment">
+                                                    <span ng-repeat="subject in doc._source.subject" class="ui tag label">{{subject}}</span>
+                                                </div>
+                                                
                                             </div>
                                         </div>
                                     </div>
@@ -238,7 +284,7 @@
                             index: ["admin"],
                             type: [],
                             facets: [
-                                {"field": "type.exact", "size": 70, "operator": "OR", "order": "desc"},
+                                {"field": "type.exact", "size": 20, "operator": "OR", "order": "desc"},
                                 {"field": "haszoom", "size": 1, "operator": "OR", "order": "term_asc"},
                                 {"field": "isdigitized", "size": 1, "operator": "OR", "order": "term_desc"},
                                 {"field": "assigned_to", "order": "term_asc"},
@@ -246,5 +292,13 @@
                                 {"field": "customer_name", "size": 10, "operator": "AND", "order": "count_desc"}]
                         });
         </script>
+        
+        <script>
+                                $('.ui.dropdown')
+                                .dropdown({
+                                  allowAdditions: true
+                                })
+                              ;
+                              </script>
     </body>
 </html>
