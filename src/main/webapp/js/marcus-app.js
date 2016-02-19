@@ -1,5 +1,5 @@
 'use strict';
-//Contoller file for Marcus-search system
+//Controller file for Marcus-search system
 
 var app = angular.module('marcus', ["checklist-model", "ui.bootstrap", "settings"]);
 
@@ -16,12 +16,12 @@ app.controller('freeTextSearch', function ($scope, $http, $location, mySetting) 
     $scope.to_date = null;
     $scope.current_page = 1;
     $scope.page_size = 10;
-    
+
 
     /**
-     * Get values from checkboxes. 
+     * Get values from checkboxes.
      * The method returns a string concatenation of a field and the selected value.
-     * Note that, a field and it's selected value must be seperated by a dot ('.'), 
+     * Note that, a field and it's selected value must be seperated by a dot ('.'),
      * otherwise the server will not know which is which and aggregations will fail.
      **/
     $scope.getCheckedValue = function (field, filterValue) {
@@ -44,10 +44,11 @@ app.controller('freeTextSearch', function ($scope, $http, $location, mySetting) 
     //Send requests to search servlet
     $scope.search = function () {
         /**We are assigning null to these values so that, if empty, they should not appear in query string**/
-        var q = $scope.query_string === "" ? null : fuzzify($scope.query_string , "*");
+        var q = $scope.query_string === "" ? null : fuzzify($scope.query_string, "*");
         var sort = $scope.sort_by === "" ? null : $scope.sort_by;
         var from = ($scope.current_page - 1) * $scope.page_size;
-        
+        $scope.test = q;
+
         $http({
             method: 'GET',
             url: 'search?aggs=' + JSON.stringify(mySetting.facets),
@@ -63,16 +64,16 @@ app.controller('freeTextSearch', function ($scope, $http, $location, mySetting) 
                 sort: sort
             }
         })
-                .success(function (data, status, headers, config) {
-                    $scope.results = data;
-                    $scope.show_loading = false;
-                    $scope.ready = true;
-                })
-                .error(function (data, status, headers, config) {
-                    $scope.log = 'Error occured while querying' + data;
-                    $scope.show_loading = false;
-                    $scope.ready = true;
-                });
+            .success(function (data, status, headers, config) {
+                $scope.results = data;
+                $scope.show_loading = false;
+                $scope.ready = true;
+            })
+            .error(function (data, status, headers, config) {
+                $scope.log = 'Error occured while querying' + data;
+                $scope.show_loading = false;
+                $scope.ready = true;
+            });
     };
 
 
@@ -88,47 +89,48 @@ app.controller('freeTextSearch', function ($scope, $http, $location, mySetting) 
                 index: mySetting.index
             }
         })
-                .success(function (data, status, headers, config) {
-                    $scope.suggestion_list = data;
-                })
-                .error(function (data, status, headers, config) {
-                    $scope.log = 'Error occured while querying';
-                });
-    };    
+            .success(function (data, status, headers, config) {
+                $scope.suggestion_list = data;
+            })
+            .error(function (data, status, headers, config) {
+                $scope.log = 'Error occured while querying';
+            });
+    };
 
     //Call this function on pageload
     $scope.search();
 });
 
 
-    /** 
-     * A method to apped * or ~ in the query string.
-     * 
-      @param descriptiondefault_freetext_fuzzify - should be either * or ~, 
-      if *, * will be prepended and appended to each string in the freetext search term
-      if ~, then ~ will be appended to each string in the freetext search term. 
-      If * or ~ or : are already in the freetext search term, no action will be taken. 
-      @param querystr - a query string.
-     **/
-    function fuzzify(querystr, default_freetext_fuzzify) {
-        var rqs = querystr;
-        if (default_freetext_fuzzify !== undefined) {
-            if (default_freetext_fuzzify === "*" || default_freetext_fuzzify === "~") {
-                if (querystr.indexOf('*') === -1 && querystr.indexOf('~') === -1 && querystr.indexOf(':') === -1) {
-                    var optparts = querystr.split(' ');
-                    var pq = "";
-                    for (var oi = 0; oi < optparts.length; oi++) {
-                        var oip = optparts[oi];
-                        if (oip.length > 0) {
-                            oip = oip + default_freetext_fuzzify;
-                            default_freetext_fuzzify === "*" ? oip : false;
-                            //default_freetext_fuzzify == "*" ? oip = "*" + oip : false;
-                            pq += oip + " ";
-                        }
+/**
+ A method to apped * or ~ in the query string
+ @param descriptiondefault_freetext_fuzzify - should be either * or ~,
+ if *, * will be prepended and appended to each string in the freetext search term
+ if ~, then ~ will be appended to each string in the freetext search term.
+ If * or ~ or : are already in the freetext search term, no action will be taken.
+ @param querystr - a query string.
+ **/
+function fuzzify(querystr, default_freetext_fuzzify) {
+    var rqs = querystr;
+    if (default_freetext_fuzzify !== undefined) {
+        if (default_freetext_fuzzify === "*" || default_freetext_fuzzify === "~") {
+            if (querystr.indexOf('*') === -1 && querystr.indexOf('~') === -1 && querystr.indexOf(':') === -1) {
+                var optparts = querystr.split(' ');
+                var pq = "";
+                for (var oi = 0; oi < optparts.length; oi++) {
+                    var oip = optparts[oi];
+
+                    //We want the string part to be greater than 1 char, and it should not contain the following special chars.
+                    if (oip.length > 1 && oip.indexOf('"') === -1
+                        && oip.indexOf(')') === -1 && oip.indexOf('(') === -1){
+
+                        oip = oip + default_freetext_fuzzify;
                     }
-                    rqs = pq;
+                    pq += oip + ' ';
                 }
+                rqs = pq;
             }
         }
-        return rqs;
     }
+    return rqs;
+}

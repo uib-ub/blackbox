@@ -32,7 +32,7 @@ public class AggregationUtilsTest extends RandomizedTest {
                 assertFalse(AggregationUtils.contains(AGGS, "hemed", "order", "term_asc"));
                 assertTrue(AggregationUtils.contains(AGGS, "subject.exact", "size", "10"));
                 assertFalse(AggregationUtils.contains(AGGS, "subject.exact", "size", "infinity"));
-                assertFalse(AggregationUtils.contains("Wrong facets", "subject.exact", "size", "10"));
+                assertFalse(AggregationUtils.contains("Test facets", "subject.exact", "size", "10"));
 
         }
 

@@ -26,23 +26,24 @@ import org.elasticsearch.index.query.FilterBuilder;
 import org.elasticsearch.index.query.FilterBuilders;
 import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
-import org.elasticsearch.index.query.QueryStringQueryBuilder;
 import org.elasticsearch.index.query.SimpleQueryStringBuilder;
 import org.elasticsearch.search.aggregations.AggregationBuilders;
 import org.elasticsearch.search.aggregations.bucket.terms.Terms.Order;
 import org.elasticsearch.search.aggregations.bucket.terms.TermsBuilder;
 import org.elasticsearch.search.builder.SearchSourceBuilderException;
 import org.elasticsearch.search.sort.SortBuilder;
+import org.elasticsearch.search.suggest.SuggestBuilder;
+import org.elasticsearch.search.suggest.SuggestBuilder.SuggestionBuilder;
+import org.elasticsearch.search.suggest.completion.CompletionSuggester;
+import org.elasticsearch.search.suggest.completion.CompletionSuggestionBuilder;
 
 public class MarcusSearchService implements SearchService, Serializable {
 
         private static final long serialVersionUID = 4L;
 
         private static final Logger logger = Logger.getLogger(MarcusSearchService.class);
-        private @Nullable
-        String[] indices;
-        private @Nullable
-        String[] types;
+        private @Nullable String[] indices;
+        private @Nullable String[] types;
         private String aggregations;
         private SortBuilder sort;
         private int from = -1;
@@ -383,6 +384,7 @@ public class MarcusSearchService implements SearchService, Serializable {
 
         //Testing Aggregations
         public static void testAggRes(BoolFilterBuilder fb1) throws IOException, Exception {
+                SuggestionBuilder sugg = new CompletionSuggestionBuilder("sugg");
                 Map map = new HashMap();
                 String json = "[{\"field\": \"status\", \"size\": 25},{\"field\" : \"assigned_to\"}]";
                 //JsonElement el = new JsonParser().parse(json);
@@ -411,7 +413,7 @@ public class MarcusSearchService implements SearchService, Serializable {
                         .setIndices("admin")
                         //.setTypes("invoice")
                         //.setQuery(QueryBuilders.matchAllQuery()) 
-                        .setQuery(QueryBuilders.filteredQuery(QueryBuilders.queryStringQuery("*"), fb))
+                        .setQuery(QueryBuilders.filteredQuery(QueryBuilders.matchAllQuery(), fb))
                         //.setPostFilter(fb1)
                         // .addAggregation(AggregationBuilders.global("_aggs")
                         .addAggregation((AggregationBuilders
@@ -423,16 +425,22 @@ public class MarcusSearchService implements SearchService, Serializable {
                                 .field("created")
                                 .addRange("created", "2010", null)
                         );
-
-                //SearchResponse res = req.execute().actionGet();
+                
+                sugg.text("Mar");
+                sugg.field("suggest");
+                req.addSuggestion(sugg);
+                
+                SearchResponse res = req.execute().actionGet();
 
                 // appendTermsAggregation(req, json);
                 //.addAggregation(aggregation)
                 //.addAggregation(AggregationBuilders.filter("filtered").filter(fb))
                 //.addAggregation(AggregationBuilders.terms("status").field("status"))
                 //.addAggregation(AggregationBuilders.terms("assigned_to").field("assigned_to"));
-                //System.out.println("JSON Response: " +  gson.toJson(responseJson));
+                
                 System.out.println("Request: " + req.toString());
+                System.out.println("JSON Response: " + res.toString());
+           
         }
 
         //Main method for easy debugging
@@ -449,8 +457,8 @@ public class MarcusSearchService implements SearchService, Serializable {
                 // String jsonString = gson.toJson(Suggestion.getSuggestions("m", "admin" , "suggest"));
                 //System.out.println("List of suggestion :" + jsonString);
                 //System.out.println("List of suggestion :" + Suggestion.getSuggestResponse("m", "admin" , "suggest"));
-                //testAggRes(null);
-                System.out.println((int) _from + " : ");
+                testAggRes(null);
+                //System.out.println((int) _from + " : ");
         }
 
 }

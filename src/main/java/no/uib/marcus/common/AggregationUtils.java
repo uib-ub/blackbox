@@ -51,8 +51,8 @@ public class AggregationUtils {
                                 }
                         }
                 } catch (JsonParseException e) {
-                        logger.error("Facets could not be processed. Please check the syntax."
-                                    + "Facets need to be valid JSON array:" + aggregations );
+                        logger.error("Facets could not be processed. Please check the syntax. "
+                                    + "Facets need to be valid JSON array: " + aggregations );
                         return false;
                 }
                 return false;
