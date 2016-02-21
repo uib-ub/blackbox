@@ -26,7 +26,7 @@ app.controller('freeTextSearch', function ($scope, $http, $location, mySetting) 
      **/
     $scope.getCheckedValue = function (field, filterValue) {
         if (field !== undefined && filterValue !== undefined) {
-            /**Seperate a field and the selected value by a dot.**/
+            /*Separate a field and the selected value by a dot.*/
             return field + "." + filterValue;
         }
         return null;
@@ -43,11 +43,12 @@ app.controller('freeTextSearch', function ($scope, $http, $location, mySetting) 
 
     //Send requests to search servlet
     $scope.search = function () {
-        /**We are assigning null to these values so that, if empty, they should not appear in query string**/
+        /*We are assigning null to these values so that, if empty, they should not appear in query string*/
         var q = $scope.query_string === "" ? null : fuzzify($scope.query_string, "*");
         var sort = $scope.sort_by === "" ? null : $scope.sort_by;
         var from = ($scope.current_page - 1) * $scope.page_size;
         $scope.test = q;
+
 
         $http({
             method: 'GET',
@@ -79,13 +80,11 @@ app.controller('freeTextSearch', function ($scope, $http, $location, mySetting) 
 
     //Send suggest request to "suggest" servlet for autocompleting.
     $scope.autoSuggest = function () {
-        var q = "";
-        $scope.query_string === undefined ? q = "" : q = $scope.query_string;
         $http({
             method: 'GET',
             url: 'suggest',
             params: {
-                q: q,
+                q: $scope.query_string,
                 index: mySetting.index
             }
         })
@@ -103,8 +102,10 @@ app.controller('freeTextSearch', function ($scope, $http, $location, mySetting) 
 
 
 /**
- A method to apped * or ~ in the query string
- @param descriptiondefault_freetext_fuzzify - should be either * or ~,
+ A method to append * or ~ in the query string
+ <p/>
+ @param querystr a query string.
+ @param default_freetext_fuzzify - should be either * or ~,
  if *, * will be prepended and appended to each string in the freetext search term
  if ~, then ~ will be appended to each string in the freetext search term.
  If * or ~ or : are already in the freetext search term, no action will be taken.
@@ -120,9 +121,10 @@ function fuzzify(querystr, default_freetext_fuzzify) {
                 for (var oi = 0; oi < optparts.length; oi++) {
                     var oip = optparts[oi];
 
-                    //We want the string part to be greater than 1 char, and it should not contain the following special chars.
-                    if (oip.length > 1 && oip.indexOf('"') === -1
-                        && oip.indexOf(')') === -1 && oip.indexOf('(') === -1){
+                    //We want the string part to be greater than 1 char,
+                    // and it should not contain the following special chars.
+                    if (oip.length > 1 && oip.indexOf('"') === -1 &&
+                        oip.indexOf(')') === -1 && oip.indexOf('(') === -1){
 
                         oip = oip + default_freetext_fuzzify;
                     }

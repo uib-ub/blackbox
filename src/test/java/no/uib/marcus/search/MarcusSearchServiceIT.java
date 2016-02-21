@@ -1,7 +1,5 @@
 package no.uib.marcus.search;
 
-import java.io.IOException;
-import java.util.concurrent.TimeUnit;
 import junit.framework.TestCase;
 import no.uib.marcus.search.client.ClientFactory;
 import org.apache.log4j.Logger;
@@ -10,31 +8,36 @@ import org.elasticsearch.common.base.Predicate;
 import org.elasticsearch.common.xcontent.XContentFactory;
 import org.elasticsearch.index.query.FilterBuilders;
 import org.elasticsearch.indices.IndexMissingException;
-import static org.elasticsearch.test.ElasticsearchTestCase.awaitBusy;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.io.IOException;
+import java.util.concurrent.TimeUnit;
+
+import static org.elasticsearch.test.ElasticsearchTestCase.awaitBusy;
+
 /**
- * @author Hemed Ali Al Ruwehy
+ * @author Hemed Ali
+ * 2016-02-20, UiB
  */
 
-/** 
+/*
  * To run this test, you need to have Elasticsearch running 
  * with the same settings as Transport client settings.
- * Make sure you have the same version to that of the other nodes and the same cluster name.
- ***/
+ * Make sure you have the same version and cluster name to that of the other nodes.
+ */
 
-/**@ElasticsearchIntegrationTest.ClusterScope(
-        scope = ElasticsearchIntegrationTest.Scope.SUITE, transportClientRatio = 0.0)
-**/
+//@ElasticsearchIntegrationTest.ClusterScope(
+//scope = ElasticsearchIntegrationTest.Scope.SUITE, transportClientRatio = 0.0)
 public class MarcusSearchServiceIT extends TestCase {
 
         private static final Logger logger = Logger.getLogger(MarcusSearchServiceIT.class);
         private String indexName = "test";
 
+        @Override
         @Before
-        public void setUp() {
+        protected void setUp() {
                 try {
                         //Delete index "test", if exists
                         ClientFactory.getTransportClient()
@@ -55,9 +58,9 @@ public class MarcusSearchServiceIT extends TestCase {
 
         }
 
-        @After
         @Override
-        public void tearDown() throws InterruptedException {
+        @After
+        protected void tearDown() throws InterruptedException {
                 //Delete index "admin-test"
                 ClientFactory.getTransportClient()
                         .admin()

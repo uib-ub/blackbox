@@ -1,15 +1,6 @@
 package no.uib.marcus.search.servlet;
 
 
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.util.List;
-import java.util.Map;
-import javax.servlet.ServletException;
-import javax.servlet.annotation.WebServlet;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import no.uib.marcus.common.AggregationUtils;
 import no.uib.marcus.common.SortUtils;
 import no.uib.marcus.search.MarcusSearchService;
@@ -20,9 +11,20 @@ import org.elasticsearch.index.query.BoolFilterBuilder;
 import org.elasticsearch.index.query.FilterBuilders;
 import org.elasticsearch.search.sort.SortBuilder;
 
+import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.util.List;
+import java.util.Map;
+
 /**
- * @author Hemed Al Ruwehy (hemed.ruwehy@uib.no) 2016-01-24, University of
- * Bergen Library
+ * @author Hemed A. Al Ruwehy (hemed.ruwehy@uib.no)
+ * <p/>
+ * 2016-01-24, University of Bergen Library
  */
 @WebServlet(
         name = "SearchServlet",
@@ -42,6 +44,7 @@ public class SearchServlet extends HttpServlet {
                 throws ServletException, IOException {
                 request.setCharacterEncoding("UTF-8");
                 response.setContentType("text/html;charset=UTF-8");
+                /*Get parameters from search request*/
                 String queryString = request.getParameter("q");
                 String[] selectedFilters = request.getParameterValues("filter");
                 String aggs = request.getParameter("aggs");
@@ -61,7 +64,7 @@ public class SearchServlet extends HttpServlet {
                         int _size = Strings.hasText(size) ? Integer.parseInt(size) : 10;
                         SortBuilder fieldSort = Strings.hasText(sortString) ? SortUtils.getFieldSort(sortString) : null;
                         
-                        /**Override service properties from previous request**/
+                        /* Override service properties from previous request */
                         service.setIndices(indices);
                         service.setTypes(types);
                         service.setAggregations(aggs);
@@ -87,7 +90,6 @@ public class SearchServlet extends HttpServlet {
 
         /**
          * A method for building BoolFilter based on the aggregation settings.
-         *
          */
         private BoolFilterBuilder buildBoolFilter(String[] selectedFilters, String aggregations, String fromDate, String toDate) {
                 //In this map, keys are "fields" and values are "terms"
@@ -98,16 +100,16 @@ public class SearchServlet extends HttpServlet {
                                 boolFilter
                                         //Range within "created" field
                                         .should(FilterBuilders.rangeFilter("created").gte(fromDate).lte(toDate))
-                                        //madeafter >= from_date and madeafter <= to_date
+                                        /*madeafter >= from_date and madeafter <= to_date*/
                                         .should(FilterBuilders.boolFilter()
                                                 .must(FilterBuilders.rangeFilter("madeafter").gte(fromDate))
                                                 .must(FilterBuilders.rangeFilter("madeafter").lte(toDate)))
-                                        //madebefore >= from_date and madebefore <= to_date
+                                        /*madebefore >= from_date and madebefore <= to_date*/
                                         .should(FilterBuilders.boolFilter()
                                                 .must(FilterBuilders.rangeFilter("madebefore").gte(fromDate))
                                                 .must(FilterBuilders.rangeFilter("madebefore").lte(toDate)));
 
-                                                /**
+                                                /*
                                                   //AND filter.
                                                   .should(FilterBuilders.boolFilter()
                                                   .must((FilterBuilders.rangeFilter("madeafter").gte(fromDate)))

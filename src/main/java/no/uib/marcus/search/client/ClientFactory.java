@@ -1,7 +1,5 @@
 package no.uib.marcus.search.client;
 
-import java.net.InetAddress;
-import java.net.UnknownHostException;
 import org.apache.log4j.Logger;
 import org.elasticsearch.ElasticsearchException;
 import org.elasticsearch.action.admin.cluster.health.ClusterHealthResponse;
@@ -11,6 +9,9 @@ import org.elasticsearch.common.settings.ImmutableSettings;
 import org.elasticsearch.common.settings.Settings;
 import org.elasticsearch.common.transport.InetSocketTransportAddress;
 import org.elasticsearch.transport.ConnectTransportException;
+
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 
 /**
  * A singleton class that connect to Elasticsearch cluster through Transport
@@ -40,10 +41,9 @@ public class ClientFactory {
                                 //.put("client.transport.ping_timeout", "100s")
                                 .build();
                         client = new TransportClient(settings)
-                                /**
+                                /*
                                  * You can add more than one addresses here,
-                                 * depending on the number of your servers. For
-                                 * now, we are connecting locally.
+                                 * depending on the number of your servers.
                                  */
                                 .addTransportAddress(
                                         //new InetSocketTransportAddress(InetAddress.getLocalHost(), 9300));

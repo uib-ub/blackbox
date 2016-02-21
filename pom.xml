@@ -32,7 +32,7 @@
 
     <dependencies>
         <dependency>
-            <!--Test framework for Lucene-->
+            <!--Testing framework for Lucene-->
             <groupId>org.apache.lucene</groupId>
             <artifactId>lucene-test-framework</artifactId>
             <version>4.10.4</version>

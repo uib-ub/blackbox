@@ -1,14 +1,15 @@
 package no.uib.marcus.search.servlet;
 
 import com.google.gson.Gson;
-import java.io.IOException;
-import java.io.PrintWriter;
+import no.uib.marcus.search.CompletionSuggestion;
+
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import no.uib.marcus.search.Suggestion;
+import java.io.IOException;
+import java.io.PrintWriter;
 
 /**
  * @author Hemed Ali
@@ -34,8 +35,8 @@ public class SuggestionServlet extends HttpServlet {
                 try (PrintWriter out = response.getWriter()) {
                         Gson gson = new Gson();
                         jsonString = gson.toJson(
-                                Suggestion
-                                        .getSuggestions(suggestText, SUGGEST_FIELD, indices));
+                                CompletionSuggestion.getSuggestions(suggestText, SUGGEST_FIELD, indices)
+                        );
                         out.write(jsonString);
                 }
         }
@@ -54,7 +55,7 @@ public class SuggestionServlet extends HttpServlet {
 
         @Override
         public String getServletInfo() {
-                return "Suggestion servlet";
+                return "CompletionSuggestion servlet";
         }
 
 }

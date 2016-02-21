@@ -54,6 +54,10 @@
     <orderEntry type="library" name="Maven: com.google.code.gson:gson:2.5" level="project" />
     <orderEntry type="library" name="Maven: log4j:log4j:1.2.17" level="project" />
     <orderEntry type="library" scope="TEST" name="Maven: org.elasticsearch:elasticsearch:test-jar:tests:1.7.5" level="project" />
+    <orderEntry type="library" name="angular-ui-bootstrap-DefinitelyTyped" level="application" />
     <orderEntry type="library" name="angularjs-DefinitelyTyped" level="application" />
+    <orderEntry type="library" name="jQuery-1.11.4" level="application" />
+    <orderEntry type="library" name="jQuery-2.0.0" level="application" />
+    <orderEntry type="library" name="angular" level="application" />
   </component>
 </module>

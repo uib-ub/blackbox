@@ -1,19 +1,12 @@
 
 package no.uib.marcus.common;
 
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParseException;
-import com.google.gson.JsonParser;
-import com.google.gson.JsonSyntaxException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import javax.validation.constraints.NotNull;
+import com.google.gson.*;
 import org.apache.log4j.Logger;
 import org.elasticsearch.common.Nullable;
+
+import javax.validation.constraints.NotNull;
+import java.util.*;
 
 /**
  * @author Hemed Ali Al Ruwehy
@@ -75,7 +68,7 @@ public class AggregationUtils {
                         }
                         for (String entry : selectedFilters) {
                                 if (entry.lastIndexOf('.') != -1) {
-                                        //Get the index for the last occurence of a dot
+                                        //Get the index for the last occurrence of a dot
                                         int lastIndex = entry.lastIndexOf('.');
                                         String key = entry.substring(0, lastIndex).trim();
                                         String value = entry.substring(lastIndex + 1, entry.length()).trim();
@@ -90,7 +83,7 @@ public class AggregationUtils {
                                 }
                         }
                 } catch (Exception ex) {
-                        logger.error("Exception occured while constructing a map from selected filters: " + ex.getMessage());
+                        logger.error("Exception occurred while constructing a map from selected filters: " + ex.getMessage());
                 }
                 return filters;
         }

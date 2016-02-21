@@ -1,9 +1,6 @@
 package no.uib.marcus.search;
 
 import com.google.gson.Gson;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.Set;
 import no.uib.marcus.search.client.ClientFactory;
 import org.apache.log4j.Logger;
 import org.elasticsearch.action.suggest.SuggestRequestBuilder;
@@ -12,14 +9,21 @@ import org.elasticsearch.search.suggest.Suggest;
 import org.elasticsearch.search.suggest.SuggestBuilder.SuggestionBuilder;
 import org.elasticsearch.search.suggest.completion.CompletionSuggestionBuilder;
 
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Set;
+
 /**
- * Hemed Ali (hemed.ruwehy@uib.no) University of Bergen Library
+ * Hemed Ali Al Ruwehy (hemed.ruwehy@uib.no)
+ * <p/>
+ *
+ * University of Bergen Library
  */
-public class Suggestion {
+public class CompletionSuggestion {
 
-        private static final Logger logger = Logger.getLogger(Suggestion.class);
+        private static final Logger logger = Logger.getLogger(CompletionSuggestion.class);
 
-        public static SuggestResponse getSuggestResponse(String text, String suggestField, String... indices) {
+        public static SuggestResponse getSuggestionResponse(String text, String suggestField, String... indices) {
                 SuggestionBuilder suggestionsBuilder = new CompletionSuggestionBuilder("completion_suggestion");
                 SuggestResponse suggestResponse = null;
                 SuggestRequestBuilder suggestRequest;
@@ -50,7 +54,7 @@ public class Suggestion {
         public static Set<String> getSuggestions(String text, String suggestField, String... indices) {
                 Set<String> items = new HashSet<>();
                 try {
-                        SuggestResponse suggestResponse = getSuggestResponse(text, suggestField, indices);
+                        SuggestResponse suggestResponse = getSuggestionResponse(text, suggestField, indices);
                         Iterator<? extends Suggest.Suggestion.Entry.Option> iter = suggestResponse
                                 .getSuggest()
                                 .getSuggestion("completion_suggestion")
@@ -68,13 +72,13 @@ public class Suggestion {
                 }
                 return items;
         }
-        
+
         //Main method for easy debugging
         public static void main(String[] args) {
                 Gson gson = new Gson();
                 String jsonString = gson.toJson(
-                        Suggestion
-                        .getSuggestions("t", "suggest", "admin"));
+                        CompletionSuggestion
+                                .getSuggestions("t", "suggest", "admin"));
 
                 logger.info(jsonString);
         }

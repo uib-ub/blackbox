@@ -12,4 +12,3 @@ angular.module('marcus', ['marcus.filters', 'marcus.services', 'marcus.directive
                         otherwise({redirectTo: '/'});
             }]);
 
-
