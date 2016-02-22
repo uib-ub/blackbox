@@ -1,0 +1,89 @@
+<div ng-show="doc._source.hasthumbnail" class="ui image">
+    <div class="ui blue ribbon label">{{doc._source.type}}</div>
+    <a target="_blank" href="{{doc._source.uri}}">
+        <img alt="{{doc._source.title}}" class="small image" src="{{doc._source.hasthumbnail}}">
+    </a>
+    <div class="ui bottom attached label marcus pushup">{{doc._source.identifier}}<br>
+        <span class="ui floated right">{{doc._source.available}}</span><br>
+        <span class="ui floated right"><i>{{doc._source.cataloguer}}</i></span>
+    </div>
+</div>
+<div ng-show="!doc._source.hasthumbnail" class="ui image">
+    <i class="ui bordered inverted grey icon huge camera retro"></i>
+</div>
+<div  class="content">
+    <a target="_blank" href="{{doc._source.uri}}" class="header">{{doc._source.title|| "Uten tittel"}}</a>
+    <div class="meta">
+        <div class="ui horizontal list">
+            <div class="item">
+                <i class="icon user"></i><div class="content"><span class="header">{{doc._source.maker}}</span>
+                </div>
+            </div>
+        </div>
+        <span class="ui floated right"><i class="icon wait"></i><span>{{doc._source.madeafter}}</span> - <span>{{doc._source.madebefore}}</span></span>
+    </div>
+    <div class="description">
+        <p ng-bind-html="doc._source.description | unsafe"></p>
+    </div>
+    <div class="extra">
+        <div class="ui horizontal list">
+            <div class="item"><i class="icon archive"></i>
+                <div class="content">
+                    <span class="header">{{doc._source.ispartof}}</span>
+                </div>
+            </div>
+        </div>
+        <br>
+
+        <div ng-if="!isString(doc._source.spatial)">
+            <div ng-show="doc._source.spatial" class="ui horizontal list">
+                <div ng-repeat="spatials in doc._source.spatial track by $index" class="item">
+                    <div class="content"><i class="ui icon point"></i><span>{{spatials}}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <br>
+        <div ng-show="doc._source.subject" class="ui basic segment">
+            <span ng-repeat="subject in doc._source.subject track by $index" class="ui tag label">{{subject}}</span>
+        </div>
+        <div>
+            <div>
+                <div class="ui horizontal list events">
+                    <div class="item event dateDigitized">
+                        <span class="year{{from_date| date:'yyyy'}}"></span>
+                        <span>{{from_date|| '&infin;'}}</span>
+                    </div>
+                    <div ng-show="from_date" class="item event dateDigitized">
+                        <span class="year{{from_date| date:'yyyy'}}"></span>
+                        <span>Fra: {{from_date| date:'yyyy'}}</span>
+                    </div>
+                    <div ng-show="doc._source.created" class="item event dateDigitized">
+                        <span class="year{{doc._source.created| date:'yyyy'}}"></span>
+                        <span>Skapt:{{doc._source.created}}</span>
+                    </div>
+                    <div ng-show="doc._source.madeafter" class="item event dateDigitized">
+                        <span class="year{{doc._source.madeafter| date:'yyyy'}}"></span>
+                        <span>Etter: {{doc._source.madeafter}}</span>
+                    </div>
+                    <div ng-show="doc._source.madebefore" class="item event dateDigitized">
+                        <span class="year{{doc._source.madebefore| date:'yyyy'}}"></span>
+                        <span>Før: {{doc._source.madebefore}}</span>
+                    </div>
+                    <div ng-show="doc._source.available" class="item event dateDigitized">
+                        <span class="year{{doc._source.available| date:'yyyy'}}"></span>
+                        <span>Tilgjengeliggjort: {{doc._source.available}}</span>
+                    </div>
+                    <div ng-show="to_date" class="item event dateDigitized">
+                        <span class="year{{from_date| date:'yyyy'}}"></span>
+                        <span>Til: {{to_date| date:'yyyy'}}</span>
+                    </div>
+                    <div class="item event now">
+                        <!-- has no mark / used for determining end of line -->
+                        <span ng-controller="nextYear" class="year{{nextYear}}">{{nextYear}}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
