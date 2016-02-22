@@ -76,7 +76,7 @@ app.controller('freeTextSearch', function ($scope, $http, $location, mySetting) 
                 $scope.ready = true;
             });
     };
-
+    
 
     //Send suggest request to "suggest" servlet for autocompleting.
     $scope.autoSuggest = function () {
@@ -151,3 +151,10 @@ function fuzzify(querystr, default_freetext_fuzzify) {
         $scope.nextYear = $filter('date')(nextYear,'yyyy');
         $scope.prevYear = $filter('date')(previousYear,'yyyy');
     });
+    
+    app.filter('unsafe', function($sce) {
+    return function(val) {
+        return $sce.trustAsHtml(val);
+    };
+});
+

@@ -14,6 +14,7 @@
         <link rel="stylesheet" href="//code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css"/>
         <link rel="stylesheet" href="css/marcus.css" />
         <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.1.8/semantic.min.css" />
+        <link href="http://fonts.googleapis.com/css?family=IM+Fell+Great+Primer" rel="stylesheet" type="text/css">
 
     </head>
     <body>
@@ -22,7 +23,7 @@
               <a id="show-menu" class="item">
                 <i class="sidebar icon"></i>
               </a>
-              <div class="header item">
+              <div class="header brand item">
                 <!-- <img class="logo" src="assets/images/logo.png">-->
                 <a href="/">Marcus admin</a>
               </div>
@@ -163,132 +164,21 @@
                                 
                                 <div class="ui divided items" ng-repeat="doc in results.hits.hits track by $index">
                  
-                                    <div ng-if='doc._source.type == "Person"' style="page-break-inside: avoid;" class="ui item" id="facetview_result">
-                                        <div ng-show="doc._source.img" class="ui image">
-                                            <div class="ui blue ribbon label">{{doc._source.type}}</div>
-                                            <a target="_blank" href="{{doc._source.uri}}">
-                                                <img alt="{{doc._source.title}}" class="small image" src="{{doc._source.img}}">
-                                            </a>
-                                            <div class="ui bottom attached label">{{doc._source.identifier}}<br>
-                                                <span class="ui floated right">{{doc._source.available}}</span><br>
-                                                <span class="ui floated right"><i>{{doc._source.cataloguer}}</i></span>
-                                            </div>
-                                        </div>
-                                        <div ng-show="!doc._source.img" class="ui image">
-                                            <i class="ui circular inverted teal icon big user"></i>
-                                        </div>
-                                        <div  class="content">
-                                            <a target="_blank" href="{{doc._source.uri}}" class="header">{{doc._source.name}}</a>
-                                            <div class="meta">
-                                                <span ng-show="doc._source.birthyear || doc._source.deathyear" class="ui floated right"><i class="icon wait"></i><span ng-show="doc._source.birthyear && !doc._source.birthdate">{{doc._source.birthyear}}</span><span ng-show="doc._source.birthdate">{{doc._source.birthdate}}</span> - <span ng-show="doc._source.deathyear && !doc._source.deathdate">{{doc._source.deathyear}}</span><span ng-show="doc._source.deathdate">{{doc._source.deathdate}}</span></span>
-                                            </div>
-                                            <div class="description">
-                                                <p>{{doc._source.description}}</p>
-                                            </div>
-                                            <div class="extra">
-
-                                            </div>
-                                        </div>
-                                    </div>
+                                    <div ng-if='doc._source.type == "Person" || doc._source.type == "Organisajon" || doc._source.type == "Firma"' ng-include="'partials/agent-hits.html'" style="page-break-inside: avoid;" class="ui item"></div>
+                                    <div ng-if='doc._source.type == "Objekt" || doc._source.type == "Skip" || doc._source.type == "Fartøy" || doc._source.type == "Monument"' ng-include="'partials/object-hits.html'" style="page-break-inside: avoid;" class="ui item"></div>
+                                    <div ng-if='doc._source.type == "Album"' ng-include="'partials/document-hits.html'" style="page-break-inside: avoid;" class="ui item"></div>
+                                    <div ng-if='doc._source.type == "Kart"' ng-include="'partials/document-hits.html'" style="page-break-inside: avoid;" class="ui item"></div>
+                                    <div ng-if='doc._source.type == "Akkvisisjon"' ng-include="'partials/object-hits.html'" style="page-break-inside: avoid;" class="ui item"></div>
+                                    <div ng-if='doc._source.type == "Arbeidsliste"' ng-include="'partials/object-hits.html'" style="page-break-inside: avoid;" class="ui item"></div>
+                                    <div ng-if='doc._source.type == "Aggregering"' ng-include="'partials/document-hits.html'" style="page-break-inside: avoid;" class="ui item"></div>
                                     
-                                    <div ng-if='doc._source.type != "Person"' style="page-break-inside: avoid;" class="ui item">
-                                        <div ng-show="doc._source.hasthumbnail" class="ui image" style="display: block;">
-                                            <div class="ui blue ribbon label">{{doc._source.type}}</div>
-                                            <a target="_blank" href="{{doc._source.uri}}">
-                                                <img alt="{{doc._source.title}}" class="small image" src="{{doc._source.hasthumbnail}}">
-                                            </a>
-                                            <div class="ui bottom attached label marcus pushup">{{doc._source.identifier}}<br>
-                                                <span class="ui floated right">{{doc._source.available}}</span><br>
-                                                <span class="ui floated right"><i>{{doc._source.cataloguer}}</i></span>
-                                            </div>
-                                        </div>
-                                        <div ng-show="!doc._source.hasthumbnail" class="ui image">
-                                            <i class="ui bordered inverted grey icon huge camera retro"></i>
-                                        </div>
-                                        <div  class="content">
-                                            <a target="_blank" href="{{doc._source.uri}}" class="header">{{doc._source.title || "Uten tittel"}}</a>
-                                            <div class="meta">
-                                                <div class="ui horizontal list">
-                                                    <div class="item">
-                                                        <i class="icon user"></i><div class="content"><span class="header">{{doc._source.maker}}</span>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                                <span class="ui floated right"><i class="icon wait"></i><span>{{doc._source.madeafter}}</span> - <span>{{doc._source.madebefore}}</span></span>
-                                            </div>
-                                            <div class="description">
-                                                <p>{{doc._source.description}}</p>
-                                            </div>
-                                            <div class="extra">
-                                                <div class="ui horizontal list">
-                                                    <div class="item"><i class="icon archive"></i>
-                                                        <div class="content">
-                                                            <span class="header">{{doc._source.ispartof}}</span>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                                <br>
-                                                <div ng-show="doc._source.spatial" class="ui horizontal list">
-                                                    <div class="item"><i class="icon marker"></i><div class="content"><span ng-repeat="spatials in doc._source.spatial track by $index">{{spatials}}</span></div></div>
-                                                </div>
-                                                <br>
-                                                <div ng-show="doc._source.subject" class="ui basic segment">
-                                                    <span ng-repeat="subject in doc._source.subject track by $index" class="ui tag label">{{subject}}</span>
-                                                </div>
-                                                <div>
-                                                <div>
-                                                    <div class="ui horizontal list events">
-                                                        <div class="item event dateDigitized">
-                                                            <span class="year{{from_date | date:'yyyy'}}"></span>
-                                                            <span>{{from_date || '&infin;'}}</span>
-                                                        </div>
-                                                        <div ng-show="from_date" class="item event dateDigitized">
-                                                            <span class="year{{from_date | date:'yyyy'}}"></span>
-                                                            <span>Fra: {{from_date | date:'yyyy'}}</span>
-                                                        </div>
-                                                        <div ng-show="doc._source.created" class="item event dateDigitized">
-                                                            <span class="year{{doc._source.created | date:'yyyy'}}"></span>
-                                                            <span>Skapt:{{doc._source.created}}</span>
-                                                        </div>
-                                                        <div ng-show="doc._source.madeafter" class="item event dateDigitized">
-                                                            <span class="year{{doc._source.madeafter | date:'yyyy'}}"></span>
-                                                            <span>Etter: {{doc._source.madeafter}}</span>
-                                                        </div>
-                                                        <div ng-show="doc._source.madebefore" class="item event dateDigitized">
-                                                            <span class="year{{doc._source.madebefore | date:'yyyy'}}"></span>
-                                                            <span>Før: {{doc._source.madebefore}}</span>
-                                                        </div>
-                                                        <div ng-show="doc._source.available" class="item event dateDigitized">
-                                                            <span class="year{{doc._source.available | date:'yyyy'}}"></span>
-                                                            <span>Tilgjengeliggjort: {{doc._source.available}}</span>
-                                                        </div>
-                                                        <div ng-show="to_date" class="item event dateDigitized">
-                                                            <span class="year{{from_date | date:'yyyy'}}"></span>
-                                                            <span>Til: {{to_date | date:'yyyy'}}</span>
-                                                        </div>
-                                                        <div class="item event now">
-                                                            <!-- has no mark / used for determining end of line -->
-                                                            <span ng-controller="nextYear" class="year{{nextYear }}">{{nextYear}}</span>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            </div>
-                                        </div>
-                                        
-                                        
-                                    </div>
+                                    <div ng-if='doc._source.type == "Fotografi" || doc._source.type == "Manuskript" || doc._source.type == "Postkort" ||doc._source.type == "Brev" || doc._source.type == "Diplom" || doc._source.type == "Bok" || doc._source.type == "Tale" || doc._source.type == "Segl" || doc._source.type == "Dokument" ||doc._source.type == "Grafikk" || doc._source.type == "Transkripsjon" || doc._source.type == "Telegram" || doc._source.type == "Tegning" || doc._source.type == "Notat" || doc._source.type == "Forhandlingsprotokoll" ||doc._source.type == "Kvittering" || doc._source.type == "Protokoll" || doc._source.type == "Reisedagbok" || doc._source.type == "Nummer" || doc._source.type == "Kartsett" || doc._source.type == "Kontrakt" ||doc._source.type == "Salgsskjøte" || doc._source.type == "Bønnebok" || doc._source.type == "Dagbok" || doc._source.type == "Fragment" || doc._source.type == "Kassebok" || doc._source.type == "Oppnålingsdokument" ||doc._source.type == "Supplikk"' ng-include="'partials/document-hits.html'" style="page-break-inside: avoid;" class="ui item"></div>  
+                                    
                                     <div class="ui raised inverted segment ng-hide">
                                         <h3 class="header">JSON source:</h3>
                                         <hr>
                                         <pre>{{doc._source | json}}</pre>
                                     </div>
-                                    <!--div class="row" style="display: block;">            
-                                        <h4 style="margin-top:7px;"> 
-                                            <a href='{{doc_source.id}}' target="_blank">{{doc._source.title}}</a>
-                                        </h4>
-                                            <span class="label label-info">{{doc._source.type}}</span>
-                                    </div-->
                                 </div>
                             </div>
                         </div>
@@ -333,12 +223,10 @@
                             index: ["admin"],
                             type: [],
                             facets: [
-                                {"field": "type.exact", "size": 30, "operator": "OR", "order": "term_asc"},
-                                {"field": "assigned_to", "order": "term_asc", "operator" : "OR" },
                                 {"field": "type.exact", "size": 200, "operator": "OR", "order": "count_desc"},
+                                {"field": "assigned_to", "order": "term_asc", "operator" : "OR" },
                                 {"field": "haszoom", "size": 1, "operator": "OR", "order": "term_asc"},
                                 {"field": "isdigitized", "size": 1, "operator": "OR", "order": "term_desc"},
-                                {"field": "assigned_to", "order": "term_asc"},
                                 {"field": "subject.exact"},
                                 {"field": "customer_name", "size": 10, "operator": "AND", "order": "count_desc"}]
                         });
@@ -346,9 +234,9 @@
         
         <script>
             $('.ui.dropdown')
-            .dropdown({
-              allowAdditions: true
-            })
+                .dropdown({
+                  allowAdditions: true
+                })
             ;
         </script>
     </body>
