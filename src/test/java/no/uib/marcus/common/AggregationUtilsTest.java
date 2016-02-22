@@ -62,8 +62,6 @@ public class AggregationUtilsTest extends RandomizedTest {
                 expectedMap.put("status", Arrays.asList("sent", "draft"));
 
                 assertEquals(AggregationUtils.getFilterMap(selectedFilter), expectedMap);
-
-
         }
 
         /**
@@ -86,6 +84,7 @@ public class AggregationUtilsTest extends RandomizedTest {
                 Map<String, List<String>> expectedMap = new HashMap<>();
                 expectedMap.put("http://marcus.uib.no", Arrays.asList("photography"));
                 assertEquals(AggregationUtils.getFilterMap(selectedFilter), expectedMap);
+
         }
 
         @Test

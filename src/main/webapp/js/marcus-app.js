@@ -104,27 +104,37 @@ app.controller('freeTextSearch', function ($scope, $http, $location, mySetting) 
 /**
  A method to append * or ~ in the query string
  <p/>
- @param querystr a query string.
+ @param query_string a query string.
  @param default_freetext_fuzzify - should be either * or ~,
  if *, * will be prepended and appended to each string in the freetext search term
  if ~, then ~ will be appended to each string in the freetext search term.
  If * or ~ or : are already in the freetext search term, no action will be taken.
- @param querystr - a query string.
+ @param query_string - a query string.
  **/
-function fuzzify(querystr, default_freetext_fuzzify) {
-    var rqs = querystr;
+function fuzzify(query_string, default_freetext_fuzzify) {
+    var rqs = query_string;
     if (default_freetext_fuzzify !== undefined) {
         if (default_freetext_fuzzify === "*" || default_freetext_fuzzify === "~") {
-            if (querystr.indexOf('*') === -1 && querystr.indexOf('~') === -1 && querystr.indexOf(':') === -1) {
-                var optparts = querystr.split(' ');
+            //Do not do anything if query string has either one of the following chars.
+            if (query_string.indexOf('*') === -1 && query_string.indexOf('~') === -1 &&
+                query_string.indexOf(':') === -1 && query_string.indexOf('"') === -1) {
+
+                /*if(query_string.indexOf('"') >= 0){
+                    var quote_index =  query_string.lastIndexOf('"');
+                    var quote_part =  query_string.substring(0, quote_index);
+                    query_string = query_string.substring(quote_index+1, rqs.length);
+
+                    alert("Quotes: " + quote_part +  "\n Other parts: " +  query_string);
+                }
+                **/
+                var option_parts = query_string.split(' ');
                 var pq = "";
-                for (var oi = 0; oi < optparts.length; oi++) {
-                    var oip = optparts[oi];
+                for (var oi = 0; oi < option_parts.length; oi++) {
+                    var oip = option_parts[oi];
 
                     //We want the string part to be greater than 1 char,
                     // and it should not contain the following special chars.
-                    if (oip.length > 1 && oip.indexOf('"') === -1 &&
-                        oip.indexOf(')') === -1 && oip.indexOf('(') === -1){
+                    if (oip.length > 1 && oip.indexOf(')') === -1 && oip.indexOf('(') === -1){
 
                         oip = oip + default_freetext_fuzzify;
                     }
