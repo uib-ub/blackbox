@@ -13,12 +13,26 @@
         <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap-theme.min.css" />
         <link rel="stylesheet" href="//code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css"/>
         <link rel="stylesheet" href="css/marcus.css" />
+        <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.1.8/semantic.min.css" />
+
     </head>
     <body>
+        <div class="ui fixed inverted menu">
+            <div class="ui container fluid header-wrap">
+              <a id="show-menu" class="item">
+                <i class="sidebar icon"></i>
+              </a>
+              <div class="header item">
+                <!-- <img class="logo" src="assets/images/logo.png">-->
+                <a href="/">Marcus admin</a>
+              </div>
+            </div>
+        </div>
+        
+        
         <div id="searchController"  ng-controller="freeTextSearch">
             <div class="main-container">
                 <div class="masthead">
-                    <h1 class="title">Blackbox</h1>
                     <div class="Demo">
                         <form action="" method="GET">
                             <input type="hidden" name="index" value="admin"/>
@@ -38,12 +52,12 @@
                     </span>
                     <!--b>Aggregations: </b>{{test}}  -->
                 </div>
-                <!--div class="loading" ng-show="show_loading"><img src="img/loading.gif" alt="Loading..." width="120"/></div-->
-                <!--div class="sticky-footer-push"></div-->
-                <uib-progressbar class="progress-striped active loading" ng-show="show_loading" value="dynamic" ><strong>Loading...</strong></uib-progressbar>
-                <div class="search-results container-fluid" ng-show="ready">
-                    <div class="content row row-fluid">
-                        <div class="facets col-lg-3 col-md-3 hidden-sm hidden-xs">
+
+                <uib-progressbar class="ui loading segment" ng-show="show_loading" value="dynamic" style="height: 100px;"></uib-progressbar>
+                <div class="ui container">
+                    <div class="ui grid search-results" ng-show="ready">
+                    <div class="content ui row">
+                        <div class="facets ui four wide column">
                             <h3>Dato</h3>
                             <hr>
                             <input id="from_date" class="datePicker" type="text"  ng-model="from_date" ng-change="search()" placeholder="FRA" title="Fra dato"><br/><br/>
@@ -54,28 +68,52 @@
 
                             <h3>Dokument typer</h3>
                             <hr>
-                            <ul class="nav nav-list">
-                                <li ng-repeat="bucket in results['aggregations']['type.exact']['buckets']">
+                            <div style="height: 300px; overflow: scroll" class="ui list">
+                                <div class="item" ng-repeat="bucket in results['aggregations']['type.exact']['buckets']">
                                     <input type="checkbox" checklist-model="selected_filters" checklist-value="getCheckedValue('type.exact', bucket.key)" ng-click="search()">
-                                        <label> {{bucket.key}}</label>
+                                        <label class="ui label" ng-class="{ 'disabled': bucket.doc_count == 0 }"> {{bucket.key}}</label>
                                         <span style="color:grey"> ({{bucket.doc_count}} of {{bucket.total_doc_count}})</span>
-                                        <br>
-                                </li>
-                            </ul>
-
+                                </div>
+                            </div>
+                            
+                            <div class="ui multiple dropdown">
+                                <input type="hidden" name="filters">
+                                <i class="filter icon"></i>
+                                <span class="text">Filter Posts</span>
+                                <div class="menu">
+                                  <div class="ui icon search input">
+                                    <i class="search icon"></i>
+                                    <input type="text" placeholder="Search tags...">
+                                  </div>
+                                  <div class="divider"></div>
+                                  <div class="scrolling menu">
+                                    <div class="item" ng-repeat="bucket in results['aggregations']['type.exact']['buckets']" checklist-value="getCheckedValue('type.exact', bucket.key)" data-value="{{bucket.key}}" ng-select="search()">
+                                      <div ng-select="search()" class="ui red empty circular label"></div>
+                                      {{bucket.key}}
+                                    </div>
+                 
+                                  </div>
+                                </div>
+                            </div>
+                            
                             <h3>Emne</h3>
                             <hr>
-                            <ul class="nav nav-list">
-                                <li ng-repeat="bucket in results['aggregations']['subject.exact']['buckets']">
+                            <div class="ui list">
+                                <div class="item" ng-repeat="bucket in results['aggregations']['subject.exact']['buckets']">
                                         <input type="checkbox" checklist-model="selected_filters" checklist-value="getCheckedValue('subject.exact', bucket.key)" ng-click="search()">
                                         <label class="row-fluid"> {{bucket.key}} </label>
                                         <span style="color:gray">({{bucket.doc_count}} of {{bucket.total_doc_count}})</span>
-                                        <br>
-                                </li>
-                            </ul>
+                                </div>
+                            </div>                 
+                        </div>
+                        
+                        <div ng-show="results.hits.total == 0" style="margin-top: 50px;" class="noresults ui ten wide column">
+                            <a href='http://www.gifbin.com/988529' title='Funny Gifs'><img src='http://www.gifbin.com/bin/042014/1399709340_how_the_solar_system_moves_through_space.gif'></a>
+                            <br>
+                            <p>Vi fant ingenting, men her er en gif som får deg til å tenke på hvor lite universet bryr seg om ElasticSearch og indeksen vår... :-(.</p>
                         </div>
 
-                        <div class="search-hits container container-fluid">
+                        <div ng-show="results.hits.total > 0" class="search-hits ui ten wide column">
                             <div class="form-group single-select" role="form">
                                 <label class="control-label" for="sort_by">Sortér på: </label>
                                 <select class="form-control" id="sort_by" ng-model="sort_by" ng-change="search()">
@@ -87,10 +125,28 @@
                                     <option value="identifier:asc">ID ASC</option>
                                     <option value="identifier:desc">ID DESC</option>
                                 </select>
-                            </div><br/>
 
+                            </div>
+                            <br/>
+                            
                             <div class="results-hit">
-                                <h4 ng-show="results.hits.total > 0"> Total hits: {{results.hits.total}}</h4>
+                                <hr>
+                                <div class="ui relaxed horizontal list">
+                                    <div ng-class="{ 'disabled': bucket.doc_count == 0 }" class="ui item toggle checkbox" ng-repeat="bucket in results['aggregations']['haszoom']['buckets']">
+                                        <input type="checkbox" checklist-model="selected_filters" checklist-value="getCheckedValue('haszoom', bucket.key)" ng-click="search()">
+                                            <label> {{bucket.key}}
+                                            <span style="color:grey"> ({{bucket.doc_count}})</span></label>
+                                    </div>
+                                    <div ng-class="{ 'disabled': bucket.doc_count == 0 }" class="ui item toggle checkbox" ng-repeat="bucket in results['aggregations']['isdigitized']['buckets']">
+                                        <input type="checkbox" checklist-model="selected_filters" checklist-value="getCheckedValue('isdigitized', bucket.key)" ng-click="search()">
+                                            <label> {{bucket.key}}
+                                            <span style="color:grey"> ({{bucket.doc_count}})</span></label>
+                                    </div>
+                                </div>
+                                <hr>
+                                
+                                <h4> Total hits: {{results.hits.total}}</h4>
+
                                 <!--div ng-show="results.hits.total == 0" class="alert alert-info" style="text-align:center;border-color:#bdbdbd; margin-top:10%;">
                                     <h4>Ingen treff</h4>
                                 </div-->
@@ -102,17 +158,133 @@
                                         previous-text="Forrige"
                                         max-size="5"
                                         force-ellipses="true"
-                                        style="margin-left: 25%">
+                                        style="">    
                                 </uib-pagination>
-                                <div class="row row-fluid" ng-repeat="doc in results.hits.hits">
-                                    <ul>
-                                        <li>
-                                            {{doc._source}}
-                                        </li>
-                                    </ul>
+                                
+                                <div class="ui divided items" ng-repeat="doc in results.hits.hits track by $index">
+                 
+                                    <div ng-if='doc._source.type == "Person"' style="page-break-inside: avoid;" class="ui item" id="facetview_result">
+                                        <div ng-show="doc._source.img" class="ui image">
+                                            <div class="ui blue ribbon label">{{doc._source.type}}</div>
+                                            <a target="_blank" href="{{doc._source.uri}}">
+                                                <img alt="{{doc._source.title}}" class="small image" src="{{doc._source.img}}">
+                                            </a>
+                                            <div class="ui bottom attached label">{{doc._source.identifier}}<br>
+                                                <span class="ui floated right">{{doc._source.available}}</span><br>
+                                                <span class="ui floated right"><i>{{doc._source.cataloguer}}</i></span>
+                                            </div>
+                                        </div>
+                                        <div ng-show="!doc._source.img" class="ui image">
+                                            <i class="ui circular inverted teal icon big user"></i>
+                                        </div>
+                                        <div  class="content">
+                                            <a target="_blank" href="{{doc._source.uri}}" class="header">{{doc._source.name}}</a>
+                                            <div class="meta">
+                                                <span ng-show="doc._source.birthyear || doc._source.deathyear" class="ui floated right"><i class="icon wait"></i><span ng-show="doc._source.birthyear && !doc._source.birthdate">{{doc._source.birthyear}}</span><span ng-show="doc._source.birthdate">{{doc._source.birthdate}}</span> - <span ng-show="doc._source.deathyear && !doc._source.deathdate">{{doc._source.deathyear}}</span><span ng-show="doc._source.deathdate">{{doc._source.deathdate}}</span></span>
+                                            </div>
+                                            <div class="description">
+                                                <p>{{doc._source.description}}</p>
+                                            </div>
+                                            <div class="extra">
 
-                                    <!--div class="row" style="display: block;">
-                                        <h4 style="margin-top:7px;">
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div ng-if='doc._source.type != "Person"' style="page-break-inside: avoid;" class="ui item">
+                                        <div ng-show="doc._source.hasthumbnail" class="ui image" style="display: block;">
+                                            <div class="ui blue ribbon label">{{doc._source.type}}</div>
+                                            <a target="_blank" href="{{doc._source.uri}}">
+                                                <img alt="{{doc._source.title}}" class="small image" src="{{doc._source.hasthumbnail}}">
+                                            </a>
+                                            <div class="ui bottom attached label marcus pushup">{{doc._source.identifier}}<br>
+                                                <span class="ui floated right">{{doc._source.available}}</span><br>
+                                                <span class="ui floated right"><i>{{doc._source.cataloguer}}</i></span>
+                                            </div>
+                                        </div>
+                                        <div ng-show="!doc._source.hasthumbnail" class="ui image">
+                                            <i class="ui bordered inverted grey icon huge camera retro"></i>
+                                        </div>
+                                        <div  class="content">
+                                            <a target="_blank" href="{{doc._source.uri}}" class="header">{{doc._source.title || "Uten tittel"}}</a>
+                                            <div class="meta">
+                                                <div class="ui horizontal list">
+                                                    <div class="item">
+                                                        <i class="icon user"></i><div class="content"><span class="header">{{doc._source.maker}}</span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <span class="ui floated right"><i class="icon wait"></i><span>{{doc._source.madeafter}}</span> - <span>{{doc._source.madebefore}}</span></span>
+                                            </div>
+                                            <div class="description">
+                                                <p>{{doc._source.description}}</p>
+                                            </div>
+                                            <div class="extra">
+                                                <div class="ui horizontal list">
+                                                    <div class="item"><i class="icon archive"></i>
+                                                        <div class="content">
+                                                            <span class="header">{{doc._source.ispartof}}</span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <br>
+                                                <div ng-show="doc._source.spatial" class="ui horizontal list">
+                                                    <div class="item"><i class="icon marker"></i><div class="content"><span ng-repeat="spatials in doc._source.spatial track by $index">{{spatials}}</span></div></div>
+                                                </div>
+                                                <br>
+                                                <div ng-show="doc._source.subject" class="ui basic segment">
+                                                    <span ng-repeat="subject in doc._source.subject track by $index" class="ui tag label">{{subject}}</span>
+                                                </div>
+                                                <div>
+                                                <div>
+                                                    <div class="ui horizontal list events">
+                                                        <div class="item event dateDigitized">
+                                                            <span class="year{{from_date | date:'yyyy'}}"></span>
+                                                            <span>{{from_date || '&infin;'}}</span>
+                                                        </div>
+                                                        <div ng-show="from_date" class="item event dateDigitized">
+                                                            <span class="year{{from_date | date:'yyyy'}}"></span>
+                                                            <span>Fra: {{from_date | date:'yyyy'}}</span>
+                                                        </div>
+                                                        <div ng-show="doc._source.created" class="item event dateDigitized">
+                                                            <span class="year{{doc._source.created | date:'yyyy'}}"></span>
+                                                            <span>Skapt:{{doc._source.created}}</span>
+                                                        </div>
+                                                        <div ng-show="doc._source.madeafter" class="item event dateDigitized">
+                                                            <span class="year{{doc._source.madeafter | date:'yyyy'}}"></span>
+                                                            <span>Etter: {{doc._source.madeafter}}</span>
+                                                        </div>
+                                                        <div ng-show="doc._source.madebefore" class="item event dateDigitized">
+                                                            <span class="year{{doc._source.madebefore | date:'yyyy'}}"></span>
+                                                            <span>Før: {{doc._source.madebefore}}</span>
+                                                        </div>
+                                                        <div ng-show="doc._source.available" class="item event dateDigitized">
+                                                            <span class="year{{doc._source.available | date:'yyyy'}}"></span>
+                                                            <span>Tilgjengeliggjort: {{doc._source.available}}</span>
+                                                        </div>
+                                                        <div ng-show="to_date" class="item event dateDigitized">
+                                                            <span class="year{{from_date | date:'yyyy'}}"></span>
+                                                            <span>Til: {{to_date | date:'yyyy'}}</span>
+                                                        </div>
+                                                        <div class="item event now">
+                                                            <!-- has no mark / used for determining end of line -->
+                                                            <span ng-controller="nextYear" class="year{{nextYear }}">{{nextYear}}</span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            </div>
+                                        </div>
+                                        
+                                        
+                                    </div>
+                                    <div class="ui raised inverted segment ng-hide">
+                                        <h3 class="header">JSON source:</h3>
+                                        <hr>
+                                        <pre>{{doc._source | json}}</pre>
+                                    </div>
+                                    <!--div class="row" style="display: block;">            
+                                        <h4 style="margin-top:7px;"> 
                                             <a href='{{doc_source.id}}' target="_blank">{{doc._source.title}}</a>
                                         </h4>
                                             <span class="label label-info">{{doc._source.type}}</span>
@@ -121,6 +293,7 @@
                             </div>
                         </div>
                     </div>
+                </div>
                 </div>
             </div>
         </div>
@@ -151,6 +324,7 @@
         <script src="js/checklist-directive.js"></script>
         <script src="js/jquery-datepicker.js"></script>
         <script src="js/ui-bootstrap-1.1.2.min.js"></script>
+        <script src="//cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.1.8/semantic.min.js"></script>
 
         <!--These are constants for this particular page-->
         <script>
@@ -161,9 +335,21 @@
                             facets: [
                                 {"field": "type.exact", "size": 30, "operator": "OR", "order": "term_asc"},
                                 {"field": "assigned_to", "order": "term_asc", "operator" : "OR" },
+                                {"field": "type.exact", "size": 200, "operator": "OR", "order": "count_desc"},
+                                {"field": "haszoom", "size": 1, "operator": "OR", "order": "term_asc"},
+                                {"field": "isdigitized", "size": 1, "operator": "OR", "order": "term_desc"},
+                                {"field": "assigned_to", "order": "term_asc"},
                                 {"field": "subject.exact"},
                                 {"field": "customer_name", "size": 10, "operator": "AND", "order": "count_desc"}]
                         });
+        </script>
+        
+        <script>
+            $('.ui.dropdown')
+            .dropdown({
+              allowAdditions: true
+            })
+            ;
         </script>
     </body>
 </html>

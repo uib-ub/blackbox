@@ -136,3 +136,18 @@ function fuzzify(querystr, default_freetext_fuzzify) {
     }
     return rqs;
 }
+
+    app.controller('nextYear', function ($scope, $filter) {
+        var myDate = new Date();
+        var previousYear = new Date(myDate);
+
+        previousYear.setYear(myDate.getFullYear()-1);
+
+        var nextYear = new Date(myDate);
+
+        nextYear.setYear(myDate.getFullYear()+1);
+
+        $scope.year = $filter('date')(myDate,'yyyy');//2014 like
+        $scope.nextYear = $filter('date')(nextYear,'yyyy');
+        $scope.prevYear = $filter('date')(previousYear,'yyyy');
+    });
