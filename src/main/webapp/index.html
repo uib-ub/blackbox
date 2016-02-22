@@ -109,9 +109,15 @@
                         </div>
                         
                         <div ng-show="results.hits.total == 0" style="margin-top: 50px;" class="noresults ui ten wide column">
-                            <a href='http://www.gifbin.com/988529' title='Funny Gifs'><img src='http://www.gifbin.com/bin/042014/1399709340_how_the_solar_system_moves_through_space.gif'></a>
+                            <div class="ui text container">
+                            <h1 style="font-size: 4em;" class="ui center aligned icon header">
+                                Ingen treff,<br>
+                                ingen Draper
+                            </h1>
+                            <img class="ui fluid image" src='img/giphy.gif'>
                             <br>
-                            <p>Vi fant ingenting, men her er en gif som får deg til å tenke på hvor lite universet bryr seg om ElasticSearch og indeksen vår... :-(.</p>
+                            <p>Det søket var så dårlig at ingen ville stå frem.</p>
+                            </div>
                         </div>
 
                         <div ng-show="results.hits.total > 0" class="search-hits ui ten wide column">
