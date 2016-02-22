@@ -16,7 +16,7 @@
     </head>
     <body>
         <div id="searchController"  ng-controller="freeTextSearch">
-            <div class="main-container">
+             <div class="main-container">
                 <div class="masthead">
                     <h1 class="title">Blackbox</h1>
                     <div class="Demo">
@@ -36,7 +36,7 @@
                     <span class="links links-examples">
                         <a href="">Advanced search</a>
                     </span>
-                    <!--b>Aggregations: </b>{{test}}  -->
+                    <b>Aggregations: </b>{{test}}
                 </div>
                 <!--div class="loading" ng-show="show_loading"><img src="img/loading.gif" alt="Loading..." width="120"/></div-->
                 <!--div class="sticky-footer-push"></div-->
@@ -145,7 +145,7 @@
         <script src="js/lib/typeahead/js/typeahead.bundle.js"></script>
         <script src="js/lib/typeahead/js/main.js"></script>
         <script src="//code.jquery.com/ui/1.11.4/jquery-ui.js"></script>
-        <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.4.8/angular.min.js"></script>
+        <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.4.9/angular.min.js"></script>
         <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
         <script src="js/marcus-app.js"></script>
         <script src="js/checklist-directive.js"></script>
@@ -159,7 +159,7 @@
                             index: ["admin"],
                             type: [],
                             facets: [
-                                {"field": "type.exact", "size": 30, "operator": "OR", "order": "term_asc"},
+                                {"field": "type.exact", "size": 30, "operator": "OR", "order": "count_desc"},
                                 {"field": "assigned_to", "order": "term_asc", "operator" : "OR" },
                                 {"field": "subject.exact"},
                                 {"field": "customer_name", "size": 10, "operator": "AND", "order": "count_desc"}]
