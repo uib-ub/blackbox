@@ -10,7 +10,6 @@ import org.elasticsearch.action.search.SearchRequestBuilder;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.common.Nullable;
 import org.elasticsearch.common.Strings;
-import org.elasticsearch.common.base.Optional;
 import org.elasticsearch.common.xcontent.XContentBuilder;
 import org.elasticsearch.common.xcontent.XContentFactory;
 import org.elasticsearch.index.query.*;
@@ -19,13 +18,12 @@ import org.elasticsearch.search.aggregations.bucket.terms.Terms.Order;
 import org.elasticsearch.search.aggregations.bucket.terms.TermsBuilder;
 import org.elasticsearch.search.builder.SearchSourceBuilderException;
 import org.elasticsearch.search.sort.SortBuilder;
-import org.elasticsearch.search.suggest.SuggestBuilder;
-import org.elasticsearch.search.suggest.completion.CompletionSuggestionBuilder;
 
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
+import org.elasticsearch.search.aggregations.bucket.histogram.DateHistogram;
 
 public class MarcusSearchService implements SearchService, Serializable {
 
@@ -244,7 +242,7 @@ public class MarcusSearchService implements SearchService, Serializable {
          * it.
          */
         private SearchRequestBuilder addTermsAggregation(SearchRequestBuilder searchRequest)
-                throws ElasticsearchException {
+                throws ElasticsearchException, JsonSyntaxException, JsonParseException {
 
                 JsonElement jsonElement = new JsonParser().parse(aggregations);
                 for (JsonElement facets : jsonElement.getAsJsonArray()) {
@@ -283,6 +281,56 @@ public class MarcusSearchService implements SearchService, Serializable {
                 }
                 return searchRequest;
         }
+        
+         /**
+         * A method to append histogram aggregations to the search request builder.
+         *
+         * @param searchRequest a search request
+         * @return the same search request where histogram aggregations have been added to it.
+         */
+        private SearchRequestBuilder addHistogramAggregations(SearchRequestBuilder searchRequest)
+                throws ElasticsearchException, JsonParseException, JsonSyntaxException {
+
+                JsonElement jsonElement = new JsonParser().parse(aggregations);
+                for (JsonElement facets : jsonElement.getAsJsonArray()) {
+                        JsonObject currentFacet = facets.getAsJsonObject();
+                        if (currentFacet.has("field") && currentFacet.get("type").getAsString().equalsIgnoreCase("date_histogram")) {
+                                String field = currentFacet.get("field").getAsString();
+                                
+                                
+                                TermsBuilder termsBuilder = AggregationBuilders
+                                        .terms(field)
+                                        .field(field)
+                                        .minDocCount(0);
+
+                                //Set size
+                                if (currentFacet.has("size")) {
+                                        int size = currentFacet.get("size").getAsInt();
+                                        termsBuilder.size(size);
+
+                                }
+
+                                //Set order
+                                if (currentFacet.has("order")) {
+                                        Order order = Order.count(false);
+                                        if (currentFacet.get("order").getAsString().equalsIgnoreCase("count_asc")) {
+                                                order = Order.count(true);
+                                        } else if (currentFacet.get("order").getAsString().equalsIgnoreCase("term_asc")) {
+                                                order = Order.term(true);
+                                        } else if (currentFacet.get("order").getAsString().equalsIgnoreCase("term_desc")) {
+                                                order = Order.term(false);
+                                        }
+                                        termsBuilder.order(order);
+                                }
+                                
+                                //Add term aggregations to the search request builder
+                                searchRequest.addAggregation(termsBuilder);
+                        }
+
+                }
+                return searchRequest;
+        }
+
 
         /**
          * A method to add extra field to every bucket in the terms
@@ -363,12 +411,8 @@ public class MarcusSearchService implements SearchService, Serializable {
         }
 
         //Testing Aggregations
-        public static void testAggRes(BoolFilterBuilder fb1) throws IOException, Exception {
-                SuggestBuilder.SuggestionBuilder sugg = new CompletionSuggestionBuilder("sugg");
+        public static void testAggRes() throws IOException, Exception {
                 Map map = new HashMap();
-                String json = "[{\"field\": \"status\", \"size\": 25},{\"field\" : \"assigned_to\"}]";
-                //JsonElement el = new JsonParser().parse(json);
-
                 map.put("status", "go_to_gate");
                 BoolFilterBuilder fb = (BoolFilterBuilder) FilterBuilders
                         .boolFilter()
@@ -391,25 +435,19 @@ public class MarcusSearchService implements SearchService, Serializable {
                 SearchRequestBuilder req = ClientFactory.getTransportClient()
                         .prepareSearch()
                         .setIndices("admin")
-                        //.setTypes("invoice")
+                        .setTypes("document")
                         //.setQuery(QueryBuilders.matchAllQuery())
-                        .setQuery(QueryBuilders.filteredQuery(QueryBuilders.matchAllQuery(), fb))
+                        //.setQuery(QueryBuilders.filteredQuery(QueryBuilders.matchAllQuery(), null))
                         //.setPostFilter(fb1)
                         // .addAggregation(AggregationBuilders.global("_aggs")
-                        .addAggregation((AggregationBuilders
-                                .terms("status")
-                                .field("status")))
-                        //.subAggregation(AggregationBuilders.terms("by_assignee").field("assigned_to"))))
                         .addAggregation(AggregationBuilders
-                                .dateRange("created")
+                                .dateHistogram("created")
                                 .field("created")
-                                .addRange("created", "2010", null)
+                                .format("yyyy-MM-dd")
+                                .extendedBounds("1997-01-01", "2016-01-01")
+                                .interval(DateHistogram.Interval.YEAR)
+                                .minDocCount(0)
                         );
-
-                sugg.text("Mar");
-                sugg.field("suggest");
-                req.addSuggestion(sugg);
-
                 SearchResponse res = req.execute().actionGet();
 
                 // appendTermsAggregation(req, json);
@@ -425,20 +463,7 @@ public class MarcusSearchService implements SearchService, Serializable {
 
         //Main method for easy debugging
         public static void main(String[] args) throws IOException, Exception {
-
-                Object _from = Optional.fromNullable(null).or(10);
-
-                //int _size = (int)Optional.fromNullable(Integer.parseInt(null)).or(10);
-                String s = "[{\"field\": \"status\", \"size\": 15, \"operator\" : \"AND\", \"order\": \"term_asc\"}]";
-                // System.out.println("Map baby: " + facetMap.toString());
-                //System.out.println(getAll("admin", null));
-                //System.out.println(getDocuments("ma", "admin" , "invoice", null));
-                //System.out.println("List of suggestion :" + CompletionSuggestion.getSuggestionsFor("m", "admin").toString());
-                // String jsonString = gson.toJson(CompletionSuggestion.getSuggestions("m", "admin" , "suggest"));
-                //System.out.println("List of suggestion :" + jsonString);
-                //System.out.println("List of suggestion :" + CompletionSuggestion.getSuggestResponse("m", "admin" , "suggest"));
-                testAggRes(null);
-                //System.out.println((int) _from + " : ");
+                testAggRes();
         }
 
 }

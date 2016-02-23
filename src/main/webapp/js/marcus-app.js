@@ -16,6 +16,8 @@ app.controller('freeTextSearch', function ($scope, $http, $location, mySetting) 
     $scope.to_date = null;
     $scope.current_page = 1;
     $scope.page_size = 10;
+    $scope.isArray = angular.isArray;
+    $scope.isString = angular.isString;
 
 
     /**
@@ -76,7 +78,7 @@ app.controller('freeTextSearch', function ($scope, $http, $location, mySetting) 
                 $scope.ready = true;
             });
     };
-
+    
 
     //Send suggest request to "suggest" servlet for autocompleting.
     $scope.autoSuggest = function () {
@@ -146,3 +148,25 @@ function fuzzify(query_string, default_freetext_fuzzify) {
     }
     return rqs;
 }
+
+    app.controller('nextYear', function ($scope, $filter) {
+        var myDate = new Date();
+        var previousYear = new Date(myDate);
+
+        previousYear.setYear(myDate.getFullYear()-1);
+
+        var nextYear = new Date(myDate);
+
+        nextYear.setYear(myDate.getFullYear()+1);
+
+        $scope.year = $filter('date')(myDate,'yyyy');//2014 like
+        $scope.nextYear = $filter('date')(nextYear,'yyyy');
+        $scope.prevYear = $filter('date')(previousYear,'yyyy');
+    });
+    
+    app.filter('unsafe', function($sce) {
+    return function(val) {
+        return $sce.trustAsHtml(val);
+    };
+});
+

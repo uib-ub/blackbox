@@ -64,7 +64,7 @@ $(document).ready(function () {
     //Set default suggestion
     function marcusSuggestionEngineWithDefaults(q, sync, async) {
         if (q === '') {
-            sync(['Hemed Ali', 'Tarje Lævik', 'Øyvind Gjesdal', 'Biledsamlingen', 'Manuskripter', 'Dokumenter', 'Personer']);
+            sync(['Hemed Al Ruwehy', 'Tarje Lavik', 'Øyvind Gjesdal', 'Marcus']);
             async([]);
         } else {
             marcusSuggegstionEngine.search(q, sync, async);
