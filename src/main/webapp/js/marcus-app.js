@@ -16,6 +16,8 @@ app.controller('freeTextSearch', function ($scope, $http, $location, mySetting) 
     $scope.to_date = null;
     $scope.current_page = 1;
     $scope.page_size = 10;
+    $scope.isArray = angular.isArray;
+    $scope.isString = angular.isString;
 
 
     /**
