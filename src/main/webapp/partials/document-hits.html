@@ -1,3 +1,37 @@
+<!--<div class="example demo" ng-show="doc._source.hasthumbnail">
+    <div class="ui shape">
+        <div class="sides">
+            <div class="side">
+                <div class="ui image">
+                    <div class="ui blue ribbon label">{{doc._source.type}}</div>
+                    <a target="_blank" href="{{doc._source.uri}}">
+                        <img alt="{{doc._source.title}}" class="small image" src="{{doc._source.hasthumbnail}}">
+                    </a>
+                    <div class="ui bottom attached label marcus pushup">{{doc._source.identifier}}<br>
+                        <span class="ui floated right">{{doc._source.available}}</span><br>
+                        <span class="ui floated right"><i>{{doc._source.cataloguer}}</i></span>
+                    </div>
+                </div>
+            </div>
+            <div class="side">
+                <div class="ui image">
+                    <div class="ui red ribbon label">{{doc._source.type}}</div>
+                    <a target="_blank" href="{{doc._source.uri}}">
+                        <img alt="{{doc._source.title}}" class="small image" src="{{doc._source.hasthumbnail}}">
+                    </a>
+                    <div class="ui bottom attached label marcus pushup">{{doc._source.identifier}}<br>
+                        <span class="ui floated right">{{doc._source.available}}</span><br>
+                        <span class="ui floated right"><i>{{doc._source.cataloguer}}</i></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="ui ignored icon direction buttons">
+        <div class="ui button" title="Flip Over" data-animation="flip" data-direction="over"><i class="retweet icon"></i></div>
+      </div>
+</div>-->
+
 <div ng-show="doc._source.hasthumbnail" class="ui image">
     <div class="ui blue ribbon label">{{doc._source.type}}</div>
     <a target="_blank" href="{{doc._source.uri}}">
@@ -87,3 +121,67 @@
         </div>
     </div>
 </div>
+
+<!--<script>
+    shape = {};
+
+    // ready event
+    shape.ready = function() {
+
+  // selector cache
+  var
+    $directionButton = $('.direction .button'),
+    // alias
+    handler
+  ;
+
+  // event handlers
+  handler = {
+    rotate: function() {
+      var
+        $shape    = $(this).closest('.example').find('.ui.shape'),
+        direction = $(this).data('direction') || false,
+        animation = $(this).data('animation') || false
+      ;
+      if(direction && animation) {
+        $shape
+          .shape(animation + '.' + direction)
+        ;
+      }
+    },
+
+    removeShape: function(){
+      var
+        shape = $(this).data('shape') || false
+      ;
+    },
+
+    changeShape: function() {
+      var
+        $shape       = $(this)
+      ;
+      $shape
+        .addClass('active')
+      ;
+    }
+  };
+
+  // attach events
+
+  $directionButton
+    .on('click', handler.rotate)
+    .popup({
+      delay     : 0,
+      position  : 'bottom center'
+    })
+  ;
+
+};
+
+
+// attach ready event
+$(document)
+  .ready(shape.ready)
+;
+</script>-->
+
