@@ -1,7 +1,7 @@
-<!--<div class="example demo" ng-show="doc._source.hasthumbnail">
-    <div class="ui shape">
+<!--<div class="example" ng-show="doc._source.hasthumbnail">
+    <div class="ui shape shape{{$index}}}}">
         <div class="sides">
-            <div class="side">
+            <div class="active side">
                 <div class="ui image">
                     <div class="ui blue ribbon label">{{doc._source.type}}</div>
                     <a target="_blank" href="{{doc._source.uri}}">
@@ -48,26 +48,32 @@
 <div  class="content">
     <a target="_blank" href="{{doc._source.uri}}" class="header">{{doc._source.title|| "Uten tittel"}}</a>
     <div class="meta">
-        <div class="ui horizontal list">
-            <div class="item">
-                <i class="icon user"></i><div class="content"><span class="header">{{doc._source.maker}}</span>
+        <div ng-if="isString(doc._source.maker)">
+            <div class="content"><i class="ui icon user"></i><span class="header">{{doc._source.maker}}</span> </div>
+        </div>
+        <div ng-if="isArray(doc._source.maker)">
+            <div class="ui horizontal list">
+                <div ng-repeat="maker in doc._source.maker track by $index" class="item">
+                    <div class="content"><i class="ui icon user"></i><span class="header">{{maker}}</span> </div>
                 </div>
             </div>
         </div>
-        <span class="ui floated right"><i class="icon wait"></i><span>{{doc._source.madeafter}}</span> - <span>{{doc._source.madebefore}}</span></span>
     </div>
     <div class="description">
         <p ng-bind-html="doc._source.description | unsafe"></p>
     </div>
+    <hr>
     <div class="extra">
-        <div class="ui horizontal list">
-            <div class="item"><i class="icon archive"></i>
-                <div class="content">
-                    <span class="header">{{doc._source.ispartof}}</span>
+        <div ng-if="isString(doc._source.ispartof)">
+            <div class="content"><i class="ui icon archive"></i><span>{{doc._source.ispartof}}</span> </div>
+        </div>
+        <div ng-if="isArray(doc._source.ispartof)">
+            <div class="ui horizontal list">
+                <div ng-repeat="ispartof in doc._source.ispartof track by $index" class="item">
+                    <div class="content"><i class="ui icon archive"></i><span>{{ispartof}}</span> </div>
                 </div>
             </div>
         </div>
-        <br>
         <div ng-if="isString(doc._source.spatial)">
             <div class="content"><i class="ui icon point"></i><span>{{doc._source.spatial}}</span> </div>
         </div>
@@ -78,10 +84,17 @@
                 </div>
             </div>
         </div>
-        <br>
-        <div ng-show="doc._source.subject" class="ui basic segment">
-            <span ng-repeat="subject in doc._source.subject track by $index" class="ui tag label">{{subject}}</span>
+        <div ng-if="isString(doc._source.subject)">
+            <div ng-show="doc._source.subject" class="ui basic segment">
+                <span class="ui tag label">{{doc._source.subject}}</span>
+            </div>        
         </div>
+        <div ng-if="isArray(doc._source.subject)">
+            <div ng-show="doc._source.subject" class="ui basic segment">
+                <span ng-repeat="subject in doc._source.subject track by $index" class="ui tag label relaxed">{{subject}}</span>
+            </div>
+        </div>        
+
         <div>
             <div>
                 <div class="ui horizontal list events">
@@ -122,67 +135,3 @@
         </div>
     </div>
 </div>
-
-<!--<script>
-    shape = {};
-
-    // ready event
-    shape.ready = function() {
-
-  // selector cache
-  var
-    $directionButton = $('.direction .button'),
-    // alias
-    handler
-  ;
-
-  // event handlers
-  handler = {
-    rotate: function() {
-      var
-        $shape    = $(this).closest('.example').find('.ui.shape'),
-        direction = $(this).data('direction') || false,
-        animation = $(this).data('animation') || false
-      ;
-      if(direction && animation) {
-        $shape
-          .shape(animation + '.' + direction)
-        ;
-      }
-    },
-
-    removeShape: function(){
-      var
-        shape = $(this).data('shape') || false
-      ;
-    },
-
-    changeShape: function() {
-      var
-        $shape       = $(this)
-      ;
-      $shape
-        .addClass('active')
-      ;
-    }
-  };
-
-  // attach events
-
-  $directionButton
-    .on('click', handler.rotate)
-    .popup({
-      delay     : 0,
-      position  : 'bottom center'
-    })
-  ;
-
-};
-
-
-// attach ready event
-$(document)
-  .ready(shape.ready)
-;
-</script>-->
-

@@ -6,3 +6,7 @@
     font-family: 'IM Fell Great Primer', serif;
     text-transform: uppercase;
 }
+
+.ui.tag.label.relaxed {
+    margin: 0 20px 10px 0;
+}

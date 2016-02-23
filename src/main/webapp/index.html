@@ -141,14 +141,12 @@
                                     <hr>
                                     <div class="ui relaxed horizontal list">
                                         <div ng-class="{ 'disabled': bucket.doc_count == 0 }" class="ui item toggle checkbox" ng-repeat="bucket in results['aggregations']['haszoom']['buckets']">
-                                            <input type="checkbox" checklist-model="selected_filters" checklist-value="getCheckedValue('haszoom', bucket.key)" ng-click="search()">
-                                            <label> {{bucket.key}}
-                                                <span style="color:grey"> ({{bucket.doc_count}})</span></label>
+                                            <input id="check-haszoom" type="checkbox" checklist-model="selected_filters" checklist-value="getCheckedValue('haszoom', bucket.key)" ng-click="search()">
+                                            <label for="check-haszoom"><i class="ui icon zoom"></i> {{bucket.key}} <span style="color:grey"> ({{bucket.doc_count}})</span></label>
                                         </div>
                                         <div ng-class="{ 'disabled': bucket.doc_count == 0 }" class="ui item toggle checkbox" ng-repeat="bucket in results['aggregations']['isdigitized']['buckets']">
-                                            <input type="checkbox" checklist-model="selected_filters" checklist-value="getCheckedValue('isdigitized', bucket.key)" ng-click="search()">
-                                            <label> {{bucket.key}}
-                                                <span style="color:grey"> ({{bucket.doc_count}})</span></label>
+                                            <input id="check-isdigitized" type="checkbox" checklist-model="selected_filters" checklist-value="getCheckedValue('isdigitized', bucket.key)" ng-click="search()">
+                                            <label for="check-isdigitized">{{bucket.key}} <span style="color:grey"> ({{bucket.doc_count}})</span></label>
                                         </div>
                                     </div>
                                     <hr>
@@ -170,8 +168,9 @@
                                     </uib-pagination>
 
                                     <div class="ui divided items" ng-repeat="doc in results.hits.hits track by $index">
-                                        <div ng-if='doc._source.type == "Person" || doc._source.type == "Organisajon" || doc._source.type == "Firma"' ng-include="'partials/agent-hits.html'" style="page-break-inside: avoid;" class="ui item"></div>
-                                        <div ng-if='doc._source.type == "Objekt" || doc._source.type == "Skip" || doc._source.type == "Fartøy" || doc._source.type == "Monument"' ng-include="'partials/object-hits.html'" style="page-break-inside: avoid;" class="ui item"></div>
+                                        <div ng-if='doc._source.type == "Person" || doc._source.type == "Organisajon" || doc._source.type == "Firma" || doc._source.type == "Katalogisator"' ng-include="'partials/agent-hits.html'" style="page-break-inside: avoid;" class="ui item"></div>
+                                        <div ng-if='doc._source.type == "Objekt" || doc._source.type == "Monument"' ng-include="'partials/object-hits.html'" style="page-break-inside: avoid;" class="ui item"></div>
+                                        <div ng-if='doc._source.type == "Skip" || doc._source.type == "Fartøy"' ng-include="'partials/vessel-hits.html'" style="page-break-inside: avoid;" class="ui item"></div>
                                         <div ng-if='doc._source.type == "Album"' ng-include="'partials/document-hits.html'" style="page-break-inside: avoid;" class="ui item"></div>
                                         <div ng-if='doc._source.type == "Kart"' ng-include="'partials/document-hits.html'" style="page-break-inside: avoid;" class="ui item"></div>
                                         <div ng-if='doc._source.type == "Akkvisisjon"' ng-include="'partials/object-hits.html'" style="page-break-inside: avoid;" class="ui item"></div>
@@ -248,11 +247,11 @@
                                                     });        </script>
 
         <script>
-                    $('.ui.dropdown')
-                    .dropdown({
+            $('.ui.dropdown')
+                .dropdown({
                     allowAdditions: true
-                    })
-                    ;
+                })
+            ;
         </script>
     </body>
 </html>
