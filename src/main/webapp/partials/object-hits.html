@@ -10,7 +10,7 @@
     </div>
     <div ng-show="!doc._source.img" class="ui image">
         <a target="_blank" href="{{doc._source.uri}}">
-            <img class="ui image" src="img/noun_99330_cc.svg"/>
+            <img style="width: 100px;" class="ui image" src="img/noun_99330_cc.svg"/>
         </a>
     </div>
     <div  class="content">
@@ -18,7 +18,17 @@
         <a ng-show="doc._source.name" target="_blank" href="{{doc._source.uri}}" class="header">{{doc._source.name}}</a>
         <a ng-show="doc._source.label" target="_blank" href="{{doc._source.uri}}" class="header">{{doc._source.label}}</a>
         <div class="meta">
-            <span ng-show="doc._source.birthyear || doc._source.deathyear" class="ui floated right"><i class="icon wait"></i><span ng-show="doc._source.birthyear && !doc._source.birthdate">{{doc._source.birthyear}}</span><span ng-show="doc._source.birthdate">{{doc._source.birthdate}}</span> - <span ng-show="doc._source.deathyear && !doc._source.deathdate">{{doc._source.deathyear}}</span><span ng-show="doc._source.deathdate">{{doc._source.deathdate}}</span></span>
+            <div ng-if="isString(doc._source.maker)">
+                <div class="content"><i class="ui icon user"></i><span class="header">{{doc._source.maker}}</span> </div>
+            </div>
+            <div ng-if="isArray(doc._source.maker)">
+                <div class="ui horizontal list">
+                    <div ng-repeat="maker in doc._source.maker track by $index" class="item">
+                        <i class="ui icon user"></i><span>{{maker}}</span>
+                    </div>
+                </div>
+            </div>
+            <span ng-show="doc._source.created"><i class="icon wait"></i> {{doc._source.created}}</span>
         </div>
         <div class="description">
             <p ng-bind-html="doc._source.description | unsafe"></p>

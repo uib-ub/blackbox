@@ -45,16 +45,16 @@
 <div ng-show="!doc._source.hasthumbnail" class="ui image">
     <i class="ui bordered inverted grey icon huge camera retro"></i>
 </div>
-<div  class="content">
-    <a target="_blank" href="{{doc._source.uri}}" class="header">{{doc._source.title|| "Uten tittel"}}</a>
+<div class="content">
+    <a class="header" target="_blank" href="{{doc._source.uri}}">{{doc._source.title|| "Uten tittel"}}</a>
     <div class="meta">
         <div ng-if="isString(doc._source.maker)">
-            <div class="content"><i class="ui icon user"></i><span class="header">{{doc._source.maker}}</span> </div>
+            <i class="ui icon user"></i><span>{{doc._source.maker}}</span>
         </div>
         <div ng-if="isArray(doc._source.maker)">
             <div class="ui horizontal list">
                 <div ng-repeat="maker in doc._source.maker track by $index" class="item">
-                    <div class="content"><i class="ui icon user"></i><span class="header">{{maker}}</span> </div>
+                    <i class="ui icon user"></i><span>{{maker}}</span>
                 </div>
             </div>
         </div>
