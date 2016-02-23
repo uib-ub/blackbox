@@ -34,11 +34,14 @@
             </div>
         </div>
         <br>
-
-        <div ng-if="!isString(doc._source.spatial)">
-            <div ng-show="doc._source.spatial" class="ui horizontal list">
-                <div ng-repeat="spatials in doc._source.spatial track by $index" class="item">
-                    <div class="content"><i class="ui icon point"></i><span>{{spatials}}</span>
+        <div ng-show="doc._source.spatial">
+            <div class="ui horizontal list">
+                <div ng-if="isString(doc._source.spatial)">
+                    <div class="content"><i class="ui icon point"></i><span>{{doc._source.spatial}}</span> </div>
+                </div>
+                <div ng-if="isArray(doc._source.spatial)">
+                    <div ng-repeat="spatials in doc._source.spatial track by $index" class="item">
+                        <div class="content"><i class="ui icon point"></i><span>{{spatials}}</span> </div>
                     </div>
                 </div>
             </div>
