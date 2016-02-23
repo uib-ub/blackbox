@@ -1,11 +1,14 @@
-#Netbeans file and logs
 /nbproject/
+
 /logs/
+
 /target/
+
 /nb-configuration.xml
 
-#Intellij idea files
 /.idea/
 build-idea/
+
 /out/
+
 *.iml
