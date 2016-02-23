@@ -9,10 +9,12 @@
         </div>
     </div>
     <div ng-show="!doc._source.img" class="ui image">
-        <i class="ui circular inverted brown icon big flag"></i>
+        <a target="_blank" href="{{doc._source.uri}}"><i class="ui circular inverted brown icon big users"></i></a>
     </div>
     <div  class="content">
         <a target="_blank" href="{{doc._source.uri}}" class="header">{{doc._source.preferredlabel}}</a>
+        <a target="_blank" href="{{doc._source.uri}}" class="header">{{doc._source.name}}</a>
+        <a target="_blank" href="{{doc._source.uri}}" class="header">{{doc._source.label}}</a>
         <div class="meta">
             <span ng-show="doc._source.birthyear || doc._source.deathyear" class="ui floated right"><i class="icon wait"></i><span ng-show="doc._source.birthyear && !doc._source.birthdate">{{doc._source.birthyear}}</span><span ng-show="doc._source.birthdate">{{doc._source.birthdate}}</span> - <span ng-show="doc._source.deathyear && !doc._source.deathdate">{{doc._source.deathyear}}</span><span ng-show="doc._source.deathdate">{{doc._source.deathdate}}</span></span>
         </div>
