@@ -6,7 +6,7 @@ var app = angular.module('marcus', ["checklist-model", "ui.bootstrap", "settings
 /**========= Search Controller ===========**/
 app.controller('freeTextSearch', function ($scope, $http, $location, mySetting) {
 
-    //Initialize variables
+    //Initialize default variables
     $scope.show_loading = true;
     $scope.show_search_results = false;
     $scope.query_string = "";
@@ -48,7 +48,7 @@ app.controller('freeTextSearch', function ($scope, $http, $location, mySetting) 
         /*We are assigning null to these values so that, if empty, they should not appear in query string*/
         var q = $scope.query_string === "" ? null : fuzzify($scope.query_string, "*");
         var sort = $scope.sort_by === "" ? null : $scope.sort_by;
-        var from = ($scope.current_page - 1) * $scope.page_size;
+        var from_page = ($scope.current_page - 1) * $scope.page_size;
         $scope.test = q;
 
 
@@ -62,7 +62,7 @@ app.controller('freeTextSearch', function ($scope, $http, $location, mySetting) 
                 from_date: $scope.from_date,
                 to_date: $scope.to_date,
                 filter: $scope.selected_filters,
-                from: from,
+                from: from_page,
                 size: $scope.page_size,
                 sort: sort
             }

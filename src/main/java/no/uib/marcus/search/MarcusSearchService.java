@@ -17,13 +17,14 @@ import org.elasticsearch.search.aggregations.AggregationBuilders;
 import org.elasticsearch.search.aggregations.bucket.terms.Terms.Order;
 import org.elasticsearch.search.aggregations.bucket.terms.TermsBuilder;
 import org.elasticsearch.search.builder.SearchSourceBuilderException;
+import org.elasticsearch.search.aggregations.bucket.histogram.DateHistogram;
 import org.elasticsearch.search.sort.SortBuilder;
 
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
-import org.elasticsearch.search.aggregations.bucket.histogram.DateHistogram;
+
 
 public class MarcusSearchService implements SearchService, Serializable {
 
@@ -251,8 +252,7 @@ public class MarcusSearchService implements SearchService, Serializable {
                                 String field = currentFacet.get("field").getAsString();
                                 TermsBuilder termsBuilder = AggregationBuilders
                                         .terms(field)
-                                        .field(field)
-                                        .minDocCount(0);
+                                        .field(field);
 
                                 //Set size
                                 if (currentFacet.has("size")) {
@@ -260,7 +260,6 @@ public class MarcusSearchService implements SearchService, Serializable {
                                         termsBuilder.size(size);
 
                                 }
-
                                 //Set order
                                 if (currentFacet.has("order")) {
                                         Order order = Order.count(false);
@@ -272,6 +271,15 @@ public class MarcusSearchService implements SearchService, Serializable {
                                                 order = Order.term(false);
                                         }
                                         termsBuilder.order(order);
+                                }
+
+                                //Set number of minimum documents that should be returned
+                                if (currentFacet.has("min_doc_count")) {
+                                        long minDocCount = currentFacet.get("min_doc_count").getAsLong();
+                                        termsBuilder.minDocCount(minDocCount);
+                                } else {
+                                        //Default min_doc_count
+                                        termsBuilder.minDocCount(0);
                                 }
 
                                 //Add term aggregations to the search request builder
@@ -294,7 +302,7 @@ public class MarcusSearchService implements SearchService, Serializable {
                 JsonElement jsonElement = new JsonParser().parse(aggregations);
                 for (JsonElement facets : jsonElement.getAsJsonArray()) {
                         JsonObject currentFacet = facets.getAsJsonObject();
-                        if (currentFacet.has("field") && currentFacet.get("type").getAsString().equalsIgnoreCase("date_histogram")) {
+                        if (currentFacet.has("field") && currentFacet.get("type").getAsString().equalsIgnoreCase("date_histogram")){
                                 String field = currentFacet.get("field").getAsString();
                                 
                                 
@@ -443,10 +451,10 @@ public class MarcusSearchService implements SearchService, Serializable {
                         .addAggregation(AggregationBuilders
                                 .dateHistogram("created")
                                 .field("created")
-                                .format("yyyy-MM-dd")
-                                .extendedBounds("1997-01-01", "2016-01-01")
-                                .interval(DateHistogram.Interval.YEAR)
-                                .minDocCount(0)
+                                .format("yyyy")
+                                //.extendedBounds("1997-01-01", "2016-01-01")
+                                .interval(new DateHistogram.Interval("12h"))
+                                .minDocCount(1)
                         );
                 SearchResponse res = req.execute().actionGet();
 

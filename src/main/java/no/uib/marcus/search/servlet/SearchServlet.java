@@ -81,7 +81,8 @@ public class SearchServlet extends HttpServlet {
                         
                         //After getting the response, add extra field "total_doc_count" 
                         //to every bucket in the aggregations
-                        searchResponseString = service.addExtraFieldToBucketsAggregation(searchResponse);
+                        //searchResponseString = service.addExtraFieldToBucketsAggregation(searchResponse);
+                        searchResponseString = searchResponse.toString();
                         
                         logger.info("Marcus service: " + service.toString() + "\n" + service.toJsonString());
                         out.write(searchResponseString);
@@ -96,7 +97,7 @@ public class SearchServlet extends HttpServlet {
                 Map<String, List> filterMap = AggregationUtils.getFilterMap(selectedFilters);
                 BoolFilterBuilder boolFilter = FilterBuilders.boolFilter();
                 try {
-                        if (fromDate != null || toDate != null) {
+                        if (Strings.hasText(fromDate) || Strings.hasText(toDate)) {
                                 boolFilter
                                         //Range within "created" field
                                         .should(FilterBuilders.rangeFilter("created").gte(fromDate).lte(toDate))
@@ -117,7 +118,7 @@ public class SearchServlet extends HttpServlet {
                                                  
                                                  */
                         }
-                        /**
+                        /*
                          * Building the BoolFilter based on user selected facets
                          */
                         for (Map.Entry<String, List> entry : filterMap.entrySet()) {

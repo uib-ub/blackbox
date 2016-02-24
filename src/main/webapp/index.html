@@ -12,8 +12,8 @@
         <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" />
         <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap-theme.min.css" />
         <link rel="stylesheet" href="//code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css"/>
-        <link rel="stylesheet" href="css/marcus.css" />
         <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.1.8/semantic.min.css" />
+        <link rel="stylesheet" href="css/marcus.css" />
         <link href="http://fonts.googleapis.com/css?family=IM+Fell+Great+Primer" rel="stylesheet" type="text/css">
     </head>
     <body>
@@ -23,23 +23,21 @@
                     <i class="sidebar icon"></i>
                 </a>
                 <div class="header brand item">
-                    <!-- <img class="logo" src="assets/images/logo.png">-->
                     <a href="/">Marcus admin</a>
                 </div>
             </div>
         </div>
-
-
-        <div style="margin-top: 80px;" id="searchController" ng-controller="freeTextSearch">
-            <div class="ui container">
-                <div class="row">
-                    <div class="">
+        
+        <div style="margin-top: 80px;" id="searchController"  ng-controller="freeTextSearch">
+            <div class="main-container">
+                <div class="masthead">
+                    <div class="Demo">
                         <form action="" method="GET">
                             <input type="hidden" name="index" value="admin"/>
-                            <div class="Typeahead">
-                                <div class="">
+                            <div class="Typeahead Typeahead--twitterUsers">
+                                <div class="u-posRelative">
                                     <input class="Typeahead-hint" type="text" tabindex="-1" readonly="readonly"/>
-                                    <input class="Typeahead-input" id="search-input" type="text" name="q" ng-model="query_string" ng-change="search();"  placeholder="Søk Marcus..."/>
+                                    <input class="Typeahead-input" id="search-input" type="text" name="q" ng-model="query_string" ng-change="search()" placeholder="Søk Marcus..."/>
                                     <img class="Typeahead-spinner" src="js/lib/typeahead/img/spinner.gif" alt=""/>
                                 </div>
                                 <div class="Typeahead-menu"></div>
@@ -47,8 +45,6 @@
                             <!--button type="submit" class="u-hidden" ng-submit="search()">Go</button-->
                         </form>
                     </div>
-                </div>
-                <div class="row">
                     <span class="links links-examples">
                         <a href="">Advanced search</a>
                     </span>
@@ -56,7 +52,7 @@
                 </div>
             </div>
 
-                <uib-progressbar class="ui loading segment" ng-show="show_loading" value="dynamic" style="height: 100px;"></uib-progressbar>
+                <uib-progressbar class="ui loading segment" ng-show="show_loading" value="dynamic" style="height:100px; margin-left: 25%"></uib-progressbar>
                 <div style="margin-top: 80px;" class="ui container">
                     <div class="ui grid search-results" ng-show="ready">
                         <div class="content ui row">
@@ -107,7 +103,7 @@
                                     <div class="item" ng-repeat="bucket in results['aggregations']['subject.exact']['buckets']">
                                         <input type="checkbox" checklist-model="selected_filters" checklist-value="getCheckedValue('subject.exact', bucket.key)" ng-click="search()">
                                         <label class="row-fluid"> {{bucket.key}} </label>
-                                        <span style="color:gray">({{bucket.doc_count}} of {{bucket.total_doc_count}})</span>
+                                        <span style="color:gray">({{bucket.doc_count}})</span>
                                     </div>
                                 </div>                 
                             </div>
@@ -187,13 +183,13 @@
                                         <div ng-if='doc._source.type == "Akkvisisjon"' ng-include="'partials/object-hits.html'" style="page-break-inside: avoid;" class="ui item"></div>
                                         <div ng-if='doc._source.type == "Arbeidsliste"' ng-include="'partials/object-hits.html'" style="page-break-inside: avoid;" class="ui item"></div>
                                         <div ng-if='doc._source.type == "Aggregering"' ng-include="'partials/document-hits.html'" style="page-break-inside: avoid;" class="ui item"></div>
-
                                         <div ng-if='doc._source.type == "Fotografi" || doc._source.type == "Manuskript" || doc._source.type == "Postkort" || doc._source.type == "Brev" || doc._source.type == "Diplom" || doc._source.type == "Bok" || doc._source.type == "Tale" || doc._source.type == "Segl" || doc._source.type == "Dokument" || doc._source.type == "Grafikk" || doc._source.type == "Transkripsjon" || doc._source.type == "Telegram" || doc._source.type == "Tegning" || doc._source.type == "Notat" || doc._source.type == "Forhandlingsprotokoll" || doc._source.type == "Kvittering" || doc._source.type == "Protokoll" || doc._source.type == "Reisedagbok" || doc._source.type == "Nummer" || doc._source.type == "Kartsett" || doc._source.type == "Kontrakt" || doc._source.type == "Salgsskjøte" || doc._source.type == "Bønnebok" || doc._source.type == "Dagbok" || doc._source.type == "Fragment" || doc._source.type == "Kassebok" || doc._source.type == "Oppmålingsdokument" || doc._source.type == "Supplikk"' ng-include="'partials/document-hits.html'" style="page-break-inside: avoid;" class="ui item"></div>
-                                        <div class="ui raised inverted segment ng-hide">
+                                        
+                                        <!--div class="ui raised inverted segment">
                                             <h3 class="header">JSON source:</h3>
                                             <hr>
                                             <pre>{{doc._source| json}}</pre>
-                                        </div>
+                                        </div-->
                                     </div>
                                     
                                     <uib-pagination class="pagination" total-items="results.hits.total"
@@ -234,7 +230,7 @@
         <script src="js/lib/typeahead/js/typeahead.bundle.js"></script>
         <script src="js/lib/typeahead/js/main.js"></script>
         <script src="//code.jquery.com/ui/1.11.4/jquery-ui.js"></script>
-        <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.0/angular.min.js"></script>
+        <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.4.9/angular.min.js"></script>
         <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
         <script src="js/marcus-app.js"></script>
         <script src="js/checklist-directive.js"></script>
@@ -244,21 +240,24 @@
 
         <!--These are constants for this particular page-->
         <script>
-            $('.ui.dropdown').dropdown({
+            angular.module("settings", [])
+                .constant("mySetting", {
+                    index: ["admin"],
+                        type: [],
+                        facets: [
+                        {"field": "type.exact", "size": 200, "operator": "OR", "order": "count_desc"},
+                        {"field": "assigned_to", "order": "term_asc", "operator" : "OR" },
+                        {"field": "haszoom", "size": 1, "operator": "OR", "order": "term_asc"},
+                        {"field": "isdigitized", "size": 1, "operator": "OR", "order": "term_desc"},
+                        {"field": "iscatalogued", "size": 1, "operator": "OR", "order": "term_asc"},
+                        {"field": "subject.exact", "size" : 10, "min_doc_count" : 100},
+                        /*supported date intervals: year(y),weeks (w),minutes(m), hours(h), seconds(s)*/
+                        {"field": "created", "type" : "date_histogram", "size" : 10, "min_doc_count" : 0, "format" : "yyyy", "interval" : "10y"},
+                        {"field": "customer_name", "size": 10, "operator": "AND", "order": "count_desc"}]
+            });  
+            
+                $('.ui.dropdown').dropdown({
                     allowAdditions: true });
-                
-            .constant("mySetting", {
-            index: ["admin"],
-                    type: [],
-                    facets: [
-                    {"field": "type.exact", "size": 200, "operator": "OR", "order": "count_desc"},
-                    {"field": "assigned_to", "order": "term_asc", "operator" : "OR" },
-                    {"field": "haszoom", "size": 1, "operator": "OR", "order": "term_asc"},
-                    {"field": "isdigitized", "size": 1, "operator": "OR", "order": "term_desc"},
-                    {"field": "iscatalogued", "size": 1, "operator": "OR", "order": "term_asc"},
-                    {"field": "subject.exact"},
-                    {"field": "customer_name", "size": 10, "operator": "AND", "order": "count_desc"}]
-            });        
         </script>
     </body>
 </html>

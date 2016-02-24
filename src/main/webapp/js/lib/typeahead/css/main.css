@@ -198,21 +198,20 @@ input[type=text]::-ms-clear {
     margin: 50px auto 0 auto;
     padding: 15px;
     text-align: left;
-    /*background-color: #0097cf;
+    background-color: #0097cf;
     background-image: -moz-linear-gradient(top, #04a2dd, #03739c);
     background-image: -webkit-gradient(linear, 0 0, 0 100%, from(#04a2dd), to(#03739c));
     background-image: -webkit-linear-gradient(top, #04a2dd, #03739c);
     background-image: -o-linear-gradient(top, #04a2dd, #03739c);
     background-image: linear-gradient(top, #04a2dd, #03739c);
     background-repeat: repeat-x;
-    */
-    border: 1px solid #ccc;
-    -webkit-border-radius: 4px;
-    -moz-border-radius: 4px;
-    border-radius: 14px;
-    /*-webkit-box-shadow: 0 0 2px #111;
+    border: 1px solid #024e6a;
+    -webkit-border-radius: 10px;
+    -moz-border-radius: 10px;
+    border-radius: 10px;
+    -webkit-box-shadow: 0 0 2px #111;
     -moz-box-shadow: 0 0 2px #111;
-    box-shadow: 0 0 2px #111;*/
+    box-shadow: 0 0 2px #111;
 }
 
 .Typeahead-spinner {
@@ -225,21 +224,20 @@ input[type=text]::-ms-clear {
 }
 
 .Typeahead-hint, .Typeahead-input {
-    width: 90%;
+    width: 100%;
     padding: 5px 8px;
     font-size: 24px;
     line-height: 30px;
-    /*border: 1px solid #024e6a;
+    border: 1px solid #024e6a;
     -webkit-border-radius: 8px;
     -moz-border-radius: 8px;
-    border-radius: 8px;*/
-    border: none;
+    border-radius: 8px;
 }
 
 .Typeahead-hint {
     position: absolute;
-    top: 10;
-    left: 10;
+    top: 0;
+    left: 0;
     color: #ccd6dd;
     opacity: 1;
 }
