@@ -1,5 +1,5 @@
 .marcus.pushup {
-    position: static !important;
+    position: relative !important;
 }
 
 .header.brand * {
@@ -9,4 +9,10 @@
 
 .ui.tag.label.relaxed {
     margin: 0 20px 10px 0;
+}
+
+.ui.ms-corner {
+    position: absolute;
+    top: 1em;
+    right: 0.5em;
 }
