@@ -43,7 +43,7 @@ public class SearchServlet extends HttpServlet {
         protected void processRequest(HttpServletRequest request, HttpServletResponse response)
                 throws ServletException, IOException {
                 request.setCharacterEncoding("UTF-8");
-                response.setContentType("text/html;charset=UTF-8");
+                response.setContentType("application/json;charset=UTF-8");
                 /*Get parameters from search request*/
                 String queryString = request.getParameter("q");
                 String[] selectedFilters = request.getParameterValues("filter");
@@ -64,7 +64,7 @@ public class SearchServlet extends HttpServlet {
                         int _size = Strings.hasText(size) ? Integer.parseInt(size) : 10;
                         SortBuilder fieldSort = Strings.hasText(sortString) ? SortUtils.getFieldSort(sortString) : null;
                         
-                        /* Override service properties from previous request */
+                        /*Override service properties from previous request */
                         service.setIndices(indices);
                         service.setTypes(types);
                         service.setAggregations(aggs);
@@ -78,13 +78,10 @@ public class SearchServlet extends HttpServlet {
                         } else {
                                 searchResponse = service.getDocuments(queryString);
                         }
-                        
-                        //After getting the response, add extra field "total_doc_count" 
-                        //to every bucket in the aggregations
+                        //After getting the response, add extra field "total_doc_count" to every bucket aggregations
                         //searchResponseString = service.addExtraFieldToBucketsAggregation(searchResponse);
                         searchResponseString = searchResponse.toString();
-                        
-                        logger.info("Marcus service: " + service.toString() + "\n" + service.toJsonString());
+                        logger.info(searchResponseString.toString());
                         out.write(searchResponseString);
                 }
         }
@@ -118,7 +115,7 @@ public class SearchServlet extends HttpServlet {
                                                  
                                                  */
                         }
-                        /*
+                         /*
                          * Building the BoolFilter based on user selected facets
                          */
                         for (Map.Entry<String, List> entry : filterMap.entrySet()) {
@@ -131,7 +128,7 @@ public class SearchServlet extends HttpServlet {
                                                         boolFilter.must(FilterBuilders.termFilter(entry.getKey(), value));
                                                 }
                                         } else {
-                                                /**
+                                                /*
                                                  *Building "OR" filter. Using "terms" filter based on several terms, matching on
                                                  *any of them This acts as OR filter, when it is inside the must clause.
                                                  */
@@ -140,7 +137,7 @@ public class SearchServlet extends HttpServlet {
                                 }
                         }
                 } catch (Exception ex) {
-                        logger.error("Exception occured on constructing OR filter" + ex.getLocalizedMessage());
+                        logger.error("Exception occurred while constructing OR filter" + ex.getLocalizedMessage());
                 }
                 return boolFilter;
         }

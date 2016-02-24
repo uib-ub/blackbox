@@ -13,8 +13,8 @@
         <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap-theme.min.css" />
         <link rel="stylesheet" href="//code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css"/>
         <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.1.8/semantic.min.css" />
-        <link rel="stylesheet" href="css/marcus.css" />
         <link href="http://fonts.googleapis.com/css?family=IM+Fell+Great+Primer" rel="stylesheet" type="text/css">
+        <link rel="stylesheet" href="css/marcus.css" />
     </head>
     <body>
         <div class="ui fixed inverted menu">
@@ -59,8 +59,8 @@
                             <div class="facets ui four wide column">
                                 <h3>Dato</h3>
                                 <hr>
-                                <input id="from_date" class="datePicker" type="text"  ng-model="from_date" ng-change="search()" placeholder="FRA" title="Fra dato"><br/><br/>
-                                <input id="to_date" class="datePicker" type="text"  ng-model="to_date" ng-change="search()" placeholder="TIL" title="Til dato"><br/><br/>
+                                <input type="text" id="from_date" class="datePicker" ng-model="from_date" ng-change="search()" placeholder="FRA" title="Fra dato"><br/><br/>
+                                <input type="text" id="to_date" class="datePicker" type="text"  ng-model="to_date" ng-change="search()" placeholder="TIL" title="Til dato"><br/><br/>
 
                                 <!--button class="btn btn-small btn-primary" ng-click="search()"><strong>OPPDATER SØKET</strong></button><br/><br/>
                                 <button class="btn btn-small btn-inverse" ng-click="clearDates()">NULLSTILL DATO</button-->
@@ -118,7 +118,6 @@
                                         Søket ditt var ikke <i>cool</i>!
                                     </h1>
                                     <p>Niks, vi trenger et stiligere søk for å finne noe kult! </p>
-
                                 </div>
                             </div>
 
@@ -230,13 +229,14 @@
         <script src="js/lib/typeahead/js/typeahead.bundle.js"></script>
         <script src="js/lib/typeahead/js/main.js"></script>
         <script src="//code.jquery.com/ui/1.11.4/jquery-ui.js"></script>
-        <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.4.9/angular.min.js"></script>
+        <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.0/angular.min.js"></script>
         <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
+        <script src="//cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.1.8/semantic.min.js"></script>
         <script src="js/marcus-app.js"></script>
         <script src="js/checklist-directive.js"></script>
         <script src="js/jquery-datepicker.js"></script>
         <script src="js/ui-bootstrap-1.1.2.min.js"></script>
-        <script src="//cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.1.8/semantic.min.js"></script>
+
 
         <!--These are constants for this particular page-->
         <script>
@@ -245,15 +245,13 @@
                     index: ["admin"],
                         type: [],
                         facets: [
-                        {"field": "type.exact", "size": 200, "operator": "OR", "order": "count_desc"},
-                        {"field": "assigned_to", "order": "term_asc", "operator" : "OR" },
+                        {"field": "type.exact", "size": 200, "operator": "OR", "order": "count_desc", "min_doc_count" : 0},
                         {"field": "haszoom", "size": 1, "operator": "OR", "order": "term_asc"},
                         {"field": "isdigitized", "size": 1, "operator": "OR", "order": "term_desc"},
                         {"field": "iscatalogued", "size": 1, "operator": "OR", "order": "term_asc"},
-                        {"field": "subject.exact", "size" : 10, "min_doc_count" : 100},
-                        /*supported date intervals: year(y),weeks (w),minutes(m), hours(h), seconds(s)*/
-                        {"field": "created", "type" : "date_histogram", "size" : 10, "min_doc_count" : 0, "format" : "yyyy", "interval" : "10y"},
-                        {"field": "customer_name", "size": 10, "operator": "AND", "order": "count_desc"}]
+                        {"field": "subject.exact", "size" : 10, "min_doc_count" : 1},
+                        /*Supported date intervals: weeks(w), days(d), hours(h), minutes(m), seconds(s)*/
+                        {"field": "created", "type" : "date_histogram", "format" : "yyyy", "interval" : "520w", "min_doc_count" : 1, "order" : "key_asc"}]
             });  
             
                 $('.ui.dropdown').dropdown({

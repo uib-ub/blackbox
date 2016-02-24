@@ -12,17 +12,21 @@ import org.elasticsearch.common.Nullable;
 import org.elasticsearch.common.Strings;
 import org.elasticsearch.common.xcontent.XContentBuilder;
 import org.elasticsearch.common.xcontent.XContentFactory;
-import org.elasticsearch.index.query.*;
+import org.elasticsearch.index.query.FilterBuilder;
+import org.elasticsearch.index.query.QueryBuilder;
+import org.elasticsearch.index.query.QueryBuilders;
+import org.elasticsearch.index.query.SimpleQueryStringBuilder;
 import org.elasticsearch.search.aggregations.AggregationBuilders;
+import org.elasticsearch.search.aggregations.bucket.histogram.DateHistogram;
+import org.elasticsearch.search.aggregations.bucket.histogram.DateHistogramBuilder;
+import org.elasticsearch.search.aggregations.bucket.histogram.Histogram;
 import org.elasticsearch.search.aggregations.bucket.terms.Terms.Order;
 import org.elasticsearch.search.aggregations.bucket.terms.TermsBuilder;
 import org.elasticsearch.search.builder.SearchSourceBuilderException;
-import org.elasticsearch.search.aggregations.bucket.histogram.DateHistogram;
 import org.elasticsearch.search.sort.SortBuilder;
 
 import java.io.IOException;
 import java.io.Serializable;
-import java.util.HashMap;
 import java.util.Map;
 
 
@@ -31,8 +35,12 @@ public class MarcusSearchService implements SearchService, Serializable {
         private static final long serialVersionUID = 4L;
 
         private static final Logger logger = Logger.getLogger(MarcusSearchService.class);
-        private @Nullable String[] indices;
-        private @Nullable String[] types;
+        private
+        @Nullable
+        String[] indices;
+        private
+        @Nullable
+        String[] types;
         private String aggregations;
         private SortBuilder sort;
         private int from = -1;
@@ -50,6 +58,7 @@ public class MarcusSearchService implements SearchService, Serializable {
                 this.size = size;
                 this.sort = sort;
         }
+
         public String[] getIndices() {
                 return indices;
         }
@@ -140,7 +149,7 @@ public class MarcusSearchService implements SearchService, Serializable {
                                 query = QueryBuilders.simpleQueryStringQuery(queryStr)
                                         .defaultOperator(SimpleQueryStringBuilder.Operator.AND);
                         } else {
-                                //Match all query
+                                //Match all documents query
                                 query = QueryBuilders.matchAllQuery();
                         }
                         //Set query
@@ -154,8 +163,8 @@ public class MarcusSearchService implements SearchService, Serializable {
                         }
 
                         if (Strings.hasText(aggregations)) {
-                                //Append term aggregations to this request builder
-                                this.addTermsAggregation(searchRequest);
+                                //Append aggregations to this request builder
+                                this.addAggregations(searchRequest);
                         }
                         //Show what has been sent to ES, for debugging..
                         logger.info(searchRequest.toString());
@@ -217,8 +226,8 @@ public class MarcusSearchService implements SearchService, Serializable {
                         }
 
                         if (Strings.hasText(aggregations)) {
-                                //Append term aggregations to this request builder
-                                this.addTermsAggregation(searchRequest);
+                                //Append aggregations to this request builder
+                                this.addAggregations(searchRequest);
                         }
                         //Show Search builder for debugging purpose
                         logger.info(searchRequest.toString());
@@ -242,104 +251,104 @@ public class MarcusSearchService implements SearchService, Serializable {
          * @return the same search request where aggregations have been added to
          * it.
          */
-        private SearchRequestBuilder addTermsAggregation(SearchRequestBuilder searchRequest)
-                throws ElasticsearchException, JsonSyntaxException, JsonParseException {
-
+        private SearchRequestBuilder addAggregations(SearchRequestBuilder searchRequest)
+                throws ElasticsearchException, JsonParseException {
                 JsonElement jsonElement = new JsonParser().parse(aggregations);
                 for (JsonElement facets : jsonElement.getAsJsonArray()) {
                         JsonObject currentFacet = facets.getAsJsonObject();
                         if (currentFacet.has("field")) {
-                                String field = currentFacet.get("field").getAsString();
-                                TermsBuilder termsBuilder = AggregationBuilders
-                                        .terms(field)
-                                        .field(field);
-
-                                //Set size
-                                if (currentFacet.has("size")) {
-                                        int size = currentFacet.get("size").getAsInt();
-                                        termsBuilder.size(size);
-
-                                }
-                                //Set order
-                                if (currentFacet.has("order")) {
-                                        Order order = Order.count(false);
-                                        if (currentFacet.get("order").getAsString().equalsIgnoreCase("count_asc")) {
-                                                order = Order.count(true);
-                                        } else if (currentFacet.get("order").getAsString().equalsIgnoreCase("term_asc")) {
-                                                order = Order.term(true);
-                                        } else if (currentFacet.get("order").getAsString().equalsIgnoreCase("term_desc")) {
-                                                order = Order.term(false);
-                                        }
-                                        termsBuilder.order(order);
-                                }
-
-                                //Set number of minimum documents that should be returned
-                                if (currentFacet.has("min_doc_count")) {
-                                        long minDocCount = currentFacet.get("min_doc_count").getAsLong();
-                                        termsBuilder.minDocCount(minDocCount);
+                                //Add DateHistogram aggregations
+                                if (currentFacet.has("type") && currentFacet.get("type").getAsString().equals("date_histogram")) {
+                                        searchRequest.addAggregation(
+                                                getDateHistogramAggregation(currentFacet)
+                                        );
                                 } else {
-                                        //Default min_doc_count
-                                        termsBuilder.minDocCount(0);
+                                        //Add terms aggregations to the search request builder (this is default)
+                                        searchRequest.addAggregation(
+                                                getTermsAggregation(currentFacet)
+                                        );
                                 }
-
-                                //Add term aggregations to the search request builder
-                                searchRequest.addAggregation(termsBuilder);
                         }
 
                 }
                 return searchRequest;
         }
-        
-         /**
-         * A method to append histogram aggregations to the search request builder.
+
+        /**
+         * A method to build a date histogram aggregation
          *
-         * @param searchRequest a search request
-         * @return the same search request where histogram aggregations have been added to it.
+         * @param facet a JSON object
+         * @return a date histogram builder
          */
-        private SearchRequestBuilder addHistogramAggregations(SearchRequestBuilder searchRequest)
-                throws ElasticsearchException, JsonParseException, JsonSyntaxException {
-
-                JsonElement jsonElement = new JsonParser().parse(aggregations);
-                for (JsonElement facets : jsonElement.getAsJsonArray()) {
-                        JsonObject currentFacet = facets.getAsJsonObject();
-                        if (currentFacet.has("field") && currentFacet.get("type").getAsString().equalsIgnoreCase("date_histogram")){
-                                String field = currentFacet.get("field").getAsString();
-                                
-                                
-                                TermsBuilder termsBuilder = AggregationBuilders
-                                        .terms(field)
-                                        .field(field)
-                                        .minDocCount(0);
-
-                                //Set size
-                                if (currentFacet.has("size")) {
-                                        int size = currentFacet.get("size").getAsInt();
-                                        termsBuilder.size(size);
-
-                                }
-
-                                //Set order
-                                if (currentFacet.has("order")) {
-                                        Order order = Order.count(false);
-                                        if (currentFacet.get("order").getAsString().equalsIgnoreCase("count_asc")) {
-                                                order = Order.count(true);
-                                        } else if (currentFacet.get("order").getAsString().equalsIgnoreCase("term_asc")) {
-                                                order = Order.term(true);
-                                        } else if (currentFacet.get("order").getAsString().equalsIgnoreCase("term_desc")) {
-                                                order = Order.term(false);
-                                        }
-                                        termsBuilder.order(order);
-                                }
-                                
-                                //Add term aggregations to the search request builder
-                                searchRequest.addAggregation(termsBuilder);
-                        }
-
+        private DateHistogramBuilder getDateHistogramAggregation(JsonObject facet) {
+                String field = facet.get("field").getAsString();
+                //Create date histogram
+                DateHistogramBuilder dateHistogram = AggregationBuilders
+                        .dateHistogram(field)
+                        .field(field);
+                //Set date format
+                if (facet.has("format")) {
+                        dateHistogram.format(facet.get("format").getAsString());
                 }
-                return searchRequest;
+                //Set interval
+                if (facet.has("interval")) {
+                        dateHistogram.interval(new DateHistogram.Interval(facet.get("interval").getAsString()));
+                }
+                //Set number of minimum documents that should be returned
+                if (facet.has("min_doc_count")) {
+                        dateHistogram.minDocCount(facet.get("min_doc_count").getAsLong());
+                }
+                //Set order
+                if (facet.has("order")) {
+                        Histogram.Order order = Histogram.Order.KEY_ASC;
+                        if (facet.get("order").getAsString().equalsIgnoreCase("count_asc")) {
+                                order = Histogram.Order.COUNT_ASC;
+                        } else if (facet.get("order").getAsString().equalsIgnoreCase("count_desc")) {
+                                order = Histogram.Order.COUNT_DESC;
+                        } else if (facet.get("order").getAsString().equalsIgnoreCase("key_desc")) {
+                                order = Histogram.Order.KEY_DESC;
+                        }
+                        dateHistogram.order(order);
+                }
+                return dateHistogram;
         }
 
-
+        /**
+         * A method to build terms aggregations
+         *
+         * @param facet a JSON object
+         * @return a term builder
+         */
+        private TermsBuilder getTermsAggregation(JsonObject facet){
+                String field = facet.get("field").getAsString();
+                TermsBuilder termsBuilder = AggregationBuilders
+                        .terms(field)
+                        .field(field);
+                //Set size
+                if (facet.has("size")) {
+                        int size = facet.get("size").getAsInt();
+                        termsBuilder.size(size);
+                }
+                //Set order
+                if (facet.has("order")) {
+                        Order order = Order.count(false);
+                        if (facet.get("order").getAsString().equalsIgnoreCase("count_asc")) {
+                                order = Order.count(true);
+                        } else if (facet.get("order").getAsString().equalsIgnoreCase("term_asc")) {
+                                order = Order.term(true);
+                        } else if (facet.get("order").getAsString().equalsIgnoreCase("term_desc")) {
+                                order = Order.term(false);
+                        }
+                        termsBuilder.order(order);
+                }
+                //Set number of minimum documents that should be returned
+                if (facet.has("min_doc_count")) {
+                        long minDocCount = facet.get("min_doc_count").getAsLong();
+                        termsBuilder.minDocCount(minDocCount);
+                }
+                
+                return termsBuilder;
+        }
         /**
          * A method to add extra field to every bucket in the terms
          * aggregations. The field value is queried independently from the
@@ -362,7 +371,7 @@ public class MarcusSearchService implements SearchService, Serializable {
                 JsonElement responseJson = new JsonParser().parse(response.toString());
                 if (responseJson.getAsJsonObject().has("aggregations")) {
                         JsonObject aggs = responseJson.getAsJsonObject().get("aggregations").getAsJsonObject();
-                        //Iterate throgh all the terms
+                        //Iterate through all the terms
                         for (Map.Entry<String, JsonElement> entry : aggs.entrySet()) {
                                 //Get term
                                 String term = entry.getKey();
@@ -372,8 +381,7 @@ public class MarcusSearchService implements SearchService, Serializable {
                                 for (JsonElement element : terms.getAsJsonArray("buckets")) {
                                         JsonObject bucket = element.getAsJsonObject();
                                         String value = bucket.get("key").getAsString();
-
-                                        /**
+                                        /*
                                          * Query Elasticsearch independently for
                                          * count of the specified term.
                                          */
@@ -419,51 +427,22 @@ public class MarcusSearchService implements SearchService, Serializable {
         }
 
         //Testing Aggregations
-        public static void testAggRes() throws IOException, Exception {
-                Map map = new HashMap();
-                map.put("status", "go_to_gate");
-                BoolFilterBuilder fb = (BoolFilterBuilder) FilterBuilders
-                        .boolFilter()
-                        //.must(FilterBuilders.termFilter("status", "Draft"))
-                        .should(FilterBuilders
-                                .rangeFilter("created")
-                                .from("1920")
-                                .to(null)
-                                .includeLower(true)
-                                .includeUpper(true))
-                        .should(FilterBuilders
-                                .rangeFilter("madeafter")
-                                .from("1920-01-01")
-                                .to(null))
-                        .should(FilterBuilders
-                                .rangeFilter("madebefore")
-                                .from(null)
-                                .to("1920-01-01"));
-
+        public static void testAggs() throws Exception {
                 SearchRequestBuilder req = ClientFactory.getTransportClient()
                         .prepareSearch()
                         .setIndices("admin")
                         .setTypes("document")
-                        //.setQuery(QueryBuilders.matchAllQuery())
-                        //.setQuery(QueryBuilders.filteredQuery(QueryBuilders.matchAllQuery(), null))
-                        //.setPostFilter(fb1)
-                        // .addAggregation(AggregationBuilders.global("_aggs")
                         .addAggregation(AggregationBuilders
                                 .dateHistogram("created")
                                 .field("created")
                                 .format("yyyy")
+                                .order(Histogram.Order.KEY_ASC)
                                 //.extendedBounds("1997-01-01", "2016-01-01")
-                                .interval(new DateHistogram.Interval("12h"))
+                                .interval(new DateHistogram.Interval("520w"))
                                 .minDocCount(1)
                         );
+
                 SearchResponse res = req.execute().actionGet();
-
-                // appendTermsAggregation(req, json);
-                //.addAggregation(aggregation)
-                //.addAggregation(AggregationBuilders.filter("filtered").filter(fb))
-                //.addAggregation(AggregationBuilders.terms("status").field("status"))
-                //.addAggregation(AggregationBuilders.terms("assigned_to").field("assigned_to"));
-
                 System.out.println("Request: " + req.toString());
                 System.out.println("JSON Response: " + res.toString());
 
@@ -471,7 +450,7 @@ public class MarcusSearchService implements SearchService, Serializable {
 
         //Main method for easy debugging
         public static void main(String[] args) throws IOException, Exception {
-                testAggRes();
+                testAggs();
         }
 
 }
