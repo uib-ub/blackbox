@@ -32,7 +32,7 @@
 
 
         <div style="margin-top: 80px;" id="searchController" ng-controller="freeTextSearch">
-            <div class="ui container">
+            <div class="ui center aligned container">
                 <div class="row">
                     <div class="">
                         <form action="" method="GET">
@@ -49,8 +49,8 @@
                         </form>
                     </div>
                 </div>
-                <div class="row">
-                    <span class="links links-examples">
+                <div class="ui row">
+                    <span>
                         <a href="">Advanced search</a>
                     </span>
                     <!--b>Query: </b>{{test}} -->
@@ -64,8 +64,13 @@
                             <div class="facets ui four wide column">
                                 <h3>Dato</h3>
                                 <hr>
-                                <input id="from_date" class="datePicker" type="text"  ng-model="from_date" ng-change="search()" placeholder="FRA" title="Fra dato"><br/><br/>
-                                <input id="to_date" class="datePicker" type="text"  ng-model="to_date" ng-change="search()" placeholder="TIL" title="Til dato"><br/><br/>
+                                <div class="ui input">
+                                    <input id="from_date" class="datePicker" type="text"  ng-model="from_date" ng-change="search()" placeholder="FRA" title="Fra dato">
+                                </div>
+                                <br>
+                                <div class="ui input">
+                                    <input id="to_date" class="datePicker" type="text"  ng-model="to_date" ng-change="search()" placeholder="TIL" title="Til dato">
+                                </div>
 
                                 <!--button class="btn btn-small btn-primary" ng-click="search()"><strong>OPPDATER SØKET</strong></button><br/><br/>
                                 <button class="btn btn-small btn-inverse" ng-click="clearDates()">NULLSTILL DATO</button-->
@@ -102,11 +107,14 @@
 
                                 <h3>Emne</h3>
                                 <hr>
-                                <div class="ui list">
-                                    <div class="item" ng-repeat="bucket in results['aggregations']['subject.exact']['buckets']">
-                                        <input type="checkbox" checklist-model="selected_filters" checklist-value="getCheckedValue('subject.exact', bucket.key)" ng-click="search()">
-                                        <label class="row-fluid"> {{bucket.key}} </label>
-                                        <span style="color:gray">({{bucket.doc_count}} of {{bucket.total_doc_count}})</span>
+                                <div style="height: 200px; overflow: hidden;" class="ui list">
+                                    <div class="ui input">
+                                        <input ng-model="query" type="text" placeholder="Filter by" autofocus>
+                                    </div>
+                                    <div class="item" ng-repeat="bucket in results['aggregations']['subject.exact']['buckets'] | filter:query ">
+                                        <input id="concept{{bucket.key}}" type="checkbox" checklist-model="selected_filters" checklist-value="getCheckedValue('subject.exact', bucket.key)" ng-click="search()">
+                                        <label for="concept{{bucket.key}}"> {{bucket.key}} 
+                                        <span style="color:gray">({{bucket.doc_count}} of {{bucket.total_doc_count}})</span></label>
                                     </div>
                                 </div>                 
                             </div>
@@ -145,15 +153,15 @@
                                     <div class="ui relaxed horizontal list">
                                         <div ng-class="{ 'disabled': bucket.doc_count == 0 }" class="ui item toggle checkbox" ng-repeat="bucket in results['aggregations']['haszoom']['buckets']">
                                             <input id="check-haszoom" type="checkbox" checklist-model="selected_filters" checklist-value="getCheckedValue('haszoom', bucket.key)" ng-click="search()">
-                                            <label for="check-haszoom"><i class="ui icon zoom"></i> {{bucket.key}} <span style="color:grey"> ({{bucket.doc_count}})</span></label>
+                                            <label for="check-haszoom"><i class="ui icon zoom"></i> {{bucket.key}}<br> <span style="color:grey"> ({{bucket.doc_count}})</span></label>
                                         </div>
                                         <div ng-class="{ 'disabled': bucket.doc_count == 0 }" class="ui item toggle checkbox" ng-repeat="bucket in results['aggregations']['isdigitized']['buckets']">
                                             <input id="check-isdigitized" type="checkbox" checklist-model="selected_filters" checklist-value="getCheckedValue('isdigitized', bucket.key)" ng-click="search()">
-                                            <label for="check-isdigitized">{{bucket.key}} <span style="color:grey"> ({{bucket.doc_count}})</span></label>
+                                            <label for="check-isdigitized">{{bucket.key}}<br> <span style="color:grey"> ({{bucket.doc_count}})</span></label>
                                         </div>
                                         <div ng-class="{ 'disabled': bucket.doc_count == 0 }" class="ui item toggle checkbox" ng-repeat="bucket in results['aggregations']['iscatalogued']['buckets']">
                                             <input id="check-iscatalogued" type="checkbox" checklist-model="selected_filters" checklist-value="getCheckedValue('iscatalogued', bucket.key)" ng-click="search()">
-                                            <label for="check-iscatalogued">{{bucket.key}} <span style="color:grey"> ({{bucket.doc_count}})</span></label>
+                                            <label for="check-iscatalogued">{{bucket.key}}<br> <span style="color:grey"> ({{bucket.doc_count}})</span></label>
                                         </div>
                                     </div>
                                     <hr>
@@ -250,7 +258,7 @@
                     {"field": "haszoom", "size": 1, "operator": "OR", "order": "term_asc"},
                     {"field": "isdigitized", "size": 1, "operator": "OR", "order": "term_desc"},
                     {"field": "iscatalogued", "size": 1, "operator": "OR", "order": "term_asc"},
-                    {"field": "subject.exact"},
+                    {"field": "subject.exact", "size": 500, "operator": "AND"},
                     {"field": "customer_name", "size": 10, "operator": "AND", "order": "count_desc"}]
             });        
         </script>
