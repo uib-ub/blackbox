@@ -165,8 +165,18 @@ function fuzzify(query_string, default_freetext_fuzzify) {
     });
     
     app.filter('unsafe', function($sce) {
-    return function(val) {
-        return $sce.trustAsHtml(val);
-    };
-});
+        return function(val) {
+            return $sce.trustAsHtml(val);
+        };
+    });
+    
+    app.directive('includeReplace', function () {
+        return {
+            require: 'ngInclude',
+            restrict: 'A', /* optional */
+            link: function (scope, el, attrs) {
+                el.replaceWith(el.children());
+            }
+        };
+    });
 
