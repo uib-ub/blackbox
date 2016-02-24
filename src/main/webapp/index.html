@@ -29,14 +29,15 @@
             </div>
         </div>
 
-        <div id="searchController"  ng-controller="freeTextSearch">
-            <div class="main-container">
-                <div class="masthead">
-                    <div class="Demo">
+
+        <div style="margin-top: 80px;" id="searchController" ng-controller="freeTextSearch">
+            <div class="ui container">
+                <div class="row">
+                    <div class="">
                         <form action="" method="GET">
                             <input type="hidden" name="index" value="admin"/>
-                            <div class="Typeahead Typeahead--twitterUsers">
-                                <div class="u-posRelative">
+                            <div class="Typeahead">
+                                <div class="">
                                     <input class="Typeahead-hint" type="text" tabindex="-1" readonly="readonly"/>
                                     <input class="Typeahead-input" id="search-input" type="text" name="q" ng-model="query_string" ng-change="search();"  placeholder="Søk Marcus..."/>
                                     <img class="Typeahead-spinner" src="js/lib/typeahead/img/spinner.gif" alt=""/>
@@ -46,14 +47,17 @@
                             <!--button type="submit" class="u-hidden" ng-submit="search()">Go</button-->
                         </form>
                     </div>
+                </div>
+                <div class="row">
                     <span class="links links-examples">
                         <a href="">Advanced search</a>
                     </span>
                     <!--b>Query: </b>{{test}} -->
                 </div>
+            </div>
 
                 <uib-progressbar class="ui loading segment" ng-show="show_loading" value="dynamic" style="height: 100px;"></uib-progressbar>
-                <div class="ui container">
+                <div style="margin-top: 80px;" class="ui container">
                     <div class="ui grid search-results" ng-show="ready">
                         <div class="content ui row">
                             <div class="facets ui four wide column">
@@ -68,10 +72,12 @@
                                 <h3>Dokument typer</h3>
                                 <hr>
                                 <div style="height: 300px; overflow: scroll" class="ui list">
-                                    <div class="item" ng-repeat="bucket in results['aggregations']['type.exact']['buckets']">
-                                        <input type="checkbox" checklist-model="selected_filters" checklist-value="getCheckedValue('type.exact', bucket.key)" ng-click="search()">
-                                        <label class="ui label" ng-class="{ 'disabled': bucket.doc_count == 0 }"> {{bucket.key}}</label>
-                                        <span style="color:grey"> ({{bucket.doc_count}} of {{bucket.total_doc_count}})</span>
+
+                                    <div class="ui slider checkbox item" ng-repeat="bucket in results['aggregations']['type.exact']['buckets']">
+                                        <input id="type{{bucket.key}}" type="checkbox" checklist-model="selected_filters" checklist-value="getCheckedValue('type.exact', bucket.key)" ng-click="search()">
+                                        <label for="type{{bucket.key}}" ng-class="{ 'disabled': bucket.doc_count == 0 }"> {{bucket.key}}
+                                        <span ng-if="bucket.doc_count > 0" style="color:grey"> ({{bucket.doc_count}})</span></label>
+
                                     </div>
                                 </div>
 
@@ -106,15 +112,17 @@
                                 </div>                 
                             </div>
 
-                            <div ng-show="results.hits.total == 0" style="margin-top: 50px;" class="noresults ui ten wide column">
-                                <div class="ui text container">
-                                    <h1 style="font-size: 4em;" class="ui center aligned icon header">
-                                        Ingen treff,<br>
-                                        ingen Draper
+                            <div ng-show="results.hits.total == 0" style="margin-top: 50px;" class="no-hits ui ten wide column">
+                                <div class="ui text ui center aligned container">
+                                    <h1 style="font-size: 4em;" class="ui icon header">
+                                        Ingen treff
                                     </h1>
-                                    <img class="ui fluid image" src='img/giphy.gif'>
-                                    <br>
-                                    <p>Det søket var så dårlig at ingen ville stå frem.</p>
+                                    <img class="ui rounded bordered fluid image" src='img/giphy.gif'>
+                                    <h1 style="font-size: 4em;" class="ui icon header">
+                                        Søket ditt var ikke <i>cool</i>!
+                                    </h1>
+                                    <p>Niks, vi trenger et stiligere søk for å finne noe kult! </p>
+
                                 </div>
                             </div>
 
@@ -138,12 +146,17 @@
                                     <hr>
                                     <div class="ui relaxed horizontal list">
                                         <div ng-class="{ 'disabled': bucket.doc_count == 0 }" class="ui item toggle checkbox" ng-repeat="bucket in results['aggregations']['haszoom']['buckets']">
-                                            <input type="checkbox" checklist-model="selected_filters" checklist-value="getCheckedValue('haszoom', bucket.key)" ng-click="search()">
-                                            <label> {{bucket.key}}<span style="color:grey"> ({{bucket.doc_count}})</span></label>
+
+                                            <input id="check-haszoom" type="checkbox" checklist-model="selected_filters" checklist-value="getCheckedValue('haszoom', bucket.key)" ng-click="search()">
+                                            <label for="check-haszoom"><i class="ui icon zoom"></i> {{bucket.key}} <span style="color:grey"> ({{bucket.doc_count}})</span></label>
                                         </div>
                                         <div ng-class="{ 'disabled': bucket.doc_count == 0 }" class="ui item toggle checkbox" ng-repeat="bucket in results['aggregations']['isdigitized']['buckets']">
-                                            <input type="checkbox" checklist-model="selected_filters" checklist-value="getCheckedValue('isdigitized', bucket.key)" ng-click="search()">
-                                            <label> {{bucket.key}} <span style="color:grey"> ({{bucket.doc_count}})</span></label>
+                                            <input id="check-isdigitized" type="checkbox" checklist-model="selected_filters" checklist-value="getCheckedValue('isdigitized', bucket.key)" ng-click="search()">
+                                            <label for="check-isdigitized">{{bucket.key}} <span style="color:grey"> ({{bucket.doc_count}})</span></label>
+                                        </div>
+                                        <div ng-class="{ 'disabled': bucket.doc_count == 0 }" class="ui item toggle checkbox" ng-repeat="bucket in results['aggregations']['iscatalogued']['buckets']">
+                                            <input id="check-iscatalogued" type="checkbox" checklist-model="selected_filters" checklist-value="getCheckedValue('iscatalogued', bucket.key)" ng-click="search()">
+                                            <label for="check-iscatalogued">{{bucket.key}} <span style="color:grey"> ({{bucket.doc_count}})</span></label>
                                         </div>
                                     </div>
                                     <hr>
@@ -166,29 +179,40 @@
 
                                     <div class="ui divided items" ng-repeat="doc in results.hits.hits track by $index">
 
-                                        <div ng-if='doc._source.type == "Person" || doc._source.type == "Organisajon" || doc._source.type == "Firma"' ng-include="'partials/agent-hits.html'" style="page-break-inside: avoid;" class="ui item"></div>
-                                        <div ng-if='doc._source.type == "Objekt" || doc._source.type == "Skip" || doc._source.type == "Fartøy" || doc._source.type == "Monument"' ng-include="'partials/object-hits.html'" style="page-break-inside: avoid;" class="ui item"></div>
+                                        <div ng-if='doc._source.type == "Person" || doc._source.type == "Organisajon" || doc._source.type == "Firma" || doc._source.type == "Katalogisator"' ng-include="'partials/agent-hits.html'" style="page-break-inside: avoid;" class="ui item"></div>
+                                        <div ng-if='doc._source.type == "Monument" || doc._source.type == "Objekt"' ng-include="'partials/object-hits.html'" style="page-break-inside: avoid;" class="ui item"></div>
+                                        <div ng-if='doc._source.type == "Skip" || doc._source.type == "Fartøy"' ng-include="'partials/vessel-hits.html'" style="page-break-inside: avoid;" class="ui item"></div>
                                         <div ng-if='doc._source.type == "Album"' ng-include="'partials/document-hits.html'" style="page-break-inside: avoid;" class="ui item"></div>
                                         <div ng-if='doc._source.type == "Kart"' ng-include="'partials/document-hits.html'" style="page-break-inside: avoid;" class="ui item"></div>
                                         <div ng-if='doc._source.type == "Akkvisisjon"' ng-include="'partials/object-hits.html'" style="page-break-inside: avoid;" class="ui item"></div>
                                         <div ng-if='doc._source.type == "Arbeidsliste"' ng-include="'partials/object-hits.html'" style="page-break-inside: avoid;" class="ui item"></div>
                                         <div ng-if='doc._source.type == "Aggregering"' ng-include="'partials/document-hits.html'" style="page-break-inside: avoid;" class="ui item"></div>
 
-                                        <div ng-if='doc._source.type == "Fotografi" || doc._source.type == "Manuskript" || doc._source.type == "Postkort" || doc._source.type == "Brev" || doc._source.type == "Diplom" || doc._source.type == "Bok" || doc._source.type == "Tale" || doc._source.type == "Segl" || doc._source.type == "Dokument" || doc._source.type == "Grafikk" || doc._source.type == "Transkripsjon" || doc._source.type == "Telegram" || doc._source.type == "Tegning" || doc._source.type == "Notat" || doc._source.type == "Forhandlingsprotokoll" || doc._source.type == "Kvittering" || doc._source.type == "Protokoll" || doc._source.type == "Reisedagbok" || doc._source.type == "Nummer" || doc._source.type == "Kartsett" || doc._source.type == "Kontrakt" || doc._source.type == "Salgsskjøte" || doc._source.type == "Bønnebok" || doc._source.type == "Dagbok" || doc._source.type == "Fragment" || doc._source.type == "Kassebok" || doc._source.type == "Oppnålingsdokument" || doc._source.type == "Supplikk"' ng-include="'partials/document-hits.html'" style="page-break-inside: avoid;" class="ui item"></div>  
-
+                                        <div ng-if='doc._source.type == "Fotografi" || doc._source.type == "Manuskript" || doc._source.type == "Postkort" || doc._source.type == "Brev" || doc._source.type == "Diplom" || doc._source.type == "Bok" || doc._source.type == "Tale" || doc._source.type == "Segl" || doc._source.type == "Dokument" || doc._source.type == "Grafikk" || doc._source.type == "Transkripsjon" || doc._source.type == "Telegram" || doc._source.type == "Tegning" || doc._source.type == "Notat" || doc._source.type == "Forhandlingsprotokoll" || doc._source.type == "Kvittering" || doc._source.type == "Protokoll" || doc._source.type == "Reisedagbok" || doc._source.type == "Nummer" || doc._source.type == "Kartsett" || doc._source.type == "Kontrakt" || doc._source.type == "Salgsskjøte" || doc._source.type == "Bønnebok" || doc._source.type == "Dagbok" || doc._source.type == "Fragment" || doc._source.type == "Kassebok" || doc._source.type == "Oppmålingsdokument" || doc._source.type == "Supplikk"' ng-include="'partials/document-hits.html'" style="page-break-inside: avoid;" class="ui item"></div>
                                         <div class="ui raised inverted segment ng-hide">
                                             <h3 class="header">JSON source:</h3>
                                             <hr>
                                             <pre>{{doc._source| json}}</pre>
                                         </div>
                                     </div>
+                                    
+                                    <uib-pagination class="pagination" total-items="results.hits.total"
+                                                    items-per-page="page_size"
+                                                    ng-model="current_page"
+                                                    ng-change="search()"
+                                                    next-text="Neste"
+                                                    previous-text="Forrige"
+                                                    max-size="5"
+                                                    force-ellipses="true"
+                                                    style="">    
+                                    </uib-pagination>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
-        </div>
+        
         <script id="result-template" type="text/x-handlebars-template">
             <div class="ProfileCard u-cf">
             <div class="ProfileCard-details">
@@ -220,23 +244,21 @@
 
         <!--These are constants for this particular page-->
         <script>
-            angular.module("settings", [])
-                    .constant("mySetting", {
-                    index: ["admin"],
-                            type: [],
-                            facets: [
-                            {"field": "type.exact", "size": 200, "operator": "OR", "order": "count_desc"},
-                            {"field": "assigned_to", "order": "term_asc", "operator" : "OR" },
-                            {"field": "haszoom", "size": 1, "operator": "OR", "order": "term_asc"},
-                            {"field": "isdigitized", "size": 1, "operator": "OR", "order": "term_desc"},
-                            {"field": "subject.exact"},
-                            {"field": "customer_name", "size": 10, "operator": "AND", "order": "count_desc"}]
-                    });
-        </script>
-
-        <script>
             $('.ui.dropdown').dropdown({
                     allowAdditions: true });
+                
+            .constant("mySetting", {
+            index: ["admin"],
+                    type: [],
+                    facets: [
+                    {"field": "type.exact", "size": 200, "operator": "OR", "order": "count_desc"},
+                    {"field": "assigned_to", "order": "term_asc", "operator" : "OR" },
+                    {"field": "haszoom", "size": 1, "operator": "OR", "order": "term_asc"},
+                    {"field": "isdigitized", "size": 1, "operator": "OR", "order": "term_desc"},
+                    {"field": "iscatalogued", "size": 1, "operator": "OR", "order": "term_asc"},
+                    {"field": "subject.exact"},
+                    {"field": "customer_name", "size": 10, "operator": "AND", "order": "count_desc"}]
+            });        
         </script>
     </body>
 </html>
