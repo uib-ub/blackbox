@@ -139,13 +139,11 @@
                                     <div class="ui relaxed horizontal list">
                                         <div ng-class="{ 'disabled': bucket.doc_count == 0 }" class="ui item toggle checkbox" ng-repeat="bucket in results['aggregations']['haszoom']['buckets']">
                                             <input type="checkbox" checklist-model="selected_filters" checklist-value="getCheckedValue('haszoom', bucket.key)" ng-click="search()">
-                                            <label> {{bucket.key}}
-                                                <span style="color:grey"> ({{bucket.doc_count}})</span></label>
+                                            <label> {{bucket.key}}<span style="color:grey"> ({{bucket.doc_count}})</span></label>
                                         </div>
                                         <div ng-class="{ 'disabled': bucket.doc_count == 0 }" class="ui item toggle checkbox" ng-repeat="bucket in results['aggregations']['isdigitized']['buckets']">
                                             <input type="checkbox" checklist-model="selected_filters" checklist-value="getCheckedValue('isdigitized', bucket.key)" ng-click="search()">
-                                            <label> {{bucket.key}}
-                                                <span style="color:grey"> ({{bucket.doc_count}})</span></label>
+                                            <label> {{bucket.key}} <span style="color:grey"> ({{bucket.doc_count}})</span></label>
                                         </div>
                                     </div>
                                     <hr>
