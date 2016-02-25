@@ -18,7 +18,7 @@
     </head>
     <body>
         <div class="ui fixed inverted menu">
-            <div class="ui container fluid header-wrap">
+            <div class="ui container fluid header-wrap" ng-i>
                 <a id="show-menu" class="item">
                     <i class="sidebar icon"></i>
                 </a>
@@ -42,7 +42,7 @@
                                            type="text" 
                                            name="q" 
                                            ng-model="query_string" 
-                                           ng-keyup="($event.keyCode==13||query_string==='')&&search()"
+                                           ng-keyup="($event.keyCode==13 || query_string==='') && search()"
                                            placeholder="Søk Marcus..." 
                                            autocomplete="off"/>
                                     <img class="Typeahead-spinner" src="js/lib/typeahead/img/spinner.gif" alt=""/>
@@ -64,9 +64,12 @@
                             <div class="facets ui four wide column">
                                 <h3>Dato</h3>
                                 <hr>
-                                <input type="text" id="from_date" class="datePicker" ng-model="from_date" ng-change="search()" placeholder="FRA" title="Fra dato"><br/><br/>
-                                <input type="text" id="to_date" class="datePicker" ng-model="to_date" ng-change="search()" placeholder="TIL" title="Til dato"><br/><br/>
-
+                                <div class="datePicker ui input">
+                                     <input type="text" id="from_date" class="datePicker" ng-model="from_date" ng-change="search()" placeholder="FRA" title="Fra dato">
+                               </div><br/><br/>
+                                <div class="datePicker ui input">
+                                     <input type="text" id="to_date" class="datePicker" ng-model="to_date" ng-change="search()" placeholder="TIL" title="Til dato">
+                                </div><br/><br/>
                                 <!--button class="btn btn-small btn-primary" ng-click="search()"><strong>OPPDATER SØKET</strong></button><br/><br/>
                                 <button class="btn btn-small btn-inverse" ng-click="clearDates()">NULLSTILL DATO</button-->
 
@@ -255,7 +258,7 @@
                         {"field": "haszoom", "size": 1, "operator": "OR", "order": "term_asc"},
                         {"field": "isdigitized", "size": 1, "operator": "OR", "order": "term_desc"},
                         {"field": "iscatalogued", "size": 1, "operator": "OR", "order": "term_asc"},
-                        {"field": "subject.exact", "size" : 10, "min_doc_count" : 1},
+                        {"field": "subject.exact", "size" : 50, "min_doc_count" : 1},
                         /*Supported date intervals: weeks(w), days(d), hours(h), minutes(m), seconds(s)*/
                         {"field": "created", "type" : "date_histogram", "format" : "yyyy", "interval" : "520w", "min_doc_count" : 1, "order" : "key_asc"}]
             });  
