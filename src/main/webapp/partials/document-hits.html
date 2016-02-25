@@ -41,7 +41,7 @@
     
     <div class="ui bottom attached label marcus pushup">
         <div style="text-align: left;">{{doc._source.identifier}}<br>
-        {{doc._source.available}}<br>
+        {{doc._source.available | date:"d. MMMM yyyy"}}<br>
         <i>{{doc._source.cataloguer}}</i></div>
         <div class="ui ms-corner">
         <i ng-show='doc._source.showweb == "true"' class="circular inverted green unlock icon"></i>
