@@ -1,4 +1,4 @@
-    <div ng-show="doc._source.img" class="ui image">
+    <div ng-if="doc._source.img" class="ui image">
         <div class="ui blue ribbon label">{{doc._source.type}}</div>
         <a target="_blank" href="{{doc._source.uri}}">
             <img alt="{{doc._source.title}}" class="small image" src="{{doc._source.img}}">
@@ -8,7 +8,7 @@
             <span class="ui floated right"><i>{{doc._source.cataloguer}}</i></span>
         </div>
     </div>
-    <div ng-show="!doc._source.img" class="ui image">
+    <div ng-if="!doc._source.img" class="ui image">
         <i class="ui circular inverted teal icon big user"></i>
     </div>
     <div  class="content">
