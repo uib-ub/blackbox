@@ -76,10 +76,10 @@ html, body {
     font-weight: bold;
 }
 
-.loading {
+/**.loading {
     margin: 30px auto 0 auto;
     width: 50%;
-}
+}**/
 
 .fancyinput-temp {
     cursor: default;

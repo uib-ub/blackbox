@@ -48,7 +48,7 @@ app.controller('freeTextSearch', function ($scope, $http, $location, mySetting) 
         /*We are assigning null to these values so that, if empty, they should not appear in query string*/
         var q = $scope.query_string === "" ? null : fuzzify($scope.query_string, "*");
         var sort = $scope.sort_by === "" ? null : $scope.sort_by;
-        var from_page = ($scope.current_page - 1) * $scope.page_size;
+        var from_page = ($scope.current_page - 1)*$scope.page_size;
         $scope.test = q;
 
 

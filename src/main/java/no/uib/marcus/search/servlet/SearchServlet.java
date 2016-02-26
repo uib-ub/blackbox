@@ -81,7 +81,7 @@ public class SearchServlet extends HttpServlet {
                         //After getting the response, add extra field "total_doc_count" to every bucket aggregations
                         //searchResponseString = service.addExtraFieldToBucketsAggregation(searchResponse);
                         searchResponseString = searchResponse.toString();
-                        logger.info(searchResponseString.toString());
+                        //logger.info(searchResponseString.toString());
                         out.write(searchResponseString);
                 }
         }
