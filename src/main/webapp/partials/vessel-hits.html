@@ -1,26 +1,29 @@
-    <div ng-show="doc._source.img" class="ui image">
-        <div class="ui blue ribbon label">{{doc._source.type}}</div>
-        <a target="_blank" href="{{doc._source.uri}}">
-            <img alt="{{doc._source.title}}" class="small image" src="{{doc._source.logo}}">
-        </a>
-        <div class="ui bottom attached label marcus pushup">
-            <span class="ui floated right">{{doc._source.available}}</span><br>
-            <span class="ui floated right"><i>{{doc._source.cataloguer}}</i></span>
-        </div>
+<div class="ui image">
+    <div  ng-if="doc._source.img" class="ui blue ribbon label">{{doc._source.type}}</div>
+    <a  ng-if="doc._source.img" target="_blank" href="{{doc._source.uri}}">
+        <img alt="{{doc._source.title}}" class="small image" src="{{doc._source.logo}}">
+    </a>
+    <div  ng-if="doc._source.img" class="ui bottom attached label marcus pushup">
+        <span class="ui floated right">{{doc._source.available}}</span><br>
+        <span class="ui floated right"><i>{{doc._source.cataloguer}}</i></span>
     </div>
-    <div ng-show="!doc._source.img" class="ui image">
-        <img class="ui image" src="img/noun_40514_cc.svg"/>
-    </div>
-    <div  class="content">
-        <a target="_blank" href="{{doc._source.uri}}" class="header">{{doc._source.preferredlabel}}</a>
-        <div class="meta">
-            <span ng-show="doc._source.birthyear || doc._source.deathyear" class="ui floated right"><i class="icon wait"></i><span ng-show="doc._source.birthyear && !doc._source.birthdate">{{doc._source.birthyear}}</span><span ng-show="doc._source.birthdate">{{doc._source.birthdate}}</span> - <span ng-show="doc._source.deathyear && !doc._source.deathdate">{{doc._source.deathyear}}</span><span ng-show="doc._source.deathdate">{{doc._source.deathdate}}</span></span>
-        </div>
-        <div class="description">
-            <p ng-bind-html="doc._source.description | unsafe"></p>
-            <p>{{doc._source.type}}</p>
-        </div>
-        <div class="extra">
+    
+    <img ng-if="!doc._source.img" class="ui image" src="img/noun_40514_cc.svg"/>
+</div>
 
-        </div>
+<div class="content">
+    <a target="_blank" href="{{doc._source.uri}}" class="header">{{doc._source.preferredlabel}}</a>
+    <div class="meta">
+        <span ng-if="doc._source.birthyear || doc._source.deathyear" class="ui floated right"><i
+                class="icon wait"></i><span ng-show="doc._source.birthyear && !doc._source.birthdate">{{doc._source.birthyear}}</span><span
+                ng-if="doc._source.birthdate">{{doc._source.birthdate}}</span> - <span
+                ng-if="doc._source.deathyear && !doc._source.deathdate">{{doc._source.deathyear}}</span><span
+                ng-if="doc._source.deathdate">{{doc._source.deathdate}}</span></span>
     </div>
+    <div class="description">
+        <p ng-bind-html="doc._source.description | unsafe"></p>
+        <p>{{doc._source.type}}</p>
+    </div>
+    <div class="extra">
+    </div>
+</div>

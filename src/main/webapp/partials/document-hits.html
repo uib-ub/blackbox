@@ -1,61 +1,26 @@
-<!--<div class="example" ng-show="doc._source.hasthumbnail">
-    <div class="ui shape shape{{$index}}}}">
-        <div class="sides">
-            <div class="active side">
-                <div class="ui image">
-                    <div class="ui blue ribbon label">{{doc._source.type}}</div>
-                    <a target="_blank" href="{{doc._source.uri}}">
-                        <img alt="{{doc._source.title}}" class="small image" src="{{doc._source.hasthumbnail}}">
-                    </a>
-                    <div class="ui bottom attached label marcus pushup">{{doc._source.identifier}}<br>
-                        <span class="ui floated right">{{doc._source.available}}</span><br>
-                        <span class="ui floated right"><i>{{doc._source.cataloguer}}</i></span>
-                    </div>
-                </div>
-            </div>
-            <div class="side">
-                <div class="ui image">
-                    <div class="ui red ribbon label">{{doc._source.type}}</div>
-                    <a target="_blank" href="{{doc._source.uri}}">
-                        <img alt="{{doc._source.title}}" class="small image" src="{{doc._source.hasthumbnail}}">
-                    </a>
-                    <div class="ui bottom attached label marcus pushup">{{doc._source.identifier}}<br>
-                        <span class="ui floated right">{{doc._source.available}}</span><br>
-                        <span class="ui floated right"><i>{{doc._source.cataloguer}}</i></span>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-    <div class="ui ignored icon direction buttons">
-        <div class="ui button" title="Flip Over" data-animation="flip" data-direction="over"><i class="retweet icon"></i></div>
-      </div>
-</div>-->
-
-<div ng-show="doc._source.hasthumbnail" class="ui image">
-    <div class="ui blue ribbon label">{{doc._source.type}}</div>
+<div class="ui image">
+    <div ng-if="doc._source.hasthumbnail" class="ui blue ribbon label">{{doc._source.type}}</div>
     
-    <a target="_blank" href="{{doc._source.uri}}">
+    <a ng-if="doc._source.hasthumbnail" target="_blank" href="{{doc._source.uri}}">
         <img alt="{{doc._source.title}}" class="small image" src="{{doc._source.hasthumbnail}}">
     </a>
     
-    <div class="ui bottom attached label marcus pushup">
+    <div ng-if="doc._source.hasthumbnail" class="ui bottom attached label marcus pushup">
         <div style="text-align: left;">{{doc._source.identifier}}<br>
         {{doc._source.available | date:"d. MMMM yyyy"}}<br>
         <i>{{doc._source.cataloguer}}</i></div>
         <div class="ui ms-corner">
-        <i ng-show='doc._source.showweb == "true"' class="circular inverted green unlock icon"></i>
-        <i ng-show='doc._source.showweb == "false"' class="circular inverted red lock icon"></i>
-        <i ng-show='doc._source.showweb == undefined' class="circular inverted help icon"></i>
-        <i style="right: 2em;" ng-show='doc._source.haszoom == "Med DeepZoom"' class="circular inverted orange zoom icon"></i>
-        <!--<i ng-show='doc._source.haszoom == "Uten DeepZoom"' class="circular inverted red lock icon"></i>
-        <i ng-show='doc._source.haszoom == undefined' class="circular inverted help icon"></i>-->
+            <i ng-show='doc._source.showweb == "true"' class="circular inverted green unlock icon"></i>
+            <i ng-show='doc._source.showweb == "false"' class="circular inverted red lock icon"></i>
+            <i ng-show='doc._source.showweb == undefined' class="circular inverted help icon"></i>
+            <i style="right: 2em;" ng-show='doc._source.haszoom == "Med DeepZoom"' class="circular inverted orange zoom icon"></i>
+            <!--<i ng-show='doc._source.haszoom == "Uten DeepZoom"' class="circular inverted red lock icon"></i>
+            <i ng-show='doc._source.haszoom == undefined' class="circular inverted help icon"></i>-->
+        </div>
     </div>
-    </div>
+    <i ng-if="!doc._source.hasthumbnail" class="ui bordered inverted grey icon huge camera retro"></i>
 </div>
-<div ng-show="!doc._source.hasthumbnail" class="ui image">
-    <i class="ui bordered inverted grey icon huge camera retro"></i>
-</div>
+
 <div class="content">
     <a class="header" target="_blank" href="{{doc._source.uri}}">{{doc._source.title|| "Uten tittel"}}</a>
     <div class="meta">
@@ -113,27 +78,27 @@
                         <span class="year{{from_date| date:'yyyy'}}"></span>
                         <span>{{from_date|| '&infin;'}}</span>
                     </div>
-                    <div ng-show="from_date" class="item event dateDigitized">
+                    <div ng-if="from_date" class="item event dateDigitized">
                         <span class="year{{from_date| date:'yyyy'}}"></span>
                         <span>Fra: {{from_date| date:'yyyy'}}</span>
                     </div>
-                    <div ng-show="doc._source.created" class="item event dateDigitized">
+                    <div ng-if="doc._source.created" class="item event dateDigitized">
                         <span class="year{{doc._source.created| date:'yyyy'}}"></span>
                         <span>Skapt:{{doc._source.created}}</span>
                     </div>
-                    <div ng-show="doc._source.madeafter" class="item event dateDigitized">
+                    <div ng-if="doc._source.madeafter" class="item event dateDigitized">
                         <span class="year{{doc._source.madeafter| date:'yyyy'}}"></span>
                         <span>Etter: {{doc._source.madeafter}}</span>
                     </div>
-                    <div ng-show="doc._source.madebefore" class="item event dateDigitized">
+                    <div ng-if="doc._source.madebefore" class="item event dateDigitized">
                         <span class="year{{doc._source.madebefore| date:'yyyy'}}"></span>
                         <span>Før: {{doc._source.madebefore}}</span>
                     </div>
-                    <div ng-show="doc._source.available" class="item event dateDigitized">
+                    <div ng-if="doc._source.available" class="item event dateDigitized">
                         <span class="year{{doc._source.available| date:'yyyy'}}"></span>
                         <span>Tilgjengeliggjort: {{doc._source.available}}</span>
                     </div>
-                    <div ng-show="to_date" class="item event dateDigitized">
+                    <div ng-if="to_date" class="item event dateDigitized">
                         <span class="year{{from_date| date:'yyyy'}}"></span>
                         <span>Til: {{to_date| date:'yyyy'}}</span>
                     </div>

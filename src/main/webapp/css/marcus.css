@@ -1,3 +1,97 @@
+html, body {
+    /**background: #f2f9ff repeat scroll 0 0; /**Tyeahead**/
+    background: #e9e9e9 repeat scroll 0 0;/**Linked In**/
+    /**background: #e9eff5 repeat scroll 0 0;/**FINN**/
+    /**background-color: #f5f8fa;/**Twitter**/
+    /**background: #f8f8f8 repeat scroll 0 0;**/
+
+}
+
+.main-container {
+    /**background-color: #f2f9ff;**/
+    width: 100%;
+}
+
+/**@media (min-width: 320px) {**/
+.main-container .content {
+    width: 1000px;
+    margin: 30px auto 0 auto;
+    overflow: hidden;
+}
+
+.search-results .facets {
+    width: 26.5%;
+    float: left;
+    display: inline-block;
+    overflow-x: hidden;
+    overflow-y: auto;
+    background: white;
+    padding-left: 10px;
+    border: 1px solid #e1e8ed; /**#eee**/
+    border-radius: 8px;
+    margin-right: 12px;
+}
+
+.search-results .search-hits {
+    display: inline-block;
+    background: white;
+    margin: 0 auto;
+    width: 70%;
+    border: 1px solid #e1e8ed;
+    margin-bottom: 50px;
+    border-radius: 10px;
+}
+
+.datePicker {
+    width: 65%;
+    /**margin-left: 4px;**/
+}
+
+.ui-datepicker select.ui-datepicker-month,
+.ui-datepicker select.ui-datepicker-year {
+    width: 45%;
+    /**background: black;
+    color : orange;**/
+}
+
+.single-select {
+    width: 30%;
+    margin-top: 10px;
+    /**background: whitesmoke;**/
+    /**color: #07e;**/
+    float: right;
+}
+
+#sort_by {
+    color: #07e;
+    background: whitesmoke;
+}
+
+.results-hit {
+    width: 100%;
+    margin: 0 0 0 0;
+}
+
+.pagination {
+    font-weight: bold;
+}
+
+/**.loading {
+    margin: 30px auto 0 auto;
+    width: 50%;
+}**/
+
+.fancyinput-temp {
+    cursor: default;
+    padding: 2px 0;
+}
+
+@media (max-width: 1024px) {
+    .fancyinput-temp {
+        padding: 8px 0;
+    }
+}
+
 .marcus.pushup {
     position: relative !important;
 }
@@ -16,3 +110,4 @@
     top: 1em;
     right: 0.5em;
 }
+
