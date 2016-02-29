@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   viewBox="0 0 512 640"
+   version="1.1"
+   x="0px"
+   y="0px"
+   id="svg2"
+   inkscape:version="0.91 r13725"
+   sodipodi:docname="noun_16508_cc.svg">
+  <metadata
+     id="metadata18">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <defs
+     id="defs16" />
+  <sodipodi:namedview
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1"
+     objecttolerance="10"
+     gridtolerance="10"
+     guidetolerance="10"
+     inkscape:pageopacity="0"
+     inkscape:pageshadow="2"
+     inkscape:window-width="640"
+     inkscape:window-height="480"
+     id="namedview14"
+     showgrid="false"
+     inkscape:zoom="0.36875"
+     inkscape:cx="256"
+     inkscape:cy="320"
+     inkscape:window-x="0"
+     inkscape:window-y="0"
+     inkscape:window-maximized="0"
+     inkscape:current-layer="svg2" />
+  <title
+     id="title4">Slice 1</title>
+  <description>Created with Sketch (http://www.bohemiancoding.com/sketch)</description>
+  <g
+     fill="#000000"
+     fill-rule="evenodd"
+     id="g6">
+    <path
+       d="M128,208 C128,110.797879 206.797879,32 304,32 C401.202121,32 480,110.797879 480,208 C480,305.202121 401.202121,384 304,384 C271.824119,384 241.664874,375.365764 215.712397,360.287603 L96,480 C60.6538843,480 32,451.346224 32,416 L151.712397,296.287603 C136.634236,270.335126 128,240.175881 128,208 Z M416,208 C416,146.144105 365.855895,96 304,96 C242.144105,96 192,146.144105 192,208 C192,269.855895 242.144105,320 304,320 C365.855895,320 416,269.855895 416,208 Z M416,208"
+       fill="#000000"
+       id="path8" />
+  </g>
+</svg>

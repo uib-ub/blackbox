@@ -74,38 +74,47 @@
         <div>
             <div>
                 <div class="ui horizontal list events">
-                    <div class="item event dateDigitized">
+                    <!--<div class="item event dateDigitized">
+                        <img src="img/noun_16508_cc.svg">
                         <span class="year{{from_date| date:'yyyy'}}"></span>
                         <span>{{from_date|| '&infin;'}}</span>
-                    </div>
+                    </div>-->
                     <div ng-if="from_date" class="item event dateDigitized">
+                        <img style="width: 20px;" src="img/noun_16508_cc.svg">
                         <span class="year{{from_date| date:'yyyy'}}"></span>
                         <span>Fra: {{from_date| date:'yyyy'}}</span>
                     </div>
                     <div ng-if="doc._source.created" class="item event dateDigitized">
+                        <img style="width: 20px;" src="img/noun_173850_cc.svg">
                         <span class="year{{doc._source.created| date:'yyyy'}}"></span>
-                        <span>Skapt:{{doc._source.created}}</span>
+                        <span>{{doc._source.created | date:"d. MMM yyyy"}}</span>
                     </div>
                     <div ng-if="doc._source.madeafter" class="item event dateDigitized">
+                        <img style="width: 20px;" src="img/noun_346838_cc.svg">
                         <span class="year{{doc._source.madeafter| date:'yyyy'}}"></span>
-                        <span>Etter: {{doc._source.madeafter}}</span>
+                        <span>{{doc._source.madeafter | date:"d. MMM yyyy"}}</span>
+                    </div>
+                    <div ng-if="doc._source.madeafter || doc._source.madebefore" class="item event dateDigitized">
+                        <img style="width: 40px; margin-top: 5px;" src="img/noun_212152_cc.svg">
                     </div>
                     <div ng-if="doc._source.madebefore" class="item event dateDigitized">
                         <span class="year{{doc._source.madebefore| date:'yyyy'}}"></span>
-                        <span>Før: {{doc._source.madebefore}}</span>
+                        <span>{{doc._source.madebefore | date:"d. MMM yyyy"}}</span>
+                        <img style="width: 20px;" src="img/noun_346839_cc.svg">
                     </div>
                     <div ng-if="doc._source.available" class="item event dateDigitized">
+                        <img style="width: 20px;" src="img/noun_250439_cc.svg">
                         <span class="year{{doc._source.available| date:'yyyy'}}"></span>
-                        <span>Tilgjengeliggjort: {{doc._source.available}}</span>
-                    </div>
+                        <span>{{doc._source.available | date:"d. MMM yyyy"}}</span>
+                    </div>                    
                     <div ng-if="to_date" class="item event dateDigitized">
                         <span class="year{{from_date| date:'yyyy'}}"></span>
                         <span>Til: {{to_date| date:'yyyy'}}</span>
+                        <img style="width: 20px;" src="img/noun_16508_cc.svg">
                     </div>
-                    <div class="item event now">
-                        <!-- has no mark / used for determining end of line -->
+                    <!--<div class="item event now">
                         <span ng-controller="nextYear" class="year{{nextYear}}">{{nextYear}}</span>
-                    </div>
+                    </div>-->
                 </div>
             </div>
         </div>
