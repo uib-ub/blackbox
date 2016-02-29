@@ -198,8 +198,8 @@ input[type=text]::-ms-clear {
     margin: 50px auto 0 auto;
     padding: 15px;
     text-align: left;
-    /**background-color: lightslategray;
-    background-color:  #615851;**/
+    /**background-color: lightslategray;**/
+    /**background-color:  #615851;**/
     background-color: #0097cf;
     background-image: -moz-linear-gradient(top, #04a2dd, #03739c);
     background-image: -webkit-gradient(linear, 0 0, 0 100%, from(#04a2dd), to(#03739c));

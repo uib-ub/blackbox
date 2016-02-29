@@ -49,6 +49,9 @@ app.controller('freeTextSearch', function ($scope, $http, $location, mySetting) 
         var q = $scope.query_string === "" ? null : fuzzify($scope.query_string, "*");
         var sort = $scope.sort_by === "" ? null : $scope.sort_by;
         var from_page = ($scope.current_page - 1)*$scope.page_size;
+        var from_date = $scope.from_date === ""? null : $scope.from_date;
+        var to_date = $scope.to_date === ""? null : $scope.to_date;
+
         $http({
             method: 'GET',
             url: 'search?aggs=' + JSON.stringify(mySetting.facets),
@@ -56,8 +59,8 @@ app.controller('freeTextSearch', function ($scope, $http, $location, mySetting) 
                 q: q,
                 index: mySetting.index,
                 type: mySetting.type,
-                from_date: $scope.from_date,
-                to_date: $scope.to_date,
+                from_date: from_date,
+                to_date: to_date,
                 filter: $scope.selected_filters,
                 from: from_page,
                 size: $scope.page_size,

@@ -134,7 +134,7 @@
                                     </select>
                                 </div>
                                 <div class="results-hit ng-cloak">
-                                   <strong ng-bind-template="Søkeresultater: {{results.hits.total}}" style="font-size:25px;"></strong>
+                                    <strong ng-bind-template="Søketreff: {{results.hits.total}}" style="font-size:2em;"></strong>
                                     <hr>
                                     <uib-pagination class="pagination" total-items="results.hits.total"
                                                     items-per-page="page_size"
@@ -170,8 +170,7 @@
                                                     next-text="Neste"
                                                     previous-text="Forrige"
                                                     max-size="5"
-                                                    force-ellipses="true"
-                                                    style="">    
+                                                    force-ellipses="true">
                                     </uib-pagination>
                                 </div>
                             </div>
