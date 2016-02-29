@@ -1,0 +1,24 @@
+<div ng-show="doc._source.hasthumbnail" class="ui image">
+    <div class="ui grey ribbon label">{{doc._source.type}}</div>
+    
+    <a target="_blank" href="{{doc._source.uri}}">
+        <img alt="{{doc._source.title}}" class="small image" src="{{doc._source.hasthumbnail}}">
+    </a>
+</div>
+<div ng-show="!doc._source.hasthumbnail" class="ui image">
+    <i class="ui bordered inverted reg icon huge camera retro"></i>
+</div>
+<div class="content">
+    <a class="header" target="_blank" href="{{doc._source.uri}}">{{doc._source.label|| "Uten signatur!"}}</a>
+    <div class="meta">
+        <div ng-if="doc._source.iscatalogued == 'Katalogisert'" class="ui blue label">{{doc._source.iscatalogued}}</div>
+        <div ng-if="doc._source.iscatalogued == 'Ikke katalogisert'" class="ui red label">{{doc._source.iscatalogued}}</div>
+    </div>
+    <div class="description">
+        <p>{{doc._source.isrepresentationof}}</p>
+    </div>
+    <hr>
+    <div class="extra">
+
+    </div>
+</div>

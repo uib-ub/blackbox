@@ -96,7 +96,7 @@ html, body {
 }
 
 .marcus.pushup {
-    position: static !important;
+    position: relative !important;
 }
 
 .header.brand * {
@@ -107,7 +107,6 @@ html, body {
 .ui.tag.label.relaxed {
     margin: 0 20px 10px 0;
 }
-
 .fade.ng-hide {
     transition:0.5s linear all;
     opacity:0;
@@ -115,5 +114,10 @@ html, body {
 
 [ng\:cloak], [ng-cloak], [data-ng-cloak], [x-ng-cloak], .ng-cloak, .x-ng-cloak {
     display: none !important;
+}
+.ui.ms-corner {
+    position: absolute;
+    top: 1em;
+    right: 0.5em;
 }
 

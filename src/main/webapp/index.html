@@ -27,10 +27,12 @@
                 </div>
             </div>
         </div>
-        <div ng-controller="freeTextSearch" id="searchController" style="margin-top:80px;">
-            <div class="main-container">
-                <div class="masthead">
-                    <div class="Demo">
+
+
+        <div style="margin-top: 80px;" id="searchController" ng-controller="freeTextSearch">
+            <div class="ui center aligned container">
+                <div class="row">
+                    <div class="">
                         <form action="" method="GET">
                             <input type="hidden" name="index" value="admin">
                             <div class="Typeahead">
@@ -50,64 +52,78 @@
                             </div>
                         </form>
                     </div>
-                    <span style="color:grey;"> Trykk på Enter for å søke</span>
-                    <!--span class="links links-examples">
-                        <a href="">Advasert søk</a>
-                    </span-->
+                </div>
+                <div class="ui row">
+                    <span>
+                        <a href="">Avansert søk</a>
+                    </span>
+                    <!--b>Query: </b>{{test}} -->
                 </div>
             </div>
-                <uib-progressbar ng-show="show_loading" class="ui loading segment"  value="dynamic" style="height:100px;"></uib-progressbar>
-                <div ng-cloak ng-show="ready" style="margin-top: 35px;" class="ui container">
+                <uib-progressbar ng-show="show_loading" class="ui loading segment"  value="dynamic" style="height:100px; background: white;"></uib-progressbar>
+                <div ng-show="ready" style="margin-top: 50px;" class="ui container">
                     <div class="ui grid search-results">
                         <div class="content ui row">
-                            <div ng-cloak class="facets ui four wide column">
-                                <h3 style="margin-top:15px;">Dato</h3>
+                            <div class="facets ui four wide column">
                                 <hr>
-                                <div class="datePicker ui input">
-                                     <input type="text" id="from_date" class="datePicker" ng-model="from_date" ng-change="search()" placeholder="FRA" title="Fra dato">
-                               </div><br/><br/>
-                                <div class="datePicker ui input">
-                                     <input type="text" id="to_date" class="datePicker" ng-model="to_date" ng-change="search()" placeholder="TIL" title="Til dato">
-                                </div><br/><br/>                              
-                                <h3>Kategorier</h3>
+                                <h3>Dato</h3>
                                 <hr>
-                                    <div class="ui relaxed list">
-                                        <div class="ui item checkbox" ng-repeat="bucket in results['aggregations']['haszoom']['buckets']">
-                                            <input id="hasZoom-{{bucket.key}}" type="checkbox" checklist-model="selected_filters" checklist-value="getCheckedValue('haszoom', bucket.key)" ng-click="search()">
-                                            <label for="hasZoom-{{bucket.key}}"> {{bucket.key}} <span style="color:grey"> ({{bucket.doc_count}})</span></label>
-                                        </div>
-                                        <div class="ui item checkbox" ng-repeat="bucket in results['aggregations']['isdigitized']['buckets']">
-                                            <input id="isDigitized-{{bucket.key}}" type="checkbox" checklist-model="selected_filters" checklist-value="getCheckedValue('isdigitized', bucket.key)" ng-click="search()">
-                                            <label for="isDigitized-{{bucket.key}}">{{bucket.key}} <span style="color:grey"> ({{bucket.doc_count}})</span></label>
-                                        </div>
-                                        <div class="ui item checkbox" ng-repeat="bucket in results['aggregations']['iscatalogued']['buckets']">
-                                            <input id="isCatalogued-{{bucket.key}}" type="checkbox" checklist-model="selected_filters" checklist-value="getCheckedValue('iscatalogued', bucket.key)" ng-click="search()">
-                                            <label for="isCatalogued-{{bucket.key}}">{{bucket.key}} <span style="color:grey"> ({{bucket.doc_count}})</span></label>
-                                        </div>
-                                    </div>
+                                <div class="ui input">
+                                    <input id="from_date" class="datePicker" type="text"  ng-model="from_date" ng-change="search()" placeholder="FRA" title="Fra dato">
+                                </div>
+                                <br>
+                                <div class="ui input">
+                                    <input id="to_date" class="datePicker" type="text"  ng-model="to_date" ng-change="search()" placeholder="TIL" title="Til dato">
+                                </div>
+
+                                <!--button class="btn btn-small btn-primary" ng-click="search()"><strong>OPPDATER SØKET</strong></button><br/><br/>
+                                <button class="btn btn-small btn-inverse" ng-click="clearDates()">NULLSTILL DATO</button-->
 
                                 <h3>Dokument typer</h3>
                                 <hr>
-                                <div class="ui list" style="height:300px; overflow-y: scroll" >
-                                    <div class="ui checkbox item" ng-repeat="bucket in results['aggregations']['type.exact']['buckets']">
-                                        <input id="type-{{bucket.key}}" type="checkbox" checklist-model="selected_filters" checklist-value="getCheckedValue('type.exact', bucket.key)" ng-click="search()">
-                                        <label for="type-{{bucket.key}}" ng-class="{'disabled': bucket.doc_count == 0}"> {{bucket.key}}
-                                            <span ng-if="bucket.doc_count > 0" style="color:grey"> ({{bucket.doc_count}})</span>
-                                        </label>
+                                <div style="height: 300px; overflow: scroll" class="ui list">
+                                    <div class="ui slider checkbox item" ng-repeat="bucket in results['aggregations']['type.exact']['buckets']">
+                                        <input id="type{{bucket.key}}" type="checkbox" checklist-model="selected_filters" checklist-value="getCheckedValue('type.exact', bucket.key)" ng-click="search()">
+                                        <label for="type{{bucket.key}}" ng-class="{ 'disabled': bucket.doc_count == 0 }"> {{bucket.key}}
+                                        <span ng-if="bucket.doc_count > 0" style="color:grey"> ({{bucket.doc_count}})</span></label>
                                     </div>
                                 </div>
+
+                                <!--<div class="ui multiple dropdown">
+                                    <input type="hidden" name="filters">
+                                    <i class="filter icon"></i>
+                                    <span class="text">Filter Posts</span>
+                                    <div class="menu">
+                                        <div class="ui icon search input">
+                                            <i class="search icon"></i>
+                                            <input type="text" placeholder="Search tags...">
+                                        </div>
+                                        <div class="ui item checkbox" ng-repeat="bucket in results['aggregations']['isdigitized']['buckets']">
+                                            <input id="check-{{bucket.key}}" type="checkbox" checklist-model="selected_filters" checklist-value="getCheckedValue('isdigitized', bucket.key)" ng-click="search()">
+                                            <label for="check-{{bucket.key}}">{{bucket.key}} <span style="color:grey"> ({{bucket.doc_count}})</span></label>
+                                        </div>
+                                        <div class="ui item checkbox" ng-repeat="bucket in results['aggregations']['iscatalogued']['buckets']">
+                                            <input id="check-{{bucket.key}}" type="checkbox" checklist-model="selected_filters" checklist-value="getCheckedValue('iscatalogued', bucket.key)" ng-click="search()">
+                                            <label for="check-{{bucket.key}}">{{bucket.key}} <span style="color:grey"> ({{bucket.doc_count}})</span></label>
+                                        </div>
+                                    </div>
+                                </div>-->
+
                                 <h3>Emne</h3>
                                 <hr>
-                                <div class="ui list">
-                                    <div class="ui checkbox item" ng-repeat="bucket in results['aggregations']['subject.exact']['buckets']">
-                                        <input id="subject-{{bucket.key}}" type="checkbox" checklist-model="selected_filters" checklist-value="getCheckedValue('subject.exact', bucket.key)" ng-click="search()">
-                                        <label for="subject-{{bucket.key}}" class="row-fluid"> {{bucket.key}}
-                                              <span style="color:gray">({{bucket.doc_count}})</span>
-                                        </label>
+                                <div style="height: 200px; overflow: hidden;" class="ui list">
+                                    <div class="ui input">
+                                        <input ng-model="query" type="text" placeholder="Filter by" autofocus>
+                                    </div>
+                                    <div class="item" ng-repeat="bucket in results['aggregations']['subject.exact']['buckets'] | filter:query ">
+                                        <input id="concept{{bucket.key}}" type="checkbox" checklist-model="selected_filters" checklist-value="getCheckedValue('subject.exact', bucket.key)" ng-click="search()">
+                                        <label for="concept{{bucket.key}}"> {{bucket.key}} 
+                                        <span style="color:gray">({{bucket.doc_count}} of {{bucket.total_doc_count}})</span></label>
                                     </div>
                                 </div>                 
                             </div>
-                            <div ng-if="ready && results.hits.total === 0" style="margin-top: 50px;" class="no-hits ui ten wide column">
+
+                            <div ng-if="results.hits.total == 0" style="margin-top: 50px;" class="no-hits ui ten wide column">
                                 <div class="ui text ui center aligned container">
                                     <h1 style="font-size: 4em;" class="ui icon header">
                                         Ingen treff
@@ -121,22 +137,48 @@
                             </div>
 
                             <div ng-show="results.hits.total > 0" class="search-hits ui ten wide column">
-                                <br/>
-                                <div class="pull-right">
-                                    <label for="sort_by">Sortér på:</label>
-                                    <select class="ui dropdown" id="sort_by" ng-model="sort_by" ng-change="search()">
-                                        <option value="">Mest relevant</option>
-                                        <option value="available:asc">Tilgjengeliggjort ASC</option>
-                                        <option value="available:desc">Tilgjengeliggjort DESC</option>
-                                        <option value="title:asc">Tittle ASC</option>
-                                        <option value="title:desc">Tittle DESC</option>
+                                <div class="form-group single-select" role="form">
+                                    <label class="control-label" for="sort_by">Sortér på: </label>
+                                    <select class="form-control" id="sort_by" ng-model="sort_by" ng-change="search()">
+                                        <option value="">Relevance</option>
+                                        <option value="available:asc">Availability ASC</option>
+                                        <option value="available:desc">Availability DESC</option>
+                                        <option value="title:asc">Title ASC</option>
+                                        <option value="title:desc">Title DESC</option>
                                         <option value="identifier:asc">ID ASC</option>
                                         <option value="identifier:desc">ID DESC</option>
                                     </select>
+
                                 </div>
-                                <div class="results-hit ng-cloak">
-                                    <strong ng-bind-template="Søketreff: {{results.hits.total}}" style="font-size:2em;"></strong>
+                                <br/>
+
+                                <div class="results-hit">
                                     <hr>
+                                    <div class="ui relaxed horizontal list">
+                                        <div ng-class="{ 'disabled': bucket.doc_count == 0 }" class="ui item toggle checkbox" ng-repeat="bucket in results['aggregations']['haszoom']['buckets']">
+                                            <input id="check-haszoom" type="checkbox" checklist-model="selected_filters" checklist-value="getCheckedValue('haszoom', bucket.key)" ng-click="search()">
+                                            <label for="check-haszoom"><i class="ui icon zoom"></i> {{bucket.key}}<br> <span style="color:grey"> ({{bucket.doc_count}})</span></label>
+                                        </div>
+                                        <div ng-class="{ 'disabled': bucket.doc_count == 0 }" class="ui item toggle checkbox" ng-repeat="bucket in results['aggregations']['isdigitized']['buckets']">
+                                            <input id="check-isdigitized" type="checkbox" checklist-model="selected_filters" checklist-value="getCheckedValue('isdigitized', bucket.key)" ng-click="search()">
+                                            <label for="check-isdigitized">{{bucket.key}}<br> <span style="color:grey"> ({{bucket.doc_count}})</span></label>
+                                        </div>
+                                        <div ng-class="{ 'disabled': bucket.doc_count == 0 }" class="ui item toggle checkbox" ng-repeat="bucket in results['aggregations']['iscatalogued']['buckets']">
+                                            <input id="check-iscatalogued" type="checkbox" checklist-model="selected_filters" checklist-value="getCheckedValue('iscatalogued', bucket.key)" ng-click="search()">
+                                            <label for="check-iscatalogued">{{bucket.key}}<br> <span style="color:grey"> ({{bucket.doc_count}})</span></label>
+                                        </div>
+                                        <div ng-class="{ 'disabled': bucket.doc_count == 0 }" class="ui item toggle checkbox" ng-repeat="bucket in results['aggregations']['showweb']['buckets']">
+                                            <input id="check-showweb" type="checkbox" checklist-model="selected_filters" checklist-value="getCheckedValue('showweb', bucket.key)" ng-click="search()">
+                                            <label for="check-showweb">Ikke publisert<br> <span style="color:grey"> ({{bucket.doc_count}})</span></label>
+                                        </div>
+                                    </div>
+                                    <hr>
+
+                                    <h4> Total hits: {{results.hits.total}}</h4>
+
+                                    <!--div ng-show="results.hits.total == 0" class="alert alert-info" style="text-align:center;border-color:#bdbdbd; margin-top:10%;">
+                                        <h4>Ingen treff</h4>
+                                    </div-->
                                     <uib-pagination class="pagination" total-items="results.hits.total"
                                                     items-per-page="page_size"
                                                     ng-model="current_page"
@@ -173,7 +215,8 @@
                                                     next-text="Neste"
                                                     previous-text="Forrige"
                                                     max-size="5"
-                                                    force-ellipses="true">
+                                                    force-ellipses="true"
+                                                    style="">    
                                     </uib-pagination>
                                 </div>
                             </div>
@@ -204,7 +247,6 @@
         <script src="js/lib/typeahead/js/main.js"></script>
         <script src="//code.jquery.com/ui/1.11.4/jquery-ui.js"></script>
         <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.0/angular.min.js"></script>
-        <!--script src="http://ajax.googleapis.com/ajax/libs/angularjs/1.5.0/angular-animate.js"></script-->
         <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
         <script src="//cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.1.8/semantic.min.js"></script>
         <script src="js/marcus-app.js"></script>
@@ -220,14 +262,16 @@
                     index: ["admin"],
                         type: [],
                         facets: [
-                        {"field": "type.exact", "size": 50, "operator": "OR", "order": "term_asc", "min_doc_count" : 0},
+                        {"field": "type.exact", "size": 50, "operator": "OR", "order": "count_desc", "min_doc_count" : 0},
                         {"field": "haszoom", "size": 10, "operator": "AND", "order": "term_asc", "min_doc_count" : 0},
                         {"field": "isdigitized", "size": 10, "operator": "AND", "order": "count_desc", "min_doc_count" : 0},
                         {"field": "iscatalogued", "size": 10, "operator": "AND", "order": "count_desc", "min_doc_count" : 0},
-                        {"field": "subject.exact", "size" : 30, "min_doc_count" : 1},
-                        /*Supported intervals: weeks(w), days(d), hours(h), minutes(m), seconds(s)*/
+                        {"field": "showweb", "size": 1, "operator": "OR", "order": "term_asc"},
+                        {"field": "subject.exact", "size" : 50, "operator": "AND", "min_doc_count" : 1},
+                        /*Supported date intervals: weeks(w), days(d), hours(h), minutes(m), seconds(s)*/
                         {"field": "created", "type" : "date_histogram", "format" : "yyyy", "interval" : "520w", "min_doc_count" : 1, "order" : "key_asc"}]
-            });
+            });  
+            
                 $('.ui.dropdown').dropdown({
                     allowAdditions: true });
         </script>

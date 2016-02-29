@@ -51,6 +51,7 @@ app.controller('freeTextSearch', function ($scope, $http, $location, mySetting) 
         var from_page = ($scope.current_page - 1)*$scope.page_size;
         var from_date = $scope.from_date === ""? null : $scope.from_date;
         var to_date = $scope.to_date === ""? null : $scope.to_date;
+        $scope.test = q;
 
         $http({
             method: 'GET',
@@ -165,8 +166,18 @@ function fuzzify(query_string, default_freetext_fuzzify) {
     });
     
     app.filter('unsafe', function($sce) {
-    return function(val) {
-        return $sce.trustAsHtml(val);
-    };
-});
+        return function(val) {
+            return $sce.trustAsHtml(val);
+        };
+    });
+    
+    app.directive('includeReplace', function () {
+        return {
+            require: 'ngInclude',
+            restrict: 'A', /* optional */
+            link: function (scope, el, attrs) {
+                el.replaceWith(el.children());
+            }
+        };
+    });
 
