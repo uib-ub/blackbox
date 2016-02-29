@@ -28,6 +28,7 @@ import org.elasticsearch.search.sort.SortBuilder;
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.Map;
+import org.elasticsearch.index.query.functionscore.ScoreFunctionBuilders;
 
 
 public class MarcusSearchService implements SearchService, Serializable {
@@ -215,8 +216,8 @@ public class MarcusSearchService implements SearchService, Serializable {
                                 //Use match_all query
                                 query = QueryBuilders.matchAllQuery();
                         }
-                        searchRequest.setQuery(QueryBuilders
-                                .filteredQuery(query, filter));
+
+                        searchRequest.setQuery(QueryBuilders.filteredQuery(query, filter));
 
                         searchRequest.setFrom(from);
                         searchRequest.setSize(size);
