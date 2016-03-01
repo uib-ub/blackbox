@@ -1,9 +1,10 @@
     <div class="ui image">
-        <i ng-if="!doc._source.img" class="ui big icons">
-            <i class="ui circular inverted teal icon user"></i>
-            <i ng-show='doc._source.showweb == "true"' class="corner circular inverted green unlock icon"></i>
+        <i ng-if="!doc._source.img" class="ui huge icons">
+            <!--<i class="ui circular inverted teal icon user"></i>-->
+            <img ng-if="!doc._source.img" style="width: 100px;" class="ui image" src="img/noun_89041.svg"/>
+            <!--<i ng-show='doc._source.showweb == "true"' class="corner circular inverted green unlock icon"></i>-->
             <i ng-show='doc._source.showweb == "false"' class="corner circular inverted red lock icon"></i>
-            <i ng-show='!doc._source.showweb' class="corner circular inverted help icon"></i>
+            <!--<i ng-show='!doc._source.showweb' class="corner circular inverted help icon"></i>-->
         </i>  
         
         <div ng-if="doc._source.img" class="ui blue ribbon label">{{doc._source.type}}</div>

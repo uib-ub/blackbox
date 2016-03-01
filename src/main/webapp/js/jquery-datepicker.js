@@ -7,7 +7,6 @@ $(function () {
         //buttonImage: "img/calendar.gif",
         //buttonText: '<span class="glyphicon glyphicon-calendar" style="border:0"></span>',
         buttonText : '<i class="ui icon calendar"></i>',
-
         changeMonth: true,
         changeYear: true,
         yearRange: "1700:+1",

@@ -107,6 +107,13 @@ html, body {
 .ui.tag.label.relaxed {
     margin: 0 20px 10px 0;
 }
+
+.ui.ms-corner {
+    position: absolute;
+    top: 0.5em;
+    right: 0.5em;
+}
+
 .fade.ng-hide {
     transition:0.5s linear all;
     opacity:0;

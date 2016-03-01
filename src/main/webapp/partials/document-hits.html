@@ -1,5 +1,5 @@
 <div class="ui image">
-    <div ng-if="doc._source.hasthumbnail" class="ui blue ribbon label">{{doc._source.type}}</div>
+    <div class="ui blue ribbon label">{{doc._source.type}}</div>
     
     <a ng-if="doc._source.hasthumbnail" target="_blank" href="{{doc._source.uri}}">
         <img alt="{{doc._source.title}}" class="small image" src="{{doc._source.hasthumbnail}}">
@@ -7,7 +7,6 @@
     
     <div ng-if="doc._source.hasthumbnail" class="ui bottom attached label marcus pushup">
         <div style="text-align: left;">{{doc._source.identifier}}<br>
-        {{doc._source.available | date:"d. MMMM yyyy"}}<br>
         <i>{{doc._source.cataloguer}}</i></div>
         <div class="ui ms-corner">
             <i ng-show='doc._source.showweb == "true"' class="circular inverted green unlock icon"></i>
@@ -18,7 +17,16 @@
             <i ng-show='doc._source.haszoom == undefined' class="circular inverted help icon"></i>-->
         </div>
     </div>
-    <i ng-if="!doc._source.hasthumbnail" class="ui bordered inverted grey icon huge camera retro"></i>
+    <i ng-if="!doc._source.hasthumbnail" class="ui bordered inverted grey icon massive camera retro"></i>
+    <div ng-if="!doc._source.hasthumbnail" class="ui ms-corner">
+            <i ng-show='doc._source.showweb == "true"' class="circular inverted green unlock icon"></i>
+            <i ng-show='doc._source.showweb == "false"' class="circular inverted red lock icon"></i>
+            <i ng-show='doc._source.showweb == undefined' class="circular inverted help icon"></i>
+            <i style="right: 2em;" ng-show='doc._source.haszoom == "Med DeepZoom"' class="circular inverted orange zoom icon"></i>
+            <!--<i ng-show='doc._source.haszoom == "Uten DeepZoom"' class="circular inverted red lock icon"></i>
+            <i ng-show='doc._source.haszoom == undefined' class="circular inverted help icon"></i>-->
+        </div>
+    
 </div>
 
 <div class="content">

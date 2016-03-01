@@ -51,7 +51,6 @@ app.controller('freeTextSearch', function ($scope, $http, $location, mySetting) 
         var from_page = ($scope.current_page - 1)*$scope.page_size;
         var from_date = $scope.from_date === ""? null : $scope.from_date;
         var to_date = $scope.to_date === ""? null : $scope.to_date;
-        $scope.test = q;
 
         $http({
             method: 'GET',
