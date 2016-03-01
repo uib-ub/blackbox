@@ -72,10 +72,12 @@ app.controller('freeTextSearch', function ($scope, $http, $location, $window, my
                 $scope.results = data;
                 $scope.show_loading = false;
                 $scope.ready = true;
-                //alert(JSON.stringify(config.params));
-                $location.url(config.params);
-                $location.replace();
-                $window.history.pushState(null, 'locationURL', $location.absUrl());
+                /*
+                 alert(JSON.stringify(config.params));
+                 $location.url(config.params);
+                 $location.replace();
+                 $window.history.pushState(null, 'locationURL', $location.absUrl());
+                */
             })
             .error(function (data, status, headers, config) {
                 $scope.log = 'Error occured while querying' + data;
