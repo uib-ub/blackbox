@@ -1,0 +1,28 @@
+    <div class="ui image">
+        <a target="_blank" href="{{doc._source.uri}}">
+            <img style="width: 100px;" class="ui image" src="img/noun_124929_cc.svg"/>
+        </a>
+    </div>
+    <div  class="content">
+        <a ng-if="doc._source.preferredlabel" target="_blank" href="{{doc._source.uri}}" class="header">{{doc._source.preferredlabel}}</a>
+        <div class="meta">
+            <div ng-if="isString(doc._source.maker)">
+                <div class="content"><i class="ui icon user"></i><span class="header">{{doc._source.maker}}</span> </div>
+            </div>
+            <div ng-if="isArray(doc._source.maker)">
+                <div class="ui horizontal list">
+                    <div ng-repeat="maker in doc._source.maker track by $index" class="item">
+                        <i class="ui icon user"></i><span>{{maker}}</span>
+                    </div>
+                </div>
+            </div>
+            <span ng-if="doc._source.created"><i class="icon wait"></i> {{doc._source.created}}</span>
+        </div>
+        <div class="description">
+            <p ng-bind-html="doc._source.description | unsafe"></p>
+            <p>{{doc._source.type}}</p>
+        </div>
+        <div class="extra">
+
+        </div>
+    </div>
