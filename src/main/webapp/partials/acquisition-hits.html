@@ -9,11 +9,11 @@
         </div>
         
         <a ng-if="!doc._source.img" target="_blank" href="{{doc._source.uri}}">
-            <img style="width: 100px;" class="ui image" src="img/noun_291202_cc.svg"/>
+            <img style="width: 100px;" class="ui image" src="img/noun_179983_cc.svg"/>
         </a>
     </div>
     <div  class="content">
-        <a ng-if="doc._source.preferredlabel" target="_blank" href="{{doc._source.uri}}" class="header">{{doc._source.preferredlabel}}</a>
+        <a ng-if="doc._source.title" target="_blank" href="{{doc._source.uri}}" class="header">{{doc._source.title}}</a>
         <a ng-if="doc._source.name" target="_blank" href="{{doc._source.uri}}" class="header">{{doc._source.name}}</a>
         <a ng-if="doc._source.label" target="_blank" href="{{doc._source.uri}}" class="header">{{doc._source.label}}</a>
         <div class="meta">
