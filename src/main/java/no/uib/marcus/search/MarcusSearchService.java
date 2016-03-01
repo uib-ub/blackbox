@@ -10,12 +10,10 @@ import org.elasticsearch.action.search.SearchRequestBuilder;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.common.Nullable;
 import org.elasticsearch.common.Strings;
+import org.elasticsearch.common.lucene.search.function.FiltersFunctionScoreQuery;
 import org.elasticsearch.common.xcontent.XContentBuilder;
 import org.elasticsearch.common.xcontent.XContentFactory;
-import org.elasticsearch.index.query.FilterBuilder;
-import org.elasticsearch.index.query.QueryBuilder;
-import org.elasticsearch.index.query.QueryBuilders;
-import org.elasticsearch.index.query.SimpleQueryStringBuilder;
+import org.elasticsearch.index.query.*;
 import org.elasticsearch.search.aggregations.AggregationBuilders;
 import org.elasticsearch.search.aggregations.bucket.histogram.DateHistogram;
 import org.elasticsearch.search.aggregations.bucket.histogram.DateHistogramBuilder;
@@ -145,13 +143,16 @@ public class MarcusSearchService implements SearchService, Serializable {
                         if (types != null && types.length > 0) {
                                 searchRequest.setTypes(types);
                         }
+                        //set query
                         if (Strings.hasText(queryStr)) {
-                                //Use simple_query_string query
+                                //Use simple_query_string query with AND operator
                                 query = QueryBuilders.simpleQueryStringQuery(queryStr)
                                         .defaultOperator(SimpleQueryStringBuilder.Operator.AND);
                         } else {
-                                //Match all documents query
-                                query = QueryBuilders.matchAllQuery();
+                                //Match all documents and boost documents of type "document", if exist
+                                query = QueryBuilders.functionScoreQuery(QueryBuilders.matchAllQuery())
+                                        .add(FilterBuilders.termFilter("_type", "document"), ScoreFunctionBuilders.weightFactorFunction(2));
+
                         }
                         //Set query
                         searchRequest.setQuery(query);

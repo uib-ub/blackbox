@@ -107,13 +107,11 @@ html, body {
 .ui.tag.label.relaxed {
     margin: 0 20px 10px 0;
 }
-
-<<<<<<< HEAD
 .ui.ms-corner {
     position: absolute;
     top: 0.5em;
     right: 0.5em;
-=======
+}
 .fade.ng-hide {
     transition:0.5s linear all;
     opacity:0;
@@ -121,6 +119,12 @@ html, body {
 
 [ng\:cloak], [ng-cloak], [data-ng-cloak], [x-ng-cloak], .ng-cloak, .x-ng-cloak {
     display: none !important;
->>>>>>> 48a9c57c5461aba673d0904785bfe79684612cfe
+}
+
+.ui.ms-corner {
+    position: absolute;
+    top: 1em;
+    right: 0.5em;
+>>>>>>> 8ebd50d7aaaea428e7c27a82f7766f513f4ba509
 }
 

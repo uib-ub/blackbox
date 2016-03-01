@@ -126,12 +126,12 @@
                                     <label for="sort_by">Sortér på:</label>
                                     <select class="ui dropdown" id="sort_by" ng-model="sort_by" ng-change="search()">
                                         <option value="">Mest relevant</option>
-                                        <option value="available:asc">Tilgjengeliggjort ASC</option>
-                                        <option value="available:desc">Tilgjengeliggjort DESC</option>
-                                        <option value="title:asc">Tittle ASC</option>
-                                        <option value="title:desc">Tittle DESC</option>
                                         <option value="identifier:asc">ID ASC</option>
                                         <option value="identifier:desc">ID DESC</option>
+                                        <option value="title:asc">Tittle ASC</option>
+                                        <option value="title:desc">Tittle DESC</option>
+                                        <option value="available:asc">Tilgjengeliggjort ASC</option>
+                                        <option value="available:desc">Tilgjengeliggjort DESC</option>
                                     </select>
                                 </div>
                                 <div class="results-hit ng-cloak">
@@ -218,7 +218,7 @@
             angular.module("settings", [])
                 .constant("mySetting", {
                     index: ["admin"],
-                        type: [],
+                        /*type: [],*/
                         facets: [
                         {"field": "type.exact", "size": 50, "operator": "OR", "order": "term_asc", "min_doc_count" : 0},
                         {"field": "haszoom", "size": 10, "operator": "AND", "order": "term_asc", "min_doc_count" : 0},
