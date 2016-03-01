@@ -4,7 +4,7 @@
 var app = angular.module('marcus', ["checklist-model", "ui.bootstrap", "settings"]);
 
 /**========= Search Controller ===========**/
-app.controller('freeTextSearch', function ($scope, $http, $location, mySetting) {
+app.controller('freeTextSearch', function ($scope, $http, $location, $window, mySetting) {
 
     //Initialize default variables
     $scope.show_loading = true;
@@ -51,6 +51,7 @@ app.controller('freeTextSearch', function ($scope, $http, $location, mySetting) 
         var from_page = ($scope.current_page - 1)*$scope.page_size;
         var from_date = $scope.from_date === ""? null : $scope.from_date;
         var to_date = $scope.to_date === ""? null : $scope.to_date;
+        console.log(JSON.stringify($location.host));
 
         $http({
             method: 'GET',
@@ -71,6 +72,10 @@ app.controller('freeTextSearch', function ($scope, $http, $location, mySetting) 
                 $scope.results = data;
                 $scope.show_loading = false;
                 $scope.ready = true;
+                //alert(JSON.stringify(config.params));
+                $location.url(config.params);
+                $location.replace();
+                $window.history.pushState(null, 'locationURL', $location.absUrl());
             })
             .error(function (data, status, headers, config) {
                 $scope.log = 'Error occured while querying' + data;
@@ -78,7 +83,6 @@ app.controller('freeTextSearch', function ($scope, $http, $location, mySetting) 
                 $scope.ready = true;
             });
     };
-    
 
     //Send suggest request to "suggest" servlet for autocompleting.
     $scope.autoSuggest = function () {
@@ -120,15 +124,6 @@ function fuzzify(query_string, default_freetext_fuzzify) {
             //Do not do anything if query string has either one of the following chars.
             if (query_string.indexOf('*') === -1 && query_string.indexOf('~') === -1 &&
                 query_string.indexOf(':') === -1 && query_string.indexOf('"') === -1) {
-
-                /*if(query_string.indexOf('"') >= 0){
-                    var quote_index =  query_string.lastIndexOf('"');
-                    var quote_part =  query_string.substring(0, quote_index);
-                    query_string = query_string.substring(quote_index+1, rqs.length);
-
-                    alert("Quotes: " + quote_part +  "\n Other parts: " +  query_string);
-                }
-                **/
                 var option_parts = query_string.split(' ');
                 var pq = "";
                 for (var oi = 0; oi < option_parts.length; oi++) {
