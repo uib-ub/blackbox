@@ -1,28 +1,28 @@
 <div class="ui image">
     <div class="ui blue ribbon label">{{doc._source.type}}</div>
     
-    <a ng-if="doc._source.hasthumbnail" target="_blank" href="{{doc._source.uri}}">
-        <img alt="{{doc._source.title}}" class="small image" src="{{doc._source.hasthumbnail}}">
+    <a ng-if="doc._source.hasThumbnail" target="_blank" href="{{doc._source.uri}}">
+        <img alt="{{doc._source.title}}" class="small image" src="{{doc._source.hasThumbnail}}">
     </a>
     
-    <div ng-if="doc._source.hasthumbnail" class="ui bottom attached label marcus pushup">
+    <div ng-if="doc._source.hasThumbnail" class="ui bottom attached label marcus pushup">
         <div style="text-align: left;">{{doc._source.identifier}}<br>
         <i>{{doc._source.cataloguer}}</i></div>
         <div class="ui ms-corner">
-            <i ng-show='doc._source.showweb == "true"' class="circular inverted green unlock icon"></i>
-            <i ng-show='doc._source.showweb == "false"' class="circular inverted red lock icon"></i>
-            <i ng-show='doc._source.showweb == undefined' class="circular inverted help icon"></i>
-            <i style="right: 2em;" ng-show='doc._source.haszoom == "Med DeepZoom"' class="circular inverted orange zoom icon"></i>
+            <i ng-show='doc._source.showWeb == "true"' class="circular inverted green unlock icon"></i>
+            <i ng-show='doc._source.showWeb == "false"' class="circular inverted red lock icon"></i>
+            <i ng-show='doc._source.showWeb == undefined' class="circular inverted help icon"></i>
+            <i style="right: 2em;" ng-show='doc._source.hasZoom == "Med DeepZoom"' class="circular inverted orange zoom icon"></i>
             <!--<i ng-show='doc._source.haszoom == "Uten DeepZoom"' class="circular inverted red lock icon"></i>
             <i ng-show='doc._source.haszoom == undefined' class="circular inverted help icon"></i>-->
         </div>
     </div>
-    <i ng-if="!doc._source.hasthumbnail" class="ui bordered inverted grey icon massive camera retro"></i>
-    <div ng-if="!doc._source.hasthumbnail" class="ui ms-corner">
-            <i ng-show='doc._source.showweb == "true"' class="circular inverted green unlock icon"></i>
-            <i ng-show='doc._source.showweb == "false"' class="circular inverted red lock icon"></i>
-            <i ng-show='doc._source.showweb == undefined' class="circular inverted help icon"></i>
-            <i style="right: 2em;" ng-show='doc._source.haszoom == "Med DeepZoom"' class="circular inverted orange zoom icon"></i>
+    <i ng-if="!doc._source.hasThumbnail" class="ui bordered inverted grey icon massive camera retro"></i>
+    <div ng-if="!doc._source.hasThumbnail" class="ui ms-corner">
+            <i ng-show='doc._source.showWeb == "true"' class="circular inverted green unlock icon"></i>
+            <i ng-show='doc._source.showWeb == "false"' class="circular inverted red lock icon"></i>
+            <i ng-show='doc._source.showWeb == undefined' class="circular inverted help icon"></i>
+            <i style="right: 2em;" ng-show='doc._source.hasZoom == "Med DeepZoom"' class="circular inverted orange zoom icon"></i>
             <!--<i ng-show='doc._source.haszoom == "Uten DeepZoom"' class="circular inverted red lock icon"></i>
             <i ng-show='doc._source.haszoom == undefined' class="circular inverted help icon"></i>-->
         </div>
@@ -30,7 +30,7 @@
 </div>
 
 <div class="content">
-    <a class="header" target="_blank" href="{{doc._source.uri}}">{{doc._source.title|| "Uten tittel"}}</a>
+    <a class="header" target="_blank" href="{{doc._source.uri}}">{{doc._source.title||doc._source.label}}</a>
     <div class="meta">
         <div ng-if="isString(doc._source.maker)">
             <i class="ui icon user"></i><span>{{doc._source.maker}}</span>
@@ -48,13 +48,13 @@
     </div>
     <hr>
     <div class="extra">
-        <div ng-if="isString(doc._source.ispartof)">
-            <div class="content"><i class="ui icon archive"></i><span>{{doc._source.ispartof}}</span> </div>
+        <div ng-if="isString(doc._source.isPartOf)">
+            <div class="content"><i class="ui icon archive"></i><span>{{doc._source.isPartOf}}</span> </div>
         </div>
-        <div ng-if="isArray(doc._source.ispartof)">
+        <div ng-if="isArray(doc._source.isPartOf)">
             <div class="ui horizontal list">
-                <div ng-repeat="ispartof in doc._source.ispartof track by $index" class="item">
-                    <div class="content"><i class="ui icon archive"></i><span>{{ispartof}}</span> </div>
+                <div ng-repeat="isPartOf in doc._source.isPartOf track by $index" class="item">
+                    <div class="content"><i class="ui icon archive"></i><span>{{isPartOf}}</span> </div>
                 </div>
             </div>
         </div>
@@ -97,17 +97,17 @@
                         <span class="year{{doc._source.created| date:'yyyy'}}"></span>
                         <span>{{doc._source.created | date:"d. MMM yyyy"}}</span>
                     </div>
-                    <div ng-if="doc._source.madeafter" class="item event dateDigitized">
+                    <div ng-if="doc._source.madeAfter" class="item event dateDigitized">
                         <img style="width: 20px;" src="img/noun_346838_cc.svg">
-                        <span class="year{{doc._source.madeafter| date:'yyyy'}}"></span>
-                        <span>{{doc._source.madeafter | date:"d. MMM yyyy"}}</span>
+                        <span class="year{{doc._source.madeAfter| date:'yyyy'}}"></span>
+                        <span>{{doc._source.madeAfter | date:"d. MMM yyyy"}}</span>
                     </div>
-                    <div ng-if="doc._source.madeafter || doc._source.madebefore" class="item event dateDigitized">
+                    <div ng-if="doc._source.madeAfter || doc._source.madeBefore" class="item event dateDigitized">
                         <img style="width: 40px; margin-top: 5px;" src="img/noun_212152_cc.svg">
                     </div>
-                    <div ng-if="doc._source.madebefore" class="item event dateDigitized">
-                        <span class="year{{doc._source.madebefore| date:'yyyy'}}"></span>
-                        <span>{{doc._source.madebefore | date:"d. MMM yyyy"}}</span>
+                    <div ng-if="doc._source.madeBefore" class="item event dateDigitized">
+                        <span class="year{{doc._source.madeBefore| date:'yyyy'}}"></span>
+                        <span>{{doc._source.madeBefore | date:"d. MMM yyyy"}}</span>
                         <img style="width: 20px;" src="img/noun_346839_cc.svg">
                     </div>
                     <div ng-if="doc._source.available" class="item event dateDigitized">

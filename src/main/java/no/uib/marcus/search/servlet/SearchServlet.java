@@ -98,14 +98,14 @@ public class SearchServlet extends HttpServlet {
                                 boolFilter
                                         //Range within "created" field
                                         .should(FilterBuilders.rangeFilter("created").gte(fromDate).lte(toDate))
-                                        /*madeafter >= from_date and madeafter <= to_date*/
+                                        /*madeAfter >= from_date and madeAfter <= to_date*/
                                         .should(FilterBuilders.boolFilter()
-                                                .must(FilterBuilders.rangeFilter("madeafter").gte(fromDate))
-                                                .must(FilterBuilders.rangeFilter("madeafter").lte(toDate)))
-                                        /*madebefore >= from_date and madebefore <= to_date*/
+                                                .must(FilterBuilders.rangeFilter("madeAfter").gte(fromDate))
+                                                .must(FilterBuilders.rangeFilter("madeAfter").lte(toDate)))
+                                        /*madeBefore >= from_date and madeBefore <= to_date*/
                                         .should(FilterBuilders.boolFilter()
-                                                .must(FilterBuilders.rangeFilter("madebefore").gte(fromDate))
-                                                .must(FilterBuilders.rangeFilter("madebefore").lte(toDate)));
+                                                .must(FilterBuilders.rangeFilter("madeBefore").gte(fromDate))
+                                                .must(FilterBuilders.rangeFilter("madeBefore").lte(toDate)));
 
                                                 /*
                                                   //AND filter.

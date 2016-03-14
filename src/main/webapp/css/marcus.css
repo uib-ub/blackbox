@@ -58,10 +58,9 @@ html, body {
 }
 
 .single-select {
-    width: 30%;
-    margin-top: 10px;
-    /**background: whitesmoke;**/
-    /**color: #07e;**/
+    margin-top: 20px;
+    /**background: whitesmoke;
+    color: #07e;**/
     float: right;
 }
 

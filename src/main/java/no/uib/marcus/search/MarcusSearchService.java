@@ -159,9 +159,10 @@ public class MarcusSearchService implements SearchService, Serializable {
                                 //Use simple_query_string query with AND operator
                                 query = getSimpleQueryString(queryStr);
                         } else {
-                                //Match all documents and boost documents of type "document", if exist
+                                //Match all documents and boost documents of type "fotographi", if exist
                                 query = QueryBuilders.functionScoreQuery(QueryBuilders.matchAllQuery())
-                                        .add(FilterBuilders.termFilter("_type", "document"), ScoreFunctionBuilders.weightFactorFunction(2));
+                                       .add(FilterBuilders.termFilter("showWeb", "true"), ScoreFunctionBuilders.weightFactorFunction(2))
+                                       .add(FilterBuilders.termFilter("type", "fotografi"), ScoreFunctionBuilders.weightFactorFunction(2));
 
                         }
                         //Set query

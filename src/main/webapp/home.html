@@ -72,16 +72,16 @@
                                 <h3>Kategorier</h3>
                                 <hr>
                                     <div class="ui relaxed list">
-                                        <div class="ui item checkbox" ng-repeat="bucket in results['aggregations']['haszoom']['buckets']">
-                                            <input id="hasZoom-{{bucket.key}}" type="checkbox" checklist-model="selected_filters" checklist-value="getCheckedValue('haszoom', bucket.key)" ng-click="search()">
+                                        <div class="ui item checkbox" ng-repeat="bucket in results['aggregations']['hasZoom']['buckets']">
+                                            <input id="hasZoom-{{bucket.key}}" type="checkbox" checklist-model="selected_filters" checklist-value="getCheckedValue('hasZoom', bucket.key)" ng-click="search()">
                                             <label for="hasZoom-{{bucket.key}}"> {{bucket.key}} <span style="color:grey"> ({{bucket.doc_count}})</span></label>
                                         </div>
-                                        <div class="ui item checkbox" ng-repeat="bucket in results['aggregations']['isdigitized']['buckets']">
-                                            <input id="isDigitized-{{bucket.key}}" type="checkbox" checklist-model="selected_filters" checklist-value="getCheckedValue('isdigitized', bucket.key)" ng-click="search()">
+                                        <div class="ui item checkbox" ng-repeat="bucket in results['aggregations']['isDigitized']['buckets']">
+                                            <input id="isDigitized-{{bucket.key}}" type="checkbox" checklist-model="selected_filters" checklist-value="getCheckedValue('isDigitized', bucket.key)" ng-click="search()">
                                             <label for="isDigitized-{{bucket.key}}">{{bucket.key}} <span style="color:grey"> ({{bucket.doc_count}})</span></label>
                                         </div>
-                                        <div class="ui item checkbox" ng-repeat="bucket in results['aggregations']['iscatalogued']['buckets']">
-                                            <input id="isCatalogued-{{bucket.key}}" type="checkbox" checklist-model="selected_filters" checklist-value="getCheckedValue('iscatalogued', bucket.key)" ng-click="search()">
+                                        <div class="ui item checkbox" ng-repeat="bucket in results['aggregations']['isCatalogued']['buckets']">
+                                            <input id="isCatalogued-{{bucket.key}}" type="checkbox" checklist-model="selected_filters" checklist-value="getCheckedValue('isCatalogued', bucket.key)" ng-click="search()">
                                             <label for="isCatalogued-{{bucket.key}}">{{bucket.key}} <span style="color:grey"> ({{bucket.doc_count}})</span></label>
                                         </div>
                                     </div>
@@ -91,8 +91,8 @@
                                 <div class="ui list" style="height:300px; overflow-y: scroll" >
                                     <div class="ui checkbox item" ng-repeat="bucket in results['aggregations']['type.exact']['buckets']">
                                         <input id="type-{{bucket.key}}" type="checkbox" checklist-model="selected_filters" checklist-value="getCheckedValue('type.exact', bucket.key)" ng-click="search()">
-                                        <label for="type-{{bucket.key}}"> {{bucket.key}}
-                                            <span style="color:grey"> ({{bucket.doc_count}})</span>
+                                        <label for="type-{{bucket.key}}" ng-class="{'disabled': bucket.doc_count == 0}"> {{bucket.key}}
+                                            <span ng-if="bucket.doc_count > 0" style="color:grey"> ({{bucket.doc_count}})</span>
                                         </label>
                                     </div>
                                 </div>
@@ -128,8 +128,8 @@
                                         <option value="">Mest relevant</option>
                                         <option value="identifier:asc">ID ASC</option>
                                         <option value="identifier:desc">ID DESC</option>
-                                        <option value="title:asc">Tittle ASC</option>
-                                        <option value="title:desc">Tittle DESC</option>
+                                        <option value="title.exact:asc">Tittle ASC</option>
+                                        <option value="title.exact:desc">Tittle DESC</option>
                                         <option value="available:asc">Tilgjengeliggjort ASC</option>
                                         <option value="available:desc">Tilgjengeliggjort DESC</option>
                                     </select>
@@ -146,6 +146,20 @@
                                                     max-size="5"
                                                     force-ellipses="true">
                                     </uib-pagination>
+                                    <div class="single-select">
+                                        <label for="pageSize">Resultater per side</label>
+                                        <select id="pageSize" ng-model="page_size" ng-change="search()">
+                                            <option value="10">10</option>
+                                            <option value="50">50</option>
+                                            <option value="100">100</option>
+                                            <option value="200">200</option>
+                                            <option value="250">250</option>
+                                            <option value="300">300</option>
+                                        </select>
+                                    </div>
+
+
+
 
                                     <div class="ui divided items">
                                         <div ng-repeat="doc in results.hits.hits track by $index" class="ui item">
@@ -159,8 +173,6 @@
                                         <div include-replace ng-if='doc._source.type == "Aggregering"' ng-include="'partials/aggregation-hits.html'" style="page-break-inside: avoid;" class="ui item"></div>
                                         <div include-replace ng-if='doc._source.type == "Fotografi" || doc._source.type == "Manuskript" || doc._source.type == "Postkort" || doc._source.type == "Brev" || doc._source.type == "Diplom" || doc._source.type == "Bok" || doc._source.type == "Tale" || doc._source.type == "Segl" || doc._source.type == "Dokument" || doc._source.type == "Grafikk" || doc._source.type == "Transkripsjon" || doc._source.type == "Telegram" || doc._source.type == "Tegning" || doc._source.type == "Notat" || doc._source.type == "Forhandlingsprotokoll" || doc._source.type == "Kvittering" || doc._source.type == "Protokoll" || doc._source.type == "Reisedagbok" || doc._source.type == "Nummer" || doc._source.type == "Kartsett" || doc._source.type == "Kontrakt" || doc._source.type == "Salgsskjøte" || doc._source.type == "Bønnebok" || doc._source.type == "Dagbok" || doc._source.type == "Fragment" || doc._source.type == "Kassebok" || doc._source.type == "Oppmålingsdokument" || doc._source.type == "Supplikk"' ng-include="'partials/document-hits.html'" style="page-break-inside: avoid;" class="ui item"></div>
                                             <div include-replace ng-if='doc._source.type == "Emne"' ng-include="'partials/concept-hits.html'" style="page-break-inside: avoid;" class="ui item"></div>
-
-
                                         </div>
                                     </div>
                                     
@@ -202,7 +214,6 @@
         <script src="js/lib/typeahead/js/main.js"></script>
         <script src="//code.jquery.com/ui/1.11.4/jquery-ui.js"></script>
         <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.0/angular.min.js"></script>
-        <!--script src="http://ajax.googleapis.com/ajax/libs/angularjs/1.5.0/angular-animate.js"></script-->
         <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
         <script src="//cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.1.8/semantic.min.js"></script>
         <script src="js/marcus-app.js"></script>
@@ -216,12 +227,12 @@
             angular.module("settings", [])
                 .constant("mySetting", {
                     index: ["admin-test"],
-                        type: ["document"],
+                        /**type: ["document"],**/
                         facets: [
                         {"field": "type.exact", "size": 50, "operator": "OR", /*"order": "term_asc",*/ "min_doc_count" : 0},
-                        {"field": "haszoom", "size": 10, "operator": "AND", "order": "term_asc", "min_doc_count" : 0},
-                        {"field": "isdigitized", "size": 10, "operator": "AND", "order": "count_desc", "min_doc_count" : 0},
-                        {"field": "iscatalogued", "size": 10, "operator": "AND", "order": "count_desc", "min_doc_count" : 0},
+                        {"field": "hasZoom", "size": 10, "operator": "AND", "order": "term_asc", "min_doc_count" : 0},
+                        {"field": "isDigitized", "size": 10, "operator": "AND", "order": "count_desc", "min_doc_count" : 0},
+                        {"field": "isCatalogued", "size": 10, "operator": "AND", "order": "count_desc", "min_doc_count" : 0},
                         {"field": "subject.exact", "size" : 30, "min_doc_count" : 1},
                         /*Supported intervals: weeks(w), days(d), hours(h), minutes(m), seconds(s)*/
                         {"field": "created", "type" : "date_histogram", "format" : "yyyy", "interval" : "520w", "min_doc_count" : 1, "order" : "key_asc"}]
