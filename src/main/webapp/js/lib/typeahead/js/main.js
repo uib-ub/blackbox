@@ -55,7 +55,7 @@ $(document).ready(function () {
         limit: 10,
         remote: {
             /*You must manually append indices here*/
-            url: 'suggest?q=%QUERY&index=admin', 
+            url: 'suggest?q=%QUERY&index=admin-test',
             wildcard: '%QUERY',
             rateLimitWait: 20
         }

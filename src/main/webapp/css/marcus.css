@@ -15,7 +15,7 @@ html, body {
 
 /**@media (min-width: 320px) {**/
 .main-container .content {
-    width: 1000px;
+    /**width: 1000px;**/
     margin: 30px auto 0 auto;
     overflow: hidden;
 }
@@ -125,6 +125,5 @@ html, body {
     position: absolute;
     top: 1em;
     right: 0.5em;
->>>>>>> 8ebd50d7aaaea428e7c27a82f7766f513f4ba509
 }
 

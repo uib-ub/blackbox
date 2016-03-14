@@ -10,10 +10,10 @@ import org.elasticsearch.action.search.SearchRequestBuilder;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.common.Nullable;
 import org.elasticsearch.common.Strings;
-import org.elasticsearch.common.lucene.search.function.FiltersFunctionScoreQuery;
 import org.elasticsearch.common.xcontent.XContentBuilder;
 import org.elasticsearch.common.xcontent.XContentFactory;
 import org.elasticsearch.index.query.*;
+import org.elasticsearch.index.query.functionscore.ScoreFunctionBuilders;
 import org.elasticsearch.search.aggregations.AggregationBuilders;
 import org.elasticsearch.search.aggregations.bucket.histogram.DateHistogram;
 import org.elasticsearch.search.aggregations.bucket.histogram.DateHistogramBuilder;
@@ -26,7 +26,6 @@ import org.elasticsearch.search.sort.SortBuilder;
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.Map;
-import org.elasticsearch.index.query.functionscore.ScoreFunctionBuilders;
 
 
 public class MarcusSearchService implements SearchService, Serializable {
@@ -107,6 +106,20 @@ public class MarcusSearchService implements SearchService, Serializable {
         }
 
         /**
+         * Build a simple query string
+         * @param queryString a query string
+         * @return a builder for simple query string
+         */
+        private SimpleQueryStringBuilder getSimpleQueryString(String queryString){
+                return QueryBuilders.simpleQueryStringQuery(queryString)
+                        .analyzer("default")//The custom "default" analyzer is defined in the settings.
+                        .field("identifier")
+                        .field("label" , 3)
+                        .field("_all")
+                        .defaultOperator(SimpleQueryStringBuilder.Operator.AND);
+        }
+
+        /**
          * Get all documents.
          * <br />
          *
@@ -132,9 +145,7 @@ public class MarcusSearchService implements SearchService, Serializable {
                 QueryBuilder query;
                 try {
                         //Prepare search request
-                        searchRequest = ClientFactory
-                                .getTransportClient()
-                                .prepareSearch();
+                        searchRequest = ClientFactory.getTransportClient().prepareSearch();
                         //Set indices
                         if (indices != null && indices.length > 0) {
                                 searchRequest.setIndices(indices);
@@ -146,8 +157,7 @@ public class MarcusSearchService implements SearchService, Serializable {
                         //set query
                         if (Strings.hasText(queryStr)) {
                                 //Use simple_query_string query with AND operator
-                                query = QueryBuilders.simpleQueryStringQuery(queryStr)
-                                        .defaultOperator(SimpleQueryStringBuilder.Operator.AND);
+                                query = getSimpleQueryString(queryStr);
                         } else {
                                 //Match all documents and boost documents of type "document", if exist
                                 query = QueryBuilders.functionScoreQuery(QueryBuilders.matchAllQuery())
@@ -211,8 +221,7 @@ public class MarcusSearchService implements SearchService, Serializable {
 
                         if (Strings.hasText(queryStr)) {
                                 //Use simple_query_string query
-                                query = QueryBuilders.simpleQueryStringQuery(queryStr)
-                                        .defaultOperator(SimpleQueryStringBuilder.Operator.AND);
+                                query = getSimpleQueryString(queryStr);
                         } else {
                                 //Use match_all query
                                 query = QueryBuilders.matchAllQuery();
@@ -264,7 +273,14 @@ public class MarcusSearchService implements SearchService, Serializable {
                                         searchRequest.addAggregation(
                                                 getDateHistogramAggregation(currentFacet)
                                         );
-                                } else {
+                                }
+                                /**else if (currentFacet.has("operator") && currentFacet.get("operator").getAsString().equalsIgnoreCase("OR")){
+                                        searchRequest.addAggregation(AggregationBuilders.global("or_agg")
+                                                .subAggregation(getTermsAggregation(currentFacet))
+                                                .subAggregation(AggregationBuilders));**
+
+                                }**/
+                                else {
                                         //Add terms aggregations to the search request builder (this is default)
                                         searchRequest.addAggregation(
                                                 getTermsAggregation(currentFacet)
@@ -351,7 +367,7 @@ public class MarcusSearchService implements SearchService, Serializable {
                 
                 return termsBuilder;
         }
-        /**
+        /**@deprecated
          * A method to add extra field to every bucket in the terms
          * aggregations. The field value is queried independently from the
          * Elasticsearch.
@@ -363,6 +379,7 @@ public class MarcusSearchService implements SearchService, Serializable {
          * @return a JSON string of response where the extra field has been
          * added to each bucket aggregation.
          */
+        @Deprecated
         public String addExtraFieldToBucketsAggregation(SearchResponse response) {
                 Gson gson = new GsonBuilder().setPrettyPrinting().create();
                 if (response == null) {
@@ -434,7 +451,11 @@ public class MarcusSearchService implements SearchService, Serializable {
                         .prepareSearch()
                         .setIndices("admin")
                         .setTypes("document")
-                        .addAggregation(AggregationBuilders
+                        .addAggregation(AggregationBuilders.global("or_agg")
+                                .subAggregation(AggregationBuilders.filter("type_filter").filter(FilterBuilders.termFilter("type.exact", "Brev")))
+                                .subAggregation(AggregationBuilders.terms("type.exact").field("type.exact")));
+
+                        /**.addAggregation(AggregationBuilders
                                 .dateHistogram("created")
                                 .field("created")
                                 .format("yyyy")
@@ -442,7 +463,7 @@ public class MarcusSearchService implements SearchService, Serializable {
                                 //.extendedBounds("1997-01-01", "2016-01-01")
                                 .interval(new DateHistogram.Interval("520w"))
                                 .minDocCount(1)
-                        );
+                        );**/
 
                 SearchResponse res = req.execute().actionGet();
                 System.out.println("Request: " + req.toString());

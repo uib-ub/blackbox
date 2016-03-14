@@ -61,7 +61,7 @@
                     <div class="ui grid search-results">
                         <div class="content ui row">
                             <div ng-cloak class="facets ui four wide column">
-                                <h3 style="margin-top:15px;">Tilgjengeliggjort</h3>
+                                <h3 style="margin-top:15px;">Dato</h3>
                                 <hr>
                                 <div class="datePicker ui input">
                                      <input type="text" id="from_date" class="datePicker" ng-model="from_date" ng-change="search()" placeholder="FRA" title="Fra dato">
@@ -91,8 +91,8 @@
                                 <div class="ui list" style="height:300px; overflow-y: scroll" >
                                     <div class="ui checkbox item" ng-repeat="bucket in results['aggregations']['type.exact']['buckets']">
                                         <input id="type-{{bucket.key}}" type="checkbox" checklist-model="selected_filters" checklist-value="getCheckedValue('type.exact', bucket.key)" ng-click="search()">
-                                        <label for="type-{{bucket.key}}" ng-class="{'disabled': bucket.doc_count == 0}"> {{bucket.key}}
-                                            <span ng-if="bucket.doc_count > 0" style="color:grey"> ({{bucket.doc_count}})</span>
+                                        <label for="type-{{bucket.key}}"> {{bucket.key}}
+                                            <span style="color:grey"> ({{bucket.doc_count}})</span>
                                         </label>
                                     </div>
                                 </div>
@@ -158,11 +158,9 @@
                                         <div include-replace ng-if='doc._source.type == "Arbeidsliste"' ng-include="'partials/object-hits.html'" style="page-break-inside: avoid;" class="ui item"></div>
                                         <div include-replace ng-if='doc._source.type == "Aggregering"' ng-include="'partials/aggregation-hits.html'" style="page-break-inside: avoid;" class="ui item"></div>
                                         <div include-replace ng-if='doc._source.type == "Fotografi" || doc._source.type == "Manuskript" || doc._source.type == "Postkort" || doc._source.type == "Brev" || doc._source.type == "Diplom" || doc._source.type == "Bok" || doc._source.type == "Tale" || doc._source.type == "Segl" || doc._source.type == "Dokument" || doc._source.type == "Grafikk" || doc._source.type == "Transkripsjon" || doc._source.type == "Telegram" || doc._source.type == "Tegning" || doc._source.type == "Notat" || doc._source.type == "Forhandlingsprotokoll" || doc._source.type == "Kvittering" || doc._source.type == "Protokoll" || doc._source.type == "Reisedagbok" || doc._source.type == "Nummer" || doc._source.type == "Kartsett" || doc._source.type == "Kontrakt" || doc._source.type == "Salgsskjøte" || doc._source.type == "Bønnebok" || doc._source.type == "Dagbok" || doc._source.type == "Fragment" || doc._source.type == "Kassebok" || doc._source.type == "Oppmålingsdokument" || doc._source.type == "Supplikk"' ng-include="'partials/document-hits.html'" style="page-break-inside: avoid;" class="ui item"></div>
-                                        <!--div class="ui raised inverted segment ng-hide">
-                                            <h3 class="header">JSON source:</h3>
-                                            <hr>
-                                            <pre>{{doc._source| json}}</pre>
-                                        </div-->
+                                            <div include-replace ng-if='doc._source.type == "Emne"' ng-include="'partials/concept-hits.html'" style="page-break-inside: avoid;" class="ui item"></div>
+
+
                                         </div>
                                     </div>
                                     
@@ -217,10 +215,10 @@
         <script>
             angular.module("settings", [])
                 .constant("mySetting", {
-                    index: ["admin"],
-                        /*type: [],*/
+                    index: ["admin-test"],
+                        type: ["document"],
                         facets: [
-                        {"field": "type.exact", "size": 50, "operator": "OR", "order": "term_asc", "min_doc_count" : 0},
+                        {"field": "type.exact", "size": 50, "operator": "OR", /*"order": "term_asc",*/ "min_doc_count" : 0},
                         {"field": "haszoom", "size": 10, "operator": "AND", "order": "term_asc", "min_doc_count" : 0},
                         {"field": "isdigitized", "size": 10, "operator": "AND", "order": "count_desc", "min_doc_count" : 0},
                         {"field": "iscatalogued", "size": 10, "operator": "AND", "order": "count_desc", "min_doc_count" : 0},
