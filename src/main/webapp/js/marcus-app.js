@@ -1,7 +1,7 @@
 'use strict';
 //Controller file for Marcus-search system
 
-var app = angular.module('marcus', ["checklist-model", "ui.bootstrap", "settings"]);
+var app = angular.module('marcus', ["checklist-model", "ui.bootstrap", "settings", "ngAnimate"]);
 
 /**========= Search Controller ===========**/
 app.controller('freeTextSearch', function ($scope, $http, $location, $window, mySetting) {

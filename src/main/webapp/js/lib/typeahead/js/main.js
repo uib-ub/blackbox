@@ -47,7 +47,7 @@ $(document).ready(function () {
      */
 
     //Initialize suggestion engine
-    var marcusSuggegstionEngine = new Bloodhound({
+    var marcusSuggestionEngine = new Bloodhound({
         name: 'suggest',
         datumTokenizer: Bloodhound.tokenizers.whitespace,
         queryTokenizer: Bloodhound.tokenizers.whitespace,
@@ -67,7 +67,7 @@ $(document).ready(function () {
             sync(['Hemed Al Ruwehy', 'Tarje Lavik', 'Øyvind Gjesdal', 'Marcus']);
             async([]);
         } else {
-            marcusSuggegstionEngine.search(q, sync, async);
+            marcusSuggestionEngine.search(q, sync, async);
         }
     }
 

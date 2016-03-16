@@ -1,6 +1,6 @@
 html, body {
-    /**background: #f2f9ff repeat scroll 0 0; /**Tyeahead**/
-    background: #e7e9ec repeat scroll 0 0;/**Linked In**/
+    background: #f2f9ff repeat scroll 0 0; /**Tyeahead**/
+    /**background: #e7e9ec repeat scroll 0 0;/**Linked In**/
     /**background: #e9eff5 repeat scroll 0 0;/**FINN**/
     /**background-color: #f5f8fa;/**Twitter**/
     /**background: #f8f8f8 repeat scroll 0 0;**/
@@ -58,7 +58,7 @@ html, body {
 }
 
 .single-select {
-    margin-top: 20px;
+    margin-top: 15px;
     /**background: whitesmoke;
     color: #07e;**/
     float: right;
@@ -111,18 +111,22 @@ html, body {
     top: 0.5em;
     right: 0.5em;
 }
-.fade.ng-hide {
-    transition:0.5s linear all;
-    opacity:0;
-}
+
 
 [ng\:cloak], [ng-cloak], [data-ng-cloak], [x-ng-cloak], .ng-cloak, .x-ng-cloak {
     display: none !important;
 }
 
-.ui.ms-corner {
-    position: absolute;
-    top: 1em;
-    right: 0.5em;
+.fade.ng-hide {
+    transition:0.2s ease-in all;
+    opacity:0;
 }
 
+.fade.ng-leave {
+    transition:0.2s linear all;
+    opacity:0;
+}
+.fade.ng-leave.ng-leave-active {
+    transition:0.2s linear all;
+    opacity:0;
+}
