@@ -17,7 +17,7 @@
         <link rel="stylesheet" href="css/marcus.css" />
     </head>
     <body>
-        <div class="ui fixed inverted menu" style="background:#0063FB;">
+        <div class="ui fixed inverted menu">
             <div class="ui container fluid header-wrap">
                 <a id="show-menu" class="item">
                     <i class="sidebar icon"></i>
@@ -147,7 +147,7 @@
                                                     force-ellipses="true">
                                     </uib-pagination>
                                     <div class="single-select form-group">
-                                        <label class="ui item" for="docPerPage">Resultater/side: </label>
+                                        <label class="ui item" for="docPerPage">Resultater per side: </label>
                                         <select id="docPerPage" ng-model="page_size" ng-change="search()">
                                             <option value="10" ng-selected="selected">10</option>
                                             <option value="20">20</option>
