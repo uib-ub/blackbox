@@ -68,24 +68,7 @@
                                </div><br/><br/>
                                 <div class="datePicker ui input">
                                      <input type="text" id="to_date" class="datePicker" ng-model="to_date" ng-change="search()" placeholder="TIL" title="Til dato">
-                                </div><br/><br/>                              
-                                <h3>Kategorier</h3>
-                                <hr>
-                                    <div class="ui relaxed list">
-                                        <div class="ui item checkbox" ng-repeat="bucket in results['aggregations']['hasZoom']['buckets']">
-                                            <input id="hasZoom-{{bucket.key}}" type="checkbox" checklist-model="selected_filters" checklist-value="getCheckedValue('hasZoom', bucket.key)" ng-click="search()">
-                                            <label for="hasZoom-{{bucket.key}}"> {{bucket.key}} <span style="color:grey"> ({{bucket.doc_count}})</span></label>
-                                        </div>
-                                        <div class="ui item checkbox" ng-repeat="bucket in results['aggregations']['isDigitized']['buckets']">
-                                            <input id="isDigitized-{{bucket.key}}" type="checkbox" checklist-model="selected_filters" checklist-value="getCheckedValue('isDigitized', bucket.key)" ng-click="search()">
-                                            <label for="isDigitized-{{bucket.key}}">{{bucket.key}} <span style="color:grey"> ({{bucket.doc_count}})</span></label>
-                                        </div>
-                                        <div class="ui item checkbox" ng-repeat="bucket in results['aggregations']['isCatalogued']['buckets']">
-                                            <input id="isCatalogued-{{bucket.key}}" type="checkbox" checklist-model="selected_filters" checklist-value="getCheckedValue('isCatalogued', bucket.key)" ng-click="search()">
-                                            <label for="isCatalogued-{{bucket.key}}">{{bucket.key}} <span style="color:grey"> ({{bucket.doc_count}})</span></label>
-                                        </div>
-                                    </div>
-
+                                </div><br/><br/>
                                 <h3>Dokument typer</h3>
                                 <hr>
                                 <div class="ui list" style="height:300px; overflow-y: scroll" >
@@ -94,6 +77,22 @@
                                         <label for="type-{{bucket.key}}" ng-class="{'disabled': bucket.doc_count == 0}"> {{bucket.key}}
                                             <span ng-if="bucket.doc_count > 0" style="color:grey"> ({{bucket.doc_count}})</span>
                                         </label>
+                                    </div>
+                                </div>
+                                <h3>Kategorier</h3>
+                                <hr>
+                                <div class="ui relaxed list">
+                                    <div class="ui item checkbox" ng-repeat="bucket in results['aggregations']['hasZoom']['buckets']">
+                                        <input id="hasZoom-{{bucket.key}}" type="checkbox" checklist-model="selected_filters" checklist-value="getCheckedValue('hasZoom', bucket.key)" ng-click="search()">
+                                        <label for="hasZoom-{{bucket.key}}"> {{bucket.key}} <span style="color:grey"> ({{bucket.doc_count}})</span></label>
+                                    </div>
+                                    <div class="ui item checkbox" ng-repeat="bucket in results['aggregations']['isDigitized']['buckets']">
+                                        <input id="isDigitized-{{bucket.key}}" type="checkbox" checklist-model="selected_filters" checklist-value="getCheckedValue('isDigitized', bucket.key)" ng-click="search()">
+                                        <label for="isDigitized-{{bucket.key}}">{{bucket.key}} <span style="color:grey"> ({{bucket.doc_count}})</span></label>
+                                    </div>
+                                    <div class="ui item checkbox" ng-repeat="bucket in results['aggregations']['isCatalogued']['buckets']">
+                                        <input id="isCatalogued-{{bucket.key}}" type="checkbox" checklist-model="selected_filters" checklist-value="getCheckedValue('isCatalogued', bucket.key)" ng-click="search()">
+                                        <label for="isCatalogued-{{bucket.key}}">{{bucket.key}} <span style="color:grey"> ({{bucket.doc_count}})</span></label>
                                     </div>
                                 </div>
                                 <h3>Emne</h3>
@@ -234,9 +233,10 @@
                         {"field": "hasZoom", "size": 10, "operator": "AND", "order": "term_asc", "min_doc_count" : 0},
                         {"field": "isDigitized", "size": 10, "operator": "AND", "order": "count_desc", "min_doc_count" : 0},
                         {"field": "isCatalogued", "size": 10, "operator": "AND", "order": "count_desc", "min_doc_count" : 0},
-                        {"field": "subject.exact", "size" : 30, "min_doc_count" : 1},
+                        {"field": "subject.exact", "size" : 30, "min_doc_count" : 1}
                         /*Supported intervals: weeks(w), days(d), hours(h), minutes(m), seconds(s)*/
-                        {"field": "created", "type" : "date_histogram", "format" : "yyyy", "interval" : "520w", "min_doc_count" : 1, "order" : "key_asc"}]
+                        //{"field": "created", "type" : "date_histogram", "format" : "yyyy", "interval" : "520w", "min_doc_count" : 1, "order" : "key_asc"}
+                        ]
             });
                 $('.ui.dropdown').dropdown({
                     allowAdditions: true });

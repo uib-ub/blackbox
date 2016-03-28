@@ -81,7 +81,6 @@ public class SearchServlet extends HttpServlet {
                         //After getting the response, add extra field "total_doc_count" to every bucket aggregations
                         //searchResponseString = service.addExtraFieldToBucketsAggregation(searchResponse);
                         searchResponseString = searchResponse.toString();
-                        //logger.info(searchResponseString.toString());
                         out.write(searchResponseString);
                 }
         }
@@ -94,44 +93,33 @@ public class SearchServlet extends HttpServlet {
                 Map<String, List> filterMap = AggregationUtils.getFilterMap(selectedFilters);
                 BoolFilterBuilder boolFilter = FilterBuilders.boolFilter();
                 try {
+                        //Build a date filter
                         if (Strings.hasText(fromDate) || Strings.hasText(toDate)) {
                                 boolFilter
+                                        //Range within "available" field
+                                        .should(FilterBuilders.rangeFilter("available").gte(fromDate).lte(toDate))
                                         //Range within "created" field
                                         .should(FilterBuilders.rangeFilter("created").gte(fromDate).lte(toDate))
-                                        /*madeAfter >= from_date and madeAfter <= to_date*/
-                                        .should(FilterBuilders.boolFilter()
-                                                .must(FilterBuilders.rangeFilter("madeAfter").gte(fromDate))
-                                                .must(FilterBuilders.rangeFilter("madeAfter").lte(toDate)))
-                                        /*madeBefore >= from_date and madeBefore <= to_date*/
+                                        //madeBefore >= from_date and madeBefore <= to_date
                                         .should(FilterBuilders.boolFilter()
                                                 .must(FilterBuilders.rangeFilter("madeBefore").gte(fromDate))
-                                                .must(FilterBuilders.rangeFilter("madeBefore").lte(toDate)));
-
-                                                /*
-                                                  //AND filter.
-                                                  .should(FilterBuilders.boolFilter()
-                                                  .must((FilterBuilders.rangeFilter("madeafter").gte(fromDate)))
-                                                  .must(FilterBuilders.rangeFilter("madebefore").lte(fromDate)));
-                                                 
-                                                 */
+                                                .must(FilterBuilders.rangeFilter("madeBefore").lte(toDate)))
+                                        //madeAfter >= from_date and madeAfter <= to_date
+                                        .should(FilterBuilders.boolFilter()
+                                                .must(FilterBuilders.rangeFilter("madeAfter").gte(fromDate))
+                                                .must(FilterBuilders.rangeFilter("madeAfter").lte(toDate)));
                         }
-                         /*
-                         * Building the BoolFilter based on user selected facets
-                         */
+                        //Building a filter based on the user selected facets
                         for (Map.Entry<String, List> entry : filterMap.entrySet()) {
                                 if (!entry.getValue().isEmpty()) {
                                         if (AggregationUtils.contains(aggregations, entry.getKey(), "operator", "AND")) {
-                                                logger.info("Constructing AND query for facet: " + entry.getKey());
+                                                //logger.info("Constructing AND query for facet: " + entry.getKey());
                                                 for (Object value : entry.getValue()) {
-                                                        //Building "AND" filter. A filter based on a term. 
-                                                        //If it is inside a must, it acts as "AND" filter
+                                                        //Building "AND" filter.
                                                         boolFilter.must(FilterBuilders.termFilter(entry.getKey(), value));
                                                 }
                                         } else {
-                                                /*
-                                                 *Building "OR" filter. Using "terms" filter based on several terms, matching on
-                                                 *any of them This acts as OR filter, when it is inside the must clause.
-                                                 */
+                                                //Building "OR" filter.
                                                 boolFilter.must(FilterBuilders.termsFilter(entry.getKey(), entry.getValue()));
                                         }
                                 }

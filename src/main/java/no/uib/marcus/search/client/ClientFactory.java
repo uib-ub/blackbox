@@ -14,10 +14,9 @@ import java.net.InetAddress;
 import java.net.UnknownHostException;
 
 /**
- * A singleton class that connect to Elasticsearch cluster through Transport
- * client
- * <br>
- * Note that you should define the same clustername as the one you defined on
+ * A singleton that connects to Elasticsearch cluster through Transport client
+ * <p>
+ * Note that you should define the same cluster name as the one you defined on
  * your running nodes. Otherwise, your Transport Client won't connect to the
  * node. Note also that you must define the transport client port (9300-9399)
  * and not the REST port (9200-9299). Transport client does not use REST API.
@@ -28,26 +27,24 @@ public class ClientFactory {
         private static Client client;
 
         /**
-         * We want to prevent direct instantiation of this class, thus we create
-         * private constructor
+         * We want to prevent direct instantiation of this class, thus we create private constructor
          */
-        private ClientFactory() {
-        }
+        private ClientFactory() {}
 
+        /**
+         * Create a transport client
+         **/
         private static Client createTransportClient(){
                 try {
                         Settings settings = ImmutableSettings.settingsBuilder()
-                                .put("cluster.name", "elasticsearch")
+                                .put("cluster.name", "ubb-elasticsearch")
+                                .put("node.name", "Blackbox")
                                 //.put("client.transport.ping_timeout", "100s")
                                 .build();
                         client = new TransportClient(settings)
-                                /*
-                                 * You can add more than one addresses here,
-                                 * depending on the number of your servers.
-                                 */
-                                .addTransportAddress(
-                                        //new InetSocketTransportAddress(InetAddress.getLocalHost(), 9300));
-                                        new InetSocketTransportAddress(InetAddress.getByName("kirishima.uib.no"), 9300));
+                                //You can add more than one addresses here, depending on the number of your servers.
+                                //.addTransportAddress(new InetSocketTransportAddress(InetAddress.getLocalHost(), 9300))
+                                .addTransportAddress(new InetSocketTransportAddress(InetAddress.getByName("kirishima.uib.no"), 9300));
 
                         ClusterHealthResponse hr = client.admin().cluster().prepareHealth().get();
                         logger.info("Connected to Elasticsearch cluster: " + hr);
@@ -62,7 +59,9 @@ public class ClientFactory {
                 return client;
         }
 
-        /*Syncronize the call so that different threads do not end up creating different instances**/
+        /**
+         * Syncronize the call so that different threads do not end up creating different instances
+         */
         public static synchronized Client getTransportClient() {
                 if (client == null) {
                         client = createTransportClient();
@@ -70,6 +69,9 @@ public class ClientFactory {
                 return client;
         }
 
+        /**
+         * Don't allow cloning for this object
+         **/
         @Override
         protected Object clone() throws CloneNotSupportedException {
                 throw new CloneNotSupportedException("Cloning for this object is not supported");
