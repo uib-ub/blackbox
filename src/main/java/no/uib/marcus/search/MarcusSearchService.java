@@ -33,12 +33,8 @@ public class MarcusSearchService implements SearchService, Serializable {
         private static final long serialVersionUID = 4L;
 
         private static final Logger logger = Logger.getLogger(MarcusSearchService.class);
-        private
-        @Nullable
-        String[] indices;
-        private
-        @Nullable
-        String[] types;
+        private @Nullable String[] indices;
+        private @Nullable String[] types;
         private String aggregations;
         private SortBuilder sort;
         private int from = -1;
@@ -275,12 +271,6 @@ public class MarcusSearchService implements SearchService, Serializable {
                                                 getDateHistogramAggregation(currentFacet)
                                         );
                                 }
-                                /**else if (currentFacet.has("operator") && currentFacet.get("operator").getAsString().equalsIgnoreCase("OR")){
-                                        searchRequest.addAggregation(AggregationBuilders.global("or_agg")
-                                                .subAggregation(getTermsAggregation(currentFacet))
-                                                .subAggregation(AggregationBuilders));**
-
-                                }**/
                                 else {
                                         //Add terms aggregations to the search request builder (this is default)
                                         searchRequest.addAggregation(

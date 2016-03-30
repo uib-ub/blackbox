@@ -74,11 +74,12 @@ app.controller('freeTextSearch', function ($scope, $http, $location, $window, my
                 $scope.show_loading = false;
                 $scope.ready = true;
 
-                $location.html5Mode(true);
+                /*$location.html5Mode(true);
                 alert(JSON.stringify(config.params));
                 $location.url(config.params);
                 $location.replace();
                 $window.history.pushState(null, 'locationURL', $location.absUrl());
+                */
 
 
             })
@@ -89,7 +90,7 @@ app.controller('freeTextSearch', function ($scope, $http, $location, $window, my
             });
     };
 
-    //Send suggest request to "suggest" servlet for autocompleting.
+    //Send suggest request to "suggest" servlet for autocompletion.
     $scope.autoSuggest = function () {
         $http({
             method: 'GET',

@@ -8,6 +8,8 @@ import org.elasticsearch.client.transport.TransportClient;
 import org.elasticsearch.common.settings.ImmutableSettings;
 import org.elasticsearch.common.settings.Settings;
 import org.elasticsearch.common.transport.InetSocketTransportAddress;
+import org.elasticsearch.search.highlight.HighlightBuilder;
+import org.elasticsearch.search.highlight.SearchContextHighlight;
 import org.elasticsearch.transport.ConnectTransportException;
 
 import java.net.InetAddress;
@@ -44,7 +46,8 @@ public class ClientFactory {
                         client = new TransportClient(settings)
                                 //You can add more than one addresses here, depending on the number of your servers.
                                 //.addTransportAddress(new InetSocketTransportAddress(InetAddress.getLocalHost(), 9300))
-                                .addTransportAddress(new InetSocketTransportAddress(InetAddress.getByName("kirishima.uib.no"), 9300));
+                                .addTransportAddress(
+                                        new InetSocketTransportAddress(InetAddress.getByName("kirishima.uib.no"), 9300));
 
                         ClusterHealthResponse hr = client.admin().cluster().prepareHealth().get();
                         logger.info("Connected to Elasticsearch cluster: " + hr);

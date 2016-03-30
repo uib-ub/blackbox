@@ -31,7 +31,6 @@ import java.util.Map;
         urlPatterns = {"/search"}
 )
 public class SearchServlet extends HttpServlet {
-
         private static final Logger logger = Logger.getLogger(SearchServlet.class);
         private static final long serialVersionUID = 1L;
         MarcusSearchService service;
@@ -40,6 +39,17 @@ public class SearchServlet extends HttpServlet {
                 //Share this object amongst all requests.
                 this.service = new MarcusSearchService();
         }
+
+        /**
+         * Date fields to perform ranges from
+         **/
+        private static class DateField {
+                private static final String AVAILABLE = "available";
+                private static final String CREATED = "created";
+                private static final String MADE_BEFORE = "madeBefore";
+                private static final String MADE_AFTER = "madeAfter";
+        }
+
         protected void processRequest(HttpServletRequest request, HttpServletResponse response)
                 throws ServletException, IOException {
                 request.setCharacterEncoding("UTF-8");
@@ -97,17 +107,17 @@ public class SearchServlet extends HttpServlet {
                         if (Strings.hasText(fromDate) || Strings.hasText(toDate)) {
                                 boolFilter
                                         //Range within "available" field
-                                        .should(FilterBuilders.rangeFilter("available").gte(fromDate).lte(toDate))
+                                        .should(FilterBuilders.rangeFilter(DateField.AVAILABLE).gte(fromDate).lte(toDate))
                                         //Range within "created" field
-                                        .should(FilterBuilders.rangeFilter("created").gte(fromDate).lte(toDate))
+                                        .should(FilterBuilders.rangeFilter(DateField.CREATED).gte(fromDate).lte(toDate))
                                         //madeBefore >= from_date and madeBefore <= to_date
                                         .should(FilterBuilders.boolFilter()
-                                                .must(FilterBuilders.rangeFilter("madeBefore").gte(fromDate))
-                                                .must(FilterBuilders.rangeFilter("madeBefore").lte(toDate)))
+                                                .must(FilterBuilders.rangeFilter(DateField.MADE_BEFORE).gte(fromDate))
+                                                .must(FilterBuilders.rangeFilter(DateField.MADE_BEFORE).lte(toDate)))
                                         //madeAfter >= from_date and madeAfter <= to_date
                                         .should(FilterBuilders.boolFilter()
-                                                .must(FilterBuilders.rangeFilter("madeAfter").gte(fromDate))
-                                                .must(FilterBuilders.rangeFilter("madeAfter").lte(toDate)));
+                                                .must(FilterBuilders.rangeFilter(DateField.MADE_AFTER).gte(fromDate))
+                                                .must(FilterBuilders.rangeFilter(DateField.MADE_AFTER).lte(toDate)));
                         }
                         //Building a filter based on the user selected facets
                         for (Map.Entry<String, List> entry : filterMap.entrySet()) {
