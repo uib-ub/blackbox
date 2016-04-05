@@ -8,8 +8,6 @@ import org.elasticsearch.client.transport.TransportClient;
 import org.elasticsearch.common.settings.ImmutableSettings;
 import org.elasticsearch.common.settings.Settings;
 import org.elasticsearch.common.transport.InetSocketTransportAddress;
-import org.elasticsearch.search.highlight.HighlightBuilder;
-import org.elasticsearch.search.highlight.SearchContextHighlight;
 import org.elasticsearch.transport.ConnectTransportException;
 
 import java.net.InetAddress;
@@ -25,64 +23,66 @@ import java.net.UnknownHostException;
  */
 public class ClientFactory {
 
-        private static final Logger logger = Logger.getLogger(ClientFactory.class);
-        private static Client client;
+    private static final Logger logger = Logger.getLogger(ClientFactory.class);
+    private static Client client;
 
-        /**
-         * We want to prevent direct instantiation of this class, thus we create private constructor
-         */
-        private ClientFactory() {}
+    /**
+     * We want to prevent direct instantiation of this class, thus we create private constructor
+     */
+    private ClientFactory() {
+    }
 
-        /**
-         * Create a transport client
-         **/
-        private static Client createTransportClient(){
-                try {
-                        Settings settings = ImmutableSettings.settingsBuilder()
-                                .put("cluster.name", "ubb-elasticsearch")
-                                .put("node.name", "Blackbox")
-                                //.put("client.transport.ping_timeout", "100s")
-                                .build();
-                        client = new TransportClient(settings)
-                                //You can add more than one addresses here, depending on the number of your servers.
-                                //.addTransportAddress(new InetSocketTransportAddress(InetAddress.getLocalHost(), 9300))
-                                .addTransportAddress(
-                                        new InetSocketTransportAddress(InetAddress.getByName("kirishima.uib.no"), 9300));
+    /**
+     * Create a transport client
+     **/
+    private static Client createTransportClient() {
+        try {
+            Settings settings = ImmutableSettings.settingsBuilder()
+                    .put("cluster.name", "ubb-elasticsearch")
+                    .put("node.name", "Blackbox")
+                    //.put("client.transport.ping_timeout", "100s")
+                    .build();
+            client = new TransportClient(settings)
+                    //You can add more than one addresses here, depending on the number of your servers.
+                    //.addTransportAddress(new InetSocketTransportAddress(InetAddress.getLocalHost(), 9300))
+                    .addTransportAddress(
+                            new InetSocketTransportAddress(InetAddress.getByName("kirishima.uib.no"), 9300)
+                    );
 
-                        ClusterHealthResponse hr = client.admin().cluster().prepareHealth().get();
-                        logger.info("Connected to Elasticsearch cluster: " + hr);
-                } catch (UnknownHostException ue) {
-                        logger.error("Unknown host: " + ue.getMessage());
-                } catch (ElasticsearchException e) {
-                        if(e instanceof ConnectTransportException){
-                            logger.warn("Unable to connect to Elasticsearch. Is it running? ");
-                        }
-                        logger.error(e.getDetailedMessage());
-                }
-                return client;
+            ClusterHealthResponse hr = client.admin().cluster().prepareHealth().get();
+            logger.info("Connected to Elasticsearch cluster: " + hr);
+        } catch (UnknownHostException ue) {
+            logger.error("Unknown host: " + ue.getMessage());
+        } catch (ElasticsearchException e) {
+            if (e instanceof ConnectTransportException) {
+                logger.warn("Unable to connect to Elasticsearch. Is it running? ");
+            }
+            logger.error(e.getDetailedMessage());
         }
+        return client;
+    }
 
-        /**
-         * Syncronize the call so that different threads do not end up creating different instances
-         */
-        public static synchronized Client getTransportClient() {
-                if (client == null) {
-                        client = createTransportClient();
-                }
-                return client;
+    /**
+     * Syncronize the call so that different threads do not end up creating multiple instances
+     */
+    public static synchronized Client getTransportClient() {
+        if (client == null) {
+            client = createTransportClient();
         }
+        return client;
+    }
 
-        /**
-         * Don't allow cloning for this object
-         **/
-        @Override
-        protected Object clone() throws CloneNotSupportedException {
-                throw new CloneNotSupportedException("Cloning for this object is not supported");
-        }
-        
-        //Main method for easy debugging..
-        public static void main(String[] args) {
-                getTransportClient();
-        }
+    //Main method for easy debugging..
+    public static void main(String[] args) {
+        getTransportClient();
+    }
+
+    /**
+     * Don't allow cloning for this object
+     **/
+    @Override
+    protected Object clone() throws CloneNotSupportedException {
+        throw new CloneNotSupportedException("Cloning for this object is not supported");
+    }
 
 }
