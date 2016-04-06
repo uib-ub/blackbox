@@ -1,14 +1,17 @@
-'use strict';
-//Controller file for Marcus-search system
+/**
+ * Controller file for Marcus-search system
+ * @author: Hemed, Tarje
+ **/
 
-var app = angular.module('marcus', ["checklist-model", "ui.bootstrap", "settings"]);
+'use strict';
+var app = angular.module('marcus', ["checklist-model", "ui.bootstrap", "settings", "ngAnimate"]);
 
 /**========= Search Controller ===========**/
 app.controller('freeTextSearch', function ($scope, $http, $location, $window, mySetting) {
 
     //Initialize default variables
     $scope.show_loading = true;
-    $scope.show_search_results = false;
+    $scope.ready = false;
     $scope.query_string = "";
     $scope.sort_by = "";
     $scope.selected_filters = [];
@@ -18,7 +21,6 @@ app.controller('freeTextSearch', function ($scope, $http, $location, $window, my
     $scope.page_size = 10;
     $scope.isArray = angular.isArray;
     $scope.isString = angular.isString;
-
 
     /**
      * Get values from checkboxes.
@@ -46,12 +48,11 @@ app.controller('freeTextSearch', function ($scope, $http, $location, $window, my
     //Send requests to search servlet
     $scope.search = function () {
         /*We are assigning null to these values so that, if empty, they should not appear in query string*/
-        var q = $scope.query_string === "" ? null : fuzzify($scope.query_string, "*");
+        var q = $scope.query_string === "" ? null : $scope.query_string /**fuzzify($scope.query_string, "*")**/;
         var sort = $scope.sort_by === "" ? null : $scope.sort_by;
-        var from_page = ($scope.current_page - 1)*$scope.page_size;
-        var from_date = $scope.from_date === ""? null : $scope.from_date;
-        var to_date = $scope.to_date === ""? null : $scope.to_date;
-        console.log(JSON.stringify($location.host));
+        var fromPage = ($scope.current_page - 1) * $scope.page_size;
+        var fromDate = $scope.from_date === "" ? null : $scope.from_date;
+        var toDate = $scope.to_date === "" ? null : $scope.to_date;
 
         $http({
             method: 'GET',
@@ -60,10 +61,10 @@ app.controller('freeTextSearch', function ($scope, $http, $location, $window, my
                 q: q,
                 index: mySetting.index,
                 type: mySetting.type,
-                from_date: from_date,
-                to_date: to_date,
+                from_date: fromDate,
+                to_date: toDate,
                 filter: $scope.selected_filters,
-                from: from_page,
+                from: fromPage,
                 size: $scope.page_size,
                 sort: sort
             }
@@ -72,12 +73,15 @@ app.controller('freeTextSearch', function ($scope, $http, $location, $window, my
                 $scope.results = data;
                 $scope.show_loading = false;
                 $scope.ready = true;
-                /*
-                 alert(JSON.stringify(config.params));
-                 $location.url(config.params);
-                 $location.replace();
-                 $window.history.pushState(null, 'locationURL', $location.absUrl());
+
+                /*$location.html5Mode(true);
+                alert(JSON.stringify(config.params));
+                $location.url(config.params);
+                $location.replace();
+                $window.history.pushState(null, 'locationURL', $location.absUrl());
                 */
+
+
             })
             .error(function (data, status, headers, config) {
                 $scope.log = 'Error occured while querying' + data;
@@ -86,7 +90,7 @@ app.controller('freeTextSearch', function ($scope, $http, $location, $window, my
             });
     };
 
-    //Send suggest request to "suggest" servlet for autocompleting.
+    //Send suggest request to "suggest" servlet for autocompletion.
     $scope.autoSuggest = function () {
         $http({
             method: 'GET',
@@ -110,6 +114,45 @@ app.controller('freeTextSearch', function ($scope, $http, $location, $window, my
 
 
 /**
+ * Year Controller
+ */
+app.controller('nextYear', function ($scope, $filter) {
+    var myDate = new Date();
+    var previousYear = new Date(myDate);
+    var nextYear = new Date(myDate);
+
+    previousYear.setYear(myDate.getFullYear() - 1);
+    nextYear.setYear(myDate.getFullYear() + 1);
+
+    $scope.year = $filter('date')(myDate, 'yyyy');//2014 like
+    $scope.nextYear = $filter('date')(nextYear, 'yyyy');
+    $scope.prevYear = $filter('date')(previousYear, 'yyyy');
+});
+
+/**
+ * A filter
+ */
+app.filter('unsafe', function ($sce) {
+    return function (val) {
+        return $sce.trustAsHtml(val);
+    };
+});
+
+/**
+ * A directive.
+ */
+app.directive('includeReplace', function () {
+    return {
+        require: 'ngInclude',
+        restrict: 'A', /* optional */
+        link: function (scope, el, attrs) {
+            el.replaceWith(el.children());
+        }
+    };
+});
+
+
+/**
  A method to append * or ~ in the query string
  <p/>
  @param query_string a query string.
@@ -125,7 +168,8 @@ function fuzzify(query_string, default_freetext_fuzzify) {
         if (default_freetext_fuzzify === "*" || default_freetext_fuzzify === "~") {
             //Do not do anything if query string has either one of the following chars.
             if (query_string.indexOf('*') === -1 && query_string.indexOf('~') === -1 &&
-                query_string.indexOf(':') === -1 && query_string.indexOf('"') === -1) {
+                query_string.indexOf(':') === -1 && query_string.indexOf('"') === -1 &&
+                query_string.indexOf('[') === -1) {
                 var option_parts = query_string.split(' ');
                 var pq = "";
                 for (var oi = 0; oi < option_parts.length; oi++) {
@@ -133,8 +177,7 @@ function fuzzify(query_string, default_freetext_fuzzify) {
 
                     //We want the string part to be greater than 1 char,
                     // and it should not contain the following special chars.
-                    if (oip.length > 1 && oip.indexOf(')') === -1 && oip.indexOf('(') === -1){
-
+                    if (oip.length > 1 && oip.indexOf(')') === -1 && oip.indexOf('(') === -1) {
                         oip = oip + default_freetext_fuzzify;
                     }
                     pq += oip + ' ';
@@ -145,35 +188,3 @@ function fuzzify(query_string, default_freetext_fuzzify) {
     }
     return rqs;
 }
-
-    app.controller('nextYear', function ($scope, $filter) {
-        var myDate = new Date();
-        var previousYear = new Date(myDate);
-
-        previousYear.setYear(myDate.getFullYear()-1);
-
-        var nextYear = new Date(myDate);
-
-        nextYear.setYear(myDate.getFullYear()+1);
-
-        $scope.year = $filter('date')(myDate,'yyyy');//2014 like
-        $scope.nextYear = $filter('date')(nextYear,'yyyy');
-        $scope.prevYear = $filter('date')(previousYear,'yyyy');
-    });
-    
-    app.filter('unsafe', function($sce) {
-        return function(val) {
-            return $sce.trustAsHtml(val);
-        };
-    });
-    
-    app.directive('includeReplace', function () {
-        return {
-            require: 'ngInclude',
-            restrict: 'A', /* optional */
-            link: function (scope, el, attrs) {
-                el.replaceWith(el.children());
-            }
-        };
-    });
-

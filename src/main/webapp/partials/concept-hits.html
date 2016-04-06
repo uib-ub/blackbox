@@ -4,7 +4,7 @@
         </a>
     </div>
     <div  class="content">
-        <a ng-if="doc._source.preferredlabel" target="_blank" href="{{doc._source.uri}}" class="header">{{doc._source.preferredlabel}}</a>
+        <a ng-if="doc._source.preferredLabel" target="_blank" href="{{doc._source.uri}}" class="header">{{doc._source.preferredLabel}}</a>
         <div class="meta">
             <div ng-if="isString(doc._source.maker)">
                 <div class="content"><i class="ui icon user"></i><span class="header">{{doc._source.maker}}</span> </div>
@@ -23,6 +23,5 @@
             <p>{{doc._source.type}}</p>
         </div>
         <div class="extra">
-
         </div>
     </div>

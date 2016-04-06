@@ -12,13 +12,13 @@
 </div>
 
 <div class="content">
-    <a target="_blank" href="{{doc._source.uri}}" class="header">{{doc._source.preferredlabel}}</a>
+    <a target="_blank" href="{{doc._source.uri}}" class="header">{{doc._source.preferredLabel}}</a>
     <div class="meta">
-        <span ng-if="doc._source.birthyear || doc._source.deathyear" class="ui floated right"><i
-                class="icon wait"></i><span ng-show="doc._source.birthyear && !doc._source.birthdate">{{doc._source.birthyear}}</span><span
-                ng-if="doc._source.birthdate">{{doc._source.birthdate}}</span> - <span
-                ng-if="doc._source.deathyear && !doc._source.deathdate">{{doc._source.deathyear}}</span><span
-                ng-if="doc._source.deathdate">{{doc._source.deathdate}}</span></span>
+        <span ng-if="doc._source.birthYear || doc._source.deathYear" class="ui floated right"><i
+                class="icon wait"></i><span ng-show="doc._source.birthYear && !doc._source.birthDate">{{doc._source.birthYear}}</span><span
+                ng-if="doc._source.birthDate">{{doc._source.birthDate}}</span> - <span
+                ng-if="doc._source.deathYear && !doc._source.deathDate">{{doc._source.deathYear}}</span><span
+                ng-if="doc._source.deathDate">{{doc._source.deathDate}}</span></span>
     </div>
     <div class="description">
         <p ng-bind-html="doc._source.description | unsafe"></p>

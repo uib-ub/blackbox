@@ -5,6 +5,7 @@ $(function () {
     $("#from_date").datepicker({
         showOn: "both",
         //buttonImage: "img/calendar.gif",
+        buttonText: '<i class="ui icon calendar"></i>',
         //buttonText: '<span class="glyphicon glyphicon-calendar" style="border:0"></span>',
         buttonText : '<i class="ui icon calendar"></i>',
         changeMonth: true,
@@ -21,6 +22,7 @@ $(function () {
     $("#to_date").datepicker({
         showOn: "both",
         //buttonImage: "img/calendar.gif",
+        //buttonText: '<span class="glyphicon glyphicon-calendar" style="border:0"></span>',
         buttonText: '<i class="ui icon calendar"></i>',
         changeMonth: true,
         changeYear: true,

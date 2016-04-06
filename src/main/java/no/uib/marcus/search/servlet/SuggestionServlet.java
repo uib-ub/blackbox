@@ -20,42 +20,42 @@ import java.io.PrintWriter;
 )
 public class SuggestionServlet extends HttpServlet {
 
-        private static final long serialVersionUID = 2L;
-        private static final String SUGGEST_FIELD = "suggest";
+    private static final long serialVersionUID = 2L;
+    private static final String SUGGEST_FIELD = "suggest";
 
-        protected void processRequest(HttpServletRequest request, HttpServletResponse response)
-                throws ServletException, IOException {
+    protected void processRequest(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
 
-                request.setCharacterEncoding("UTF-8");
-                response.setContentType("application/json;charset=UTF-8");
-                String suggestText = request.getParameter("q");
-                String[] indices = request.getParameterValues("index");
-                String jsonString;
+        request.setCharacterEncoding("UTF-8");
+        response.setContentType("application/json;charset=UTF-8");
+        String suggestText = request.getParameter("q");
+        String[] indices = request.getParameterValues("index");
+        String jsonString;
 
-                try (PrintWriter out = response.getWriter()) {
-                        Gson gson = new Gson();
-                        jsonString = gson.toJson(
-                                CompletionSuggestion.getSuggestions(suggestText, SUGGEST_FIELD, indices)
-                        );
-                        out.write(jsonString);
-                }
+        try (PrintWriter out = response.getWriter()) {
+            Gson gson = new Gson();
+            jsonString = gson.toJson(
+                    CompletionSuggestion.getSuggestions(suggestText, SUGGEST_FIELD, indices)
+            );
+            out.write(jsonString);
         }
+    }
 
-        @Override
-        protected void doGet(HttpServletRequest request, HttpServletResponse response)
-                throws ServletException, IOException {
-                processRequest(request, response);
-        }
+    @Override
+    protected void doGet(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        processRequest(request, response);
+    }
 
-        @Override
-        protected void doPost(HttpServletRequest request, HttpServletResponse response)
-                throws ServletException, IOException {
-                processRequest(request, response);
-        }
+    @Override
+    protected void doPost(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        processRequest(request, response);
+    }
 
-        @Override
-        public String getServletInfo() {
-                return "CompletionSuggestion servlet";
-        }
+    @Override
+    public String getServletInfo() {
+        return "CompletionSuggestion servlet";
+    }
 
 }
