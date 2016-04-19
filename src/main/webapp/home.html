@@ -9,8 +9,8 @@
         <link rel="shortcut icon" type="image/x-icon" href="http://marcus.uib.no/img/favicon.ico"/>
         <link rel="stylesheet" href="js/lib/typeahead/css/main.css"/>
         <link rel="stylesheet" href="js/lib/typeahead/css/normalize.min.css"/>
-        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" />
-        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap-theme.min.css" />
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css"/>
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap-theme.min.css"/>
         <link rel="stylesheet" href="//code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css"/>
         <link href="http://fonts.googleapis.com/css?family=IM+Fell+Great+Primer" rel="stylesheet" type="text/css">
         <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.1.8/semantic.min.css" />
@@ -27,7 +27,7 @@
                 </div>
             </div>
         </div>
-        <div ng-controller="freeTextSearch" id="searchController" style="margin-top:65px;">
+        <div ng-controller="freeTextSearch" id="searchController">
             <div class="main-container">
                 <div class="masthead">
                         <form action="" method="GET">
@@ -137,7 +137,7 @@
                                 </div>
                                 <div class="results-hit ng-cloak">
                                     <hr>
-                                    <uib-pagination class="pagination" total-items="results.hits.total"
+                                    <uib-pagination class="pagination hidden-sm hidden-xs" total-items="results.hits.total"
                                                     items-per-page="page_size"
                                                     ng-model="current_page"
                                                     ng-change="search()"
@@ -149,7 +149,7 @@
                                                     boundary-links="true"
                                                     force-ellipses="true">
                                     </uib-pagination>
-                                    <div class="single-select form-group">
+                                    <div class="single-select form-group hidden-xs hidden-sm">
                                         <label class="ui item" for="docPerPage">Treff per side: </label>
                                         <select id="docPerPage" ng-model="page_size" ng-change="search()">
                                             <option value="10" ng-selected="selected">10</option>
@@ -159,7 +159,7 @@
                                             <option value="200">200</option>
                                             <option value="250">250</option>
                                         </select>
-                                    </div>
+                                    </div><br>
 
                                     <div class="ui divided items">
                                         <div ng-repeat="doc in results.hits.hits track by $index" class="ui item">
@@ -216,8 +216,8 @@
         <script src="js/lib/typeahead/js/typeahead.bundle.js"></script>
         <script src="js/lib/typeahead/js/main.js"></script>
         <script src="//code.jquery.com/ui/1.11.4/jquery-ui.js"></script>
-        <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.0/angular.min.js"></script>
-        <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.0/angular-animate.min.js"></script>
+        <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.5/angular.min.js"></script>
+        <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.5/angular-animate.min.js"></script>
         <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.1.8/semantic.min.js"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/angular-i18n/1.5.5/angular-locale_nb-no.min.js"></script>

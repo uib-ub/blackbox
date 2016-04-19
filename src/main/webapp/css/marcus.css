@@ -1,3 +1,7 @@
+html{
+    overflow: hidden;
+}
+
 html, body {
     /**background: #f2f9ff repeat scroll 0 0; /**Tyeahead**/
     background: #e7e9ec repeat scroll 0 0;/**Linked In**/
@@ -8,16 +12,19 @@ html, body {
 
 }
 
+#searchController{
+}
 .main-container {
     /**background-color: #f2f9ff;**/
     width: 100%;
+    /**overflow: hidden;**/
 }
 
 /**@media (min-width: 320px) {**/
 .main-container .content {
     /**width: 1500px;**/
     margin: 0 auto ;
-    /**overflow: hidden;**/
+    overflow: hidden;
 }
 
 .search-results .facets {

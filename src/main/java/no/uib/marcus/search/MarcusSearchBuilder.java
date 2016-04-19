@@ -116,7 +116,7 @@ public class MarcusSearchBuilder extends AbstractSearchBuilder<MarcusSearchBuild
      private boolean isValidJSONArray(String jsonString){
          JsonElement element =  new JsonParser().parse(jsonString);
              if(!element.isJsonArray()){
-                 throw new IllegalArgumentException(
+                 throw new IllegalParameterException(
                          "Aggregations must be valid JSON string. Expected JSON Array of objects but found : ["+ jsonString + "]");
              }
          return true;
@@ -228,7 +228,7 @@ public class MarcusSearchBuilder extends AbstractSearchBuilder<MarcusSearchBuild
     public static void main(String[] args) throws IOException {
         Client c = ClientFactory.getTransportClient();
         MarcusSearchBuilder service = ServiceFactory.createMarcusSearchService(c);
-        service.setAggregations("koba");
+        service.setAggregations("koba"); //Invalid aggs, it should fail.
         System.out.println(QueryUtils.toJsonString(service.getDocuments(), true));
     }
 }
