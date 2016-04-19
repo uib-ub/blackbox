@@ -1,6 +1,7 @@
 /**
  * This is a Javascript file for getting completion suggestions.
- * Please note that, suggestion is executed accross indices, therefore index must be explicitly specified in
+ * Please note that, suggestion is executed accross indices,
+ * therefore index must be explicitly specified in
  * the remote URL.
 **/
 
@@ -48,10 +49,10 @@ $(document).ready(function () {
 
     //Initialize suggestion engine
     var marcusSuggestionEngine = new Bloodhound({
-        name: 'suggest',
+        name: 'suggestion',
         datumTokenizer: Bloodhound.tokenizers.whitespace,
         queryTokenizer: Bloodhound.tokenizers.whitespace,
-        //prefetch: 'suggest?q=m&index=admin',
+        //prefetch: 'suggestion?q=m&index=admin',
         limit: 10,
         remote: {
             /*You must manually append indices here*/
@@ -64,8 +65,10 @@ $(document).ready(function () {
     //Set default suggestion
     function marcusSuggestionEngineWithDefaults(q, sync, async) {
         if (q === '') {
-            sync(['Hemed Al Ruwehy', 'Tarje Lavik', 'Øyvind Gjesdal', 'Marcus']);
-            async([]);
+            /**sync(['Hemed Al Ruwehy', 'Tarje Lavik', 'Øyvind Gjesdal', 'Marcus']);**/
+            sync([]);
+            //async([]);
+            $('.Typeahead-search-icon').hide();
         } else {
             marcusSuggestionEngine.search(q, sync, async);
         }
@@ -86,7 +89,7 @@ $(document).ready(function () {
         }
     },
             {
-                name: 'suggest',
+                name: 'suggestion',
                 source: marcusSuggestionEngineWithDefaults,
                 limit: 5
                         /**templates: {
@@ -94,10 +97,11 @@ $(document).ready(function () {
                          }**/
             })
             .on('typeahead:asyncrequest', function () {
-                $('.Typeahead-spinner').show();
+                //$('.Typeahead-spinner').show();
+                $('.Typeahead-search-icon').show();
             })
             .on('typeahead:asynccancel typeahead:asyncreceive', function () {
-                $('.Typeahead-spinner').hide();
+                //$('.Typeahead-spinner').hide();
             })
             //When suggestion value is selected, update angular contoller with new value
             .on('typeahead:select', function (event, suggestionValue) {

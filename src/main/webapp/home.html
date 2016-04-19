@@ -30,9 +30,8 @@
         <div ng-controller="freeTextSearch" id="searchController" style="margin-top:65px;">
             <div class="main-container">
                 <div class="masthead">
-                    <div class="Demo">
                         <form action="" method="GET">
-                            <input type="hidden" name="index" value="admin">
+                            <!--input type="hidden" name="index" value="admin"-->
                             <div class="Typeahead">
                                 <div class="u-posRelative">
                                     <input class="Typeahead-hint" type="text" tabindex="-1" readonly="readonly"/>
@@ -40,17 +39,19 @@
                                            id="search-input" 
                                            type="text" 
                                            name="q" 
-                                           ng-model="query_string" 
+                                           ng-model="query_string"
                                            ng-keyup="($event.keyCode==13||query_string==='')&&search()"
                                            placeholder="Søk Marcus..." 
                                            autocomplete="off"/>
-                                    <img class="Typeahead-spinner" src="js/lib/typeahead/img/spinner.gif" alt=""/>
+                                    <!--img class="Typeahead-spinner" src="js/lib/typeahead/img/spinner.gif" alt=""/-->
+                                    <button class="Typeahead-search-icon" type="button" ng-click="search()">
+                                        <i class="search icon"></i>
+                                    </button>
                                 </div>
                                 <div class="Typeahead-menu"></div>
                             </div>
                         </form>
-                    </div>
-                    <span style="color:grey;"> Trykk på Enter for å søke</span>
+                    <!--span style="color:grey;"> Trykk på Enter for å søke</span-->
                     <!--span class="links links-examples">
                         <a href="">Advasert søk</a>
                     </span-->
@@ -58,9 +59,9 @@
             </div>
                 <uib-progressbar ng-show="show_loading" class="ui loading segment"  value="dynamic" style="height:100px;"></uib-progressbar>
                 <div ng-cloak ng-show="ready" style="margin-top:30px;" class="ui container">
-                    <div class="ui grid search-results">
+                    <div class="search-results ui grid">
                         <div class="content ui row">
-                            <div ng-cloak class="facets ui four wide column">
+                            <div ng-cloak class="ng-cloak facets ui four wide column computer only">
                                 <h3 style="margin-top:15px;">Dato</h3>
                                 <hr>
                                 <div class="datePicker ui input">
@@ -119,22 +120,22 @@
                                 </div>
                             </div>
 
-                            <div ng-show="results.hits.total > 0" class="search-hits ui ten wide column">
+                            <div ng-show="results.hits.total > 0" class="search-hits ng-cloak ui eleven wide column">
                                 <br/>
+                                <strong class="ui item" ng-bind-template="{{results.hits.total | number}} treff" style="font-size:2em;"></strong>
                                 <div class="pull-right">
                                     <label for="sort_by">Sortér på:</label>
                                     <select class="ui dropdown" id="sort_by" ng-model="sort_by" ng-change="search()">
                                         <option value="">Mest relevant</option>
-                                        <option value="identifier:asc">ID ASC</option>
-                                        <option value="identifier:desc">ID DESC</option>
-                                        <option value="title.exact:asc">Tittle ASC</option>
-                                        <option value="title.exact:desc">Tittle DESC</option>
-                                        <option value="available:asc">Tilgjengeliggjort ASC</option>
-                                        <option value="available:desc">Tilgjengeliggjort DESC</option>
+                                        <option value="identifier:asc">ID asc</option>
+                                        <option value="identifier:desc">ID desc</option>
+                                        <option value="title.exact:asc">Tittle asc</option>
+                                        <option value="title.exact:desc">Tittle desc</option>
+                                        <option value="available:asc">Tilgjeng. asc</option>
+                                        <option value="available:desc">Tilgjeng. desc</option>
                                     </select>
                                 </div>
                                 <div class="results-hit ng-cloak">
-                                    <strong class="ui item" ng-bind-template="Søketreff: {{results.hits.total}}" style="font-size:2em;"></strong>
                                     <hr>
                                     <uib-pagination class="pagination" total-items="results.hits.total"
                                                     items-per-page="page_size"
@@ -142,11 +143,14 @@
                                                     ng-change="search()"
                                                     next-text="Neste"
                                                     previous-text="Forrige"
-                                                    max-size="5"
+                                                    max-size="4"
+                                                    first-text="&laquo;"
+                                                    last-text="&raquo;"
+                                                    boundary-links="true"
                                                     force-ellipses="true">
                                     </uib-pagination>
                                     <div class="single-select form-group">
-                                        <label class="ui item" for="docPerPage">Resultater per side: </label>
+                                        <label class="ui item" for="docPerPage">Treff per side: </label>
                                         <select id="docPerPage" ng-model="page_size" ng-change="search()">
                                             <option value="10" ng-selected="selected">10</option>
                                             <option value="20">20</option>
@@ -156,9 +160,6 @@
                                             <option value="250">250</option>
                                         </select>
                                     </div>
-
-
-
 
                                     <div class="ui divided items">
                                         <div ng-repeat="doc in results.hits.hits track by $index" class="ui item">
@@ -174,14 +175,17 @@
                                             <div include-replace ng-if='doc._source.type == "Emne"' ng-include="'partials/concept-hits.html'" style="page-break-inside: avoid;" class="ui item"></div>
                                         </div>
                                     </div>
-                                    
+
                                     <uib-pagination class="pagination" total-items="results.hits.total"
                                                     items-per-page="page_size"
                                                     ng-model="current_page"
                                                     ng-change="search()"
                                                     next-text="Neste"
                                                     previous-text="Forrige"
-                                                    max-size="5"
+                                                    max-size="4"
+                                                    first-text="&laquo;"
+                                                    last-text="&raquo;"
+                                                    boundary-links="true"
                                                     force-ellipses="true">
                                     </uib-pagination>
                                 </div>
@@ -215,7 +219,8 @@
         <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.0/angular.min.js"></script>
         <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.0/angular-animate.min.js"></script>
         <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
-        <script src="//cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.1.8/semantic.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.1.8/semantic.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/angular-i18n/1.5.5/angular-locale_nb-no.min.js"></script>
         <script src="js/marcus-app.js"></script>
         <script src="js/checklist-directive.js"></script>
         <script src="js/jquery-datepicker.js"></script>
@@ -229,7 +234,7 @@
                     index: ["admin-test"],
                         /**type: ["document"],**/
                         facets: [
-                        {"field": "type.exact", "size": 50, "operator": "OR", /*"order": "term_asc",*/ "min_doc_count" : 0},
+                        {"field": "type.exact", "size": 20, "operator": "OR", /*"order": "term_asc",*/ "min_doc_count" : 0},
                         {"field": "hasZoom", "size": 10, "operator": "AND", "order": "term_asc", "min_doc_count" : 0},
                         {"field": "isDigitized", "size": 10, "operator": "AND", "order": "count_desc", "min_doc_count" : 0},
                         {"field": "isCatalogued", "size": 10, "operator": "AND", "order": "count_desc", "min_doc_count" : 0},

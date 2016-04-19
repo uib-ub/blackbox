@@ -90,7 +90,7 @@ app.controller('freeTextSearch', function ($scope, $http, $location, $window, my
             });
     };
 
-    //Send suggest request to "suggest" servlet for autocompletion.
+    //Send suggestion request to "suggestion" servlet for autocompletion.
     $scope.autoSuggest = function () {
         $http({
             method: 'GET',

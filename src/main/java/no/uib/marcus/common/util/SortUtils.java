@@ -1,4 +1,4 @@
-package no.uib.marcus.common;
+package no.uib.marcus.common.util;
 
 import org.apache.log4j.Logger;
 import org.elasticsearch.ElasticsearchException;
@@ -9,14 +9,16 @@ import org.elasticsearch.search.sort.SortOrder;
 /**
  * @author Hemed
  */
-public class SortUtils {
-    private static final Logger logger = Logger.getLogger(AggregationUtils.class);
+public final class SortUtils {
+    private static final Logger logger = Logger.getLogger(SortUtils.class);
+
+    private SortUtils(){}
 
     /**
      * Building a fieldSort.
      *
      * @param sortString a string that contains a field and sort type in
-     *                   the form of "field:asc" or "field:desc"
+     * the form of "field:asc" or "field:desc"
      **/
     public static SortBuilder getFieldSort(String sortString) {
         SortBuilder sortBuilder = null;
@@ -32,7 +34,7 @@ public class SortUtils {
             if (order.equalsIgnoreCase("desc")) {
                 sortOrder = SortOrder.DESC;
             }
-                        /* Build sort */
+            //Build sort
             sortBuilder = SortBuilders
                     .fieldSort(field)
                     .missing("_last");
@@ -50,5 +52,4 @@ public class SortUtils {
         }
         return sortBuilder;
     }
-
 }

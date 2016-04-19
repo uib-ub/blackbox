@@ -1,7 +1,7 @@
-package no.uib.marcus.search;
+package no.uib.marcus.search.suggestion;
 
 import com.google.gson.Gson;
-import no.uib.marcus.search.client.ClientFactory;
+import no.uib.marcus.client.ClientFactory;
 import org.apache.log4j.Logger;
 import org.elasticsearch.action.suggest.SuggestRequestBuilder;
 import org.elasticsearch.action.suggest.SuggestResponse;
@@ -26,8 +26,8 @@ public class CompletionSuggestion {
 
     /**A method to get a list of suggestions.
      * @param text input text
-     * @param suggestField a suggest field
-     * @param indices array of one or more indices, can be <code>null</code>
+     * @param suggestField a suggestion field
+     * @param indices array of one or more setIndices, can be <code>null</code>
      * @return a set of suggestion texts.
      **/
     public static Set<String> getSuggestions(String text, String suggestField, @Nullable String... indices) {
@@ -47,15 +47,15 @@ public class CompletionSuggestion {
                 items.add(next.getText().string());
             }
         } catch (Exception e) {
-            logger.error(e.getLocalizedMessage());
+            logger.error("Unable to perform suggestion for text: [" + text + "]") ;
         }
         return items;
     }
 
     /**A method to get a list of suggestions.
      * @param text input text
-     * @param suggestField a suggest field
-     * @param indices array of one or more indices, can be <code>null</code>
+     * @param suggestField a suggestion field
+     * @param indices array of one or more setIndices, can be <code>null</code>
      * @return a suggestion response.
      **/
     public static SuggestResponse getSuggestionResponse(String text, String suggestField, @Nullable String... indices) {
@@ -66,6 +66,7 @@ public class CompletionSuggestion {
         try {
             suggestionsBuilder.text(text);
             suggestionsBuilder.field(suggestField);
+            //suggestionsBuilder.size(50);
 
             suggestRequest = ClientFactory
                     .getTransportClient()
@@ -85,7 +86,6 @@ public class CompletionSuggestion {
         }
         return suggestResponse;
     }
-
 
     //Main method for easy debugging
     public static void main(String[] args) {

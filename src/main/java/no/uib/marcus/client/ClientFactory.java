@@ -1,4 +1,4 @@
-package no.uib.marcus.search.client;
+package no.uib.marcus.client;
 
 import org.apache.log4j.Logger;
 import org.elasticsearch.ElasticsearchException;

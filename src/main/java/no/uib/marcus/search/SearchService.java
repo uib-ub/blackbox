@@ -1,38 +1,43 @@
 package no.uib.marcus.search;
 
 import org.elasticsearch.action.search.SearchResponse;
+import org.elasticsearch.client.Client;
+
 import org.elasticsearch.common.Nullable;
-import org.elasticsearch.index.query.FilterBuilder;
+import javax.validation.constraints.NotNull;
 
 /**
  * @author Hemed Ali Al Ruwehy
  */
-public interface SearchService {
+public interface SearchService<S extends SearchService> {
+    /**
+     * Set Elasticsearch client to the service
+     * @param client Elasticsearch client to communicate with a cluster. Cannot be <code>null</code>
+     */
+     S setClient(@NotNull Client client);
 
     /**
-     * Get all documents through all indices in the cluster
+     * Set up indices for the service, default to all indices in the cluster
+     * @param indices one or more indices
+     */
+    S setIndices(@Nullable String... indices);
+
+    /**
+     * Set up index types for the service, default to all types in an index
+     * @param types one or more index types
+     */
+    S setTypes(@Nullable String... types);
+
+    /**
+     * Set up a query string, default to <code>null</code> which means query for everything.
+     * @param queryString a nullable query string
+     **/
+    S setQueryString(@Nullable String queryString);
+
+    /**
+     * Get documents based on the service settings.
      *
      * @return a search response.
      */
-    SearchResponse getAllDocuments();
-
-    /**
-     * Get all documents based on the query string. If the queryString is <code> null </code>
-     * then match all documents.
-     *
-     * @param queryString a nullable query string.
-     * @return a search response.
-     */
-    SearchResponse getDocuments(@Nullable String queryString);
-
-    /**
-     * Get all documents based on the given parameters and then apply post
-     * filter.
-     *
-     * @param queryString a query string
-     * @param filter      a filter builder.
-     * @return a search response.
-     */
-    SearchResponse getDocuments(String queryString, FilterBuilder filter);
-
+    SearchResponse getDocuments();
 }

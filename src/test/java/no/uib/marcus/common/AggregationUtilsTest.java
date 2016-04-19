@@ -3,11 +3,12 @@ package no.uib.marcus.common;
 import com.carrotsearch.randomizedtesting.RandomizedTest;
 import com.carrotsearch.randomizedtesting.annotations.Repeat;
 import com.carrotsearch.randomizedtesting.annotations.Seed;
+import no.uib.marcus.common.util.AggregationUtils;
 import org.junit.Test;
 
 import java.util.*;
 
-import static no.uib.marcus.common.AggregationUtils.contains;
+import static no.uib.marcus.common.util.AggregationUtils.contains;
 
 /**
  * @author Hemed Ali

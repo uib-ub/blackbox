@@ -15,13 +15,13 @@ html, body {
 
 /**@media (min-width: 320px) {**/
 .main-container .content {
-    /**width: 1000px;**/
-    margin: 30px auto 0 auto;
-    overflow: hidden;
+    /**width: 1500px;**/
+    margin: 0 auto ;
+    /**overflow: hidden;**/
 }
 
 .search-results .facets {
-    width: 26.5%;
+    /**width: 26.5%;**/
     float: left;
     display: inline-block;
     overflow-x: hidden;
@@ -31,16 +31,16 @@ html, body {
     /**border: 1px solid #e1e8ed; /**#eee**/
     box-shadow: 0 1px 1px rgba(0, 0, 0, 0.15), -1px 0 0 rgba(0, 0, 0, 0.03), 1px 0 0 rgba(0, 0, 0, 0.03), 0 1px 0 rgba(0, 0, 0, 0.12);
     border-radius: 8px;
-    margin-right: 12px;
+    margin-right: 2%;
+    /**padding-right: 2px;**/
 }
 
 .search-results .search-hits {
     display: inline-block;
     background: white;
-    margin: 0 auto;
-    width: 70%;
+    /**width: 70%;**/
     /**border: 1px solid #e1e8ed;**/
-    margin-bottom: 50px;
+    margin: 0 auto 50px;
     border-radius: 10px;
     box-shadow: 0 1px 1px rgba(0, 0, 0, 0.15), -1px 0 0 rgba(0, 0, 0, 0.03), 1px 0 0 rgba(0, 0, 0, 0.03), 0 1px 0 rgba(0, 0, 0, 0.12);
 }

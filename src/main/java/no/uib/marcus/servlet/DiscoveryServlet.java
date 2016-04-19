@@ -1,10 +1,12 @@
-package no.uib.marcus.search.servlet;
+package no.uib.marcus.servlet;
 
-import no.uib.marcus.common.SortUtils;
-import no.uib.marcus.search.MarcusSearchService;
+import no.uib.marcus.client.ClientFactory;
+import no.uib.marcus.common.RequestParams;
+import no.uib.marcus.search.MarcusDiscoveryBuilder;
+import no.uib.marcus.search.ServiceFactory;
 import org.elasticsearch.action.search.SearchResponse;
+import org.elasticsearch.client.Client;
 import org.elasticsearch.common.Strings;
-import org.elasticsearch.search.sort.SortBuilder;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -14,11 +16,17 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.PrintWriter;
 
+/**
+ * Discovery service which is available at "/discover" endpoint only allow
+ * to explore Marcus data in a simplest fashion.
+ * It does not provide advance functionality such as free text search, aggregations or sorting.
+ * For complex operations, please go to "/search" endpoint.
+ */
 @WebServlet(
-        name = "DiscoverServlet",
+        name = "DiscoveryServlet",
         urlPatterns = {"/discover"}
 )
-public class DiscoverServlet extends HttpServlet {
+public class DiscoveryServlet extends HttpServlet {
     private static final long serialVersionUID = 3L;
 
     /**
@@ -28,30 +36,27 @@ public class DiscoverServlet extends HttpServlet {
             throws ServletException, IOException {
         request.setCharacterEncoding("UTF-8");
         response.setContentType("application/json;charset=UTF-8");
-        String[] indices = request.getParameterValues("index");
-        String[] types = request.getParameterValues("type");
-        String from = request.getParameter("from");
-        String size = request.getParameter("size");
-        String sortString = request.getParameter("sort");
+        String[] indices = request.getParameterValues(RequestParams.INDICES);
+        String[] types = request.getParameterValues(RequestParams.INDEX_TYPES);
+        String from = request.getParameter(RequestParams.FROM);
+        String size = request.getParameter(RequestParams.SIZE);
 
         int _from = Strings.hasText(from) ? Integer.parseInt(from) : 0;
         int _size = Strings.hasText(size) ? Integer.parseInt(size) : 10;
-        SortBuilder fieldSort = Strings.hasText(sortString) ? SortUtils.getFieldSort(sortString) : null;
+        Client client = ClientFactory.getTransportClient();
 
-        MarcusSearchService service = new MarcusSearchService();
-        service.setIndices(indices);
-        service.setTypes(types);
-        service.setFrom(_from);
-        service.setSize(_size);
-        service.setSort(fieldSort);
+        //Build a discovery service
+        MarcusDiscoveryBuilder service = ServiceFactory.createMarcusDiscoveryService(client)
+                .setIndices(indices)
+                .setTypes(types)
+                .setFrom(_from)
+                .setSize(_size);
 
         try (PrintWriter out = response.getWriter()) {
-            SearchResponse searchResponse = service.getAllDocuments();
+            SearchResponse searchResponse = service.getDocuments();
             out.write(searchResponse.toString());
         }
     }
-
-    // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
 
     /**
      * Handles the HTTP <code>GET</code> method.
@@ -89,5 +94,5 @@ public class DiscoverServlet extends HttpServlet {
     @Override
     public String getServletInfo() {
         return "Discover servlet";
-    }// </editor-fold>
+    }
 }
