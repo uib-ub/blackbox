@@ -24,7 +24,7 @@ html {
 }
 
 .container {
-    max-width: 700px;
+    /**max-width: 700px;**/
     margin: 0 auto;
 }
 
@@ -57,9 +57,9 @@ input[type=text]::-ms-clear {
 /* site theme */
 /* ---------- */
 
-.masthead,
-.footer {
+.masthead{
     max-width: 800px;
+    /**width: 60%;**/
     margin: 0 auto;
     text-align: center;
 }
@@ -195,7 +195,7 @@ input[type=text]::-ms-clear {
     position: relative;
     *z-index: 1;
     width: 85%; /**500px;**/
-    margin: 9% auto 0 auto;
+    margin: 8.5% auto 0 auto;
     /**padding: 15px;**/
     padding: 2%;
     text-align: left;

@@ -6,7 +6,7 @@ package no.uib.marcus.search;
 public class IllegalParameterException extends RuntimeException {
 
     /**
-     * Constructs a new runtime exception with {@code null} as its
+     * Constructs a illegal parameter exception new exception with {@code null} as its
      * detail message.
      */
     public IllegalParameterException(){
@@ -14,14 +14,14 @@ public class IllegalParameterException extends RuntimeException {
     }
 
    /**
-    * Constructs a new runtime exception with the specified detail message.
+    * Constructs a new illegal parameter exception with the specified detail message.
     **/
     public IllegalParameterException(String message) {
         super(message);
     }
 
    /**
-    * Constructs a new runtime exception with the specified detail message and a cause.
+    * Constructs a new illegal parameter exception with the specified detail message and a cause.
     **/
     public IllegalParameterException(String message, Throwable cause) {
         super(message, cause);

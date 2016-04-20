@@ -28,7 +28,7 @@ import java.io.IOException;
 /**
  * Builder for Marcus search service
  * @author Hemed A. Al Ruwehy
- * @since 1.0
+ * @since 0.1
  * 2016-01-24, University of Bergen Library.
  */
 public class MarcusSearchBuilder extends AbstractSearchBuilder<MarcusSearchBuilder> {
