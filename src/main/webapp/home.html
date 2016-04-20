@@ -72,7 +72,7 @@
                                 </div><br/><br/>
                                 <h3>Dokument typer</h3>
                                 <hr>
-                                <div class="ui list" style="height:300px; overflow-y: scroll">
+                                <div class="ui list" style="height:400px; overflow-y: scroll">
                                     <div class="ui checkbox item" ng-repeat="bucket in results['aggregations']['type.exact']['buckets']">
                                         <input id="type-{{bucket.key}}" type="checkbox" checklist-model="selected_filters" checklist-value="getCheckedValue('type.exact', bucket.key)" ng-click="search()">
                                         <label for="type-{{bucket.key}}" ng-class="{'disabled': bucket.doc_count == 0}"> {{bucket.key}}
@@ -98,7 +98,7 @@
                                 </div>
                                 <h3>Emne</h3>
                                 <hr>
-                                <div class="ui list" style="height:300px; overflow-y: scroll">
+                                <div class="ui list" style="height:400px; overflow-y: scroll">
                                     <div class="ui checkbox item" ng-repeat="bucket in results['aggregations']['subject.exact']['buckets']">
                                         <input id="subject-{{bucket.key}}" type="checkbox" checklist-model="selected_filters" checklist-value="getCheckedValue('subject.exact', bucket.key)" ng-click="search()">
                                         <label for="subject-{{bucket.key}}" class="row-fluid"> {{bucket.key}}
@@ -108,7 +108,7 @@
                                 </div>
                                 <h3>Samling</h3>
                                 <hr>
-                                <div class="ui list" style="height:300px; overflow-y: scroll" >
+                                <div class="ui list" style="height:400px; overflow-y: scroll" >
                                     <div class="ui checkbox item" ng-repeat="bucket in results['aggregations']['isPartOf.exact']['buckets']">
                                         <input id="isPartOf-{{bucket.key}}" type="checkbox" checklist-model="selected_filters" checklist-value="getCheckedValue('isPartOf.exact', bucket.key)" ng-click="search()">
                                         <label for="isPartOf-{{bucket.key}}" ng-class="{'disabled': bucket.doc_count == 0}"> {{bucket.key}}
