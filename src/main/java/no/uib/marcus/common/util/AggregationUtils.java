@@ -24,6 +24,7 @@ import java.util.*;
  */
 public final class AggregationUtils {
     private static final Logger logger = Logger.getLogger(AggregationUtils.class);
+    private static final char AGGS_KEY_VALUE_SEPARATOR = '#';
 
      public AggregationUtils(){}
 
@@ -75,9 +76,9 @@ public final class AggregationUtils {
                 return Collections.emptyMap();
             }
             for (String entry : selectedFilters) {
-                if (entry.lastIndexOf('.') != -1) {
-                    //Get the index for the last occurrence of a dot
-                    int lastIndex = entry.lastIndexOf('.');
+                if (entry.lastIndexOf(AGGS_KEY_VALUE_SEPARATOR) != -1) {
+                    //Get the index for the last occurrence of a separator
+                    int lastIndex = entry.lastIndexOf(AGGS_KEY_VALUE_SEPARATOR);
                     String key = entry.substring(0, lastIndex).trim();
                     String value = entry.substring(lastIndex + 1, entry.length()).trim();
                     //Should we allow empty values? maybe :)
