@@ -11,6 +11,7 @@ import org.elasticsearch.search.sort.SortOrder;
  */
 public final class SortUtils {
     private static final Logger logger = Logger.getLogger(SortUtils.class);
+    private static final char FIELD_SORT_TYPE_SEPARATOR = ':';
 
     private SortUtils(){}
 
@@ -24,7 +25,7 @@ public final class SortUtils {
         SortBuilder sortBuilder = null;
         SortOrder sortOrder = null;
         try {
-            int lastIndex = sortString.lastIndexOf(':');
+            int lastIndex = sortString.lastIndexOf(FIELD_SORT_TYPE_SEPARATOR);
             String field = sortString.substring(0, lastIndex).trim();
             String order = sortString.substring(lastIndex + 1, sortString.length()).trim();
 

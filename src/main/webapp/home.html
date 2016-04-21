@@ -174,18 +174,14 @@
 
                                     <div class="ui divided items">
                                         <div ng-repeat="doc in results.hits.hits track by $index" class="ui item">
-                                        <div include-replace ng-if='doc._source.type == "Person" || doc._source.type == "Organisajon" || doc._source.type == "Firma" || doc._source.type == "Katalogisator"' ng-include="'partials/agent-hits.html'" style="page-break-inside: avoid;" class="ui item"></div>
-                                        <div include-replace ng-if='doc._source.type == "Monument" || doc._source.type == "Objekt"' ng-include="'partials/object-hits.html'" style="page-break-inside: avoid;" class="ui item fade"></div>
-                                        <div include-replace ng-if='doc._source.type == "Skip" || doc._source.type == "Fartøy"' ng-include="'partials/vessel-hits.html'" style="page-break-inside: avoid;" class="ui item fade"></div>
-                                        <div include-replace ng-if='doc._source.type == "Album"' ng-include="'partials/document-hits.html'" style="page-break-inside: avoid;" class="ui item fade"></div>
-                                        <div include-replace ng-if='doc._source.type == "Kart"' ng-include="'partials/document-hits.html'" style="page-break-inside: avoid;" class="ui item fade"></div>
-                                        <div include-replace ng-if='doc._source.type == "Akkvisisjon"' ng-include="'partials/acquisition-hits.html'" style="page-break-inside: avoid;" class="ui item fade"></div>
-                                        <div include-replace ng-if='doc._source.type == "Arbeidsliste"' ng-include="'partials/object-hits.html'" style="page-break-inside: avoid;" class="ui item fade"></div>
-                                        <div include-replace ng-if='doc._source.type == "Aggregering"' ng-include="'partials/aggregation-hits.html'" style="page-break-inside: avoid;" class="ui item fade"></div>
-                                        <div include-replace ng-if='doc._source.type == "Fotografi" || doc._source.type == "Manuskript" || doc._source.type == "Postkort" || doc._source.type == "Brev" || doc._source.type == "Diplom" || doc._source.type == "Bok" || doc._source.type == "Tale" || doc._source.type == "Segl" || doc._source.type == "Dokument" || doc._source.type == "Grafikk" || doc._source.type == "Transkripsjon" || doc._source.type == "Telegram" || doc._source.type == "Tegning" || doc._source.type == "Notat" || doc._source.type == "Forhandlingsprotokoll" || doc._source.type == "Kvittering" || doc._source.type == "Protokoll" || doc._source.type == "Reisedagbok" || doc._source.type == "Nummer" || doc._source.type == "Kartsett" || doc._source.type == "Kontrakt" || doc._source.type == "Salgsskjøte" || doc._source.type == "Bønnebok" || doc._source.type == "Dagbok" || doc._source.type == "Fragment" || doc._source.type == "Kassebok" || doc._source.type == "Oppmålingsdokument" || doc._source.type == "Supplikk"' ng-include="'partials/document-hits.html'" style="page-break-inside: avoid;" class="ui item fade" ></div>
-                                            <div include-replace ng-if='doc._source.type == "Emne"' ng-include="'partials/concept-hits.html'" style="page-break-inside: avoid;" class="ui item"></div>
+                                            <div include-replace ng-if='doc._type == "document"'  ng-include="'partials/document-hits.html'" style="page-break-inside: avoid;" class="ui item fade" ></div>
+                                            <div include-replace ng-if='doc._source.type == "Person" || doc._source.type == "Organisajon" || doc._source.type == "Firma" || doc._source.type == "Katalogisator"' ng-include="'partials/agent-hits.html'" style="page-break-inside: avoid;" class="ui item"></div>
+                                            <div include-replace ng-if='doc._source.type == "Monument" || doc._source.type == "Objekt"' ng-include="'partials/object-hits.html'" style="page-break-inside: avoid;" class="ui item fade"></div>
+                                            <div include-replace ng-if='doc._source.type == "Skip" || doc._source.type == "Fartøy"' ng-include="'partials/vessel-hits.html'" style="page-break-inside: avoid;" class="ui item fade"></div>
+                                            <div include-replace ng-if='doc._source.type == "Akkvisisjon"' ng-include="'partials/acquisition-hits.html'" style="page-break-inside: avoid;" class="ui item fade"></div>
+                                            <div include-replace ng-if='doc._source.type == "Arbeidsliste"' ng-include="'partials/object-hits.html'" style="page-break-inside: avoid;" class="ui item fade"></div>
+                                            <div include-replace ng-if='doc._source.type == "Aggregering"' ng-include="'partials/aggregation-hits.html'" style="page-break-inside: avoid;" class="ui item fade"></div>
                                         </div>
-                                    </div>
 
                                     <uib-pagination class="pagination" total-items="results.hits.total"
                                                     items-per-page="page_size"
@@ -245,7 +241,7 @@
                     index: ["admin-test"],
                         /**type: ["document"],**/
                         facets: [
-                        {"field": "type.exact", "size": 20, "operator": "OR", "order": "term_asc", "min_doc_count" : 0},
+                        {"field": "type.exact", "size": 30, "operator": "OR", "order": "term_asc", "min_doc_count" : 0},
                         {"field": "hasZoom", "size": 10, "operator": "AND", "order": "term_asc", "min_doc_count" : 0},
                         {"field": "isDigitized", "size": 10, "operator": "AND", "order": "count_desc", "min_doc_count" : 0},
                         {"field": "isCatalogued", "size": 10, "operator": "AND", "order": "count_desc", "min_doc_count" : 0},

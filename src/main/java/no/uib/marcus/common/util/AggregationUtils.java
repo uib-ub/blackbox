@@ -18,7 +18,7 @@ import javax.validation.constraints.NotNull;
 import java.util.*;
 
 /**
- * Utility class for constructing setAggregations.
+ * Utility class for constructing aggregations.
  * @author Hemed Ali Al Ruwehy
  * University of Bergen
  */
@@ -29,12 +29,12 @@ public final class AggregationUtils {
      public AggregationUtils(){}
 
     /**
-     * The method checks if the facets/setAggregations contain a key that has a specified value.
+     * The method checks if the facets/aggregations contain a key that has a specified value.
      * Note that the facets must be valid JSON array. For example [
      * {"field": "status", "size": 15, "operator" : "AND", "order":
      * "term_asc"}, {"field" :"assigned_to" , "order" : "term_asc"}]
      *
-     * @param aggregations setAggregations as JSON string
+     * @param aggregations aggregations as JSON string
      * @param field        field in which key-value exists
      * @param key          a facet key
      * @param value        a value of specified key
@@ -111,13 +111,13 @@ public final class AggregationUtils {
         for (JsonElement facets : jsonElement.getAsJsonArray()) {
             JsonObject currentFacet = facets.getAsJsonObject();
             if (currentFacet.has("field")) {
-                //Add DateHistogram setAggregations
+                //Add DateHistogram aggregations
                 if (currentFacet.has("type") && currentFacet.get("type").getAsString().equals("date_histogram")) {
                     searchRequest.addAggregation(
                             AggregationUtils.getDateHistogramAggregation(currentFacet)
                     );
                 } else {
-                    //Add terms setAggregations to the search request builder (this is default)
+                    //Add terms aggregations to the search request builder (this is default)
                     searchRequest.addAggregation(
                             AggregationUtils.getTermsAggregation(currentFacet)
                     );
@@ -168,7 +168,7 @@ public final class AggregationUtils {
     }
 
     /**
-     * A method to build terms setAggregations
+     * A method to build terms aggregations
      *
      * @param facet a JSON object
      * @return a term builder

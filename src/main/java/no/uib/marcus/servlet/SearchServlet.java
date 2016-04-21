@@ -116,7 +116,7 @@ public class SearchServlet extends HttpServlet {
             parameterMapCopy.remove("index");
             XContentBuilder builder = XContentFactory.jsonBuilder()
                     .startObject()
-                    .field("host", request.getRemoteAddr().equals("0:0:0:0:0:0:0:1") ? InetAddress.getLocalHost() : request.getRemoteAddr())
+                    //.field("host", request.getRemoteAddr().equals("0:0:0:0:0:0:0:1") ? InetAddress.getLocalHost() : request.getRemoteAddr())
                     .field("params", parameterMapCopy)
                     .field("hits", searchResponse.getHits().getTotalHits())
                     .field("took", searchResponse.getTook())
