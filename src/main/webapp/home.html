@@ -62,7 +62,7 @@
                     <div class="search-results ui grid">
                         <div class="content ui row">
                             <div ng-cloak class="ng-cloak facets ui four wide column computer only">
-                                <h3 style="margin-top:15px;">Dato</h3>
+                                <h3 style="margin-top:15px;">Skapt</h3>
                                 <hr>
                                 <div class="datePicker ui input">
                                      <input type="text" id="from_date" class="datePicker" ng-model="from_date" ng-change="search()" placeholder="FRA" title="Fra dato">
@@ -249,8 +249,8 @@
                         {"field": "hasZoom", "size": 10, "operator": "AND", "order": "term_asc", "min_doc_count" : 0},
                         {"field": "isDigitized", "size": 10, "operator": "AND", "order": "count_desc", "min_doc_count" : 0},
                         {"field": "isCatalogued", "size": 10, "operator": "AND", "order": "count_desc", "min_doc_count" : 0},
-                        {"field": "subject.exact", "size" : 30, "min_doc_count" : 1},
-                        {"field": "isPartOf.exact", "size": 20, "operator": "OR", "min_doc_count" : 0}
+                        {"field": "subject.exact", "size" : 30, "operator": "AND", "min_doc_count" : 1},
+                        {"field": "isPartOf.exact", "size": 20, "operator": "OR", "order" : "count_desc", "min_doc_count" : 1}
                         /*Supported intervals: weeks(w), days(d), hours(h), minutes(m), seconds(s)*/
                         //{"field": "created", "type" : "date_histogram", "format" : "yyyy", "interval" : "520w", "min_doc_count" : 1, "order" : "key_asc"}
                         ]

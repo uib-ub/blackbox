@@ -37,7 +37,7 @@ public final class FilterUtils {
             if (Strings.hasText(fromDate) || Strings.hasText(toDate)) {
                 boolFilter
                         //Range within "available" field
-                        .should(FilterBuilders.rangeFilter(RequestParams.DateField.AVAILABLE).gte(fromDate).lte(toDate))
+                        //.should(FilterBuilders.rangeFilter(RequestParams.DateField.AVAILABLE).gte(fromDate).lte(toDate))
                         //Range within "created" field
                         .should(FilterBuilders.rangeFilter(RequestParams.DateField.CREATED).gte(fromDate).lte(toDate))
                         //madeBefore >= from_date and madeBefore <= to_date

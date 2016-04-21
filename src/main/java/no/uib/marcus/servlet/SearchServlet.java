@@ -111,7 +111,10 @@ public class SearchServlet extends HttpServlet {
 
             //Log what has been queried
             Map<String, String[]> parameterMapCopy = new HashMap<>(request.getParameterMap());
-            parameterMapCopy.remove("aggs");//Remove setAggregations setFrom the parameter list, we are not interested to logging them.
+            //Remove those that we are not interested in logging.
+            parameterMapCopy.remove("aggs");
+            parameterMapCopy.remove("index");
+            parameterMapCopy.remove("type");
             XContentBuilder builder = XContentFactory.jsonBuilder()
                     .startObject()
                     .field("host", request.getRemoteAddr().equals("0:0:0:0:0:0:0:1") ? InetAddress.getLocalHost() : request.getRemoteAddr())

@@ -187,8 +187,8 @@ public class MarcusSearchBuilder extends AbstractSearchBuilder<MarcusSearchBuild
                 AggregationUtils.addAggregations(searchRequest, aggregations);
             }
 
-            //Show SearchServlet builder for debugging purpose
-            //logger.info(searchRequest.toString());
+            //Show builder for debugging purpose
+            logger.info(searchRequest.toString());
             response = searchRequest
                     .execute()
                     .actionGet();
