@@ -161,7 +161,7 @@ public class MarcusSearchBuilder extends AbstractSearchBuilder<MarcusSearchBuild
             query = functionScoreQueryBuilder
                     .add(FilterBuilders.termFilter("type", "fotografi"),
                             ScoreFunctionBuilders.weightFactorFunction(2))
-                    .add(FilterBuilders.termFilter("showWeb", "true"),
+                    .add(FilterBuilders.termFilter("showWeb", true),
                             ScoreFunctionBuilders.weightFactorFunction(2));
 
 

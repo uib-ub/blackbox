@@ -70,6 +70,7 @@
                                 <div class="datePicker ui input">
                                      <input type="text" id="to_date" class="datePicker" ng-model="to_date" ng-change="search()" placeholder="TIL" title="Til dato">
                                 </div><br/><br/>
+                                <!-- Document types facets-->
                                 <h3>Dokument typer</h3>
                                 <hr>
                                 <div class="ui list" style="height:400px; overflow-y: scroll">
@@ -80,6 +81,7 @@
                                         </label>
                                     </div>
                                 </div>
+                                <!-- Category facets -->
                                 <h3>Kategorier</h3>
                                 <hr>
                                 <div class="ui relaxed list">
@@ -96,6 +98,7 @@
                                         <label for="isCatalogued-{{bucket.key}}">{{bucket.key}} <span style="color:grey"> ({{bucket.doc_count | number}})</span></label>
                                     </div>
                                 </div>
+                                <!-- Topic facets-->
                                 <h3>Emne</h3>
                                 <hr>
                                 <div class="ui list" style="height:400px; overflow-y: scroll">
@@ -106,6 +109,7 @@
                                         </label>
                                     </div>
                                 </div>
+                                <!-- Collection facets-->
                                 <h3>Samling</h3>
                                 <hr>
                                 <div class="ui list" style="height:400px; overflow-y: scroll" >
@@ -171,7 +175,7 @@
                                             <option value="250">250</option>
                                         </select>
                                     </div><br>
-
+                                    <!-- Search results view--->
                                     <div class="ui divided items">
                                         <div ng-repeat="doc in results.hits.hits track by $index" class="ui item">
                                             <div include-replace ng-if='doc._type == "document"'  ng-include="'partials/document-hits.html'" style="page-break-inside: avoid;" class="ui item fade" ></div>
