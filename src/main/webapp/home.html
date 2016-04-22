@@ -182,6 +182,7 @@
                                             <div include-replace ng-if='doc._source.type == "Arbeidsliste"' ng-include="'partials/object-hits.html'" style="page-break-inside: avoid;" class="ui item fade"></div>
                                             <div include-replace ng-if='doc._source.type == "Aggregering"' ng-include="'partials/aggregation-hits.html'" style="page-break-inside: avoid;" class="ui item fade"></div>
                                         </div>
+                                    </div>
 
                                     <uib-pagination class="pagination" total-items="results.hits.total"
                                                     items-per-page="page_size"
