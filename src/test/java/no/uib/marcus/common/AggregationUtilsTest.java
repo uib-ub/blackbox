@@ -3,11 +3,12 @@ package no.uib.marcus.common;
 import com.carrotsearch.randomizedtesting.RandomizedTest;
 import com.carrotsearch.randomizedtesting.annotations.Repeat;
 import com.carrotsearch.randomizedtesting.annotations.Seed;
+import no.uib.marcus.common.util.AggregationUtils;
 import org.junit.Test;
 
 import java.util.*;
 
-import static no.uib.marcus.common.AggregationUtils.contains;
+import static no.uib.marcus.common.util.AggregationUtils.contains;
 
 /**
  * @author Hemed Ali
@@ -55,7 +56,7 @@ public class AggregationUtilsTest extends RandomizedTest {
 
         @Test
         public void testGetFilterMap01() {
-                String[] selectedFilter = {"hemed.ali", "status.sent", "status.draft"};
+                String[] selectedFilter = {"hemed#ali", "status#sent", "status#draft"};
 
                 Map<String, List<String>> expectedMap = new HashMap<>();
                 expectedMap.put("hemed", Arrays.asList("ali"));
@@ -80,7 +81,7 @@ public class AggregationUtilsTest extends RandomizedTest {
         @Test
         public void testGetFilterMap03() throws Exception {
                 //Separate keys with "_", it should return null.
-                String[] selectedFilter = {"http://marcus.uib.no.photography", "status_sent", "status_draft"};
+                String[] selectedFilter = {"http://marcus.uib.no#photography", "status_sent", "status_draft"};
                 Map<String, List<String>> expectedMap = new HashMap<>();
                 expectedMap.put("http://marcus.uib.no", Arrays.asList("photography"));
                 assertEquals(AggregationUtils.getFilterMap(selectedFilter), expectedMap);
@@ -89,7 +90,7 @@ public class AggregationUtilsTest extends RandomizedTest {
 
         @Test
         public void testGetFilterMap05() {
-                String[] input = {"status.sent", "status.draft", "status.makame", "status.bee"};
+                String[] input = {"status#sent", "status#draft", "status#makame", "status#bee"};
 
                 Map<String, List<String>> expectedMap = new HashMap<>();
                 expectedMap.put("status", Arrays.asList("sent", "draft", "makame", "bee"));

@@ -25,13 +25,13 @@ app.controller('freeTextSearch', function ($scope, $http, $location, $window, my
     /**
      * Get values from checkboxes.
      * The method returns a string concatenation of a field and the selected value.
-     * Note that, a field and it's selected value must be seperated by a dot ('.'),
+     * Note that, a field and it's selected value must be separated by a hash ('#'),
      * otherwise the server will not know which is which and aggregations will fail.
      **/
     $scope.getCheckedValue = function (field, filterValue) {
         if (field !== undefined && filterValue !== undefined) {
-            /*Separate a field and the selected value by a dot.*/
-            return field + "." + filterValue;
+            /*Separate a field and the selected value by a hash*/
+            return field + '#' + filterValue;
         }
         return null;
     };
@@ -90,7 +90,7 @@ app.controller('freeTextSearch', function ($scope, $http, $location, $window, my
             });
     };
 
-    //Send suggest request to "suggest" servlet for autocompletion.
+    //Send suggestion request to "suggestion" servlet for autocompletion.
     $scope.autoSuggest = function () {
         $http({
             method: 'GET',
