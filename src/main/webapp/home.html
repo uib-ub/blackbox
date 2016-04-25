@@ -18,12 +18,12 @@
     </head>
     <body>
         <div class="ui fixed inverted menu hidden-sm hidden-xs">
-            <div class="ui container fluid header-wrap">
+            <div class="top-header ui container fluid header-wrap">
                 <a id="show-menu" class="item">
                     <i class="sidebar icon"></i>
                 </a>
                 <div class="header brand item">
-                    <a href="">Marcus admin</a>
+                    <a href="#">MARCUS ADMIN</a>
                 </div>
             </div>
         </div>
@@ -41,7 +41,7 @@
                                            name="q" 
                                            ng-model="query_string"
                                            ng-keyup="($event.keyCode==13||query_string==='')&&search()"
-                                           placeholder="Søk Marcus..." 
+                                           placeholder="Søk Marcus..."
                                            autocomplete="off"/>
                                     <!--img class="Typeahead-spinner" src="js/lib/typeahead/img/spinner.gif" alt=""/-->
                                     <button class="Typeahead-search-icon" type="button" ng-click="search()">
@@ -61,6 +61,7 @@
                 <div ng-cloak ng-show="ready" style="margin-top:30px;" class="ui container">
                     <div class="search-results ui grid">
                         <div class="content ui row">
+                            <!--Starting with facets-->
                             <div ng-cloak class="ng-cloak facets ui four wide column computer only">
                                 <h3 style="margin-top:15px;">Skapt dato</h3>
                                 <hr>
@@ -73,7 +74,7 @@
                                 <!-- Document types facets-->
                                 <h3>Dokument typer</h3>
                                 <hr>
-                                <div class="ui list" style="height:400px; overflow-y: scroll">
+                                <div class="ui list">  <!--style="height:500px; overflow-y: scroll"-->
                                     <div class="ui checkbox item" ng-repeat="bucket in results['aggregations']['type.exact']['buckets']">
                                         <input id="type-{{bucket.key}}" type="checkbox" checklist-model="selected_filters" checklist-value="getCheckedValue('type.exact', bucket.key)" ng-click="search()">
                                         <label for="type-{{bucket.key}}" ng-class="{'disabled': bucket.doc_count == 0}"> {{bucket.key}}
@@ -101,7 +102,7 @@
                                 <!-- Topic facets-->
                                 <h3>Emne</h3>
                                 <hr>
-                                <div class="ui list" style="height:400px; overflow-y: scroll">
+                                <div class="ui list" style="height:500px; overflow-y: scroll" >
                                     <div class="ui checkbox item" ng-repeat="bucket in results['aggregations']['subject.exact']['buckets']">
                                         <input id="subject-{{bucket.key}}" type="checkbox" checklist-model="selected_filters" checklist-value="getCheckedValue('subject.exact', bucket.key)" ng-click="search()">
                                         <label for="subject-{{bucket.key}}" class="row-fluid"> {{bucket.key}}
@@ -112,7 +113,7 @@
                                 <!-- Collection facets-->
                                 <h3>Samling</h3>
                                 <hr>
-                                <div class="ui list" style="height:400px; overflow-y: scroll" >
+                                <div class="ui list" style="height:500px; overflow-y: scroll">
                                     <div class="ui checkbox item" ng-repeat="bucket in results['aggregations']['isPartOf.exact']['buckets']">
                                         <input id="isPartOf-{{bucket.key}}" type="checkbox" checklist-model="selected_filters" checklist-value="getCheckedValue('isPartOf.exact', bucket.key)" ng-click="search()">
                                         <label for="isPartOf-{{bucket.key}}" ng-class="{'disabled': bucket.doc_count == 0}"> {{bucket.key}}
@@ -206,7 +207,7 @@
                     </div>
                 </div>
             </div>
-        
+
         <script id="result-template" type="text/x-handlebars-template">
             <div class="ProfileCard u-cf">
             <div class="ProfileCard-details">
@@ -218,7 +219,7 @@
         </script>
 
         <script id="empty-template" type="text/x-handlebars-template">
-            <div class="EmptyMessage">Your search turned up 0 results.</div>
+            <div class="EmptyMessage">Your search turned up 0 hits</div>
         </script>
 
         <!--JavaScript files -->
