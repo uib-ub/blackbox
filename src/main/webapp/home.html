@@ -247,7 +247,7 @@
                     index: ["admin-test"],
                         /**type: ["document"],**/
                         facets: [
-                        {"field": "type.exact", "size": 30, "operator": "OR", "order": "term_asc", "min_doc_count" : 0},
+                        {"field": "type.exact", "size": 40, "operator": "OR", "order": "term_asc", "min_doc_count" : 0},
                         {"field": "hasZoom", "size": 10, "operator": "AND", "order": "term_asc", "min_doc_count" : 0},
                         {"field": "isDigitized", "size": 10, "operator": "AND", "order": "count_desc", "min_doc_count" : 0},
                         {"field": "isCatalogued", "size": 10, "operator": "AND", "order": "count_desc", "min_doc_count" : 0},
