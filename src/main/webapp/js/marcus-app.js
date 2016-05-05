@@ -4,12 +4,32 @@
  **/
 
 'use strict';
-var app = angular.module('marcus', ["checklist-model", "ui.bootstrap", "settings", "ngAnimate"]);
+var app = angular.module('marcus', ["checklist-model", "ui.bootstrap", "settings", "ngAnimate", "ngRoute"]);
+
+app.config(["$routeProvider", function($routeProvider) {
+    $routeProvider
+        .when('/h', {
+            templateUrl : 'home.html',
+            controller  : 'freeTextSearch'
+        })
+        .when('/test', {
+            templateUrl : 'search',
+            controller  : 'freeTextSearch'
+        })
+        .otherwise({
+           redirectTo: 'home.html'
+        });
+    //$locationProvider.html5Mode(true);
+}]);
+app.config(function($locationProvider) {
+    $locationProvider.html5Mode(true).hashPrefix('');
+});
 
 /**========= Search Controller ===========**/
 app.controller('freeTextSearch', function ($scope, $http, $location, $window, mySetting) {
 
     //Initialize default variables
+    $(".blackbox-loading").show();
     $scope.show_loading = true;
     $scope.ready = false;
     $scope.query_string = "";
@@ -68,26 +88,41 @@ app.controller('freeTextSearch', function ($scope, $http, $location, $window, my
                 size: $scope.page_size,
                 sort: sort
             }
-        })
-            .success(function (data, status, headers, config) {
-                $scope.results = data;
-                $scope.show_loading = false;
-                $scope.ready = true;
-
-                /*$location.html5Mode(true);
-                alert(JSON.stringify(config.params));
-                $location.url(config.params);
-                $location.replace();
-                $window.history.pushState(null, 'locationURL', $location.absUrl());
-                */
-
-
-            })
-            .error(function (data, status, headers, config) {
+        }).then(function (response) {
+                /**console.log("URL: " + $location.url());
+                console.log("Path: " + $location.path());
+                console.log("absUrl: " + $location.absUrl());
+                var params = JSON.stringify(response.config.params);
+                //Response params:  data, status, headers, config
+                //$location.html5Mode(true);
+                //console.log(JSON.stringify(config.params));
+                //$location.url(JSON.stringify(response.config));
+                //$location.replace();
+                 //$window.history.pushState(null, 'locationURL', ($location.search(response.config.params));
+                 **/
+                //$("#searchController").hide();
+                //$("#loadingGif").show();
+                if(!response.data){
+                    $(".blackbox-loading").hide();
+                    var alert = "<div class='ui large red message' " +
+                                   "style='width: 50%; margin: 10% auto; text-align: center; font-size: 2em'>" +
+                                   "<strong> Service is temporarily unavailable </strong>" +
+                                "</div>";
+                   $("#searchController").append(alert);
+                }
+                if(response.data) {
+                    $location.search(response.config.params);
+                    $scope.results = response.data;
+                    $(".blackbox-loading").hide();
+                    //$scope.show_loading = false;
+                    $scope.ready = true;
+                }
+            });
+            /**.error(function (data, status, headers, config) {
                 $scope.log = 'Error occured while querying' + data;
                 $scope.show_loading = false;
-                $scope.ready = true;
-            });
+                $scope.ready = true;"
+            });**/
     };
 
     //Send suggestion request to "suggestion" servlet for autocompletion.
@@ -99,34 +134,13 @@ app.controller('freeTextSearch', function ($scope, $http, $location, $window, my
                 q: $scope.query_string,
                 index: mySetting.index
             }
-        })
-            .success(function (data, status, headers, config) {
-                $scope.suggestion_list = data;
-            })
-            .error(function (data, status, headers, config) {
-                $scope.log = 'Error occured while querying';
+        }).then(function (response) {
+                $scope.suggestion_list = response.data;
             });
     };
 
     //Call this function on pageload
     $scope.search();
-});
-
-
-/**
- * Year Controller
- */
-app.controller('nextYear', function ($scope, $filter) {
-    var myDate = new Date();
-    var previousYear = new Date(myDate);
-    var nextYear = new Date(myDate);
-
-    previousYear.setYear(myDate.getFullYear() - 1);
-    nextYear.setYear(myDate.getFullYear() + 1);
-
-    $scope.year = $filter('date')(myDate, 'yyyy');//2014 like
-    $scope.nextYear = $filter('date')(nextYear, 'yyyy');
-    $scope.prevYear = $filter('date')(previousYear, 'yyyy');
 });
 
 /**
@@ -152,39 +166,3 @@ app.directive('includeReplace', function () {
 });
 
 
-/**
- A method to append * or ~ in the query string
- <p/>
- @param query_string a query string.
- @param default_freetext_fuzzify - should be either * or ~,
- if *, * will be prepended and appended to each string in the freetext search term
- if ~, then ~ will be appended to each string in the freetext search term.
- If * or ~ or : are already in the freetext search term, no action will be taken.
- @param query_string - a query string.
- **/
-function fuzzify(query_string, default_freetext_fuzzify) {
-    var rqs = query_string;
-    if (default_freetext_fuzzify !== undefined) {
-        if (default_freetext_fuzzify === "*" || default_freetext_fuzzify === "~") {
-            //Do not do anything if query string has either one of the following chars.
-            if (query_string.indexOf('*') === -1 && query_string.indexOf('~') === -1 &&
-                query_string.indexOf(':') === -1 && query_string.indexOf('"') === -1 &&
-                query_string.indexOf('[') === -1) {
-                var option_parts = query_string.split(' ');
-                var pq = "";
-                for (var oi = 0; oi < option_parts.length; oi++) {
-                    var oip = option_parts[oi];
-
-                    //We want the string part to be greater than 1 char,
-                    // and it should not contain the following special chars.
-                    if (oip.length > 1 && oip.indexOf(')') === -1 && oip.indexOf('(') === -1) {
-                        oip = oip + default_freetext_fuzzify;
-                    }
-                    pq += oip + ' ';
-                }
-                rqs = pq;
-            }
-        }
-    }
-    return rqs;
-}

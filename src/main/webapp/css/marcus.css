@@ -91,10 +91,10 @@ html, body {
     font-weight: bold;
 }
 
-/**.loading {
-    margin: 30px auto 0 auto;
-    width: 50%;
-}**/
+.blackbox-loading {
+    margin-left: 47%;
+    margin-top: 10%;
+}
 
 .fancyinput-temp {
     cursor: default;
