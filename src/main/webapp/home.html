@@ -42,7 +42,7 @@
                                            name="q" 
                                            ng-model="query_string"
                                            ng-keyup="($event.keyCode==13 || query_string==='')&&search()"
-                                           placeholder="Søk Marcus Test..."
+                                           placeholder="Søk Marcus ..."
                                            autocomplete="off"/>
                                     <!--img class="Typeahead-spinner" src="js/lib/typeahead/img/spinner.gif" alt=""/-->
                                     <button class="Typeahead-search-icon" type="button" ng-click="search()">
@@ -65,7 +65,7 @@
                         <div class="content ui row">
                             <!--Starting with facets-->
                             <div ng-cloak class="ng-cloak facets ui four wide column computer only">
-                                <h3 style="margin-top:15px;">Skapt dato</h3>
+                                <h3 style="margin-top:15px;">Skapt</h3>
                                 <hr>
                                 <div class="datePicker ui input">
                                      <input type="text" id="from_date" class="datePicker" ng-model="from_date" ng-change="search()" placeholder="FRA" title="Fra dato">
@@ -140,19 +140,21 @@
 
                             <div ng-show="results.hits.total > 0" class="search-hits ng-cloak ui eleven wide column">
                                 <br/>
-                                <strong class="ui item" ng-bind-template="{{results.hits.total | number}} treff" style="font-size:2em;"></strong>
-                                <div class="pull-right">
-                                    <label for="sort_by">Sortér på:</label>
-                                    <select class="ui dropdown" id="sort_by" ng-model="sort_by" ng-change="search()">
-                                        <option value="">Mest relevant</option>
-                                        <option value="identifier:asc">ID asc</option>
-                                        <option value="identifier:desc">ID desc</option>
-                                        <option value="title.exact:asc">Tittle asc</option>
-                                        <option value="title.exact:desc">Tittle desc</option>
-                                        <option value="available:asc">Tilgjeng. asc</option>
-                                        <option value="available:desc">Tilgjeng. desc</option>
-                                    </select>
-                                </div>
+                                <div>
+                                    <strong class="ui item" ng-bind-template="{{results.hits.total | number}}" style="font-size:2em;"></strong> <span style="font-size: 1.8em"> treff</span>
+                                    <div class="pull-right">
+                                        <label for="sort_by">Sortér på:</label>
+                                        <select class="ui dropdown" id="sort_by" ng-model="sort_by" ng-change="search()">
+                                            <option value="">Mest relevant</option>
+                                            <option value="identifier:asc">ID asc</option>
+                                            <option value="identifier:desc">ID desc</option>
+                                            <option value="title.exact:asc">Tittle asc</option>
+                                            <option value="title.exact:desc">Tittle desc</option>
+                                            <option value="available:asc">Tilgjeng. asc</option>
+                                            <option value="available:desc">Tilgjeng. desc</option>
+                                        </select>
+                                    </div>
+                                    </div>
                                 <div class="results-hit ng-cloak">
                                     <hr>
                                     <uib-pagination class="pagination hidden-sm hidden-xs" total-items="results.hits.total"
@@ -168,9 +170,10 @@
                                                     force-ellipses="true">
                                     </uib-pagination>
                                     <div class="single-select form-group hidden-xs hidden-sm">
-                                        <label class="ui item" for="docPerPage">Treff per side: </label>
-                                        <select id="docPerPage" ng-model="page_size" ng-change="search()">
-                                            <option value="10" ng-selected="selected">10</option>
+                                        <!--label class="ui item" for="docPerPage">#Treff: </label-->
+                                        <select id="docPerPage" class="ui dropdown" ng-model="page_size" ng-change="search()">
+                                            <option value="">Treff per side</option>
+                                            <!--option value="10" ng-selected="selected">10</option-->
                                             <option value="20">20</option>
                                              <option value="30">30</option>
                                             <option value="100">100</option>
@@ -209,7 +212,6 @@
                     </div>
                 </div>
             </div>
-
         <script id="result-template" type="text/x-handlebars-template">
             <div class="ProfileCard u-cf">
             <div class="ProfileCard-details">
@@ -219,7 +221,6 @@
             </div>
             </div>
         </script>
-
         <script id="empty-template" type="text/x-handlebars-template">
             <div class="EmptyMessage">Your search turned up 0 hits</div>
         </script>
@@ -241,7 +242,6 @@
         <script src="js/checklist-directive.js"></script>
         <script src="js/jquery-datepicker.js"></script>
         <script src="js/ui-bootstrap-1.1.2.min.js"></script>
-
 
         <!--These are constants for this particular page-->
         <script>

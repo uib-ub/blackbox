@@ -5,7 +5,6 @@
 
 'use strict';
 var app = angular.module('marcus', ["checklist-model", "ui.bootstrap", "settings", "ngAnimate", "ngRoute"]);
-
 app.config(["$routeProvider", function($routeProvider) {
     $routeProvider
         .when('/h', {
@@ -22,16 +21,19 @@ app.config(["$routeProvider", function($routeProvider) {
     //$locationProvider.html5Mode(true);
 }]);
 app.config(function($locationProvider) {
-    $locationProvider.html5Mode(true).hashPrefix('');
+    $locationProvider.html5Mode(true);
 });
 
-/**========= Search Controller ===========**/
-app.controller('freeTextSearch', function ($scope, $http, $location, $window, mySetting) {
+/**
+ * ================================
+ *     Search Controller
+ * ================================
+ **/
+app.controller('freeTextSearch', function ($scope, $http, $location, mySetting) {
+    var searchParams = $location.search();
+    console.log(JSON.stringify(searchParams));
 
     //Initialize default variables
-    $(".blackbox-loading").show();
-    $scope.show_loading = true;
-    $scope.ready = false;
     $scope.query_string = "";
     $scope.sort_by = "";
     $scope.selected_filters = [];
@@ -41,6 +43,11 @@ app.controller('freeTextSearch', function ($scope, $http, $location, $window, my
     $scope.page_size = 10;
     $scope.isArray = angular.isArray;
     $scope.isString = angular.isString;
+    //$scope.show_loading = true;
+    $scope.ready = false;
+
+    //Show loading gif
+    $(".blackbox-loading").show();
 
     /**
      * Get values from checkboxes.
@@ -50,30 +57,21 @@ app.controller('freeTextSearch', function ($scope, $http, $location, $window, my
      **/
     $scope.getCheckedValue = function (field, filterValue) {
         if (field !== undefined && filterValue !== undefined) {
-            /*Separate a field and the selected value by a hash*/
+            //Separate a field and the selected value
             return field + '#' + filterValue;
         }
         return null;
     };
 
-    //Clear date fields
-    $scope.clearDates = function () {
-        $scope.from_date = null;
-        $scope.to_date = null;
-
-        //After clearing the dates, send new search request.
-        $scope.search();
-    };
-
     //Send requests to search servlet
     $scope.search = function () {
-        /*We are assigning null to these values so that, if empty, they should not appear in query string*/
-        var q = $scope.query_string === "" ? null : $scope.query_string /**fuzzify($scope.query_string, "*")**/;
+        //We are assigning null to these values so that, if empty,
+        // they should not appear in query string
+        var q = $scope.query_string === "" ? null : $scope.query_string;
         var sort = $scope.sort_by === "" ? null : $scope.sort_by;
         var fromPage = ($scope.current_page - 1) * $scope.page_size;
         var fromDate = $scope.from_date === "" ? null : $scope.from_date;
         var toDate = $scope.to_date === "" ? null : $scope.to_date;
-
         $http({
             method: 'GET',
             url: 'search?aggs=' + JSON.stringify(mySetting.facets),
@@ -99,24 +97,27 @@ app.controller('freeTextSearch', function ($scope, $http, $location, $window, my
                 //$location.url(JSON.stringify(response.config));
                 //$location.replace();
                  //$window.history.pushState(null, 'locationURL', ($location.search(response.config.params));
-                 **/
                 //$("#searchController").hide();
                 //$("#loadingGif").show();
-                if(!response.data){
-                    $(".blackbox-loading").hide();
-                    var alert = "<div class='ui large red message' " +
-                                   "style='width: 50%; margin: 10% auto; text-align: center; font-size: 2em'>" +
-                                   "<strong> Service is temporarily unavailable </strong>" +
-                                "</div>";
-                   $("#searchController").append(alert);
-                }
+                 **/
+                var params = response.config.params;
+                $location.search(params);
+
                 if(response.data) {
-                    $location.search(response.config.params);
                     $scope.results = response.data;
-                    $(".blackbox-loading").hide();
                     //$scope.show_loading = false;
                     $scope.ready = true;
                 }
+                else{
+                    //Empty everything in search controller
+                    $("#searchController").empty();
+                    var alert = "<div id='alert-server-status' class='ui large red message' " +
+                                      "<strong> Service is temporarily unavailable </strong>" +
+                                "</div>";
+                    $("#searchController").append(alert);
+                    console.log("No response from Elasticsearch")
+                }
+               $(".blackbox-loading").hide();
             });
             /**.error(function (data, status, headers, config) {
                 $scope.log = 'Error occured while querying' + data;
