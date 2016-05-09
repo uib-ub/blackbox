@@ -1,3 +1,8 @@
+/**
+ * A factory JavaScript file that contains common methods
+ * to be used throughout the system
+ * **/
+
 
 /**
  A method to append * or ~ in the query string
@@ -34,4 +39,15 @@ function fuzzify(query_string, default_freetext_fuzzify) {
         }
     }
     return rqs;
+}
+/**
+ * Check for the string and return null if it is empty or undefined
+ * @param s
+ * @returns {*}
+ */
+function stripEmpty(s) {
+    if(s == undefined || s === "") {
+        return null;
+    }
+    return s;
 }

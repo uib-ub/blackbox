@@ -7,7 +7,7 @@
 var app = angular.module('marcus', ["checklist-model", "ui.bootstrap", "settings", "ngAnimate", "ngRoute"]);
 app.config(["$routeProvider", function($routeProvider) {
     $routeProvider
-        .when('/h', {
+        .when('/search', {
             templateUrl : 'home.html',
             controller  : 'freeTextSearch'
         })
@@ -16,7 +16,8 @@ app.config(["$routeProvider", function($routeProvider) {
             controller  : 'freeTextSearch'
         })
         .otherwise({
-           redirectTo: 'home.html'
+            redirectTo: 'home.html',
+            controller  : 'freeTextSearch'
         });
     //$locationProvider.html5Mode(true);
 }]);
@@ -30,20 +31,25 @@ app.config(function($locationProvider) {
  * ================================
  **/
 app.controller('freeTextSearch', function ($scope, $http, $location, mySetting) {
-    var searchParams = $location.search();
-    console.log(JSON.stringify(searchParams));
 
-    //Initialize default variables
-    $scope.query_string = "";
-    $scope.sort_by = "";
+    //Declare variables
+    $scope.isArray = angular.isArray;
+    $scope.isString = angular.isString;
+
+    //Get parameters from the URL
+    var urlParams = $location.search();
+
+    console.log("URL Params: " + JSON.stringify(urlParams));
+
+    //Initialize variables to default values
+    $scope.query_string = null;
+    $scope.sort_by = null;
     $scope.selected_filters = [];
     $scope.from_date = null;
     $scope.to_date = null;
     $scope.current_page = 1;
     $scope.page_size = 10;
-    $scope.isArray = angular.isArray;
-    $scope.isString = angular.isString;
-    //$scope.show_loading = true;
+    $scope.from = ($scope.current_page - 1) * $scope.page_size;
     $scope.ready = false;
 
     //Show loading gif
@@ -65,29 +71,31 @@ app.controller('freeTextSearch', function ($scope, $http, $location, mySetting) 
 
     //Send requests to search servlet
     $scope.search = function () {
-        //We are assigning null to these values so that, if empty,
-        // they should not appear in query string
-        var q = $scope.query_string === "" ? null : $scope.query_string;
-        var sort = $scope.sort_by === "" ? null : $scope.sort_by;
-        var fromPage = ($scope.current_page - 1) * $scope.page_size;
-        var fromDate = $scope.from_date === "" ? null : $scope.from_date;
-        var toDate = $scope.to_date === "" ? null : $scope.to_date;
+
+        var defaultParams = {
+            q: stripEmpty($scope.query_string),
+            index: mySetting.index,
+            type: mySetting.type,
+            from_date: stripEmpty($scope.from_date),
+            to_date: stripEmpty($scope.to_date),
+            filter: $scope.selected_filters,
+            from: $scope.from,
+            size: $scope.page_size,
+            sort: stripEmpty($scope.sort_by)
+        };
+
+        //Merge and/or extend default params with URL params. URL params take precedence.
+        var extendedParams = $.extend(defaultParams, urlParams);
+        //Clear URL params after use.
+        urlParams = {};
         $http({
             method: 'GET',
             url: 'search?aggs=' + JSON.stringify(mySetting.facets),
-            params: {
-                q: q,
-                index: mySetting.index,
-                type: mySetting.type,
-                from_date: fromDate,
-                to_date: toDate,
-                filter: $scope.selected_filters,
-                from: fromPage,
-                size: $scope.page_size,
-                sort: sort
-            }
+            params: extendedParams
         }).then(function (response) {
-                /**console.log("URL: " + $location.url());
+            //Initialize the view with extended parameters
+
+            /**console.log("URL: " + $location.url());
                 console.log("Path: " + $location.path());
                 console.log("absUrl: " + $location.absUrl());
                 var params = JSON.stringify(response.config.params);
@@ -100,12 +108,45 @@ app.controller('freeTextSearch', function ($scope, $http, $location, mySetting) 
                 //$("#searchController").hide();
                 //$("#loadingGif").show();
                  **/
-                var params = response.config.params;
-                $location.search(params);
 
+            //Parameters that have been used to generate response.
+            // In principle, they are the same as extendedParams
+            var responseParams = response.config.params;
                 if(response.data) {
+
+                    //Initialize the view by copying response params to scope variables
+                    if ("q" in responseParams) {
+                        $scope.query_string = responseParams.q
+                    }
+                    if ("from_date" in responseParams) {
+                        $scope.from_date = responseParams.from_date
+                    }
+                    if ("to_date" in responseParams) {
+                        $scope.to_date = responseParams.to_date
+                    }
+                    if ("from" in responseParams) {
+                        $scope.from = responseParams.from
+                    }
+                    if ("size" in responseParams) {
+                        $scope.size = responseParams.size
+                    }
+                    if ("sort" in responseParams) {
+                        $scope.sort = responseParams.sort
+                    }
+                    if ("filter" in responseParams) {
+                        if (responseParams.filter instanceof Array) {
+                            $scope.selected_filters = responseParams.filter
+                        }
+                        else {
+                            if ($scope.selected_filters.indexOf(responseParams.filter) === -1) {
+                                $scope.selected_filters.push(responseParams.filter);
+                                responseParams.filter = $scope.selected_filters;
+                            }
+                        }
+                    }
+                    console.log("extended Params: " + JSON.stringify(extendedParams));
+                    //TODO: Initialize dropdown lists and facets.
                     $scope.results = response.data;
-                    //$scope.show_loading = false;
                     $scope.ready = true;
                 }
                 else{
@@ -117,13 +158,10 @@ app.controller('freeTextSearch', function ($scope, $http, $location, mySetting) 
                     $("#searchController").append(alert);
                     console.log("No response from Elasticsearch")
                 }
+            //Set params to the browser history
+            $location.search(responseParams);
                $(".blackbox-loading").hide();
             });
-            /**.error(function (data, status, headers, config) {
-                $scope.log = 'Error occured while querying' + data;
-                $scope.show_loading = false;
-                $scope.ready = true;"
-            });**/
     };
 
     //Send suggestion request to "suggestion" servlet for autocompletion.
@@ -165,5 +203,6 @@ app.directive('includeReplace', function () {
         }
     };
 });
+
 
 
