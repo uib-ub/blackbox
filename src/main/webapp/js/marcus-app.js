@@ -12,7 +12,7 @@ app.config(["$routeProvider", function($routeProvider) {
             controller  : 'freeTextSearch'
         })
         .when('/test', {
-            templateUrl : 'search',
+            templateUrl : 'home.html',
             controller  : 'freeTextSearch'
         })
         .otherwise({
@@ -36,10 +36,8 @@ app.controller('freeTextSearch', function ($scope, $http, $location, mySetting) 
     $scope.isArray = angular.isArray;
     $scope.isString = angular.isString;
 
-    //Get parameters from the URL
+    //Get parameters from the search URL
     var urlParams = $location.search();
-
-    console.log("URL Params: " + JSON.stringify(urlParams));
 
     //Initialize variables to default values
     $scope.query_string = null;
@@ -49,7 +47,7 @@ app.controller('freeTextSearch', function ($scope, $http, $location, mySetting) 
     $scope.to_date = null;
     $scope.current_page = 1;
     $scope.page_size = 10;
-    $scope.from = ($scope.current_page - 1) * $scope.page_size;
+    $scope.from =  0;
     $scope.ready = false;
 
     //Show loading gif
@@ -69,7 +67,9 @@ app.controller('freeTextSearch', function ($scope, $http, $location, mySetting) 
         return null;
     };
 
-    //Send requests to search servlet
+    /**
+     * Send requests to search servlet and prepare the view for rendering
+     */
     $scope.search = function () {
 
         var defaultParams = {
@@ -79,63 +79,45 @@ app.controller('freeTextSearch', function ($scope, $http, $location, mySetting) 
             from_date: stripEmpty($scope.from_date),
             to_date: stripEmpty($scope.to_date),
             filter: $scope.selected_filters,
-            from: $scope.from,
+            from: ($scope.current_page - 1) * $scope.page_size,
             size: $scope.page_size,
             sort: stripEmpty($scope.sort_by)
         };
 
-        //Merge and/or extend default params with URL params. URL params take precedence.
+        //Merge or extend default params with URL params. URL params take precedence.
         var extendedParams = $.extend(defaultParams, urlParams);
-        //Clear URL params after use.
+        //Clear URL params once after use.
         urlParams = {};
         $http({
             method: 'GET',
             url: 'search?aggs=' + JSON.stringify(mySetting.facets),
             params: extendedParams
         }).then(function (response) {
-            //Initialize the view with extended parameters
-
-            /**console.log("URL: " + $location.url());
-                console.log("Path: " + $location.path());
-                console.log("absUrl: " + $location.absUrl());
-                var params = JSON.stringify(response.config.params);
-                //Response params:  data, status, headers, config
-                //$location.html5Mode(true);
-                //console.log(JSON.stringify(config.params));
-                //$location.url(JSON.stringify(response.config));
-                //$location.replace();
-                 //$window.history.pushState(null, 'locationURL', ($location.search(response.config.params));
-                //$("#searchController").hide();
-                //$("#loadingGif").show();
-                 **/
-
-            //Parameters that have been used to generate response.
-            // In principle, they are the same as extendedParams
+            //Parameters that have been used to generate response. In principle, they are the same as extendedParams
             var responseParams = response.config.params;
                 if(response.data) {
-
                     //Initialize the view by copying response params to scope variables
                     if ("q" in responseParams) {
-                        $scope.query_string = responseParams.q
+                        $scope.query_string = responseParams.q;
                     }
                     if ("from_date" in responseParams) {
-                        $scope.from_date = responseParams.from_date
+                        $scope.from_date = responseParams.from_date;
                     }
                     if ("to_date" in responseParams) {
-                        $scope.to_date = responseParams.to_date
+                        $scope.to_date = responseParams.to_date;
                     }
                     if ("from" in responseParams) {
-                        $scope.from = responseParams.from
+                        $scope.from = responseParams.from;
                     }
                     if ("size" in responseParams) {
-                        $scope.size = responseParams.size
+                        $scope.size = responseParams.size;
                     }
                     if ("sort" in responseParams) {
-                        $scope.sort = responseParams.sort
+                        $scope.sort = responseParams.sort;
                     }
                     if ("filter" in responseParams) {
                         if (responseParams.filter instanceof Array) {
-                            $scope.selected_filters = responseParams.filter
+                            $scope.selected_filters = responseParams.filter;
                         }
                         else {
                             if ($scope.selected_filters.indexOf(responseParams.filter) === -1) {
@@ -144,7 +126,7 @@ app.controller('freeTextSearch', function ($scope, $http, $location, mySetting) 
                             }
                         }
                     }
-                    console.log("extended Params: " + JSON.stringify(extendedParams));
+                    //console.log("Params: " + JSON.stringify(responseParams));
                     //TODO: Initialize dropdown lists and facets.
                     $scope.results = response.data;
                     $scope.ready = true;
@@ -156,10 +138,11 @@ app.controller('freeTextSearch', function ($scope, $http, $location, mySetting) 
                                       "<strong> Service is temporarily unavailable </strong>" +
                                 "</div>";
                     $("#searchController").append(alert);
-                    console.log("No response from Elasticsearch")
+                    console.log("No response from Elasticsearch");
                 }
-            //Set params to the browser history
-            $location.search(responseParams);
+                //Set params to the browser history
+                $location.search(responseParams);
+               //Hide loading
                $(".blackbox-loading").hide();
             });
     };
