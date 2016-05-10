@@ -71,7 +71,7 @@ $(document).ready(function () {
             //When suggestion value is selected, update angular contoller with new value
             .on('typeahead:select', function (event, suggestionValue) {
                 var angularScope = angular.element($('#searchController')).scope();
-                angularScope.query_string = suggestionValue;
+                angularScope.queryString = suggestionValue;
                 //Execute search
                 angularScope.search();
                 angularScope.$apply();

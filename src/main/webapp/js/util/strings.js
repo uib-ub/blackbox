@@ -14,15 +14,15 @@
  If * or ~ or : are already in the freetext search term, no action will be taken.
  @param query_string - a query string.
  **/
-function fuzzify(query_string, default_freetext_fuzzify) {
-    var rqs = query_string;
+function fuzzify(queryString, default_freetext_fuzzify) {
+    var rqs = queryString;
     if (default_freetext_fuzzify !== undefined) {
         if (default_freetext_fuzzify === "*" || default_freetext_fuzzify === "~") {
             //Do not do anything if query string has either one of the following chars.
-            if (query_string.indexOf('*') === -1 && query_string.indexOf('~') === -1 &&
-                query_string.indexOf(':') === -1 && query_string.indexOf('"') === -1 &&
-                query_string.indexOf('[') === -1) {
-                var option_parts = query_string.split(' ');
+            if (queryString.indexOf('*') === -1 && queryString.indexOf('~') === -1 &&
+                queryString.indexOf(':') === -1 && queryString.indexOf('"') === -1 &&
+                queryString.indexOf('[') === -1) {
+                var option_parts = queryString.split(' ');
                 var pq = "";
                 for (var oi = 0; oi < option_parts.length; oi++) {
                     var oip = option_parts[oi];
@@ -45,8 +45,8 @@ function fuzzify(query_string, default_freetext_fuzzify) {
  * @param s
  * @returns {*}
  */
-function stripEmpty(s) {
-    if(s == undefined || s === "") {
+function stripEmptyString(s) {
+    if(s === undefined || s === "") {
         return null;
     }
     return s;

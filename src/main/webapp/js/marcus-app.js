@@ -1,10 +1,13 @@
 /**
  * Controller file for Marcus-search system
  * @author: Hemed, Tarje
+ * University of Bergen Library
  **/
 
 'use strict';
 var app = angular.module('marcus', ["checklist-model", "ui.bootstrap", "settings", "ngAnimate", "ngRoute"]);
+
+//Configure URL rooting
 app.config(["$routeProvider", function($routeProvider) {
     $routeProvider
         .when('/search', {
@@ -19,34 +22,41 @@ app.config(["$routeProvider", function($routeProvider) {
             redirectTo: 'home.html',
             controller  : 'freeTextSearch'
         });
-    //$locationProvider.html5Mode(true);
 }]);
+
+//Enable HTML5 mode for browser history
 app.config(function($locationProvider) {
     $locationProvider.html5Mode(true);
 });
 
 /**
- * ================================
- *     Search Controller
- * ================================
+ * ==============================
+ * Search Controller
+ * ==============================
  **/
 app.controller('freeTextSearch', function ($scope, $http, $location, mySetting) {
-
     //Declare variables
     $scope.isArray = angular.isArray;
     $scope.isString = angular.isString;
+    $scope.sortOptions = [
+        {value: '', displayName: 'Mest relevant'},
+        {value: 'identifier:asc', displayName: 'ID asc'},
+        {value: 'identifier:desc', displayName: 'ID desc'},
+        {value: 'available:asc', displayName: 'Tilgjeng. asc'},
+        {value: 'available:desc', displayName: 'Tilgjeng. desc'}
+    ];
 
     //Get parameters from the search URL
     var urlParams = $location.search();
 
-    //Initialize variables to default values
-    $scope.query_string = null;
-    $scope.sort_by = null;
-    $scope.selected_filters = [];
-    $scope.from_date = null;
-    $scope.to_date = null;
-    $scope.current_page = 1;
-    $scope.page_size = 10;
+    //Initialize scope variables to default values
+    $scope.queryString = null;
+    $scope.sortBy = null;
+    $scope.selectedFilters = [];
+    $scope.fromDate = null;
+    $scope.toDate = null;
+    $scope.currentPage = 1;
+    $scope.pageSize = 10;
     $scope.from =  0;
     $scope.ready = false;
 
@@ -73,69 +83,73 @@ app.controller('freeTextSearch', function ($scope, $http, $location, mySetting) 
     $scope.search = function () {
 
         var defaultParams = {
-            q: stripEmpty($scope.query_string),
+            q: stripEmptyString($scope.queryString),
             index: mySetting.index,
             type: mySetting.type,
-            from_date: stripEmpty($scope.from_date),
-            to_date: stripEmpty($scope.to_date),
-            filter: $scope.selected_filters,
-            from: ($scope.current_page - 1) * $scope.page_size,
-            size: $scope.page_size,
-            sort: stripEmpty($scope.sort_by)
+            from_date: stripEmptyString($scope.fromDate),
+            to_date: stripEmptyString($scope.toDate),
+            filter: $scope.selectedFilters,
+            from: ($scope.currentPage - 1) * $scope.pageSize,
+            size: $scope.pageSize,
+            sort: stripEmptyString($scope.sortBy)
         };
 
-        //Merge or extend default params with URL params. URL params take precedence.
+        //Merge or extend default params with URL params. If exists, URL params take precedence.
         var extendedParams = $.extend(defaultParams, urlParams);
         //Clear URL params once after use.
         urlParams = {};
+        //Send ajax request to the server
         $http({
             method: 'GET',
             url: 'search?aggs=' + JSON.stringify(mySetting.facets),
             params: extendedParams
         }).then(function (response) {
-            //Parameters that have been used to generate response. In principle, they are the same as extendedParams
+            //Parameters that have been used to generate response.
             var responseParams = response.config.params;
                 if(response.data) {
                     //Initialize the view by copying response params to scope variables
+                    //By updating scope variables, the view will automatically be updated,
+                    // thanks to angular two-way binding..
                     if ("q" in responseParams) {
-                        $scope.query_string = responseParams.q;
+                        $scope.queryString = responseParams.q;
                     }
                     if ("from_date" in responseParams) {
-                        $scope.from_date = responseParams.from_date;
+                        $scope.fromDate = responseParams.from_date;
                     }
                     if ("to_date" in responseParams) {
-                        $scope.to_date = responseParams.to_date;
+                        $scope.toDate = responseParams.to_date;
                     }
                     if ("from" in responseParams) {
                         $scope.from = responseParams.from;
                     }
                     if ("size" in responseParams) {
-                        $scope.size = responseParams.size;
+                        $scope.pageSize = responseParams.size;
                     }
                     if ("sort" in responseParams) {
-                        $scope.sort = responseParams.sort;
+                        if (responseParams.sort) {
+                            $scope.sortBy = responseParams.sort;
+                            console.log("Sort order: " + responseParams.sort);
+                        }
                     }
                     if ("filter" in responseParams) {
                         if (responseParams.filter instanceof Array) {
-                            $scope.selected_filters = responseParams.filter;
+                            $scope.selectedFilters = responseParams.filter;
                         }
                         else {
-                            if ($scope.selected_filters.indexOf(responseParams.filter) === -1) {
-                                $scope.selected_filters.push(responseParams.filter);
-                                responseParams.filter = $scope.selected_filters;
+                            if ($scope.selectedFilters.indexOf(responseParams.filter) === -1) {
+                                $scope.selectedFilters.push(responseParams.filter);
+                                responseParams.filter = $scope.selectedFilters;
                             }
                         }
                     }
-                    //console.log("Params: " + JSON.stringify(responseParams));
-                    //TODO: Initialize dropdown lists and facets.
                     $scope.results = response.data;
                     $scope.ready = true;
                 }
                 else{
-                    //Empty everything in search controller
+                    //Empty everything in search controller using jQuery
                     $("#searchController").empty();
                     var alert = "<div id='alert-server-status' class='ui large red message' " +
-                                      "<strong> Service is temporarily unavailable </strong>" +
+                                      "<strong> No response from the server.</strong>" +
                                 "</div>";
                     $("#searchController").append(alert);
                     console.log("No response from Elasticsearch");
@@ -153,13 +167,13 @@ app.controller('freeTextSearch', function ($scope, $http, $location, mySetting) 
             method: 'GET',
             url: 'suggest',
             params: {
-                q: $scope.query_string,
+                q: $scope.queryString,
                 index: mySetting.index
             }
         }).then(function (response) {
                 $scope.suggestion_list = response.data;
-            });
-    };
+        });
+    }
 
     //Call this function on pageload
     $scope.search();

@@ -40,8 +40,8 @@
                                            id="search-input" 
                                            type="text" 
                                            name="q" 
-                                           ng-model="query_string"
-                                           ng-keyup="($event.keyCode==13 || query_string==='')&&search()"
+                                           ng-model="queryString"
+                                           ng-keyup="($event.keyCode==13 || queryString==='')&&search()"
                                            placeholder="Søk Marcus ..."
                                            autocomplete="off"/>
                                     <!--img class="Typeahead-spinner" src="js/lib/typeahead/img/spinner.gif" alt=""/-->
@@ -68,17 +68,17 @@
                                 <h3 style="margin-top:15px;">Skapt</h3>
                                 <hr>
                                 <div class="datePicker ui input">
-                                     <input type="text" id="from_date" class="datePicker" ng-model="from_date" ng-change="search()" placeholder="FRA" title="Fra dato">
+                                     <input type="text" id="from_date" class="datePicker" ng-model="fromDate" ng-change="search()" placeholder="FRA" title="Fra dato">
                                </div><br/><br/>
                                 <div class="datePicker ui input">
-                                     <input type="text" id="to_date" class="datePicker" ng-model="to_date" ng-change="search()" placeholder="TIL" title="Til dato">
+                                     <input type="text" id="to_date" class="datePicker" ng-model="toDate" ng-change="search()" placeholder="TIL" title="Til dato">
                                 </div><br/><br/>
                                 <!-- Document types facets-->
                                 <h3>Dokument typer</h3>
                                 <hr>
                                 <div class="ui list">  <!--style="height:500px; overflow-y: scroll"-->
                                     <div class="ui checkbox item" ng-repeat="bucket in results['aggregations']['type.exact']['buckets']">
-                                        <input id="type-{{bucket.key}}" type="checkbox" checklist-model="selected_filters" checklist-value="getCheckedValue('type.exact', bucket.key)" ng-click="search()">
+                                        <input id="type-{{bucket.key}}" type="checkbox" checklist-model="selectedFilters" checklist-value="getCheckedValue('type.exact', bucket.key)" ng-click="search()">
                                         <label for="type-{{bucket.key}}" ng-class="{'disabled': bucket.doc_count == 0}"> {{bucket.key}}
                                             <span ng-if="bucket.doc_count > 0" style="color:grey"> ({{bucket.doc_count | number}})</span>
                                         </label>
@@ -89,15 +89,15 @@
                                 <hr>
                                 <div class="ui relaxed list">
                                     <div class="ui item checkbox" ng-repeat="bucket in results['aggregations']['hasZoom']['buckets']">
-                                        <input id="hasZoom-{{bucket.key}}" type="checkbox" checklist-model="selected_filters" checklist-value="getCheckedValue('hasZoom', bucket.key)" ng-click="search()">
+                                        <input id="hasZoom-{{bucket.key}}" type="checkbox" checklist-model="selectedFilters" checklist-value="getCheckedValue('hasZoom', bucket.key)" ng-click="search()">
                                         <label for="hasZoom-{{bucket.key}}"> {{bucket.key}} <span style="color:grey"> ({{bucket.doc_count | number}})</span></label>
                                     </div>
                                     <div class="ui item checkbox" ng-repeat="bucket in results['aggregations']['isDigitized']['buckets']">
-                                        <input id="isDigitized-{{bucket.key}}" type="checkbox" checklist-model="selected_filters" checklist-value="getCheckedValue('isDigitized', bucket.key)" ng-click="search()">
+                                        <input id="isDigitized-{{bucket.key}}" type="checkbox" checklist-model="selectedFilters" checklist-value="getCheckedValue('isDigitized', bucket.key)" ng-click="search()">
                                         <label for="isDigitized-{{bucket.key}}">{{bucket.key}} <span style="color:grey"> ({{bucket.doc_count | number}})</span></label>
                                     </div>
                                     <div class="ui item checkbox" ng-repeat="bucket in results['aggregations']['isCatalogued']['buckets']">
-                                        <input id="isCatalogued-{{bucket.key}}" type="checkbox" checklist-model="selected_filters" checklist-value="getCheckedValue('isCatalogued', bucket.key)" ng-click="search()">
+                                        <input id="isCatalogued-{{bucket.key}}" type="checkbox" checklist-model="selectedFilters" checklist-value="getCheckedValue('isCatalogued', bucket.key)" ng-click="search()">
                                         <label for="isCatalogued-{{bucket.key}}">{{bucket.key}} <span style="color:grey"> ({{bucket.doc_count | number}})</span></label>
                                     </div>
                                 </div>
@@ -106,7 +106,7 @@
                                 <hr>
                                 <div class="ui list" style="height:500px; overflow-y: scroll" >
                                     <div class="ui checkbox item" ng-repeat="bucket in results['aggregations']['subject.exact']['buckets']">
-                                        <input id="subject-{{bucket.key}}" type="checkbox" checklist-model="selected_filters" checklist-value="getCheckedValue('subject.exact', bucket.key)" ng-click="search()">
+                                        <input id="subject-{{bucket.key}}" type="checkbox" checklist-model="selectedFilters" checklist-value="getCheckedValue('subject.exact', bucket.key)" ng-click="search()">
                                         <label for="subject-{{bucket.key}}" class="row-fluid"> {{bucket.key}}
                                               <span style="color:gray">({{bucket.doc_count | number}})</span>
                                         </label>
@@ -117,7 +117,7 @@
                                 <hr>
                                 <div class="ui list" style="height:500px; overflow-y: scroll">
                                     <div class="ui checkbox item" ng-repeat="bucket in results['aggregations']['isPartOf.exact']['buckets']">
-                                        <input id="isPartOf-{{bucket.key}}" type="checkbox" checklist-model="selected_filters" checklist-value="getCheckedValue('isPartOf.exact', bucket.key)" ng-click="search()">
+                                        <input id="isPartOf-{{bucket.key}}" type="checkbox" checklist-model="selectedFilters" checklist-value="getCheckedValue('isPartOf.exact', bucket.key)" ng-click="search()">
                                         <label for="isPartOf-{{bucket.key}}" ng-class="{'disabled': bucket.doc_count == 0}"> {{bucket.key}}
                                             <span ng-if="bucket.doc_count > 0" style="color:grey"> ({{bucket.doc_count | number}})</span>
                                         </label>
@@ -144,22 +144,18 @@
                                     <strong class="ui item" ng-bind-template="{{results.hits.total | number}}" style="font-size:2em;"></strong> <span style="font-size: 1.8em"> treff</span>
                                     <div class="pull-right">
                                         <label for="sort_by">Sortér på:</label>
-                                        <select class="ui dropdown" id="sort_by" ng-model="sort_by" ng-change="search()">
-                                            <option value="">Mest relevant</option>
-                                            <option value="identifier:asc">ID asc</option>
-                                            <option value="identifier:desc">ID desc</option>
-                                            <option value="title.exact:asc">Tittle asc</option>
-                                            <option value="title.exact:desc">Tittle desc</option>
-                                            <option value="available:asc">Tilgjeng. asc</option>
-                                            <option value="available:desc">Tilgjeng. desc</option>
+                                        <select id="sort_by"
+                                                ng-model="sortBy"
+                                                ng-change="search()"
+                                                ng-options="item.value as item.displayName for item in sortOptions">
                                         </select>
                                     </div>
-                                    </div>
+                                </div>
                                 <div class="results-hit ng-cloak">
                                     <hr>
                                     <uib-pagination class="pagination hidden-sm hidden-xs" total-items="results.hits.total"
-                                                    items-per-page="page_size"
-                                                    ng-model="current_page"
+                                                    items-per-page="pageSize"
+                                                    ng-model="currentPage"
                                                     ng-change="search()"
                                                     next-text="Neste"
                                                     previous-text="Forrige"
@@ -170,12 +166,11 @@
                                                     force-ellipses="true">
                                     </uib-pagination>
                                     <div class="single-select form-group hidden-xs hidden-sm">
-                                        <!--label class="ui item" for="docPerPage">#Treff: </label-->
-                                        <select id="docPerPage" class="ui dropdown" ng-model="page_size" ng-change="search()">
-                                            <option value="">Treff per side</option>
-                                            <!--option value="10" ng-selected="selected">10</option-->
+                                        <label class="ui item" for="docPerPage">Treff/side: </label>
+                                        <select id="docPerPage" ng-model="pageSize" ng-change="search()">
+                                            <option value="10">10</option>
                                             <option value="20">20</option>
-                                             <option value="30">30</option>
+                                            <option value="30">30</option>
                                             <option value="100">100</option>
                                             <option value="200">200</option>
                                             <option value="250">250</option>
@@ -195,8 +190,8 @@
                                     </div>
 
                                     <uib-pagination class="pagination" total-items="results.hits.total"
-                                                    items-per-page="page_size"
-                                                    ng-model="current_page"
+                                                    items-per-page="pageSize"
+                                                    ng-model="currentPage"
                                                     ng-change="search()"
                                                     next-text="Neste"
                                                     previous-text="Forrige"
