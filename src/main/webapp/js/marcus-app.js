@@ -1,5 +1,5 @@
 /**
- * Controller file for Marcus-search system
+ * Controller file for Blackbox
  * @author: Hemed, Tarje
  * University of Bergen Library
  **/
@@ -45,7 +45,6 @@ app.controller('freeTextSearch', function ($scope, $http, $location, mySetting) 
         {value: 'available:asc', displayName: 'Tilgjeng. asc'},
         {value: 'available:desc', displayName: 'Tilgjeng. desc'}
     ];
-
     //Get parameters from the search URL
     var urlParams = $location.search();
 
@@ -109,7 +108,7 @@ app.controller('freeTextSearch', function ($scope, $http, $location, mySetting) 
                 if(response.data) {
                     //Initialize the view by copying response params to scope variables
                     //By updating scope variables, the view will automatically be updated,
-                    // thanks to angular two-way binding..
+                    //thanks to angular two-way binding.
                     if ("q" in responseParams) {
                         $scope.queryString = responseParams.q;
                     }
@@ -128,7 +127,6 @@ app.controller('freeTextSearch', function ($scope, $http, $location, mySetting) 
                     if ("sort" in responseParams) {
                         if (responseParams.sort) {
                             $scope.sortBy = responseParams.sort;
-                            console.log("Sort order: " + responseParams.sort);
                         }
                     }
                     if ("filter" in responseParams) {
@@ -145,11 +143,10 @@ app.controller('freeTextSearch', function ($scope, $http, $location, mySetting) 
                     $scope.results = response.data;
                     $scope.ready = true;
                 }
-                else{
-                    //Empty everything in search controller using jQuery
-                    $("#searchController").empty();
+                else{ //If no data in the response
+                    $("#searchController").empty(); //Empty everything in search controller using jQuery
                     var alert = "<div id='alert-server-status' class='ui large red message' " +
-                                      "<strong> No response from the server.</strong>" +
+                                      "<strong> No response from the server</strong>" +
                                 "</div>";
                     $("#searchController").append(alert);
                     console.log("No response from Elasticsearch");
@@ -174,7 +171,6 @@ app.controller('freeTextSearch', function ($scope, $http, $location, mySetting) 
                 $scope.suggestion_list = response.data;
         });
     }
-
     //Call this function on pageload
     $scope.search();
 });
