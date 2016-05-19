@@ -40,8 +40,8 @@ app.controller('freeTextSearch', function ($scope, $http, $location, mySetting) 
     $scope.isString = angular.isString;
     $scope.sortOptions = [
         {value: '', displayName: 'Mest relevant'},
-        {value: 'identifier:asc', displayName: 'ID asc'},
-        {value: 'identifier:desc', displayName: 'ID desc'},
+        {value: 'identifier:asc', displayName: 'Signatur asc'},
+        {value: 'identifier:desc', displayName: 'Signatur desc'},
         {value: 'available:asc', displayName: 'Tilgjeng. asc'},
         {value: 'available:desc', displayName: 'Tilgjeng. desc'}
     ];
