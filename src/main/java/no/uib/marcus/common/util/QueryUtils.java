@@ -5,6 +5,7 @@ import org.elasticsearch.common.xcontent.ToXContent;
 import org.elasticsearch.common.xcontent.XContentBuilder;
 import org.elasticsearch.common.xcontent.XContentFactory;
 import org.elasticsearch.index.query.QueryBuilders;
+import org.elasticsearch.index.query.QueryStringQueryBuilder;
 import org.elasticsearch.index.query.SimpleQueryStringBuilder;
 
 import java.io.IOException;
@@ -24,10 +25,26 @@ public final class QueryUtils {
     public static SimpleQueryStringBuilder getSimpleQueryString(String queryString) {
         SimpleQueryStringBuilder builder = QueryBuilders.simpleQueryStringQuery(queryString)
                 .analyzer("default")//The custom "default" analyzer is defined in the "_settings".
-                .field("identifier")
-                .field("label", 3)
+                .field("identifier")//Not analyzed field
+                .field("label", 3)//Not analyzed field.
                 .field("_all")
                 .defaultOperator(SimpleQueryStringBuilder.Operator.AND);
+        return builder;
+    }
+
+    /**
+     * Build a query string
+     *
+     * @param queryString a query string
+     * @return a builder for query string
+     */
+    public static QueryStringQueryBuilder buildQueryString(String queryString) {
+        QueryStringQueryBuilder builder = QueryBuilders.queryStringQuery(queryString)
+                .analyzer("default")//The custom "default" analyzer is defined in the "_settings".
+                .field("identifier")//Not analyzed field
+                .field("label", 3)//Not analyzed field.
+                .field("_all")
+                .defaultOperator(QueryStringQueryBuilder.Operator.AND);
         return builder;
     }
 

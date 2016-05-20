@@ -151,7 +151,7 @@ public class MarcusSearchBuilder extends AbstractSearchBuilder<MarcusSearchBuild
             if (Strings.hasText(getQueryString())) {
                 //Use simple_query_string query with AND operator
                 functionScoreQueryBuilder = QueryBuilders.functionScoreQuery(
-                        QueryUtils.getSimpleQueryString(getQueryString()));
+                        QueryUtils.buildQueryString(getQueryString()));
             } else {
                 //Match all documents
                 functionScoreQueryBuilder = QueryBuilders.functionScoreQuery(
@@ -188,7 +188,7 @@ public class MarcusSearchBuilder extends AbstractSearchBuilder<MarcusSearchBuild
             }
 
             //Show builder for debugging purpose
-            //logger.info(searchRequest.toString());
+            logger.info(searchRequest.toString());
             response = searchRequest
                     .execute()
                     .actionGet();
