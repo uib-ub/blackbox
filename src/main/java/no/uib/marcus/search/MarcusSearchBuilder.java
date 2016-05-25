@@ -188,7 +188,7 @@ public class MarcusSearchBuilder extends AbstractSearchBuilder<MarcusSearchBuild
             }
 
             //Show builder for debugging purpose
-            logger.info(searchRequest.toString());
+            //logger.info(searchRequest.toString());
             response = searchRequest
                     .execute()
                     .actionGet();

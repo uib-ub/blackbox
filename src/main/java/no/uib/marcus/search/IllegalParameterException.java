@@ -6,8 +6,7 @@ package no.uib.marcus.search;
 public class IllegalParameterException extends RuntimeException {
 
     /**
-     * Constructs a illegal parameter exception new exception with {@code null} as its
-     * detail message.
+     * Constructs illegal parameter exceptionnwith {@code null} as its detail message.
      */
     public IllegalParameterException(){
         super();
