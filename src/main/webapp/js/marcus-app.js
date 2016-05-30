@@ -143,13 +143,13 @@ app.controller('freeTextSearch', function ($scope, $http, $location, mySetting) 
                     $scope.results = response.data;
                     $scope.ready = true;
                 }
-                else{ //If no data in the response
+                else{ //If no data in the response, means server is unavailable
                     $("#searchController").empty(); //Empty everything in search controller using jQuery
                     var alert = "<div id='alert-server-status' class='ui large red message' " +
-                                      "<strong> No response from the server</strong>" +
+                                      "<strong> Service is temporarily unavailable.</strong>" +
                                 "</div>";
                     $("#searchController").append(alert);
-                    console.log("No response from Elasticsearch");
+                    console.log("No response from Elasticsearch. The server is unreachable");
                 }
                 //Set params to the browser history
                 $location.search(responseParams);

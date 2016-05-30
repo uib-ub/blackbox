@@ -7,9 +7,11 @@ import no.uib.marcus.common.util.AggregationUtils;
 import no.uib.marcus.common.util.QueryUtils;
 import org.apache.log4j.Logger;
 import org.elasticsearch.ElasticsearchException;
+import org.elasticsearch.action.search.SearchPhaseExecutionException;
 import org.elasticsearch.action.search.SearchRequestBuilder;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.client.Client;
+import org.elasticsearch.common.Nullable;
 import org.elasticsearch.common.Strings;
 import org.elasticsearch.common.xcontent.XContentBuilder;
 import org.elasticsearch.common.xcontent.XContentFactory;
@@ -24,6 +26,7 @@ import org.elasticsearch.search.sort.SortBuilder;
 
 import javax.validation.constraints.NotNull;
 import java.io.IOException;
+import java.util.Optional;
 
 /**
  * Builder for Marcus search service
@@ -123,13 +126,33 @@ public class MarcusSearchBuilder extends AbstractSearchBuilder<MarcusSearchBuild
      }
 
     /**
+     * Experimental search response
+     *
+     * @param request
+     * @return optional search response
+     */
+    private static Optional<SearchResponse> getSearchResponse(SearchRequestBuilder request) {
+        Optional<SearchResponse> optionalResponse = Optional.empty();
+        try {
+            SearchResponse response = request.execute().actionGet();
+            if (response.getHits().getTotalHits() > -1) {
+                optionalResponse = Optional.of(response);
+            }
+        } catch (ElasticsearchException e) {
+            logger.error(e.getDetailedMessage());
+        }
+        return optionalResponse;
+    }
+
+    /**
      * Get all documents based on the service settings.
      *
-     * @return a SearchResponse
+     * @return a SearchResponse, can be <code>null</code>, which means search was not successfully executed.
      */
     @Override
+    @Nullable
     public SearchResponse getDocuments() {
-        assert getClient() != null;
+        assert super.getClient() != null;
         SearchResponse response = null;
         SearchRequestBuilder searchRequest;
         QueryBuilder query;
@@ -149,7 +172,7 @@ public class MarcusSearchBuilder extends AbstractSearchBuilder<MarcusSearchBuild
 
             //Set query
             if (Strings.hasText(getQueryString())) {
-                //Use simple_query_string query with AND operator
+                //Use query_string query with AND operator
                 functionScoreQueryBuilder = QueryBuilders.functionScoreQuery(
                         QueryUtils.buildQueryString(getQueryString()));
             } else {
@@ -181,7 +204,6 @@ public class MarcusSearchBuilder extends AbstractSearchBuilder<MarcusSearchBuild
             if (sortBuilder != null) {
                 searchRequest.addSort(sortBuilder);
             }
-
             //Append aggregations to the request builder
             if (Strings.hasText(aggregations)) {
                 AggregationUtils.addAggregations(searchRequest, aggregations);
@@ -189,15 +211,17 @@ public class MarcusSearchBuilder extends AbstractSearchBuilder<MarcusSearchBuild
 
             //Show builder for debugging purpose
             //logger.info(searchRequest.toString());
-            response = searchRequest
-                    .execute()
-                    .actionGet();
+
+            //Execute the response
+            response = searchRequest.execute().actionGet();
+
             //logger.info(response.toString());
-        } catch (SearchSourceBuilderException se) {
-            logger.error("Exception on preparing the request: "
-                    + se.getDetailedMessage());
-        } catch (ElasticsearchException ex) {
-            logger.error(ex.getDetailedMessage());
+        } catch (SearchSourceBuilderException e) {
+            logger.error("Exception on building search request: " + e.getDetailedMessage());
+        } catch (SearchPhaseExecutionException e) {
+            //I've not found a direct way to validate a query string, so if search fails to execute it means
+            //there is internal error due to malformed query and this method will return NULL
+            logger.error("Could not execute search: " + e.getDetailedMessage());
         }
         return response;
     }
@@ -224,12 +248,26 @@ public class MarcusSearchBuilder extends AbstractSearchBuilder<MarcusSearchBuild
         }
     }
 
+
     //Main method for easy debugging
     public static void main(String[] args) throws IOException {
         Client c = ClientFactory.getTransportClient();
         MarcusSearchBuilder service = ServiceFactory.createMarcusSearchService(c);
-        service.setAggregations("koba"); //Invalid aggs, it should fail.
+        //service.setAggregations("koba"); //Invalid aggs, it should fail.
+        service.setQueryString("~ana");
         System.out.println(QueryUtils.toJsonString(service.getDocuments(), true));
+        /**try {
+         //System.out.println(QueryUtils.toJsonString(service.getDocuments(), true));
+         SearchRequestBuilder sr = c.prepareSearch("admin-test").setQuery(QueryBuilders.queryStringQuery("~ana"));
+         //System.out.println(sr.execute().actionGet().toString());
+         System.out.println(getSearchResponse(sr));
+         }
+         catch(org.elasticsearch.index.query.QueryParsingException ex){
+         logger.error("Your query was fucked up: " + service.getQueryString());
+         }
+         /**catch (org.elasticsearch.action.search.SearchPhaseExecutionException ex){
+         logger.error("Unable to execute search : " + ex.getMessage());
+         }**/
     }
 }
 

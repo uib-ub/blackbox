@@ -5,6 +5,7 @@ import org.elasticsearch.ElasticsearchException;
 import org.elasticsearch.action.search.SearchRequestBuilder;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.client.Client;
+import org.elasticsearch.common.Strings;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.search.builder.SearchSourceBuilderException;
 
@@ -23,7 +24,9 @@ public class MarcusDiscoveryBuilder extends AbstractSearchBuilder<MarcusDiscover
         super(client);
     }
 
-    /**Index to start the search from, defaults to 0 **/
+    /**
+     * Index to start the search from, defaults to 0
+     **/
     public MarcusDiscoveryBuilder setFrom(int from) {
         if(from >= 0) {
             this.from = from;
@@ -31,7 +34,9 @@ public class MarcusDiscoveryBuilder extends AbstractSearchBuilder<MarcusDiscover
         return this;
     }
 
-    /**Size of documents that will be returned, defaults to 10 **/
+    /**
+     * Size of documents that will be returned, defaults to 10
+     **/
     public MarcusDiscoveryBuilder setSize(int size) {
         if(size >= 0) {
             this.size = size;
@@ -40,7 +45,9 @@ public class MarcusDiscoveryBuilder extends AbstractSearchBuilder<MarcusDiscover
     }
 
 
-    /**Get documents based on the service settings**/
+    /**
+     * Get documents based on the service settings
+     **/
     @Override
     public SearchResponse getDocuments() {
         assert super.getClient() != null;
@@ -58,19 +65,19 @@ public class MarcusDiscoveryBuilder extends AbstractSearchBuilder<MarcusDiscover
             if (getTypes() != null && getTypes().length > 0) {
                 searchRequest.setTypes(getTypes());
             }
-
             //Set query
-            searchRequest.setQuery(QueryBuilders.matchAllQuery());
-
+            if(Strings.hasText(getQueryString())){
+                searchRequest.setQuery(QueryBuilders.queryStringQuery(getQueryString()));
+            }else {
+                searchRequest.setQuery(QueryBuilders.matchAllQuery());
+            }
             //Set from and size
             searchRequest.setFrom(from);
             searchRequest.setSize(size);
 
             //Show SearchRequest builder for debugging purpose
-            logger.info(searchRequest.toString());
-            response = searchRequest
-                    .execute()
-                    .actionGet();
+            //logger.info(searchRequest.toString());
+            response = searchRequest.execute().actionGet();
             //logger.info(response.toString());
         } catch (SearchSourceBuilderException se) {
             logger.error("Exception on preparing the request: "

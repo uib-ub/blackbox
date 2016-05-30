@@ -2,6 +2,7 @@ package no.uib.marcus.servlet;
 
 import no.uib.marcus.client.ClientFactory;
 import no.uib.marcus.common.RequestParams;
+import no.uib.marcus.common.util.QueryUtils;
 import no.uib.marcus.search.MarcusDiscoveryBuilder;
 import no.uib.marcus.search.ServiceFactory;
 import org.elasticsearch.action.search.SearchResponse;
@@ -38,6 +39,7 @@ public class DiscoveryServlet extends HttpServlet {
         response.setContentType("application/json;charset=UTF-8");
         String[] indices = request.getParameterValues(RequestParams.INDICES);
         String[] types = request.getParameterValues(RequestParams.INDEX_TYPES);
+        String queryString = request.getParameter(RequestParams.QUERY_STRING);
         String from = request.getParameter(RequestParams.FROM);
         String size = request.getParameter(RequestParams.SIZE);
 
@@ -50,11 +52,12 @@ public class DiscoveryServlet extends HttpServlet {
                 .setIndices(indices)
                 .setTypes(types)
                 .setFrom(_from)
-                .setSize(_size);
+                .setSize(_size)
+                .setQueryString(queryString);
 
         try (PrintWriter out = response.getWriter()) {
             SearchResponse searchResponse = service.getDocuments();
-            out.write(searchResponse.toString());
+            out.write(QueryUtils.toJsonString(searchResponse, true));
         }
     }
 

@@ -126,7 +126,7 @@
                                     </div>
                                 </div>
                             </div>
-
+                            <!-- No hits-->
                             <div ng-if="ready && results.hits.total === 0" style="margin-top: 50px;" class="no-hits ui ten wide column">
                                 <div class="ui text ui center aligned container">
                                     <h1 style="font-size: 4em;" class="ui icon header">
@@ -136,7 +136,15 @@
                                     <h1 style="font-size: 4em;" class="ui icon header">
                                         Søket ditt var ikke <i>cool</i>!
                                     </h1>
-                                    <p>Niks, vi trenger et stiligere søk for å finne noe kult! </p>
+                                    <!--p>Niks, vi trenger et stiligere søk for å finne noe kult! </p-->
+                                </div>
+                            </div>
+                            <!-- Internal error on executing search-->
+                            <div ng-if="ready && results.error" style="margin-top: 50px;" class="no-hits ui nine wide column">
+                                <div  class='ui large red message'>
+                                    <h1 style="font-size: 2em;" class="ui icon header">
+                                        Søket ditt var <i>misdannet</i>
+                                    </h1>
                                 </div>
                             </div>
 

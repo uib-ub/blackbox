@@ -24,7 +24,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.net.InetAddress;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -122,6 +121,9 @@ public class SearchServlet extends HttpServlet {
                     .field("took", searchResponse.getTook())
                     .endObject();
             logger.info(builder.string());
+        }
+        catch (org.elasticsearch.action.search.SearchPhaseExecutionException ex){
+
         }
     }
 

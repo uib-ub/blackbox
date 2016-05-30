@@ -11,18 +11,19 @@ import org.elasticsearch.index.query.SimpleQueryStringBuilder;
 import java.io.IOException;
 
 /**
- * @author Hemed
+ * @author Hemed Ali
  */
 public final class QueryUtils {
 
     private QueryUtils(){}
+
     /**
      * Build a simple query string
      *
      * @param queryString a query string
      * @return a builder for simple query string
      */
-    public static SimpleQueryStringBuilder getSimpleQueryString(String queryString) {
+    public static SimpleQueryStringBuilder buildSimpleQueryString(String queryString) {
         SimpleQueryStringBuilder builder = QueryBuilders.simpleQueryStringQuery(queryString)
                 .analyzer("default")//The custom "default" analyzer is defined in the "_settings".
                 .field("identifier")//Not analyzed field
@@ -47,8 +48,6 @@ public final class QueryUtils {
                 .defaultOperator(QueryStringQueryBuilder.Operator.AND);
         return builder;
     }
-
-
     /**
      * Convert a search response to a JSON string.
      *
@@ -58,6 +57,9 @@ public final class QueryUtils {
      **/
     public static String toJsonString(SearchResponse response, boolean isPretty) {
         try {
+            if(response == null){
+                return "{ \"error\" : \"" + "Could not execute search. Your query is malformed" + "\"}";
+            }
             XContentBuilder builder = XContentFactory.jsonBuilder();
             if (isPretty) {
                 builder.prettyPrint();
