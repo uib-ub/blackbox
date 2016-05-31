@@ -120,7 +120,7 @@ public class MarcusSearchBuilder extends AbstractSearchBuilder<MarcusSearchBuild
          JsonElement element =  new JsonParser().parse(jsonString);
              if(!element.isJsonArray()){
                  throw new IllegalParameterException(
-                         "Aggregations must be valid JSON string. Expected JSON Array of objects but found : ["+ jsonString + "]");
+                         "Aggregations must be valid JSON. Expected JSON Array of objects but found : ["+ jsonString + "]");
              }
          return true;
      }
@@ -217,10 +217,10 @@ public class MarcusSearchBuilder extends AbstractSearchBuilder<MarcusSearchBuild
 
             //logger.info(response.toString());
         } catch (SearchSourceBuilderException e) {
-            logger.error("Exception on building search request: " + e.getDetailedMessage());
+            logger.error("Exception occurred when building search request: " + e.getDetailedMessage());
         } catch (SearchPhaseExecutionException e) {
-            //I've not found a direct way to validate a query string, so if search fails to execute it means
-            //there is internal error due to malformed query and this method will return NULL
+            //I've not found a direct way to validate a query string. Therefore, the idea here is to catch any
+            //exception that is related to search execution.
             logger.error("Could not execute search: " + e.getDetailedMessage());
         }
         return response;
@@ -253,7 +253,8 @@ public class MarcusSearchBuilder extends AbstractSearchBuilder<MarcusSearchBuild
     public static void main(String[] args) throws IOException {
         Client c = ClientFactory.getTransportClient();
         MarcusSearchBuilder service = ServiceFactory.createMarcusSearchService(c);
-        //service.setAggregations("koba"); //Invalid aggs, it should fail.
+        service.setAggregations("koba"); //Invalid aggs, it should fail.
+        service.setClient(null);
         service.setQueryString("~ana");
         System.out.println(QueryUtils.toJsonString(service.getDocuments(), true));
         /**try {

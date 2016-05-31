@@ -1,7 +1,9 @@
 package no.uib.marcus.search;
 
 /**
- * Custom exception class for illegal arguments
+ * Custom exception class for illegal arguments.
+ * Thrown to indicate that a method has been passed an illegal or
+ * inappropriate parameter.
  **/
 public class IllegalParameterException extends RuntimeException {
 

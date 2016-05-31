@@ -29,7 +29,7 @@ public abstract class AbstractSearchBuilder<T extends AbstractSearchBuilder<T>> 
      */
     public AbstractSearchBuilder(@NotNull Client client) {
         if (client == null) {
-            throw new IllegalArgumentException("[Unable to initialize service. Client cannot be null]");
+            throw new IllegalParameterException("[Unable to initialize service. Client cannot be null]");
         }
         this.client = client;
     }
@@ -49,7 +49,7 @@ public abstract class AbstractSearchBuilder<T extends AbstractSearchBuilder<T>> 
     @SuppressWarnings("unchecked")
     public T setClient(@NotNull Client client) {
         if (client == null) {
-            throw new IllegalArgumentException("[Unable to initialize service. Client cannot be null]");
+            throw new IllegalParameterException("[Unable to initialize service. Client cannot be null]");
         }
         this.client = client;
         return (T)this;
