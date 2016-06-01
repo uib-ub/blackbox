@@ -25,7 +25,7 @@
                     <i class="sidebar icon"></i>
                 </a>
                 <div class="header brand item">
-                    <a href="#">MARCUS ADMIN</a>
+                    <a href="/" target="_self">MARCUS ADMIN</a>
                 </div>
             </div>
         </div>
@@ -135,19 +135,30 @@
                                         </h1>
                                     </div>
                                     <img class="ui rounded bordered fluid image" src='img/giphy.gif'>
-                                    <!--h1 style="font-size: 4em;" class="ui icon header">
+                                    <!--
+                                    <h1 style="font-size: 4em;" class="ui icon header">
                                         Søket ditt var ikke <i>cool</i>!
-                                    </h1-->
-                                    <!--p>Niks, vi trenger et stiligere søk for å finne noe kult! </p-->
-
+                                    </h1>
+                                    <p>Niks, vi trenger et stiligere søk for å finne noe kult! </p>
+                                    -->
                                 </div>
                             </div>
                             <!-- Internal error on executing search-->
-                            <div ng-if="ready && results.error" style="margin-top: 50px;" class="no-hits ui nine wide column">
+                            <div ng-if="ready && results.error" style="margin-top:50px;" class="no-hits ui ten wide column">
                                 <div  class='ui large red message'>
-                                    <h1 class="ui icon header">
-                                        Søket ditt er ulovlig og kan ikke utføres
-                                    </h1>
+                                     <div class="header">
+                                        Søket ditt kan ikke utføres
+                                    </div>
+                                    <ul class="list">
+                                        <li>
+                                            Det inneholder sannsynligvis disse spesialtegnene: <code> + - = && || > < ! ( ) { } [ ] ^ " ~ * ? : \ / </code>
+                                        </li>
+                                        <li>
+                                            Hvis man skulle søke etter reserverte tegn, må man ha omvendt skråstrek foran.
+                                            F.eks søk etter <code> D/S </code> må gjøres som <code> D\/S </code>
+                                        </li>
+
+                                    </ul>
                                 </div>
                             </div>
 
@@ -166,18 +177,22 @@
                                 </div>
                                 <div class="results-hit ng-cloak">
                                     <hr>
-                                    <uib-pagination class="pagination hidden-sm hidden-xs" total-items="results.hits.total"
-                                                    items-per-page="pageSize"
-                                                    ng-model="currentPage"
-                                                    ng-change="search()"
-                                                    next-text="Neste"
-                                                    previous-text="Forrige"
-                                                    max-size="4"
-                                                    first-text="&laquo;"
-                                                    last-text="&raquo;"
-                                                    boundary-links="true"
-                                                    force-ellipses="true">
-                                    </uib-pagination>
+                                        <!--Pagination-->
+                                        <uib-pagination class="pagination hidden-sm hidden-xs" total-items="results.hits.total"
+                                                        items-per-page="pageSize"
+                                                        ng-model="currentPage"
+                                                        ng-change="search()"
+                                                        next-text="Neste"
+                                                        previous-text="Forrige"
+                                                        max-size="4"
+                                                        first-text="&laquo;"
+                                                        last-text="&raquo;"
+                                                        boundary-links="true"
+                                                        force-ellipses="true">
+                                        </uib-pagination>
+                                    <!--Nullstill søk-->
+                                    <!--a class="btn btn-default" href="/" target="_self" title="Nullstill søk"><i class="remove circle icon"></i></a-->
+                                    <!--Sortering -->
                                     <div class="single-select form-group hidden-xs hidden-sm">
                                         <label class="ui item" for="docPerPage">Treff/side: </label>
                                         <select id="docPerPage" ng-model="pageSize" ng-change="search()">
