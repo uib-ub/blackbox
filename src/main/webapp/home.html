@@ -10,12 +10,12 @@
         <link rel="shortcut icon" type="image/x-icon" href="http://marcus.uib.no/img/favicon.ico"/>
         <link rel="stylesheet" href="js/lib/typeahead/css/main.css"/>
         <link rel="stylesheet" href="js/lib/typeahead/css/normalize.min.css"/>
-        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css"/>
-        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap-theme.min.css"/>
+
         <link rel="stylesheet" href="//code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css"/>
         <link href="http://fonts.googleapis.com/css?family=IM+Fell+Great+Primer" rel="stylesheet" type="text/css">
         <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.1.8/semantic.min.css" />
         <link rel="stylesheet" href="css/marcus.css" />
+        <link rel="stylesheet" href="css/bootstrap-pagination.css" />
     </head>
     <body>
     <!-- Sticky header-->
@@ -31,12 +31,13 @@
         </div>
         <!-- Controller starts here-->
         <div ng-controller="freeTextSearch" id="searchController">
-            <div class="main-container">
+            <div class="ui container">
                 <div class="masthead">
                         <form action="" method="GET">
                             <!--input type="hidden" name="index" value="admin"-->
                             <div class="Typeahead">
                                 <div class="u-posRelative">
+                                    <div class="ui massive icon input">
                                     <input class="Typeahead-hint" type="text" tabindex="-1" readonly="readonly"/>
                                     <input class="Typeahead-input" 
                                            id="search-input" 
@@ -50,6 +51,7 @@
                                     <button class="Typeahead-search-icon" type="button" ng-click="search()">
                                         <i class="search icon"></i>
                                     </button>
+                                    </div>
                                 </div>
                                 <div class="Typeahead-menu"></div>
                             </div>
@@ -60,14 +62,90 @@
                     </span-->
                 </div>
             </div>
+            <div class="ui stackable container secondary menu">
+                <!-- Nullstill søk -->
+                <div class="item">
+                    <a href="/" target="_self" title="Nullstill søk"><i class="remove circle icon"></i> nullstill</a>
+                </div>
+                
+                <div class="item">
+                    <button class="search-help-button ui button" accesskey="h" title="Søketips"><i class="remove circle icon"></i> Søketips</button>
+                </div>
+                
+                <div class="search-help ui basic modal">
+                    <i class="close icon"></i>
+                    <div class="header">
+                      Søketips
+                    </div>
+                    <div class="image content">
+                      <div class="image">
+                        <i class="search icon"></i>
+                      </div>
+                      <div class="description">
+                        <h4>OG/ELLER</h4>
+                        <ul>
+                            <li>Søket bruker i utgangspunktet "OG" mellom alle søketermer</li>
+                            <li>Bruk "OR" for å endre dette, for eksempel "vaksdal OR voss"</li>
+                        </ul>
+                        <h4>Negasjon</h4>
+                        <ul>
+                            <li>Bruk minustegn foran søketermer du ikke vil ha med i trefflisten, for eksempel "husarbeid"</li>
+                        </ul>
+                        <h4>Trunkering</h4>
+                        <ul>
+                            <li>Bruke * til å trunkere, for eksempel "*strand" eller "knu*sen"</li>
+                        </ul>
+                        <h4>Søk direkte i ett felt</h4>
+                        <ul>
+                            <li>Du kan søke i tittel, beskrivelse og mange andre felt ved å bruke <i>felt:</i></li>
+                            <li>subject:hund</li>
+                            <li>spatial:bergen</li>
+                            <li>description:fisketur</li>
+                            <li>maker:knudsen</li>
+                            <li>isPartOf:holm [OBS! Må være skrevet slik, såkalt camelCase]</li>
+                        </ul>
+                        <h4>Fuzzy</h4>
+                        <ul>
+                            <li>Du kan søke med en fuzzy-søketerm ved å sette ~ etter ordet du søker etter.</li>
+                            <li>”Fana~” -> gir treff på Tana, Anax, Fina, etc.</li>
+                        </ul>
+                      </div>
+                    </div>
+                  </div>
+
+
+                <!-- Sortering -->
+                <div class="item">
+                    <select id="sort_by" class="ui dropdown"
+                            ng-model="sortBy"
+                            ng-change="search()"
+                            ng-options="item.value as item.displayName for item in sortOptions">
+                        <option value="">Sortér på</option>
+                    </select>
+                </div>
+
+                <!-- Antall treff -->
+                <div class="item">
+                    <select id="docPerPage" class="ui dropdown" ng-model="pageSize" ng-change="search()">
+                        <option value="">Antall treff</option>
+                        <option value="10">10</option>
+                        <option value="20">20</option>
+                        <option value="30">30</option>
+                        <option value="100">100</option>
+                        <option value="200">200</option>
+                        <option value="250">250</option>
+                    </select>
+                </div>
+            </div>
+            
                 <img class="blackbox-loading" src="img/loading.gif" alt="Loading ...">
                 <!---uib-progressbar ng-show="show_loading" class="ui loading segment"  value="dynamic" style="height:100px;"></uib-progressbar-->
+                
                 <div ng-cloak ng-show="ready" style="margin-top:30px;" class="ui container">
-                    <div class="search-results ui grid">
-                        <div class="content ui row">
+                    <div class="search-results ui equal width grid">
                             <!--Starting with facets-->
-                            <div ng-cloak class="ng-cloak facets ui four wide column computer only">
-                                <h3 style="margin-top:15px;">Skapt</h3>
+                            <div ng-cloak class="ng-cloak facets five wide column computer only">
+                                <h3>Skapt</h3>
                                 <hr>
                                 <div class="datePicker ui input">
                                      <input type="text" id="from_date" class="datePicker" ng-model="fromDate" ng-change="search()" placeholder="FRA" title="Fra dato">
@@ -78,7 +156,7 @@
                                 <!-- Document types facets-->
                                 <h3>Dokument typer</h3>
                                 <hr>
-                                <div class="ui list">  <!--style="height:500px; overflow-y: scroll"-->
+                                <div class="ui list">
                                     <div class="ui checkbox item" ng-repeat="bucket in results['aggregations']['type.exact']['buckets']">
                                         <input id="type-{{bucket.key}}" type="checkbox" checklist-model="selectedFilters" checklist-value="getCheckedValue('type.exact', bucket.key)" ng-click="search()">
                                         <label for="type-{{bucket.key}}" ng-class="{'disabled': bucket.doc_count == 0}"> {{bucket.key}}
@@ -106,7 +184,7 @@
                                 <!-- Topic facets-->
                                 <h3>Emne</h3>
                                 <hr>
-                                <div class="ui list" style="height:500px; overflow-y: scroll" >
+                                <div class="ui list">
                                     <div class="ui checkbox item" ng-repeat="bucket in results['aggregations']['subject.exact']['buckets']">
                                         <input id="subject-{{bucket.key}}" type="checkbox" checklist-model="selectedFilters" checklist-value="getCheckedValue('subject.exact', bucket.key)" ng-click="search()">
                                         <label for="subject-{{bucket.key}}" class="row-fluid"> {{bucket.key}}
@@ -117,7 +195,7 @@
                                 <!-- Collection facets-->
                                 <h3>Samling</h3>
                                 <hr>
-                                <div class="ui list" style="height:500px; overflow-y: scroll">
+                                <div class="ui list">
                                     <div class="ui checkbox item" ng-repeat="bucket in results['aggregations']['isPartOf.exact']['buckets']">
                                         <input id="isPartOf-{{bucket.key}}" type="checkbox" checklist-model="selectedFilters" checklist-value="getCheckedValue('isPartOf.exact', bucket.key)" ng-click="search()">
                                         <label for="isPartOf-{{bucket.key}}" ng-class="{'disabled': bucket.doc_count == 0}"> {{bucket.key}}
@@ -127,24 +205,17 @@
                                 </div>
                             </div>
                             <!-- No hits-->
-                            <div ng-if="ready && results.hits.total === 0" style="margin-top:50px;" class="no-hits ui six wide column">
-                                <div class="ui text ui center aligned container">
+                            <div ng-if="ready && results.hits.total === 0" style="margin-top:50px;" class="no-hits ui column">
+                                <div class="ui text ui center aligned">
                                     <div class="ui large blue message">
                                          <h1 style="font-size: 2em;" class="ui icon header">
                                             Vi fant ingen treff
                                         </h1>
                                     </div>
-                                    <img class="ui rounded bordered fluid image" src='img/giphy.gif'>
-                                    <!--
-                                    <h1 style="font-size: 4em;" class="ui icon header">
-                                        Søket ditt var ikke <i>cool</i>!
-                                    </h1>
-                                    <p>Niks, vi trenger et stiligere søk for å finne noe kult! </p>
-                                    -->
                                 </div>
                             </div>
                             <!-- Internal error on executing search-->
-                            <div ng-if="ready && results.error" style="margin-top:50px;" class="no-hits ui ten wide column">
+                            <div ng-if="ready && results.error" style="margin-top:50px;" class="no-hits ui column">
                                 <div  class='ui large red message'>
                                      <div class="header">
                                         Søket ditt kan ikke utføres
@@ -157,23 +228,13 @@
                                             Hvis man skulle søke etter reserverte tegn, må man ha omvendt skråstrek foran.
                                             F.eks søk etter <code> D/S </code> må gjøres som <code> D\/S </code>
                                         </li>
-
                                     </ul>
                                 </div>
                             </div>
 
-                            <div ng-show="results.hits.total > 0" class="search-hits ng-cloak ui eleven wide column">
-                                <br/>
+                            <div ng-show="results.hits.total > 0" class="search-hits ng-cloak column">
                                 <div>
                                     <strong class="ui item" ng-bind-template="{{results.hits.total | number}}" style="font-size:2em;"></strong> &ensp;<span style="font-size: 1.8em">treff</span>
-                                    <div class="pull-right">
-                                        <label for="sort_by">Sortér på:</label>
-                                        <select id="sort_by"
-                                                ng-model="sortBy"
-                                                ng-change="search()"
-                                                ng-options="item.value as item.displayName for item in sortOptions">
-                                        </select>
-                                    </div>
                                 </div>
                                 <div class="results-hit ng-cloak">
                                     <hr>
@@ -190,30 +251,19 @@
                                                         boundary-links="true"
                                                         force-ellipses="true">
                                         </uib-pagination>
-                                    <!--Nullstill søk-->
-                                    <!--a class="btn btn-default" href="/" target="_self" title="Nullstill søk"><i class="remove circle icon"></i></a-->
-                                    <!--Sortering -->
-                                    <div class="single-select form-group hidden-xs hidden-sm">
-                                        <label class="ui item" for="docPerPage">Treff/side: </label>
-                                        <select id="docPerPage" ng-model="pageSize" ng-change="search()">
-                                            <option value="10">10</option>
-                                            <option value="20">20</option>
-                                            <option value="30">30</option>
-                                            <option value="100">100</option>
-                                            <option value="200">200</option>
-                                            <option value="250">250</option>
-                                        </select>
-                                    </div><br>
+                                        
                                     <!-- Search results view--->
-                                    <div class="ui divided items">
-                                        <div ng-repeat="doc in results.hits.hits track by $index" class="ui item">
-                                            <div include-replace ng-if='doc._type == "document"'  ng-include="'partials/document-hits.html'" style="page-break-inside: avoid;" class="ui item fade" ></div>
-                                            <div include-replace ng-if='doc._source.type == "Person" || doc._source.type == "Organisajon" || doc._source.type == "Firma" || doc._source.type == "Katalogisator"' ng-include="'partials/agent-hits.html'" style="page-break-inside: avoid;" class="ui item"></div>
-                                            <div include-replace ng-if='doc._source.type == "Monument" || doc._source.type == "Objekt"' ng-include="'partials/object-hits.html'" style="page-break-inside: avoid;" class="ui item fade"></div>
-                                            <div include-replace ng-if='doc._source.type == "Skip" || doc._source.type == "Emne" || doc._source.type == "Fartøy"' ng-include="'partials/vessel-hits.html'" style="page-break-inside: avoid;" class="ui item fade"></div>
-                                            <div include-replace ng-if='doc._source.type == "Akkvisisjon"' ng-include="'partials/acquisition-hits.html'" style="page-break-inside: avoid;" class="ui item fade"></div>
-                                            <div include-replace ng-if='doc._source.type == "Arbeidsliste"' ng-include="'partials/object-hits.html'" style="page-break-inside: avoid;" class="ui item fade"></div>
-                                            <div include-replace ng-if='doc._source.type == "Aggregering"' ng-include="'partials/aggregation-hits.html'" style="page-break-inside: avoid;" class="ui item fade"></div>
+                                    <div class="ui container">
+                                        <div class="ui divided items">
+                                            <div ng-repeat="doc in results.hits.hits track by $index" class="ui item">
+                                                <div include-replace ng-if='doc._type == "document"'  ng-include="'partials/document-hits.html'" style="page-break-inside: avoid;" class="ui item fade" ></div>
+                                                <div include-replace ng-if='doc._source.type == "Person" || doc._source.type == "Organisajon" || doc._source.type == "Firma" || doc._source.type == "Katalogisator"' ng-include="'partials/agent-hits.html'" style="page-break-inside: avoid;" class="ui item"></div>
+                                                <div include-replace ng-if='doc._source.type == "Monument" || doc._source.type == "Objekt"' ng-include="'partials/object-hits.html'" style="page-break-inside: avoid;" class="ui item fade"></div>
+                                                <div include-replace ng-if='doc._source.type == "Skip" || doc._source.type == "Emne" || doc._source.type == "Fartøy"' ng-include="'partials/vessel-hits.html'" style="page-break-inside: avoid;" class="ui item fade"></div>
+                                                <div include-replace ng-if='doc._source.type == "Akkvisisjon"' ng-include="'partials/acquisition-hits.html'" style="page-break-inside: avoid;" class="ui item fade"></div>
+                                                <div include-replace ng-if='doc._source.type == "Arbeidsliste"' ng-include="'partials/object-hits.html'" style="page-break-inside: avoid;" class="ui item fade"></div>
+                                                <div include-replace ng-if='doc._source.type == "Aggregering"' ng-include="'partials/aggregation-hits.html'" style="page-break-inside: avoid;" class="ui item fade"></div>
+                                            </div>
                                         </div>
                                     </div>
 
@@ -234,19 +284,8 @@
                         </div>
                     </div>
                 </div>
-            </div>
-        <script id="result-template" type="text/x-handlebars-template">
-            <div class="ProfileCard u-cf">
-            <div class="ProfileCard-details">
-            <div class="ProfileCard-realName">{{value}}</div>
-            <div class="ProfileCard-screenName"></div>
-            <div class="ProfileCard-description">{{value}}</div>
-            </div>
-            </div>
-        </script>
-        <script id="empty-template" type="text/x-handlebars-template">
-            <div class="EmptyMessage">Your search turned up 0 hits</div>
-        </script>
+
+
 
         <!--JavaScript files -->
         <script src="js/lib/typeahead/js/handlebars.js"></script>

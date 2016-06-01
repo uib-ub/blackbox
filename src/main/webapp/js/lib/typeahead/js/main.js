@@ -152,5 +152,7 @@ $(document).ready(function () {
      $('.Typeahead-spinner').hide();
      });**/
 
-
+    $('.search-help.ui.basic.modal')
+        .modal('attach events', '.search-help-button', 'show')
+    ;
 });
