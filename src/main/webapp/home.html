@@ -52,6 +52,9 @@
                                         <i class="search icon"></i>
                                     </button>
                                     </div>
+                                  
+                                    <strong class="ui item" ng-bind-template="{{results.hits.total | number}}" style="font-size:2em; margin-left: 20px;"></strong> &ensp;<span style="font-size: 1.8em">treff</span>
+
                                 </div>
                                 <div class="Typeahead-menu"></div>
                             </div>
@@ -278,24 +281,20 @@
 
                             <div ng-show="results.hits.total > 0" class="ng-cloak column">
                                 <div class="search-hits">
-                                    <div>
-                                        <strong class="ui item" ng-bind-template="{{results.hits.total | number}}" style="font-size:2em;"></strong> &ensp;<span style="font-size: 1.8em">treff</span>
-                                    </div>
                                     <div class="results-hit ng-cloak">
-                                        <hr>
-                                            <!--Pagination-->
-                                            <uib-pagination class="pagination hidden-sm hidden-xs" total-items="results.hits.total"
-                                                            items-per-page="pageSize"
-                                                            ng-model="currentPage"
-                                                            ng-change="search()"
-                                                            next-text="Neste"
-                                                            previous-text="Forrige"
-                                                            max-size="4"
-                                                            first-text="&laquo;"
-                                                            last-text="&raquo;"
-                                                            boundary-links="true"
-                                                            force-ellipses="true">
-                                            </uib-pagination>
+                                        <!--Pagination-->
+                                        <uib-pagination class="pagination hidden-sm hidden-xs" total-items="results.hits.total"
+                                                        items-per-page="pageSize"
+                                                        ng-model="currentPage"
+                                                        ng-change="search()"
+                                                        next-text="Neste"
+                                                        previous-text="Forrige"
+                                                        max-size="4"
+                                                        first-text="&laquo;"
+                                                        last-text="&raquo;"
+                                                        boundary-links="true"
+                                                        force-ellipses="true">
+                                        </uib-pagination>
 
                                         <!-- Search results view--->
                                         <div class="ui container">
@@ -359,7 +358,7 @@
                     index: ["admin-test"],
                         /**type: ["document"],**/
                         facets: [
-                        {"field": "type.exact", "size": 40, "operator": "OR", "order": "term_asc", "min_doc_count" : 0},
+                        {"field": "type.exact", "size": 40, "operator": "OR", "order": "count_desc", "min_doc_count" : 0},
                         {"field": "hasZoom", "size": 10, "operator": "AND", "order": "term_asc", "min_doc_count" : 0},
                         {"field": "isDigitized", "size": 10, "operator": "AND", "order": "count_desc", "min_doc_count" : 0},
                         {"field": "isCatalogued", "size": 10, "operator": "AND", "order": "count_desc", "min_doc_count" : 0},
