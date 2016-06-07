@@ -7,6 +7,8 @@ import org.elasticsearch.index.query.BoolFilterBuilder;
 import org.elasticsearch.index.query.FilterBuilders;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -27,10 +29,25 @@ public final class FilterUtils {
         String fromDate = request.getParameter(RequestParams.FROM_DATE);
         String toDate = request.getParameter(RequestParams.TO_DATE);
         String[] selectedFilters = request.getParameterValues(RequestParams.SELECTED_FILTERS);
+        String[] settingFilters = request.getParameterValues(RequestParams.SETTING_FILTER);
         String aggregations = request.getParameter(RequestParams.AGGREGATIONS);
 
+        //Merge two arrays
+        List<String> l1=null, l2=null;
+        if(settingFilters != null) {
+            l2 = new ArrayList(Arrays.asList(settingFilters));
+        }
+        if(selectedFilters != null){
+            l1 = new ArrayList(Arrays.asList(selectedFilters));
+        }
+
+        if(l1==null && l2 != null) { l1 = l2;}
+        if(l2 != null) {
+            l1.addAll(l2);
+        }
+
         //In this map, keys are "fields" and values are "terms"
-        Map<String, List<String>> filterMap = AggregationUtils.getFilterMap(selectedFilters);
+        Map<String, List<String>> filterMap = AggregationUtils.getFilterMap(l1);
         BoolFilterBuilder boolFilter = FilterBuilders.boolFilter();
         try {
             //Building date filter

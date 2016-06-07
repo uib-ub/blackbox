@@ -19,14 +19,14 @@ html, body {
     /**width: 26.5%;**/
     overflow-x: hidden;
     overflow-y: auto;
-    background: #ddd;
-    /**border: 1px solid #e1e8ed; /**#eee**/
+    background: white;
+    border: 1px solid #e1e8ed; /**#eee**/
     /**border-radius: 8px;**/
 }
 
 .search-results .search-hits {
     background: white;
-    /**border: 1px solid #e1e8ed;**/
+    border: 1px solid #e1e8ed;
 }
 
 .datePicker {

@@ -51,6 +51,7 @@ app.controller('freeTextSearch', function ($scope, $http, $location, mySetting) 
     //Initialize scope variables to default values
     $scope.queryString = null;
     $scope.sortBy = null;
+    $scope.settingFilter = [];
     $scope.selectedFilters = [];
     $scope.fromDate = null;
     $scope.toDate = null;
@@ -81,6 +82,33 @@ app.controller('freeTextSearch', function ($scope, $http, $location, mySetting) 
      */
     $scope.search = function () {
 
+        //var filters = $.extend($scope.selectedFilters, $scope.settingFilter);
+
+        //console.log("Merged: " + filters);
+
+        //Testing, testing
+        //Push everything to the slectedFilters
+        /**if ($scope.settingFilter) {
+            //Addition
+            for (var i = 0; i < $scope.settingFilter.length; i++ ){
+                var filter = $scope.settingFilter[i];
+                if ($scope.selectedFilters.indexOf(filter) === -1) {
+                    $scope.selectedFilters.push(filter);
+                }
+            }
+            
+            //Removal
+            for (var i = 0; i < $scope.selectedFilters.length; i++ ){
+                var item = $scope.selectedFilters[i];
+                if ($scope.selectedFilters.indexOf(filter) === -1) {
+                    $scope.selectedFilters.push(filter);
+                }
+            }
+        }
+        console.log($scope.selectedFilters);
+         **/
+         
+
         var defaultParams = {
             q: stripEmptyString($scope.queryString),
             index: mySetting.index,
@@ -88,6 +116,7 @@ app.controller('freeTextSearch', function ($scope, $http, $location, mySetting) 
             from_date: stripEmptyString($scope.fromDate),
             to_date: stripEmptyString($scope.toDate),
             filter: $scope.selectedFilters,
+            setting_filter : $scope.settingFilter,
             from: ($scope.currentPage - 1) * $scope.pageSize,
             size: $scope.pageSize,
             sort: stripEmptyString($scope.sortBy)
@@ -103,6 +132,8 @@ app.controller('freeTextSearch', function ($scope, $http, $location, mySetting) 
             url: 'search?aggs=' + JSON.stringify(mySetting.facets),
             params: extendedParams
         }).then(function (response) {
+            //var s = $.extend($scope.selectedFilters, $scope.settingFilter);
+            //console.log("FILETERS: " + s);
             //Parameters that have been used to generate response.
             var responseParams = response.config.params;
                 if(response.data) {
@@ -120,6 +151,8 @@ app.controller('freeTextSearch', function ($scope, $http, $location, mySetting) 
                     }
                     if ("from" in responseParams) {
                         $scope.from = responseParams.from;
+                        //Set current page
+                        $scope.currentPage = ($scope.from/$scope.pageSize) + 1;
                     }
                     if ("size" in responseParams) {
                         $scope.pageSize = responseParams.size;
