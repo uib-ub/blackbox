@@ -14,7 +14,7 @@ app.config(["$routeProvider", function($routeProvider) {
             templateUrl : 'home.html',
             controller  : 'freeTextSearch'
         })
-        .when('/test', {
+        .when('/', {
             templateUrl : 'home.html',
             controller  : 'freeTextSearch'
         })
@@ -77,7 +77,9 @@ app.controller('freeTextSearch', function ($scope, $http, $location, mySetting) 
         return null;
     };
 
-    //Remove element of an array
+    /**
+     * Remove element (filter) of an array
+     */
     $scope.removeFilter = function(arr, item) {
         if (angular.isArray(arr)) {
             for (var i = arr.length; i--;){
@@ -86,6 +88,7 @@ app.controller('freeTextSearch', function ($scope, $http, $location, mySetting) 
                     break;
                 }
             }
+            //After removing a filter, execute search.
             $scope.search();
         }
     }
@@ -118,12 +121,10 @@ app.controller('freeTextSearch', function ($scope, $http, $location, mySetting) 
             url: 'search?aggs=' + JSON.stringify(mySetting.facets),
             params: extendedParams
         }).then(function (response) {
-            //var s = $.extend($scope.selectedFilters, $scope.settingFilter);
-            //console.log("FILETERS: " + s);
             //Parameters that have been used to generate response.
             var responseParams = response.config.params;
                 if(response.data) {
-                    //Initialize the view by copying response params to scope variables
+                    //Initialize the view by copying response params to scope variables.
                     //By updating scope variables, the view will automatically be updated,
                     //thanks to angular two-way binding.
                     if ("q" in responseParams) {
@@ -159,6 +160,7 @@ app.controller('freeTextSearch', function ($scope, $http, $location, mySetting) 
                             }
                         }
                     }
+                    //Assign response data to the results scope
                     $scope.results = response.data;
                     $scope.ready = true;
                 }

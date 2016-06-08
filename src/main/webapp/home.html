@@ -72,45 +72,48 @@
     <div class="ui stackable container secondary menu">
         <!-- Nullstill søk -->
         <div class="item"><a href="/blackbox" target="_self" title="Nullstill søk"> <i class="delete circle icon"></i>Nullstill</a></div>
+
+        <!--Søketips-->
         <div class="item"><a class="search-help-button" accesskey="h" title="Søketips"><i class="help icon"></i>Søketips</a></div>
+
         <!--Search help info-->
         <div class="search-help ui basic modal">
             <i class="close icon"></i>
-            <div class="header">Søketips</div>
-            <div class="image content">
-                <div class="image"><i class="search icon"></i></div>
-                <div class="description">
-                    <h4>OG/ELLER</h4>
-                    <ul>
-                        <li>Søket bruker i utgangspunktet "OG" mellom alle søketermer</li>
-                        <li>Bruk "OR" for å endre dette, for eksempel "vaksdal OR voss"</li>
-                    </ul>
-                    <h4>Negasjon</h4>
-                    <ul>
-                        <li>Bruk minustegn foran søketermer du ikke vil ha med i trefflisten, for eksempel "husarbeid"
-                        </li>
-                    </ul>
-                    <h4>Trunkering</h4>
-                    <ul>
-                        <li>Bruke * til å trunkere, for eksempel "*strand" eller "knu*sen"</li>
-                    </ul>
-                    <h4>Søk direkte i ett felt</h4>
-                    <ul>
-                        <li>Du kan søke i tittel, beskrivelse og mange andre felt ved å bruke <i>felt:</i></li>
-                        <li>subject:hund</li>
-                        <li>spatial:bergen</li>
-                        <li>description:fisketur</li>
-                        <li>maker:knudsen</li>
-                        <li>isPartOf:holm [OBS! Må være skrevet slik, såkalt camelCase]</li>
-                    </ul>
-                    <h4>Fuzzy</h4>
-                    <ul>
-                        <li>Du kan søke med en fuzzy-søketerm ved å sette ~ etter ordet du søker etter.</li>
-                        <li>”Fana~” -> gir treff på Tana, Anax, Fina, etc.</li>
-                    </ul>
-                </div>
-            </div>
-        </div>
+                <div class="header">Søketips</div>
+                    <div class="image content">
+                        <div class="image"><i class="search icon"></i></div>
+                            <div class="description">
+                                <h4>OG/ELLER</h4>
+                                <ul>
+                                    <li>Søket bruker i utgangspunktet "OG" mellom alle søketermer</li>
+                                    <li>Bruk "OR" for å endre dette, for eksempel "vaksdal OR voss"</li>
+                                </ul>
+                                <h4>Negasjon</h4>
+                                <ul>
+                                    <li>Bruk minustegn foran søketermer du ikke vil ha med i trefflisten, for eksempel "husarbeid"
+                                    </li>
+                                </ul>
+                                <h4>Trunkering</h4>
+                                <ul>
+                                    <li>Bruke * til å trunkere, for eksempel "*strand" eller "knu*sen"</li>
+                                </ul>
+                                <h4>Søk direkte i ett felt</h4>
+                                <ul>
+                                    <li>Du kan søke i tittel, beskrivelse og mange andre felt ved å bruke <i>felt:</i></li>
+                                    <li>subject:hund</li>
+                                    <li>spatial:bergen</li>
+                                    <li>description:fisketur</li>
+                                    <li>maker:knudsen</li>
+                                    <li>isPartOf:holm [OBS! Må være skrevet slik, såkalt camelCase]</li>
+                                </ul>
+                                <h4>Fuzzy</h4>
+                                <ul>
+                                    <li>Du kan søke med en fuzzy-søketerm ved å sette ~ etter ordet du søker etter.</li>
+                                    <li>”Fana~” -> gir treff på Tana, Anax, Fina, etc.</li>
+                                </ul>
+                            </div>
+                        </div>
+                   </div>
 
         <!-- Sortering -->
         <div class="item">
@@ -204,6 +207,7 @@
                                    placeholder="TIL" title="Til dato">
                         </div>
                         <br/><br/>
+
                         <!-- Document types facets-->
                         <h3>Dokument typer</h3>
                         <hr>
@@ -363,7 +367,6 @@
     </div>
 </div>
 
-
     <!--JavaScript files -->
     <script src="js/lib/typeahead/js/handlebars.js"></script>
     <script src="https://code.jquery.com/jquery-1.11.3.min.js"></script>
@@ -383,7 +386,7 @@
     <script src="js/jquery-datepicker.js"></script>
     <script src="js/ui-bootstrap-1.1.2.min.js"></script>
 
-    <!--These are constants for this particular page-->
+    <!--Constants for this particular page-->
     <script>
         angular.module("settings", [])
                 .constant("mySetting", {
@@ -397,7 +400,12 @@
                             "order": "count_desc",
                             "min_doc_count": 0
                         },
-                        {"field": "hasZoom", "size": 10, "operator": "AND", "order": "term_asc", "min_doc_count": 0},
+                        {   "field": "hasZoom",
+                            "size": 10,
+                            "operator": "AND",
+                            "order": "term_asc",
+                            "min_doc_count": 0
+                        },
                         {
                             "field": "isDigitized",
                             "size": 10,
@@ -412,7 +420,11 @@
                             "order": "count_desc",
                             "min_doc_count": 0
                         },
-                        {"field": "subject.exact", "size": 30, "operator": "AND", "min_doc_count": 1},
+                        {
+                            "field": "subject.exact",
+                            "size": 30, "operator": "AND",
+                            "min_doc_count": 1
+                        },
                         {
                             "field": "isPartOf.exact",
                             "size": 20,
@@ -423,12 +435,19 @@
                         {
                             "field": "cataloguer.exact",
                             "size": 50,
-                            "operator": "AND",
+                            "operator": "OR",
                             "order": "term_asc",
                             "min_doc_count": 0
                         }
-                        /*Supported intervals: weeks(w), days(d), hours(h), minutes(m), seconds(s)*/
-                        //{"field": "created", "type" : "date_histogram", "format" : "yyyy", "interval" : "520w", "min_doc_count" : 1, "order" : "key_asc"}
+                        //OBS: Supported intervals: weeks(w), days(d), hours(h), minutes(m), seconds(s)
+                        /*{
+                            "field": "created",
+                            "type" : "date_histogram",
+                            "format" : "yyyy",
+                            "interval" : "520w",
+                            "min_doc_count" : 1,
+                            "order" : "key_asc"
+                        }*/
                     ]
                 });
 
@@ -436,5 +455,5 @@
             transition: 'drop'
         });
     </script>
-</body>
+  </body>
 </html>

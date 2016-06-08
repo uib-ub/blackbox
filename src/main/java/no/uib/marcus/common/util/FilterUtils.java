@@ -3,13 +3,10 @@ package no.uib.marcus.common.util;
 import no.uib.marcus.common.RequestParams;
 import org.apache.log4j.Logger;
 import org.elasticsearch.common.Strings;
-import org.elasticsearch.common.lang3.ArrayUtils;
 import org.elasticsearch.index.query.BoolFilterBuilder;
 import org.elasticsearch.index.query.FilterBuilders;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -32,8 +29,6 @@ public final class FilterUtils {
         String[] selectedFilters = request.getParameterValues(RequestParams.SELECTED_FILTERS);
         String[] settingFilters = request.getParameterValues(RequestParams.SETTING_FILTER);
         String aggregations = request.getParameter(RequestParams.AGGREGATIONS);
-
-        //String[] joinedFilter = ArrayUtils.addAll(selectedFilters, settingFilters);
 
         //In this map, keys are "fields" and values are "terms"
         Map<String, List<String>> filterMap = AggregationUtils.getFilterMap(selectedFilters);
