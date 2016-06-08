@@ -69,7 +69,7 @@ public final class AggregationUtils {
      * @return a map of selected filters as field-value pair
      */
     @NotNull
-    public static Map<String, List<String>> getFilterMap(@Nullable List<String> selectedFilters) {
+    public static Map<String, List<String>> getFilterMap(@Nullable String[] selectedFilters) {
         Map<String, List<String>> filters = new HashMap<>();
         try {
             if (selectedFilters == null) {

@@ -3,6 +3,7 @@ package no.uib.marcus.common.util;
 import no.uib.marcus.common.RequestParams;
 import org.apache.log4j.Logger;
 import org.elasticsearch.common.Strings;
+import org.elasticsearch.common.lang3.ArrayUtils;
 import org.elasticsearch.index.query.BoolFilterBuilder;
 import org.elasticsearch.index.query.FilterBuilders;
 
@@ -32,22 +33,10 @@ public final class FilterUtils {
         String[] settingFilters = request.getParameterValues(RequestParams.SETTING_FILTER);
         String aggregations = request.getParameter(RequestParams.AGGREGATIONS);
 
-        //Merge two arrays
-        List<String> l1=null, l2=null;
-        if(settingFilters != null) {
-            l2 = new ArrayList(Arrays.asList(settingFilters));
-        }
-        if(selectedFilters != null){
-            l1 = new ArrayList(Arrays.asList(selectedFilters));
-        }
-
-        if(l1==null && l2 != null) { l1 = l2;}
-        if(l2 != null) {
-            l1.addAll(l2);
-        }
+        //String[] joinedFilter = ArrayUtils.addAll(selectedFilters, settingFilters);
 
         //In this map, keys are "fields" and values are "terms"
-        Map<String, List<String>> filterMap = AggregationUtils.getFilterMap(l1);
+        Map<String, List<String>> filterMap = AggregationUtils.getFilterMap(selectedFilters);
         BoolFilterBuilder boolFilter = FilterBuilders.boolFilter();
         try {
             //Building date filter

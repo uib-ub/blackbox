@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html ng-app="marcus" lang="no">
+<html ng-app="marcus" lang="no" xmlns="http://www.w3.org/1999/html">
 <head>
     <meta charset="utf-8"/>
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"/>
@@ -53,9 +53,11 @@
                             </button>
                         </div>
 
-                        <strong class="ui item" ng-bind-template="{{results.hits.total | number}}"
-                                style="font-size:2em; margin-left: 20px;"></strong> &ensp;<span
-                            style="font-size: 1.8em">treff</span>
+                        <strong class="ui item"
+                                ng-bind-template="{{results.hits.total | number}}"
+                                style="font-size:2em; margin-left: 20px;">
+                        </strong>
+                        &ensp;<span style="font-size: 1.8em">treff</span>
 
                     </div>
                     <div class="Typeahead-menu"></div>
@@ -69,8 +71,9 @@
     </div>
     <div class="ui stackable container secondary menu">
         <!-- Nullstill søk -->
-        <div class="item"><a href="/" target="_self" title="Nullstill søk"><i class="remove circle icon"></i> nullstill</a></div>
-        <div class="item"><a class="search-help-button" accesskey="h" title="Søketips"><i class="remove circle icon"></i> Søketips</a></div>
+        <div class="item"><a href="/blackbox" target="_self" title="Nullstill søk"> <i class="delete circle icon"></i>Nullstill</a></div>
+        <div class="item"><a class="search-help-button" accesskey="h" title="Søketips"><i class="help icon"></i>Søketips</a></div>
+        <!--Search help info-->
         <div class="search-help ui basic modal">
             <i class="close icon"></i>
             <div class="header">Søketips</div>
@@ -109,7 +112,6 @@
             </div>
         </div>
 
-
         <!-- Sortering -->
         <div class="item">
             <select id="sort_by" class="ui dropdown"
@@ -134,54 +136,31 @@
         </div>
     </div>
     <div class="ui container">
-        <!-- TODO: dummy selects for settings -->
-
-        <!--div id="multiCategory" class="ui fluid multiple search normal selection dropdown">
+        
+        <!--Display labels for selected filters-->
+         <div ng-cloak ng-if="selectedFilters.length > 0" class="selected-filter">
+             <strong>Utvalgte filtre:</strong>
+             <span ng-repeat="filter in selectedFilters">
+                  <a class="ui purple label relaxed"
+                       ng-click="removeFilter(selectedFilters, filter)">
+                       {{filter.split('#')[1]}} <i class='delete icon'></i>
+                  </a>
+             </span>
+         </div>
+         
+        <!-- Cataloguer facet as a dropdown-->
+        <div class="ui fluid multiple search normal selection dropdown" style="width:30%">
             <i class="dropdown icon"></i>
-            <div class="default text">Select Category</div>
+            <div class="default text">Katalogisator</div>
             <div class="menu">
-                <div ng-repeat="bucket in results['aggregations']['hasZoom']['buckets']">
-                    <div class="item" data-value="hasZoom#{{bucket.key}}"> {{bucket.key}} <i style="color:grey"> ({{bucket.doc_count | number}})</i></div>
-                </div>
-                <div class="item" data-value="ec">Ecuador</div>
-                <div class="item" data-value="eg">Egypt</div>
-                <div class="item" data-value="sv">El Salvador</div>
-                <div class="item" data-value="gb">England</div>
-                <div class="item" data-value="gq">Equatorial</div>
-            </div>
-        </div-->
-
-        <div style="width:40%;">
-            <select id="multiCategory" multiple="" class="ui fluid multiple search normal selection dropdown" onclick="search()"
-                    ng-model="settingFilter"
-                    ng-options="'cataloguer.exact#'+item.key as item.key for item in results['aggregations']['cataloguer.exact']['buckets']">
-                    <option value="">Sortér på</option>
-            </select>
-        </div>
-
-        <!--div class="ui fluid multiple search normal selection dropdown" style="width: 30%">
-            <input name="country" type="hidden">
-            <i class="dropdown icon"></i>
-            <div class="default text">Select Country</div>
-            <div class="menu">
-                    <div ng-repeat="bucket in results['aggregations']['hasZoom']['buckets']">
-                        <div class="item">
-                            <input id="hasZoo-{{bucket.key}}" type="checkbox" checklist-model="selectedFilters" checklist-value="getCheckedValue('hasZoom', bucket.key)" ng-click="search()">
-                            <label for="hasZoo-{{bucket.key}}"> {{bucket.key}} <span style="color:grey"> ({{bucket.doc_count | number}})</span></label>
+                    <div ng-repeat="bucket in results['aggregations']['cataloguer.exact']['buckets']">
+                        <div class="item item-checkbox">
+                            <input type="checkbox" checklist-model="selectedFilters" checklist-value="getCheckedValue('cataloguer.exact', bucket.key)" ng-click="search()">
+                            <label>{{bucket.key}} <span style="color:grey"> ({{bucket.doc_count | number}})</span></label>
                         </div>
                     </div>
             </div>
-        </div-->
-
-        <!--select id="cata" class="ui dropdown">
-                <option value="">Katalogisator</option>
-                <option value="10">Tarje</option>
-                <option value="20">Hemed</option>
-                <option value="30">Torill</option>
-                <option value="100">Pedro</option>
-                <option value="200">Marianne</option>
-                <option value="250">Bjørnene</option>
-        </select-->
+        </div>
 
         <!-- Category facets -->
         <!--div style="width: 100%;" class="ui relaxed horizontal list">
@@ -208,7 +187,6 @@
 
         <img class="blackbox-loading" src="img/loading.gif" alt="Loading ...">
         <!---uib-progressbar ng-show="show_loading" class="ui loading segment"  value="dynamic" style="height:100px;"></uib-progressbar-->
-
         <div ng-cloak ng-show="ready" style="margin-top:30px;" class="ui container">
             <div class="search-results ui equal width grid">
                 <!--Starting with facets-->
@@ -240,20 +218,6 @@
                                 </label>
                             </div>
                         </div>
-
-                        <!--Kategorie-->
-                        <h3>Kategorier</h3>
-                        <hr>
-                        <!--select id="multiSele" class="ui dropdown search" multiple="">
-                            <option value="">Multichoice</option>
-                            <option value="10"><input id="has-{{bucket.key}}" type="checkbox" checklist-model="selectedFilters" checklist-value="getCheckedValue('hasZoom', bucket.key)" ng-click="search()"></option>
-                            <option value="20">Uten zoom</option>
-                            <option value="30">Digitalisert</option>
-                            <option value="100">Ikke digitalisert</option>
-                            <option value="200">Katalogisert</option>
-                            <option value="250">Ikke katalogisert</option>
-                        </select-->
-
 
                         <!-- Cataloguer facets-->
                         <h3>Katalogisator</h3>
@@ -397,6 +361,7 @@
             </div>
         </div>
     </div>
+</div>
 
 
     <!--JavaScript files -->
@@ -467,18 +432,8 @@
                     ]
                 });
 
-        //Testing out multi category
-        /**$("#multiCategory").dropdown({
-            //On value change, append values to the array of selected filters and then search.
-            onChange: function (value, text, selectedItem) {
-                //alert("Value: " + JSON.stringify(value));
-            },
-            allowAdditions: false,
-            direction : 'upward'
-        });**/
-
         $('.ui.dropdown').dropdown({
-            allowAdditions: false
+            transition: 'drop'
         });
     </script>
 </body>

@@ -15,6 +15,14 @@ html, body {
     padding: 10px;
 }
 
+.item-checkbox {
+    padding-left:8px;
+    margin-bottom: 8px;
+}
+
+.selected-filter{
+    margin-bottom: 10px;
+}
 .search-results .facets {
     /**width: 26.5%;**/
     overflow-x: hidden;
@@ -109,6 +117,7 @@ html, body {
     text-align: center;
     font-size: 2em;
 }
+
 
 
 

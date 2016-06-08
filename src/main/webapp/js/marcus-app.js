@@ -5,7 +5,7 @@
  **/
 
 'use strict';
-var app = angular.module('marcus', ["checklist-model", "ui.bootstrap", "settings", "ngAnimate", "ngRoute"]);
+var app = angular.module('marcus', ["checklist-model" , "ui.bootstrap", "settings", "ngAnimate", "ngRoute"]);
 
 //Configure URL rooting
 app.config(["$routeProvider", function($routeProvider) {
@@ -77,37 +77,23 @@ app.controller('freeTextSearch', function ($scope, $http, $location, mySetting) 
         return null;
     };
 
+    //Remove element of an array
+    $scope.removeFilter = function(arr, item) {
+        if (angular.isArray(arr)) {
+            for (var i = arr.length; i--;){
+                if (arr[i] === item) {
+                    arr.splice(i, 1);
+                    break;
+                }
+            }
+            $scope.search();
+        }
+    }
+
     /**
      * Send requests to search servlet and prepare the view for rendering
      */
     $scope.search = function () {
-
-        //var filters = $.extend($scope.selectedFilters, $scope.settingFilter);
-
-        //console.log("Merged: " + filters);
-
-        //Testing, testing
-        //Push everything to the slectedFilters
-        /**if ($scope.settingFilter) {
-            //Addition
-            for (var i = 0; i < $scope.settingFilter.length; i++ ){
-                var filter = $scope.settingFilter[i];
-                if ($scope.selectedFilters.indexOf(filter) === -1) {
-                    $scope.selectedFilters.push(filter);
-                }
-            }
-            
-            //Removal
-            for (var i = 0; i < $scope.selectedFilters.length; i++ ){
-                var item = $scope.selectedFilters[i];
-                if ($scope.selectedFilters.indexOf(filter) === -1) {
-                    $scope.selectedFilters.push(filter);
-                }
-            }
-        }
-        console.log($scope.selectedFilters);
-         **/
-         
 
         var defaultParams = {
             q: stripEmptyString($scope.queryString),

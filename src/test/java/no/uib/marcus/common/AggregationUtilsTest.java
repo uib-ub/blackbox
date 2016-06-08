@@ -54,7 +54,7 @@ public class AggregationUtilsTest extends RandomizedTest {
         }
 
 
-       /** @Test
+        @Test
         public void testGetFilterMap01() {
                 String[] selectedFilter = {"hemed#ali", "status#sent", "status#draft"};
 
@@ -73,7 +73,7 @@ public class AggregationUtilsTest extends RandomizedTest {
                 //Separate keys with "_", it should return null.
                 String[] selectedFilter = {"hemed", "status_sent_draft", "status_draft"};
 
-                /**assertEquals(Collections.emptyMap(), AggregationUtils.getFilterMap(selectedFilter));
+                assertEquals(Collections.emptyMap(), AggregationUtils.getFilterMap(selectedFilter));
                 assertEquals(Collections.emptyMap(), AggregationUtils.getFilterMap(new String[0]));
                 assertEquals(Collections.emptyMap(), AggregationUtils.getFilterMap(null));
         }
@@ -95,7 +95,7 @@ public class AggregationUtilsTest extends RandomizedTest {
                 Map<String, List<String>> expectedMap = new HashMap<>();
                 expectedMap.put("status", Arrays.asList("sent", "draft", "makame", "bee"));
 
-                assertEquals(AggregationUtils.getFilterMap(input), expectedMap);**/
+                assertEquals(AggregationUtils.getFilterMap(input), expectedMap);
 
         }
 }
