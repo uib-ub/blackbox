@@ -31,33 +31,36 @@
         </div>
         <!-- Controller starts here-->
         <div ng-controller="freeTextSearch" id="searchController">
-            <div class="ui container">
+            <div id="search-header" class="ui container">
                 <div class="masthead">
                         <form action="" method="GET">
                             <!--input type="hidden" name="index" value="admin"-->
-                            <div class="Typeahead">
-                                <div class="u-posRelative">
-                                    <div class="ui massive icon input">
-                                    <input class="Typeahead-hint" type="text" tabindex="-1" readonly="readonly"/>
-                                    <input class="Typeahead-input" 
-                                           id="search-input" 
-                                           type="text" 
-                                           name="q" 
-                                           ng-model="queryString"
-                                           ng-keyup="($event.keyCode==13 || queryString==='')&&search()"
-                                           placeholder="Søk Marcus ..."
-                                           autocomplete="off"/>
-                                    <!--img class="Typeahead-spinner" src="js/lib/typeahead/img/spinner.gif" alt=""/-->
-                                    <button class="Typeahead-search-icon" type="button" ng-click="search()">
-                                        <i class="search icon"></i>
-                                    </button>
+                            <div class="Typeahead ui equal width grid">
+                                <div class="u-posRelative ui twelve wide column">
+                                    <div class="ui massive icon fluid input">
+                                        <input class="Typeahead-hint" type="text" tabindex="-1" readonly="readonly"/>
+                                        <input class="Typeahead-input"
+                                               id="search-input" 
+                                               type="text" 
+                                               name="q" 
+                                               ng-model="queryString"
+                                               ng-keyup="($event.keyCode==13 || queryString==='')&&search()"
+                                               placeholder="Søk Marcus ..."
+                                               autocomplete="off"/>
+                                        <!--img class="Typeahead-spinner" src="js/lib/typeahead/img/spinner.gif" alt=""/-->
+                                        <i ng-click="search()" class="search link icon"></i>
+                                        <!-- <button class="Typeahead-search-icon" type="button" ng-click="search()">
+                                            <i class="search icon"></i>
+                                        </button> -->
                                     </div>
-                                  
+                                </div>
+                                <div class="ui column" style="margin-top: 20px !important;">
                                     <strong class="ui item" ng-bind-template="{{results.hits.total | number}}" style="font-size:2em; margin-left: 20px;"></strong> &ensp;<span style="font-size: 1.8em">treff</span>
-
+                                </div>
+                                    
                                 </div>
                                 <div class="Typeahead-menu"></div>
-                            </div>
+                           
                         </form>
                     <!--span style="color:grey;"> Trykk på Enter for å søke</span-->
                     <!--span class="links links-examples">
@@ -252,7 +255,7 @@
                                 </div>
                             </div>
                             <!-- No hits-->
-                            <div ng-if="ready && results.hits.total === 0" style="margin-top:50px;" class="no-hits ui column">
+                            <div ng-if="ready && results.hits.total === 0" class="no-hits ui column">
                                 <div class="ui text ui center aligned">
                                     <div class="ui large blue message">
                                          <h1 style="font-size: 2em;" class="ui icon header">
@@ -262,7 +265,7 @@
                                 </div>
                             </div>
                             <!-- Internal error on executing search-->
-                            <div ng-if="ready && results.error" style="margin-top:50px;" class="no-hits ui column">
+                            <div ng-if="ready && results.error" class="no-hits ui column">
                                 <div  class='ui large red message'>
                                      <div class="header">
                                         Søket ditt kan ikke utføres
@@ -358,7 +361,7 @@
                     index: ["admin-test"],
                         /**type: ["document"],**/
                         facets: [
-                        {"field": "type.exact", "size": 40, "operator": "OR", "order": "count_desc", "min_doc_count" : 0},
+                        {"field": "type.exact", "size": 40, "operator": "OR", "order": "count_desc", "min_doc_count" : 1},
                         {"field": "hasZoom", "size": 10, "operator": "AND", "order": "term_asc", "min_doc_count" : 0},
                         {"field": "isDigitized", "size": 10, "operator": "AND", "order": "count_desc", "min_doc_count" : 0},
                         {"field": "isCatalogued", "size": 10, "operator": "AND", "order": "count_desc", "min_doc_count" : 0},

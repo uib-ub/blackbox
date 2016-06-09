@@ -11,17 +11,18 @@ html, body {
     /**background: whitesmoke;**/
 }
 
+#search-header {
+    margin-top: 70px;
+}
+
 .search-hits, .facets {
     padding: 10px;
 }
 
 .search-results .facets {
-    /**width: 26.5%;**/
     overflow-x: hidden;
     overflow-y: auto;
-    background: #ddd;
-    /**border: 1px solid #e1e8ed; /**#eee**/
-    /**border-radius: 8px;**/
+    background: white;
 }
 
 .search-results .search-hits {
