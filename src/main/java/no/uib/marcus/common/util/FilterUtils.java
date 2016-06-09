@@ -27,6 +27,7 @@ public final class FilterUtils {
         String fromDate = request.getParameter(RequestParams.FROM_DATE);
         String toDate = request.getParameter(RequestParams.TO_DATE);
         String[] selectedFilters = request.getParameterValues(RequestParams.SELECTED_FILTERS);
+        String[] settingFilters = request.getParameterValues(RequestParams.SETTING_FILTER);
         String aggregations = request.getParameter(RequestParams.AGGREGATIONS);
 
         //In this map, keys are "fields" and values are "terms"

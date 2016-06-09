@@ -5,7 +5,7 @@
  **/
 
 'use strict';
-var app = angular.module('marcus', ["checklist-model", "ui.bootstrap", "settings", "ngAnimate", "ngRoute"]);
+var app = angular.module('marcus', ["checklist-model" , "ui.bootstrap", "settings", "ngAnimate", "ngRoute"]);
 
 //Configure URL rooting
 app.config(["$routeProvider", function($routeProvider) {
@@ -14,7 +14,7 @@ app.config(["$routeProvider", function($routeProvider) {
             templateUrl : 'home.html',
             controller  : 'freeTextSearch'
         })
-        .when('/test', {
+        .when('/', {
             templateUrl : 'home.html',
             controller  : 'freeTextSearch'
         })
@@ -51,6 +51,7 @@ app.controller('freeTextSearch', function ($scope, $http, $location, mySetting) 
     //Initialize scope variables to default values
     $scope.queryString = null;
     $scope.sortBy = null;
+    $scope.settingFilter = [];
     $scope.selectedFilters = [];
     $scope.fromDate = null;
     $scope.toDate = null;
@@ -77,6 +78,17 @@ app.controller('freeTextSearch', function ($scope, $http, $location, mySetting) 
     };
 
     /**
+     * Remove a filter in the list of selected filters
+     */
+    $scope.removeFilter = function(item) {
+        if(item){
+            remove($scope.selectedFilters, item);
+            //After removing, execute search
+            $scope.search();
+        }
+    }
+
+    /**
      * Send requests to search servlet and prepare the view for rendering
      */
     $scope.search = function () {
@@ -88,6 +100,7 @@ app.controller('freeTextSearch', function ($scope, $http, $location, mySetting) 
             from_date: stripEmptyString($scope.fromDate),
             to_date: stripEmptyString($scope.toDate),
             filter: $scope.selectedFilters,
+            setting_filter : $scope.settingFilter,
             from: ($scope.currentPage - 1) * $scope.pageSize,
             size: $scope.pageSize,
             sort: stripEmptyString($scope.sortBy)
@@ -106,7 +119,7 @@ app.controller('freeTextSearch', function ($scope, $http, $location, mySetting) 
             //Parameters that have been used to generate response.
             var responseParams = response.config.params;
                 if(response.data) {
-                    //Initialize the view by copying response params to scope variables
+                    //Initialize the view by copying response params to scope variables.
                     //By updating scope variables, the view will automatically be updated,
                     //thanks to angular two-way binding.
                     if ("q" in responseParams) {
@@ -120,6 +133,8 @@ app.controller('freeTextSearch', function ($scope, $http, $location, mySetting) 
                     }
                     if ("from" in responseParams) {
                         $scope.from = responseParams.from;
+                        //Set current page
+                        $scope.currentPage = ($scope.from/$scope.pageSize) + 1;
                     }
                     if ("size" in responseParams) {
                         $scope.pageSize = responseParams.size;
@@ -140,6 +155,7 @@ app.controller('freeTextSearch', function ($scope, $http, $location, mySetting) 
                             }
                         }
                     }
+                    //Assign response data to the results scope
                     $scope.results = response.data;
                     $scope.ready = true;
                 }

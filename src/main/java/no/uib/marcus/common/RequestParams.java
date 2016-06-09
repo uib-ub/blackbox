@@ -8,6 +8,7 @@ public class RequestParams {
 
     public static final String QUERY_STRING = "q";
     public static final String SELECTED_FILTERS = "filter";
+    public static final String SETTING_FILTER = "setting_filter";
     public static final String AGGREGATIONS = "aggs";
     public static final String INDICES = "index";
     public static final String INDEX_TYPES = "type";

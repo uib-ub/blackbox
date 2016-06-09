@@ -19,15 +19,24 @@ html, body {
     padding: 10px;
 }
 
+.item-checkbox {
+    padding-left:8px;
+    margin-bottom: 8px;
+}
+
+.selected-filter{
+    margin-bottom: 10px;
+}
 .search-results .facets {
     overflow-x: hidden;
     overflow-y: auto;
     background: white;
+    border: 1px solid #e1e8ed;
 }
 
 .search-results .search-hits {
     background: white;
-    /**border: 1px solid #e1e8ed;**/
+    border: 1px solid #e1e8ed;
 }
 
 .datePicker {
@@ -110,6 +119,7 @@ html, body {
     text-align: center;
     font-size: 2em;
 }
+
 
 
 
