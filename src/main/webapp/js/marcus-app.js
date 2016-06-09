@@ -5,7 +5,7 @@
  **/
 
 'use strict';
-var app = angular.module('marcus', ["checklist-model" , "ui.bootstrap", "settings", "ngAnimate", "ngRoute"]);
+var app = angular.module('marcus', ["checklist-model" , "ui.bootstrap", "settings", "ngAnimate", "ngRoute", "pascalprecht.translate"]);
 
 //Configure URL rooting
 app.config(["$routeProvider", function($routeProvider) {
@@ -28,6 +28,32 @@ app.config(["$routeProvider", function($routeProvider) {
 app.config(function($locationProvider) {
     $locationProvider.html5Mode(true);
 });
+
+
+/**
+ * ==============================
+ * i18n - angular-translate
+ * ==============================
+ **/
+app.config(['$translateProvider', function ($translateProvider) {
+  // add translation tables
+  $translateProvider.useStaticFilesLoader({
+    prefix: 'locales/locale-',
+    suffix: '.json'
+  });
+  $translateProvider.preferredLanguage('no');
+  $translateProvider.fallbackLanguage('en');
+  $translateProvider.useSanitizeValueStrategy('escape');
+  $translateProvider.forceAsyncReload(true);
+}]);
+ 
+app.controller('Ctrl', ['$translate', '$scope', function ($translate, $scope) {
+ 
+  $scope.changeLanguage = function (langKey) {
+    $translate.use(langKey);
+  };
+}]);
+
 
 /**
  * ==============================
