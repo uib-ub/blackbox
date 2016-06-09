@@ -30,23 +30,32 @@ app.config(function($locationProvider) {
 });
 
 
-var translations = {
-  HEADLINE: 'XSS possible!',
-  PARAGRAPH: '<span style=\'color:green\'>Hello</span> {{username}}!',
-};
- 
-var app = angular.module('myApp_escape_params', ['pascalprecht.translate']);
- 
+/**
+ * ==============================
+ * i18n - angular-translate
+ * ==============================
+ **/
 app.config(['$translateProvider', function ($translateProvider) {
-  $translateProvider.translations('en', translations);
-  $translateProvider.preferredLanguage('en');
-  // Enable escaping of HTML
-  $translateProvider.useSanitizeValueStrategy('escapeParameters');
+  // add translation tables
+  //$translateProvider.translations('no', translationsNO);
+  //$translateProvider.translations('en', translationsEN);
+  $translateProvider.useStaticFilesLoader({
+    prefix: 'locales/locale-',
+    suffix: '.json'
+  });
+  $translateProvider.preferredLanguage('no');
+  $translateProvider.fallbackLanguage('en');
+  $translateProvider.useSanitizeValueStrategy('escape');
+  $translateProvider.forceAsyncReload(true);
 }]);
  
-app.controller('Ctrl', ['$scope', function ($scope) {
+app.controller('Ctrl', ['$translate', '$scope', function ($translate, $scope) {
  
+  $scope.changeLanguage = function (langKey) {
+    $translate.use(langKey);
+  };
 }]);
+
 
 /**
  * ==============================
