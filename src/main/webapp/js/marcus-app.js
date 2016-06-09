@@ -5,7 +5,7 @@
  **/
 
 'use strict';
-var app = angular.module('marcus', ["checklist-model" , "ui.bootstrap", "settings", "ngAnimate", "ngRoute"]);
+var app = angular.module('marcus', ["checklist-model" , "ui.bootstrap", "settings", "ngAnimate", "ngRoute", "pascalprecht.translate"]);
 
 //Configure URL rooting
 app.config(["$routeProvider", function($routeProvider) {
@@ -28,6 +28,25 @@ app.config(["$routeProvider", function($routeProvider) {
 app.config(function($locationProvider) {
     $locationProvider.html5Mode(true);
 });
+
+
+var translations = {
+  HEADLINE: 'XSS possible!',
+  PARAGRAPH: '<span style=\'color:green\'>Hello</span> {{username}}!',
+};
+ 
+var app = angular.module('myApp_escape_params', ['pascalprecht.translate']);
+ 
+app.config(['$translateProvider', function ($translateProvider) {
+  $translateProvider.translations('en', translations);
+  $translateProvider.preferredLanguage('en');
+  // Enable escaping of HTML
+  $translateProvider.useSanitizeValueStrategy('escapeParameters');
+}]);
+ 
+app.controller('Ctrl', ['$scope', function ($scope) {
+ 
+}]);
 
 /**
  * ==============================

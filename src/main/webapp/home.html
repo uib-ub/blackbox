@@ -10,6 +10,8 @@
     <link rel="shortcut icon" type="image/x-icon" href="http://marcus.uib.no/img/favicon.ico"/>
     <link rel="stylesheet" href="js/lib/typeahead/css/main.css"/>
     <link rel="stylesheet" href="js/lib/typeahead/css/normalize.min.css"/>
+    
+    
 
     <link rel="stylesheet" href="//code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css"/>
     <link href="http://fonts.googleapis.com/css?family=IM+Fell+Great+Primer" rel="stylesheet" type="text/css">
@@ -25,7 +27,13 @@
             <i class="sidebar icon"></i>
         </a>
         <div class="header brand item">
-            <a href="/" target="_self">MARCUS ADMIN</a>
+            <a href="/" target="_self">{{ 'HEADLINE' | translate }}</a>
+        </div>
+        <div>
+            <div ng-controller="Ctrl">
+  <button ng-click="changeLanguage('de')" translate="BUTTON_TEXT_DE"></button>
+  <button ng-click="changeLanguage('en')" translate="BUTTON_TEXT_EN"></button>
+</div>
         </div>
     </div>
 </div>
@@ -378,6 +386,7 @@
     <script src="js/checklist-directive.js"></script>
     <script src="js/jquery-datepicker.js"></script>
     <script src="js/ui-bootstrap-1.1.2.min.js"></script>
+    <script src="js/lib/angular-translate/angular-translate.min.js"></script>
 
     <!--Constants for this particular page-->
     <script>
