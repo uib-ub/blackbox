@@ -37,8 +37,6 @@ app.config(function($locationProvider) {
  **/
 app.config(['$translateProvider', function ($translateProvider) {
   // add translation tables
-  //$translateProvider.translations('no', translationsNO);
-  //$translateProvider.translations('en', translationsEN);
   $translateProvider.useStaticFilesLoader({
     prefix: 'locales/locale-',
     suffix: '.json'
