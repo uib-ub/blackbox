@@ -72,10 +72,8 @@
     <div class="ui stackable container secondary menu">
         <!-- Nullstill søk -->
         <div class="item"><a href="/blackbox" target="_self" title="Nullstill søk"> <i class="delete circle icon"></i>Nullstill</a></div>
-
         <!--Søketips-->
         <div class="item"><a class="search-help-button" accesskey="h" title="Søketips"><i class="help icon"></i>Søketips</a></div>
-
         <!--Search help info-->
         <div class="search-help ui basic modal">
             <i class="close icon"></i>
@@ -139,13 +137,12 @@
         </div>
     </div>
     <div class="ui container">
-        
         <!--Display labels for selected filters-->
          <div ng-cloak ng-if="selectedFilters.length > 0" class="selected-filter">
              <strong>Utvalgte filtre:</strong>
              <span ng-repeat="filter in selectedFilters">
                   <a class="ui purple label relaxed"
-                       ng-click="removeFilter(selectedFilters, filter)">
+                       ng-click="removeFilter(filter)">
                        {{filter.split('#')[1]}} <i class='delete icon'></i>
                   </a>
              </span>
@@ -187,9 +184,10 @@
             </div>
         </div>
     </div-->
-
+        <!-- Loading gif -->
         <img class="blackbox-loading" src="img/loading.gif" alt="Loading ...">
         <!---uib-progressbar ng-show="show_loading" class="ui loading segment"  value="dynamic" style="height:100px;"></uib-progressbar-->
+        <!-- Search results -->
         <div ng-cloak ng-show="ready" style="margin-top:30px;" class="ui container">
             <div class="search-results ui equal width grid">
                 <!--Starting with facets-->
@@ -252,6 +250,7 @@
                                 </label>
                             </div>
                         </div>
+
                         <!-- Collection facets-->
                         <h3>Samling</h3>
                         <hr>
@@ -269,6 +268,7 @@
                         </div>
                     </div>
                 </div>
+
                 <!-- No hits-->
                 <div ng-if="ready && results.hits.total === 0" style="margin-top:50px;" class="no-hits ui column">
                     <div class="ui text ui center aligned">
@@ -279,6 +279,7 @@
                         </div>
                     </div>
                 </div>
+
                 <!-- Internal error on executing search-->
                 <div ng-if="ready && results.error" style="margin-top:50px;" class="no-hits ui column">
                     <div class='ui large red message'>
@@ -298,6 +299,7 @@
                     </div>
                 </div>
 
+                <!--Search hits -->
                 <div ng-show="results.hits.total > 0" class="ng-cloak column">
                     <div class="search-hits">
                         <div class="results-hit ng-cloak">
@@ -347,6 +349,7 @@
                                 </div>
                             </div>
 
+                            <!--Bottom pagination -->
                             <uib-pagination class="pagination" total-items="results.hits.total"
                                             items-per-page="pageSize"
                                             ng-model="currentPage"

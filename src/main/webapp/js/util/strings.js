@@ -52,4 +52,21 @@ function stripEmptyString(s) {
     return s;
 }
 
+/**
+ * Remove item in a given array
+ * @param arr
+ * @param item
+ */
+function remove(arr, item) {
+    if(angular.isArray(arr)) {
+        for (var i = arr.length; i--;){
+            if (arr[i] === item) {
+                arr.splice(i, 1);
+                break;
+            }
+        }
+    }
+    return arr;
+}
+
 

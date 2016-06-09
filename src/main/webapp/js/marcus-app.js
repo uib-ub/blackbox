@@ -78,17 +78,12 @@ app.controller('freeTextSearch', function ($scope, $http, $location, mySetting) 
     };
 
     /**
-     * Remove element (filter) of an array
+     * Remove a filter in the list of selected filters
      */
-    $scope.removeFilter = function(arr, item) {
-        if (angular.isArray(arr)) {
-            for (var i = arr.length; i--;){
-                if (arr[i] === item) {
-                    arr.splice(i, 1);
-                    break;
-                }
-            }
-            //After removing a filter, execute search.
+    $scope.removeFilter = function(item) {
+        if(item){
+            remove($scope.selectedFilters, item);
+            //After removing, execute search
             $scope.search();
         }
     }
