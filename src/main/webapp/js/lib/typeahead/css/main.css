@@ -116,3 +116,8 @@
 .Typeahead-selectable + .Typeahead-selectable {
     border-top: 1px solid #ccd6dd;
 }
+
+.tt-highlight {
+    color: red;
+    font-weight: bolder; 
+}
