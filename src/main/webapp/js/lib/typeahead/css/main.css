@@ -88,7 +88,7 @@
 
 .Typeahead-menu {
     position: absolute;
-    top: 95%;
+    /**top: 95%;**/
     left: 2.5%;
     z-index: 100;
     display: none;
@@ -120,4 +120,83 @@
 .tt-highlight {
     color: red;
     font-weight: bolder; 
+}
+
+/* ProfileCard */
+
+.ProfileCard {
+    position: relative;
+    padding: 5px;
+}
+
+.ProfileCard-avatar {
+    position: absolute;
+    top: 8px;
+    left: 8px;
+    width: 52px;
+    height: 52px;
+    border: 2px solid #ccd6dd;
+    border-radius: 5px;
+}
+
+.ProfileCard:hover .ProfileCard-avatar {
+    border-color: #f5f8fa;
+}
+
+.ProfileCard-details {
+    min-height: 60px;
+    padding-left: 60px;
+}
+
+.ProfileCard-realName,
+.ProfileCard-screenName {
+    display: inline-block;
+}
+
+.ProfileCard-realName {
+    font-weight: 700;
+}
+
+.ProfileCard-screenName {
+    color: #8899a6;
+}
+
+.ProfileCard-description {
+    margin-top: 5px;
+    font-size: 14px;
+    line-height: 18px;
+}
+
+.ProfileCard-stats {
+    float: right;
+    text-align: right;
+}
+
+.ProfileCard-stat {
+    display: inline-block;
+    font-size: 12px;
+    line-height: 16px;
+    text-transform: uppercase;
+}
+
+.ProfileCard-stat-label {
+    color: #8899a6;
+    font-weight: 500;
+}
+
+.ProfileCard-stat + .ProfileCard-stat {
+    margin-left: 5px;
+}
+
+.ProfileCard:hover,
+.ProfileCard.is-active {
+    color: #fff;
+    background: #55acee;
+}
+
+.ProfileCard:hover .ProfileCard-screenName,
+.ProfileCard:hover .ProfileCard-stat-label,
+.ProfileCard.is-active .ProfileCard-screenName,
+.ProfileCard.is-active .ProfileCard-stat-label {
+    color: #fff;
 }

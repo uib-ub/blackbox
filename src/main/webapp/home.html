@@ -64,7 +64,6 @@
                         <div class="ui column" style="margin-top: 20px !important;">
                             <strong class="ui item" ng-bind-template="{{results.hits.total | number}}" style="font-size:2em; margin-left: 20px;"></strong> &ensp;<span style="font-size: 1.8em">{{ 'HITS' | translate }}</span>
                         </div>
-
                     </div>
                 </form>
             <!--span style="color:grey;"> Trykk på Enter for å søke</span-->
@@ -143,15 +142,15 @@
     <div class="ui stackable container secondary menu">
          
         <!-- Cataloguer facet as a dropdown-->
-        <div class="ui item">
+        <div class="ui item three wide column">
             <div class="ui multiple search normal selection dropdown">
                 <i class="dropdown icon"></i>
                 <div class="default text">Katalogisator</div>
                 <div class="menu">
                         <div ng-repeat="bucket in results['aggregations']['cataloguer.exact']['buckets']">
-                            <div class="item item-checkbox">
-                                <input type="checkbox" checklist-model="selectedFilters" checklist-value="getCheckedValue('cataloguer.exact', bucket.key)" ng-click="search()">
-                                <label>{{bucket.key}} <span style="color:grey"> ({{bucket.doc_count | number}})</span></label>
+                            <div class="checkbox ui item">
+                                <input id="cataloguer-{{bucket.key}}" type="checkbox" checklist-model="selectedFilters" checklist-value="getCheckedValue('cataloguer.exact', bucket.key)" ng-click="search()">
+                                <label for="cataloguer-{{bucket.key}}">{{bucket.key}} <span style="color:grey"> ({{bucket.doc_count | number}})</span></label>
                             </div>
                         </div>
                 </div>
@@ -164,27 +163,26 @@
                 <div class="default text">Options</div>
                 <div class="menu">
                         <div ng-repeat="bucket in results['aggregations']['hasZoom']['buckets']">
-                            <div class="item item-checkbox">
-                                <input type="checkbox" checklist-model="selectedFilters" checklist-value="getCheckedValue('hasZoom', bucket.key)" ng-click="search()">
-                                <label>{{bucket.key}} <span style="color:grey"> ({{bucket.doc_count | number}})</span></label>
+                            <div class="checkbox ui item">
+                                <input id="hasZoom-{{bucket.key}}" type="checkbox" checklist-model="selectedFilters" checklist-value="getCheckedValue('hasZoom', bucket.key)" ng-click="search()">
+                                <label for="hasZoom-{{bucket.key}}">{{bucket.key}} <span style="color:grey"> ({{bucket.doc_count | number}})</span></label>
                             </div>
                         </div>
                         <div ng-repeat="bucket in results['aggregations']['isDigitized']['buckets']">
-                            <div class="item item-checkbox">
-                                <input type="checkbox" checklist-model="selectedFilters" checklist-value="getCheckedValue('isDigitized', bucket.key)" ng-click="search()">
-                                <label>{{bucket.key}} <span style="color:grey"> ({{bucket.doc_count | number}})</span></label>
+                            <div class="checkbox ui item">
+                                <input id="isDigitized-{{bucket.key}}" type="checkbox" checklist-model="selectedFilters" checklist-value="getCheckedValue('isDigitized', bucket.key)" ng-click="search()">
+                                <label for="isDigitized-{{bucket.key}}">{{bucket.key}} <span style="color:grey"> ({{bucket.doc_count | number}})</span></label>
                             </div>
                         </div>
                         <div ng-repeat="bucket in results['aggregations']['isCatalogued']['buckets']">
-                            <div class="item item-checkbox">
-                                <input type="checkbox" checklist-model="selectedFilters" checklist-value="getCheckedValue('isCatalogued', bucket.key)" ng-click="search()">
-                                <label>{{bucket.key}} <span style="color:grey"> ({{bucket.doc_count | number}})</span></label>
+                            <div class="checkbox ui item">
+                                <input id="isCatalogued-{{bucket.key}}" type="checkbox" checklist-model="selectedFilters" checklist-value="getCheckedValue('isCatalogued', bucket.key)" ng-click="search()">
+                                <label for="isCatalogued-{{bucket.key}}">{{bucket.key}} <span style="color:grey"> ({{bucket.doc_count | number}})</span></label>
                             </div>
                         </div>
                 </div>
             </div>
         </div>
-
         <!-- Category facets -->
         <!--div style="width: 100%;" class="ui relaxed horizontal list">
             <div class="item">
@@ -205,26 +203,24 @@
                 <label for="isCatalogued-{{bucket.key}}">{{bucket.key}} <span style="color:grey"> ({{bucket.doc_count | number}})</span></label>
             </div>
             </div>
-        </div>
-    </div-->
+          </div>
+       </div-->
+    </div>
         <!-- Loading gif -->
         <img class="blackbox-loading" src="img/loading.gif" alt="Loading ...">
         <!---uib-progressbar ng-show="show_loading" class="ui loading segment"  value="dynamic" style="height:100px;"></uib-progressbar-->
-        
-    </div>
     
-    <div class="ui container">
-        <!--Display labels for selected filters-->
-         <div ng-cloak ng-if="selectedFilters.length > 0" class="selected-filter">
-             <strong>Utvalgte filtre:</strong>
-             <span ng-repeat="filter in selectedFilters">
-                  <a class="ui purple label relaxed"
-                       ng-click="removeFilter(filter)">
-                       {{filter.split('#')[1]}} <i class='delete icon'></i>
-                  </a>
-             </span>
-         </div>
-    </div>
+        <div class="ui container">
+            <!--Display labels for selected filters-->
+             <div ng-cloak ng-if="selectedFilters.length > 0" class="selected-filter">
+                 <strong>Utvalgte filtre:</strong>
+                 <span ng-repeat="filter in selectedFilters">
+                      <a class="ui purple label relaxed" ng-click="removeFilter(filter)">
+                           {{filter.split('#')[1]}} <i class='delete icon'></i>
+                      </a>
+                 </span>
+             </div>
+        </div>
         <!-- Search results -->
         <div ng-cloak ng-show="ready" style="margin-top:30px;" class="ui container">
             <div class="search-results ui equal width grid">
@@ -260,8 +256,6 @@
                             </div>
                         </div>
 
-
-
                         <!-- Topic facets-->
                         <h3>Emne</h3>
                         <hr>
@@ -295,7 +289,6 @@
                         </div>
                     </div>
                 </div>
-               
 
                 <!-- No hits-->
                 <div ng-if="ready && results.hits.total === 0" style="margin-top:50px;" class="no-hits ui column">
