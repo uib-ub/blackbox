@@ -142,7 +142,7 @@
     <div class="ui stackable container secondary menu">
          
         <!-- Cataloguer facet as a dropdown-->
-        <div class="ui item three wide column">
+        <div class="ui item">
             <div class="ui multiple search normal selection dropdown">
                 <i class="dropdown icon"></i>
                 <div class="default text">Katalogisator</div>
@@ -183,28 +183,6 @@
                 </div>
             </div>
         </div>
-        <!-- Category facets -->
-        <!--div style="width: 100%;" class="ui relaxed horizontal list">
-            <div class="item">
-            <div class="ui checkbox" ng-repeat="bucket in results['aggregations']['hasZoom']['buckets']">
-                <input id="hasZoom-{{bucket.key}}" type="checkbox" checklist-model="selectedFilters" checklist-value="getCheckedValue('hasZoom', bucket.key)" ng-click="search()">
-                <label for="hasZoom-{{bucket.key}}"> {{bucket.key}} <span style="color:grey"> ({{bucket.doc_count | number}})</span></label>
-            </div>
-            </div>
-            <div class="item">
-            <div class="ui checkbox" ng-repeat="bucket in results['aggregations']['isDigitized']['buckets']">
-                <input id="isDigitized-{{bucket.key}}" type="checkbox" checklist-model="selectedFilters" checklist-value="getCheckedValue('isDigitized', bucket.key)" ng-click="search()">
-                <label for="isDigitized-{{bucket.key}}">{{bucket.key}} <span style="color:grey"> ({{bucket.doc_count | number}})</span></label>
-            </div>
-            </div>
-            <div class="item">
-            <div class="ui checkbox" ng-repeat="bucket in results['aggregations']['isCatalogued']['buckets']">
-                <input id="isCatalogued-{{bucket.key}}" type="checkbox" checklist-model="selectedFilters" checklist-value="getCheckedValue('isCatalogued', bucket.key)" ng-click="search()">
-                <label for="isCatalogued-{{bucket.key}}">{{bucket.key}} <span style="color:grey"> ({{bucket.doc_count | number}})</span></label>
-            </div>
-            </div>
-          </div>
-       </div-->
     </div>
         <!-- Loading gif -->
         <img class="blackbox-loading" src="img/loading.gif" alt="Loading ...">
