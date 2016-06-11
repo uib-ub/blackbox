@@ -45,6 +45,8 @@ app.config(['$translateProvider', function ($translateProvider) {
   $translateProvider.fallbackLanguage('en');
   $translateProvider.useSanitizeValueStrategy('escape');
   $translateProvider.forceAsyncReload(true);
+  $translateProvider.useMessageFormatInterpolation();
+  $translateProvider.addInterpolation('$translateMessageFormatInterpolation');
 }]);
  
 app.controller('Ctrl', ['$translate', '$scope', function ($translate, $scope) {

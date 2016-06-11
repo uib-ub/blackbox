@@ -2,11 +2,18 @@
   "HEADLINE": "MARCUS ADMIN (en)",
   "SEARCH_INPUT": "Search Marcus",
   "RESET": "Reset",
-  "HITS": "hits",
+  "HITS": "{val, plural, 0{} one{One hit} other{# hits}}",
   "SEARCH_HELP": "help",
   "SORT_OPTIONS": "Sort by",
   "NUMBER_OF_HITS": "Hits per page",
+  "NO_HITS": "We did not find anything",
   "FILTER_TITLE": "Filters",
   "BUTTON_LANG_NO": "Norwegian",
-  "BUTTON_LANG_EN": "English"
+  "BUTTON_LANG_EN": "English",
+  "CATALOGUER_FILTER": "Cataloguer",
+  "STATUS_FILTER": "Status",
+  "CREATED_FILTER": "Created",
+  "TYPE_FILTER": "Type",
+  "CONCEPT_FILTER": "Subject",
+  "PART_OF_FILTER": "Collection"
 }
