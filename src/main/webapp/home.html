@@ -52,7 +52,8 @@
                                        ng-model="queryString"
                                        ng-keyup="($event.keyCode==13 || queryString==='')&&search()"
                                        placeholder="{{ 'SEARCH_INPUT' | translate}}"
-                                       autocomplete="off"/>
+                                       autocomplete="off"
+                                       autofocus/>
                                 <!--img class="Typeahead-spinner" src="js/lib/typeahead/img/spinner.gif" alt=""/-->
                                 <i ng-click="search()" class="search link icon"></i>
                                 <!-- <button class="Typeahead-search-icon" type="button" ng-click="search()">
