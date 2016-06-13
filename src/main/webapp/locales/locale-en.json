@@ -14,6 +14,13 @@
       "cataloguerFilter": "Cataloguer",
       "statusFilter": "Status"
   },
+  "searchHint":{
+      "andOr": "And/Or",
+      "not": "Not",
+      "truncation": "Truncation",
+      "fuzzy": "Fuzzy",
+      "fields": "Field search"
+  },
   "filters": {
       "heading": "Filter",
       "created": "Created",

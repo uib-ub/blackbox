@@ -14,6 +14,13 @@
       "cataloguerFilter": "Katalogisator",
       "statusFilter": "Status"
   },
+  "searchHint":{
+      "andOr": "Og/Eller",
+      "not": "Filtrere vekk",
+      "truncation": "Trunkering",
+      "fuzzy": "Fuzzy",
+      "fields": "Feltsøk"
+  },
   "filters": {
       "heading": "Filter",
       "created": "Skapt",
