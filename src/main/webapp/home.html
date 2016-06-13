@@ -68,18 +68,14 @@
                         </div>
                     </div>
                 </form>
-            <!--span style="color:grey;"> Trykk på Enter for å søke</span-->
-            <!--span class="links links-examples">
-                <a href="">Advasert søk</a>
-            </span-->
-        </div>
+          </div>
     </div>
     <div class="ui stackable container secondary menu">
-        <!-- Nullstill søk -->
-        <div class="item"><a href="/blackbox" target="_self" title="Nullstill søk"><i class="delete circle icon"></i> <span translate="searchContainer.reset"></span></a></div>
-        <!--Søketips-->
+        <!-- Reset search -->
+        <div class="item"><a href="/blackbox" target="_self" title="Nullstill søk"> <i class="delete circle icon"></i> <span translate="searchContainer.reset"></span></a></div>
+        <!-- Search tips -->
         <div class="item"><a class="search-help-button" accesskey="72" title="Søketips"><i class="help icon"></i> <span translate="searchContainer.help"></span></a></div>
-        <!--Search help info-->
+        <!-- Search help info -->
         <div class="search-help ui basic modal">
             <i class="close icon"></i>
             <div class="header">Søketips</div>
@@ -118,7 +114,7 @@
             </div>
         </div>
 
-        <!-- Sortering -->
+        <!-- Sorting -->
         <div class="item">
             <select id="sort_by" class="ui dropdown"
                     ng-model="sortBy"
@@ -128,7 +124,7 @@
             </select>
         </div>
 
-        <!-- Antall treff -->
+        <!-- Items per page -->
         <div class="item">
             <select id="docPerPage" class="ui dropdown" ng-model="pageSize" ng-change="search()">
                 <option value="">{{ 'searchContainer.hitsPerPage' | translate }}</option>
@@ -144,7 +140,7 @@
     <div class="ui stackable container secondary menu">
          
         <!-- Cataloguer facet as a dropdown-->
-        <div class="ui item three wide column">
+        <div class="ui item">
             <div class="ui multiple search normal selection dropdown">
                 <i class="dropdown icon"></i>
                 <div class="default text" translate="searchContainer.cataloguerFilter"></div>
@@ -152,13 +148,14 @@
                         <div ng-repeat="bucket in results['aggregations']['cataloguer.exact']['buckets']">
                             <div class="checkbox ui item">
                                 <input id="cataloguer-{{bucket.key}}" type="checkbox" checklist-model="selectedFilters" checklist-value="getCheckedValue('cataloguer.exact', bucket.key)" ng-click="search()">
-                                <label for="cataloguer-{{bucket.key}}">{{bucket.key}} <span style="color:grey"> ({{bucket.doc_count | number}})</span></label>
+                                <label for="cataloguer-{{bucket.key}}">{{bucket.key}} <span class="doc-count"> ({{bucket.doc_count | number}})</span></label>
                             </div>
                         </div>
                 </div>
             </div>
         </div>
-        
+
+        <!--Facet status as a dropdown -->
         <div class="ui item">
             <div class="ui multiple search normal selection dropdown">
                 <i class="dropdown icon"></i>
@@ -167,46 +164,24 @@
                         <div ng-repeat="bucket in results['aggregations']['hasZoom']['buckets']">
                             <div class="checkbox ui item">
                                 <input id="hasZoom-{{bucket.key}}" type="checkbox" checklist-model="selectedFilters" checklist-value="getCheckedValue('hasZoom', bucket.key)" ng-click="search()">
-                                <label for="hasZoom-{{bucket.key}}">{{bucket.key}} <span style="color:grey"> ({{bucket.doc_count | number}})</span></label>
+                                <label for="hasZoom-{{bucket.key}}">{{bucket.key}} <span class="doc-count"> ({{bucket.doc_count | number}})</span></label>
                             </div>
                         </div>
                         <div ng-repeat="bucket in results['aggregations']['isDigitized']['buckets']">
                             <div class="checkbox ui item">
                                 <input id="isDigitized-{{bucket.key}}" type="checkbox" checklist-model="selectedFilters" checklist-value="getCheckedValue('isDigitized', bucket.key)" ng-click="search()">
-                                <label for="isDigitized-{{bucket.key}}">{{bucket.key}} <span style="color:grey"> ({{bucket.doc_count | number}})</span></label>
+                                <label for="isDigitized-{{bucket.key}}">{{bucket.key}} <span class="doc-count"> ({{bucket.doc_count | number}})</span></label>
                             </div>
                         </div>
                         <div ng-repeat="bucket in results['aggregations']['isCatalogued']['buckets']">
                             <div class="checkbox ui item">
                                 <input id="isCatalogued-{{bucket.key}}" type="checkbox" checklist-model="selectedFilters" checklist-value="getCheckedValue('isCatalogued', bucket.key)" ng-click="search()">
-                                <label for="isCatalogued-{{bucket.key}}">{{bucket.key}} <span style="color:grey"> ({{bucket.doc_count | number}})</span></label>
+                                <label for="isCatalogued-{{bucket.key}}">{{bucket.key}} <span class="doc-count"> ({{bucket.doc_count | number}})</span></label>
                             </div>
                         </div>
                 </div>
             </div>
         </div>
-        <!-- Category facets -->
-        <!--div style="width: 100%;" class="ui relaxed horizontal list">
-            <div class="item">
-            <div class="ui checkbox" ng-repeat="bucket in results['aggregations']['hasZoom']['buckets']">
-                <input id="hasZoom-{{bucket.key}}" type="checkbox" checklist-model="selectedFilters" checklist-value="getCheckedValue('hasZoom', bucket.key)" ng-click="search()">
-                <label for="hasZoom-{{bucket.key}}"> {{bucket.key}} <span style="color:grey"> ({{bucket.doc_count | number}})</span></label>
-            </div>
-            </div>
-            <div class="item">
-            <div class="ui checkbox" ng-repeat="bucket in results['aggregations']['isDigitized']['buckets']">
-                <input id="isDigitized-{{bucket.key}}" type="checkbox" checklist-model="selectedFilters" checklist-value="getCheckedValue('isDigitized', bucket.key)" ng-click="search()">
-                <label for="isDigitized-{{bucket.key}}">{{bucket.key}} <span style="color:grey"> ({{bucket.doc_count | number}})</span></label>
-            </div>
-            </div>
-            <div class="item">
-            <div class="ui checkbox" ng-repeat="bucket in results['aggregations']['isCatalogued']['buckets']">
-                <input id="isCatalogued-{{bucket.key}}" type="checkbox" checklist-model="selectedFilters" checklist-value="getCheckedValue('isCatalogued', bucket.key)" ng-click="search()">
-                <label for="isCatalogued-{{bucket.key}}">{{bucket.key}} <span style="color:grey"> ({{bucket.doc_count | number}})</span></label>
-            </div>
-            </div>
-          </div>
-       </div-->
     </div>
         <!-- Loading gif -->
         <img class="blackbox-loading" src="img/loading.gif" alt="Loading ...">
@@ -253,7 +228,7 @@
                                        checklist-value="getCheckedValue('type.exact', bucket.key)" ng-click="search()">
                                 <label for="type-{{bucket.key}}" ng-class="{'disabled': bucket.doc_count == 0}">
                                     {{bucket.key}}
-                                    <span ng-if="bucket.doc_count > 0" style="color:grey"> ({{bucket.doc_count | number}})</span>
+                                    <span ng-if="bucket.doc_count > 0" class="doc-count"> ({{bucket.doc_count | number}})</span>
                                 </label>
                             </div>
                         </div>
@@ -268,7 +243,7 @@
                                        checklist-value="getCheckedValue('subject.exact', bucket.key)"
                                        ng-click="search()">
                                 <label for="subject-{{bucket.key}}" class="row-fluid"> {{bucket.key}}
-                                    <span style="color:gray">({{bucket.doc_count | number}})</span>
+                                    <span class="doc-count">({{bucket.doc_count | number}})</span>
                                 </label>
                             </div>
                         </div>
@@ -284,7 +259,7 @@
                                        ng-click="search()">
                                 <label for="isPartOf-{{bucket.key}}" ng-class="{'disabled': bucket.doc_count == 0}">
                                     {{bucket.key}}
-                                    <span ng-if="bucket.doc_count > 0" style="color:grey"> ({{bucket.doc_count | number}})</span>
+                                    <span ng-if="bucket.doc_count > 0" class="doc-count"> ({{bucket.doc_count | number}})</span>
                                 </label>
 
                             </div>

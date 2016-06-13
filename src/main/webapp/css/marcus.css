@@ -6,9 +6,9 @@ html, body {
     /**background: #f2f9ff repeat scroll 0 0; /**Tyeahead**/
     /**background: #e7e9ec repeat scroll 0 0;/**Linked In**/
     /**background: #e9eff5 repeat scroll 0 0;/**FINN**/
-    background-color: #f5f8fa;/**Twitter**/
+    /**background-color: #f5f8fa;/**Twitter**/
     /**background: #f8f8f8 repeat scroll 0 0;**/
-    /**background: whitesmoke;**/
+    background: whitesmoke repeat scroll 0 0;
 }
 
 #search-header {
@@ -37,6 +37,12 @@ html, body {
 .search-results .search-hits {
     background: white;
     border: 1px solid #e1e8ed;
+}
+
+.doc-count {
+    color: #9ba8b1;
+    font-size: 85%;
+    font-style: italic;
 }
 
 .datePicker {
