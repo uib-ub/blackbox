@@ -16,10 +16,20 @@
     <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.1.8/semantic.min.css"/>
     <link rel="stylesheet" href="css/marcus.css"/>
     <link rel="stylesheet" href="css/bootstrap-pagination.css"/>
+    
+    <style>
+        .pusher { margin-right: 260px !important; }
+        .pusher.pusher-padding { margin-right: 0 !important; }
+        .ui.items>.item .extra button { margin-right: 0; }
+        .ui.items>.item .extra ul { padding-left: 0; }
+        .ui.items>.item .extra ul li { margin: 0 8px 8px 12px;}
+        .ui.items>.item .meta span.right, .ui.items>.item .image span.right { float: right; }
+        .ui.items>.item .image .ui.attached.label { position: relative; }
+    </style>
 </head>
 <body>
 <!-- Sticky header-->
-<div class="ui fixed inverted menu hidden-sm hidden-xs">
+<!--<div class="ui fixed inverted menu hidden-sm hidden-xs">
     <div class="top-header ui container fluid header-wrap">
         <a id="show-menu" class="item">
             <i class="sidebar icon"></i>
@@ -34,7 +44,15 @@
             </div>
         </div>
     </div>
-</div>
+</div>-->
+
+<div include-replace ng-include="'partials/header.html'"></div>
+
+<div class="ui bottom attached segment">
+    <div include-replace ng-include="'partials/sidebar.html'"></div>
+
+                               
+    <div class="pusher">
 <!-- Controller starts here-->
 <div ng-controller="freeTextSearch" id="searchController">
     <div id="search-header" class="ui container">
@@ -364,6 +382,7 @@
             </div>
         </div>
     </div>
+</div>
 
     <!--JavaScript files -->
     <script src="js/lib/typeahead/js/handlebars.js"></script>
@@ -379,6 +398,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.1.8/semantic.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/angular-i18n/1.5.5/angular-locale_nb-no.min.js"></script>
     <script src="js/marcus-app.js"></script>
+    <script src="js/marcus-ux.js"></script>
     <script src="js/util/strings.js"></script>
     <script src="js/checklist-directive.js"></script>
     <script src="js/jquery-datepicker.js"></script>
