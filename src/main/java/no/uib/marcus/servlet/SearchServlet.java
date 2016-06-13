@@ -122,9 +122,6 @@ public class SearchServlet extends HttpServlet {
                     .endObject();
             logger.info(builder.string());
         }
-        catch (org.elasticsearch.action.search.SearchPhaseExecutionException ex){
-
-        }
     }
 
     /**
