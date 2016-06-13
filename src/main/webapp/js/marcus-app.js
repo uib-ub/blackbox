@@ -132,7 +132,7 @@ app.controller('freeTextSearch', function ($scope, $http, $location, mySetting) 
             sort: stripEmptyString($scope.sortBy)
         };
 
-        //Merge or extend default params with URL params. If exists, URL params take precedence.
+        //Merge or extend default params with URL params. If parameter exists, URL param take precedence.
         var extendedParams = $.extend(defaultParams, urlParams);
         //Clear URL params once after use.
         urlParams = {};
@@ -145,9 +145,10 @@ app.controller('freeTextSearch', function ($scope, $http, $location, mySetting) 
             //Parameters that have been used to generate response.
             var responseParams = response.config.params;
                 if(response.data) {
-                    //Initialize the view by copying response params to scope variables.
-                    //By updating scope variables, the view will automatically be updated,
-                    //thanks to angular two-way binding.
+                    /*
+                      Initialize the view by copying response params to scope variables.
+                      By updating scope variables, the view is automatically updated, thanks to angular two-way binding.
+                    */
                     if ("q" in responseParams) {
                         $scope.queryString = responseParams.q;
                     }
@@ -193,9 +194,21 @@ app.controller('freeTextSearch', function ($scope, $http, $location, mySetting) 
                     $("#searchController").append(alert);
                     console.log("No response from Elasticsearch. The server is unreachable");
                 }
-                //Set params to the browser history
+                //Set the response params to the browser history
                 $location.search(responseParams);
-               //Hide loading
+
+               //Hide "index" from the browser URL params, "index" is unlikely to change.
+                $location.search('index', null);
+
+                //Hide "from" from the URL params, if it has a default value (0).
+                if(responseParams.from === 0)
+                    $location.search('from', null);
+
+                //Hide "size" from the URL params, if it has a default value (10).
+                if(responseParams.size === 10)
+                    $location.search('size', null);
+
+            //Hide loading
                $(".blackbox-loading").hide();
             });
     };
