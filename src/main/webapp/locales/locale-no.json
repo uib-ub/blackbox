@@ -1,8 +1,8 @@
 {
   "header": {
       "brand": "MARCUS ADMIN",
-      "buttonLangNo": "Norsk",
-      "buttonLangEn": "Engelsk"
+      "buttonLangNo": "<i class=\"no flag\"></i> Norsk",
+      "buttonLangEn": "<i class=\"gb flag\"></i> Engelsk"
   },
   "searchContainer": {
       "placeholder": "Søk i Marcus",

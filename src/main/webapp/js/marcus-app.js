@@ -43,7 +43,7 @@ app.config(['$translateProvider', function ($translateProvider) {
   });
   $translateProvider.preferredLanguage('no');
   $translateProvider.fallbackLanguage('en');
-  $translateProvider.useSanitizeValueStrategy('escape');
+  $translateProvider.useSanitizeValueStrategy('sanitizeParameters');
   $translateProvider.forceAsyncReload(true);
   $translateProvider.useMessageFormatInterpolation();
   $translateProvider.addInterpolation('$translateMessageFormatInterpolation');
