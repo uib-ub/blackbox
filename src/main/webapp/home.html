@@ -25,12 +25,12 @@
             <i class="sidebar icon"></i>
         </a>
         <div class="header brand item">
-            <a href="/" target="_self" translate="HEADLINE"></a>
+            <a href="/" target="_self" translate="header.brand"></a>
         </div>
         <div class="item">
             <div ng-controller="Ctrl">
-                <button class="ui button" ng-click="changeLanguage('no')" translate="BUTTON_LANG_NO"></button>
-                <button class="ui button" ng-click="changeLanguage('en')" translate="BUTTON_LANG_EN"></button>
+                <button class="ui button" ng-click="changeLanguage('no')" translate="header.buttonLangNo"></button>
+                <button class="ui button" ng-click="changeLanguage('en')" translate="header.buttonLangEn"></button>
             </div>
         </div>
     </div>
@@ -45,15 +45,15 @@
                         <div class="u-posRelative ui twelve wide column">
                             <div class="ui massive icon fluid input">
                                 <input class="Typeahead-hint" type="text" tabindex="-1" readonly="readonly"/>
+                                
+                                <!-- TODO: fix possible to use 'translate translate-attr-placeholder="SEARCH_INPUT"' instead of translate filter? Use of directives breaks search. -->
                                 <input class="Typeahead-input"
                                        id="search-input" 
                                        type="text" 
                                        name="q" 
                                        ng-model="queryString"
                                        ng-keyup="($event.keyCode==13 || queryString==='')&&search()"
-                                       placeholder="Søk"
-                                       translate 
-                                       translate-attr-placeholder="SEARCH_INPUT" 
+                                       placeholder="{{ 'searchContainer.placeholder' | translate }}"
                                        autocomplete="off"/>
                                 <!--img class="Typeahead-spinner" src="js/lib/typeahead/img/spinner.gif" alt=""/-->
                                 <i ng-click="search()" class="search link icon"></i>
@@ -64,7 +64,7 @@
                             <div class="Typeahead-menu"></div>
                         </div>
                         <div class="ui column" style="margin-top: 20px !important;">
-                            <strong style="font-size: 1.8em" translate="HITS" translate-values="{val: results.hits.total }"></strong>
+                            <strong style="font-size: 1.8em" translate="searchContainer.hitsFeedback" translate-values="{val: results.hits.total }"></strong>
                         </div>
                     </div>
                 </form>
@@ -76,47 +76,47 @@
     </div>
     <div class="ui stackable container secondary menu">
         <!-- Nullstill søk -->
-        <div class="item"><a href="/blackbox" target="_self" title="Nullstill søk"><i class="delete circle icon"></i> <span translate="RESET"></span></a></div>
+        <div class="item"><a href="/blackbox" target="_self" title="Nullstill søk"><i class="delete circle icon"></i> <span translate="searchContainer.reset"></span></a></div>
         <!--Søketips-->
-        <div class="item"><a class="search-help-button" accesskey="h" title="Søketips"><i class="help icon"></i> <span translate="SEARCH_HELP"></span></a></div>
+        <div class="item"><a class="search-help-button" accesskey="72" title="Søketips"><i class="help icon"></i> <span translate="searchContainer.help"></span></a></div>
         <!--Search help info-->
         <div class="search-help ui basic modal">
             <i class="close icon"></i>
-                <div class="header">Søketips</div>
-                    <div class="image content">
-                        <div class="image"><i class="search icon"></i></div>
-                            <div class="description">
-                                <h4>OG/ELLER</h4>
-                                <ul>
-                                    <li>Søket bruker i utgangspunktet "OG" mellom alle søketermer</li>
-                                    <li>Bruk "OR" for å endre dette, for eksempel "vaksdal OR voss"</li>
-                                </ul>
-                                <h4>Negasjon</h4>
-                                <ul>
-                                    <li>Bruk minustegn foran søketermer du ikke vil ha med i trefflisten, for eksempel "husarbeid"
-                                    </li>
-                                </ul>
-                                <h4>Trunkering</h4>
-                                <ul>
-                                    <li>Bruke * til å trunkere, for eksempel "*strand" eller "knu*sen"</li>
-                                </ul>
-                                <h4>Søk direkte i ett felt</h4>
-                                <ul>
-                                    <li>Du kan søke i tittel, beskrivelse og mange andre felt ved å bruke <i>felt:</i></li>
-                                    <li>subject:hund</li>
-                                    <li>spatial:bergen</li>
-                                    <li>description:fisketur</li>
-                                    <li>maker:knudsen</li>
-                                    <li>isPartOf:holm [OBS! Må være skrevet slik, såkalt camelCase]</li>
-                                </ul>
-                                <h4>Fuzzy</h4>
-                                <ul>
-                                    <li>Du kan søke med en fuzzy-søketerm ved å sette ~ etter ordet du søker etter.</li>
-                                    <li>”Fana~” -> gir treff på Tana, Anax, Fina, etc.</li>
-                                </ul>
-                            </div>
-                        </div>
-                   </div>
+            <div class="header">Søketips</div>
+            <div class="image content">
+                <div class="image"><i class="search icon"></i></div>
+                <div class="description">
+                    <h4>OG/ELLER</h4>
+                    <ul>
+                        <li>Søket bruker i utgangspunktet "OG" mellom alle søketermer</li>
+                        <li>Bruk "OR" for å endre dette, for eksempel "vaksdal OR voss"</li>
+                    </ul>
+                    <h4>Negasjon</h4>
+                    <ul>
+                        <li>Bruk minustegn foran søketermer du ikke vil ha med i trefflisten, for eksempel "husarbeid"
+                        </li>
+                    </ul>
+                    <h4>Trunkering</h4>
+                    <ul>
+                        <li>Bruke * til å trunkere, for eksempel "*strand" eller "knu*sen"</li>
+                    </ul>
+                    <h4>Søk direkte i ett felt</h4>
+                    <ul>
+                        <li>Du kan søke i tittel, beskrivelse og mange andre felt ved å bruke <i>felt:</i></li>
+                        <li>subject:hund</li>
+                        <li>spatial:bergen</li>
+                        <li>description:fisketur</li>
+                        <li>maker:knudsen</li>
+                        <li>isPartOf:holm [OBS! Må være skrevet slik, såkalt camelCase]</li>
+                    </ul>
+                    <h4>Fuzzy</h4>
+                    <ul>
+                        <li>Du kan søke med en fuzzy-søketerm ved å sette ~ etter ordet du søker etter.</li>
+                        <li>”Fana~” -> gir treff på Tana, Anax, Fina, etc.</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
 
         <!-- Sortering -->
         <div class="item">
@@ -124,14 +124,14 @@
                     ng-model="sortBy"
                     ng-change="search()"
                     ng-options="item.value as item.displayName for item in sortOptions">
-                <option value="">{{ 'SORT_OPTIONS' | translate }}</option>
+                <option value="">{{ 'searchContainer.sortOptions' | translate }}</option>
             </select>
         </div>
 
         <!-- Antall treff -->
         <div class="item">
             <select id="docPerPage" class="ui dropdown" ng-model="pageSize" ng-change="search()">
-                <option value="">{{ 'NUMBER_OF_HITS' | translate }}</option>
+                <option value="">{{ 'searchContainer.hitsPerPage' | translate }}</option>
                 <option value="10">10</option>
                 <option value="20">20</option>
                 <option value="30">30</option>
@@ -147,7 +147,7 @@
         <div class="ui item three wide column">
             <div class="ui multiple search normal selection dropdown">
                 <i class="dropdown icon"></i>
-                <div class="default text" translate="CATALOGUER_FILTER"></div>
+                <div class="default text" translate="searchContainer.cataloguerFilter"></div>
                 <div class="menu">
                         <div ng-repeat="bucket in results['aggregations']['cataloguer.exact']['buckets']">
                             <div class="checkbox ui item">
@@ -162,7 +162,7 @@
         <div class="ui item">
             <div class="ui multiple search normal selection dropdown">
                 <i class="dropdown icon"></i>
-                <div class="default text" translate="STATUS_FILTER"></div>
+                <div class="default text" translate="searchContainer.statusFilter"></div>
                 <div class="menu">
                         <div ng-repeat="bucket in results['aggregations']['hasZoom']['buckets']">
                             <div class="checkbox ui item">
@@ -229,8 +229,8 @@
                 <!--Starting with facets-->
                 <div ng-cloak class="ng-cloak four wide column computer only">
                     <div class="facets">
-                        <h2 translate="FILTER_TITLE"></h2>
-                        <h3 translate="CREATED_FILTER"></h3>
+                        <h2 translate="filters.heading"></h2>
+                        <h3 translate="filters.created"></h3>
                         <hr>
                         <div class="datePicker ui input">
                             <input type="text" id="from_date" class="datePicker" ng-model="fromDate"
@@ -244,7 +244,7 @@
                         <br/><br/>
 
                         <!-- Document types facets-->
-                        <h3 translate="TYPE_FILTER"></h3>
+                        <h3 translate="filters.type"></h3>
                         <hr>
                         <div class="ui list">
                             <div class="ui checkbox item"
@@ -259,7 +259,7 @@
                         </div>
 
                         <!-- Topic facets-->
-                        <h3 translate="CONCEPT_FILTER"></h3>
+                        <h3 translate="filter.concept"></h3>
                         <hr>
                         <div class="ui list">
                             <div class="ui checkbox item"
@@ -274,7 +274,7 @@
                         </div>
 
                         <!-- Collection facets-->
-                        <h3 translate="PART_OF_FILTER"></h3>
+                        <h3 translate="filters.partOf"></h3>
                         <hr>
                         <div class="ui list">
                             <div class="ui checkbox item"
@@ -296,7 +296,7 @@
                 <div ng-if="ready && results.hits.total === 0" style="margin-top:50px;" class="no-hits ui column">
                     <div class="ui text ui center aligned">
                         <div class="ui large blue message">
-                            <h1 style="font-size: 2em;" class="ui icon header" translate="NO_HITS"></h1>
+                            <h1 style="font-size: 2em;" class="ui icon header" translate="results.emptyResult"></h1>
                         </div>
                     </div>
                 </div>

@@ -1,19 +1,27 @@
 {
-  "HEADLINE": "MARCUS ADMIN",
-  "SEARCH_INPUT": "Søk i Marcus",
-  "RESET": "Nullstill",
-  "HITS": "{val, plural, 0{} one{Ett treff} other{# treff}}",
-  "SEARCH_HELP": "Søketips",
-  "SORT_OPTIONS": "Sortér på",
-  "NUMBER_OF_HITS": "Antall treff",
-  "NO_HITS": "Vi fant ingen treff på søket ditt",
-  "FILTER_TITLE": "Filter",
-  "BUTTON_LANG_NO": "Norsk",
-  "BUTTON_LANG_EN": "Engelsk",
-  "CATALOGUER_FILTER": "Katalogisator",
-  "STATUS_FILTER": "Status",
-  "CREATED_FILTER": "Skapt",
-  "TYPE_FILTER": "Dokumenttype",
-  "CONCEPT_FILTER": "Emne",
-  "PART_OF_FILTER": "Samling"
+  "header": {
+      "brand": "MARCUS ADMIN",
+      "buttonLangNo": "Norsk",
+      "buttonLangEn": "Engelsk"
+  },
+  "searchContainer": {
+      "placeholder": "Søk i Marcus",
+      "reset": "Nullstill",
+      "hitsFeedback": "{val, plural, 0{} one{Ett treff} other{# treff}}",
+      "help": "Søketips",
+      "sortOptions": "Sortér på",
+      "hitsPerPage": "Antall treff",
+      "cataloguerFilter": "Katalogisator",
+      "statusFilter": "Status"
+  },
+  "filters": {
+      "heading": "Filter",
+      "created": "Skapt",
+      "type": "Dokumenttype",
+      "concept": "Emne",
+      "partOf": "Samling"
+  },
+  "results": {
+      "emptyResult": "Vi fant ingen treff på søket ditt"
+  }
 }
