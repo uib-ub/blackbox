@@ -66,10 +66,10 @@ app.controller('freeTextSearch', function ($scope, $http, $location, mySetting) 
     $scope.isString = angular.isString;
     $scope.sortOptions = [
         {value: '', displayName: 'Mest relevant'},
-        {value: 'identifier:asc', displayName: 'Signatur asc'},
-        {value: 'identifier:desc', displayName: 'Signatur desc'},
-        {value: 'available:asc', displayName: 'Tilgjeng. asc'},
-        {value: 'available:desc', displayName: 'Tilgjeng. desc'}
+        {value: 'identifier:asc', displayName: 'Signatur ASC'},
+        {value: 'identifier:desc', displayName: 'Signatur DES'},
+        {value: 'available:asc', displayName: 'Tilgjengeliggort ASC'},
+        {value: 'available:desc', displayName: 'Tilgjengeliggort DES'}
     ];
     //Get parameters from the search URL
     var urlParams = $location.search();

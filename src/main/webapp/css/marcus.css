@@ -39,6 +39,12 @@ html, body {
     border: 1px solid #e1e8ed;
 }
 
+.doc-count {
+    color: #9ba8b1;
+    font-size: 85%;
+    font-style: italic;
+}
+
 .datePicker {
     width: 70%;
     /**margin-left: 4px;**/
