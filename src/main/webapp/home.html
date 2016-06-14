@@ -139,16 +139,17 @@
             </div>
 
             <!-- Items per page -->
-            <div class="ui dropdown column">
-                <span translate="searchContainer.hitsPerPage"></span>
+            <div class="ui dropdown selection column">
+                <span class="default text" translate="searchContainer.hitsPerPage"></span>
                 <i class="dropdown icon"></i>
+                <input type="hidden" name="hitsPerPage">
                 <select id="docPerPage" ng-model="pageSize" ng-change="search()">
-                    <option value="10">10</option>
-                    <option value="20">20</option>
-                    <option value="30">30</option>
-                    <option value="100">100</option>
-                    <option value="200">200</option>
-                    <option value="250">250</option>
+                    <option class="item" value="10">10</option>
+                    <option class="item" value="20">20</option>
+                    <option class="item" value="30">30</option>
+                    <option class="item" value="100">100</option>
+                    <option class="item" value="200">200</option>
+                    <option class="item" value="250">250</option>
                 </select>
             </div>
             </div>
@@ -175,7 +176,7 @@
             <div class="ui column">
                 <div class="ui multiple search normal selection dropdown">
                     <i class="dropdown icon"></i>
-                    <div class="default text" translate="searchContainer.statusFilter"></div>
+                    <span class="default text" translate="searchContainer.statusFilter"></span>
                     <div class="menu">
                             <div ng-repeat="bucket in results['aggregations']['hasZoom']['buckets']">
                                 <div class="checkbox ui item">
@@ -226,7 +227,10 @@
                             <!-- Document types facets-->
                             <h3 translate="filters.type"></h3>
                             <hr>
-                            <div class="ui list">
+                            <div class="ui multiple search fluid dropdown">
+                                <span class="default text" translate="filters.type"></span><i class="dropdown icon"></i>
+                            <input type="hidden" name="type">
+                            <div class="menu">
                                 <div class="ui checkbox item"
                                      ng-repeat="bucket in results['aggregations']['type.exact']['buckets']">
                                     <input id="type-{{bucket.key}}" type="checkbox" checklist-model="selectedFilters"
@@ -236,6 +240,7 @@
                                         <span ng-if="bucket.doc_count > 0" class="doc-count"> ({{bucket.doc_count | number}})</span>
                                     </label>
                                 </div>
+                            </div>
                             </div>
 
                             <!-- Topic facets-->
