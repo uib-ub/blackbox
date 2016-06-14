@@ -69,7 +69,7 @@
       <a class="item" target="blank" href="https://prosjekt.uib.no/projects/pw0/issues/new">
         <i class="fa fa-plus-square icon"></i> <strong>Opprett feilmelding</strong>
       </a>
-      <a class="item" href="http://oppdrag.ub.uib.no">
+      <a class="item" href="https://oppdrag.ub.uib.no">
         <i class="fa fa-bullseye fa-fw"></i> Oppdrag
       </a>
       <a class="item" href="https://ubblod.disqus.com/admin/moderate/">
@@ -140,34 +140,6 @@ $('.menu-popup')
       hide: 800
     }
   })
-;
-
-// Sidebar
-$('.ui.sidebar')
-  .sidebar({
-    context: $('.bottom.segment'),
-    dimPage: false,
-    closable: false
-  })
-  .sidebar('attach events', '#show-menu')
-;
-$('#show-menu').click(function() {
-  $('.pusher').toggleClass('pusher-padding');
-});
-
-// Tab for digitalresources
-$('.dr-tab .item')
-  .tab()
-;
-
-// Download dropdown
-$('.download-dropdown')
-  .dropdown()
-;
-
-// Download dropdown
-$('.ui.dropdown')
-  .dropdown()
 ;
 </script>
     

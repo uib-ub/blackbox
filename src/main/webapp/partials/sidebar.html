@@ -44,3 +44,18 @@
     </div>        
   </div>
 </div>
+
+<script>
+    // Sidebar
+    $('.ui.sidebar')
+      .sidebar({
+        context: $('.bottom.segment'),
+        dimPage: false,
+        closable: false
+      })
+      .sidebar('attach events', '#show-menu')
+    ;
+    $('#show-menu').click(function() {
+      $('.pusher').toggleClass('pusher-padding');
+    });
+</script>
