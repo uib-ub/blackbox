@@ -28,23 +28,6 @@
     </style>
 </head>
 <body>
-<!-- Sticky header-->
-<!--<div class="ui fixed inverted menu hidden-sm hidden-xs">
-    <div class="top-header ui container fluid header-wrap">
-        <a id="show-menu" class="item">
-            <i class="sidebar icon"></i>
-        </a>
-        <div class="header brand item">
-            <a href="/" target="_self" translate="header.brand"></a>
-        </div>
-        <div class="item">
-            <div ng-controller="Ctrl">
-                <button class="ui button" ng-click="changeLanguage('no')" translate="header.buttonLangNo"></button>
-                <button class="ui button" ng-click="changeLanguage('en')" translate="header.buttonLangEn"></button>
-            </div>
-        </div>
-    </div>
-</div>-->
 
 <div include-replace ng-include="'partials/header.html'"></div>
 
@@ -53,336 +36,376 @@
 
                                
     <div class="pusher">
-<!-- Controller starts here-->
-<div ng-controller="freeTextSearch" id="searchController">
-    <div id="search-header" class="ui container">
-        <div class="masthead">
-                <form action="" method="GET">
-                    <!--input type="hidden" name="index" value="admin"-->
-                    <div class="Typeahead ui equal width grid">
-                        <div class="u-posRelative ui twelve wide column">
-                            <div class="ui massive icon fluid input">
-                                <input class="Typeahead-hint" type="text" tabindex="-1" readonly="readonly"/>
-                                
-                                <!-- TODO: fix possible to use 'translate translate-attr-placeholder="SEARCH_INPUT"' instead of translate filter? Use of directives breaks search. -->
-                                <input class="Typeahead-input"
-                                       id="search-input" 
-                                       type="text" 
-                                       name="q" 
-                                       ng-model="queryString"
-                                       ng-keyup="($event.keyCode==13 || queryString==='')&&search()"
-                                       placeholder="{{ 'searchContainer.placeholder' | translate }}"
-                                       autocomplete="off"/>
-                                <!--img class="Typeahead-spinner" src="js/lib/typeahead/img/spinner.gif" alt=""/-->
-                                <i ng-click="search()" class="search link icon"></i>
-                                <!-- <button class="Typeahead-search-icon" type="button" ng-click="search()">
-                                    <i class="search icon"></i>
-                                </button> -->
+    <!-- Controller starts here-->
+    <div ng-controller="freeTextSearch" id="searchController">
+        <div id="search-header" class="ui container">
+            <div class="masthead">
+                    
+                        <!--input type="hidden" name="index" value="admin"-->
+                        <div class="Typeahead ui equal width grid">
+                            <div class="u-posRelative ui twelve wide column">
+                                <div class="ui massive icon fluid input">
+                                    <input class="Typeahead-hint" type="text" tabindex="-1" readonly="readonly"/>
+                                    
+                                    <!-- TODO: fix possible to use 'translate translate-attr-placeholder="SEARCH_INPUT"' instead of translate filter? Use of directives breaks search. -->
+                                    <input class="Typeahead-input"
+                                           id="search-input" 
+                                           type="text" 
+                                           name="q" 
+                                           ng-model="queryString"
+                                           ng-keyup="($event.keyCode==13 || queryString==='')&&search()"
+                                           placeholder="{{ 'searchContainer.placeholder' | translate }}"
+                                           autocomplete="off"/>
+                                    <!--img class="Typeahead-spinner" src="js/lib/typeahead/img/spinner.gif" alt=""/-->
+                                    <i ng-click="search()" class="search link icon"></i>
+                                    <!-- <button class="Typeahead-search-icon" type="button" ng-click="search()">
+                                        <i class="search icon"></i>
+                                    </button> -->
+                                </div>
+                                <div class="Typeahead-menu"></div>
                             </div>
-                            <div class="Typeahead-menu"></div>
+                            <div class="ui column" style="margin-top: 20px !important;">
+                                <strong style="font-size: 1.8em" translate="searchContainer.hitsFeedback" translate-values="{val: results.hits.total }"></strong>
+                            </div>
                         </div>
-                        <div class="ui column" style="margin-top: 20px !important;">
-                            <strong style="font-size: 1.8em" translate="searchContainer.hitsFeedback" translate-values="{val: results.hits.total }"></strong>
-                        </div>
-                    </div>
-                </form>
-          </div>
-    </div>
-    <div class="ui stackable container secondary menu">
-        <!-- Reset search -->
-        <div class="item"><a href="/blackbox" target="_self" title="Nullstill søk"> <i class="delete circle icon"></i> <span translate="searchContainer.reset"></span></a></div>
-        <!-- Search tips -->
-        <div class="item"><a class="search-help-button" accesskey="72" title="Søketips"><i class="help icon"></i> <span translate="searchContainer.help"></span></a></div>
-        <!-- Search help info -->
-        <div class="search-help ui basic modal">
-            <i class="close icon"></i>
-            <div class="header">Søketips</div>
-            <div class="image content">
-                <div class="image"><i class="search icon"></i></div>
-                <div class="description">
-                    <h4 translate="searchHint.andOr"></h4>
-                    <ul>
-                        <li>Søket bruker i utgangspunktet "OG" mellom alle søketermer</li>
-                        <li>Bruk "OR" for å endre dette, for eksempel "vaksdal OR voss"</li>
-                    </ul>
-                    <h4 translate="searchHint.not"></h4>
-                    <ul>
-                        <li>Bruk minustegn foran søketermer du ikke vil ha med i trefflisten, for eksempel "husarbeid"
-                        </li>
-                    </ul>
-                    <h4 translate="searchHint.truncation"></h4>
-                    <ul>
-                        <li>Bruke * til å trunkere, for eksempel "*strand" eller "knu*sen"</li>
-                    </ul>
-                    <h4 translate="searchHint.fields"></h4>
-                    <ul>
-                        <li>Du kan søke i tittel, beskrivelse og mange andre felt ved å bruke <i>felt:</i></li>
-                        <li>subject:hund</li>
-                        <li>spatial:bergen</li>
-                        <li>description:fisketur</li>
-                        <li>maker:knudsen</li>
-                        <li>isPartOf:holm [OBS! Må være skrevet slik, såkalt camelCase]</li>
-                    </ul>
-                    <h4 translate="searchHint.fuzzy"></h4>
-                    <ul>
-                        <li>Du kan søke med en fuzzy-søketerm ved å sette ~ etter ordet du søker etter.</li>
-                        <li>”Fana~” -> gir treff på Tana, Anax, Fina, etc.</li>
-                    </ul>
-                </div>
-            </div>
+                    
+              </div>
+
+                <!--Display labels for selected filters-->
+                 <div ng-cloak ng-if="selectedFilters.length > 0" class="selected-filter">
+                     <strong>Aktive filter: </strong>
+                     <span ng-repeat="filter in selectedFilters">
+                          <a class="ui purple label relaxed" ng-click="removeFilter(filter)">
+                               {{filter.split('#')[1]}} <i class='delete icon'></i>
+                          </a>
+                     </span>
+                 </div>
+            
         </div>
-
-        <!-- Sorting -->
-        <div class="item">
-            <select id="sort_by" class="ui dropdown"
-                    ng-model="sortBy"
-                    ng-change="search()"
-                    ng-options="item.value as item.displayName for item in sortOptions">
-                <option value="">{{ 'searchContainer.sortOptions' | translate }}</option>
-            </select>
-        </div>
-
-        <!-- Items per page -->
-        <div class="item">
-            <select id="docPerPage" class="ui dropdown" ng-model="pageSize" ng-change="search()">
-                <option value="">{{ 'searchContainer.hitsPerPage' | translate }}</option>
-                <option value="10">10</option>
-                <option value="20">20</option>
-                <option value="30">30</option>
-                <option value="100">100</option>
-                <option value="200">200</option>
-                <option value="250">250</option>
-            </select>
-        </div>
-    </div>
-    <div class="ui stackable container secondary menu">
-         
-        <!-- Cataloguer facet as a dropdown-->
-        <div class="ui item">
-            <div class="ui multiple search normal selection dropdown">
-                <i class="dropdown icon"></i>
-                <div class="default text" translate="searchContainer.cataloguerFilter"></div>
-                <div class="menu">
-                        <div ng-repeat="bucket in results['aggregations']['cataloguer.exact']['buckets']">
-                            <div class="checkbox ui item">
-                                <input id="cataloguer-{{bucket.key}}" type="checkbox" checklist-model="selectedFilters" checklist-value="getCheckedValue('cataloguer.exact', bucket.key)" ng-click="search()">
-                                <label for="cataloguer-{{bucket.key}}">{{bucket.key}} <span class="doc-count"> ({{bucket.doc_count | number}})</span></label>
-                            </div>
-                        </div>
-                </div>
-            </div>
-        </div>
-
-        <!--Facet status as a dropdown -->
-        <div class="ui item">
-            <div class="ui multiple search normal selection dropdown">
-                <i class="dropdown icon"></i>
-                <div class="default text" translate="searchContainer.statusFilter"></div>
-                <div class="menu">
-                        <div ng-repeat="bucket in results['aggregations']['hasZoom']['buckets']">
-                            <div class="checkbox ui item">
-                                <input id="hasZoom-{{bucket.key}}" type="checkbox" checklist-model="selectedFilters" checklist-value="getCheckedValue('hasZoom', bucket.key)" ng-click="search()">
-                                <label for="hasZoom-{{bucket.key}}">{{bucket.key}} <span class="doc-count"> ({{bucket.doc_count | number}})</span></label>
-                            </div>
-                        </div>
-                        <div ng-repeat="bucket in results['aggregations']['isDigitized']['buckets']">
-                            <div class="checkbox ui item">
-                                <input id="isDigitized-{{bucket.key}}" type="checkbox" checklist-model="selectedFilters" checklist-value="getCheckedValue('isDigitized', bucket.key)" ng-click="search()">
-                                <label for="isDigitized-{{bucket.key}}">{{bucket.key}} <span class="doc-count"> ({{bucket.doc_count | number}})</span></label>
-                            </div>
-                        </div>
-                        <div ng-repeat="bucket in results['aggregations']['isCatalogued']['buckets']">
-                            <div class="checkbox ui item">
-                                <input id="isCatalogued-{{bucket.key}}" type="checkbox" checklist-model="selectedFilters" checklist-value="getCheckedValue('isCatalogued', bucket.key)" ng-click="search()">
-                                <label for="isCatalogued-{{bucket.key}}">{{bucket.key}} <span class="doc-count"> ({{bucket.doc_count | number}})</span></label>
-                            </div>
-                        </div>
-                </div>
-            </div>
-        </div>
-    </div>
-        <!-- Loading gif -->
-        <img class="blackbox-loading" src="img/loading.gif" alt="Loading ...">
-        <!---uib-progressbar ng-show="show_loading" class="ui loading segment"  value="dynamic" style="height:100px;"></uib-progressbar-->
-    
-        <div class="ui container">
-            <!--Display labels for selected filters-->
-             <div ng-cloak ng-if="selectedFilters.length > 0" class="selected-filter">
-                 <strong>Utvalgte filtre:</strong>
-                 <span ng-repeat="filter in selectedFilters">
-                      <a class="ui purple label relaxed" ng-click="removeFilter(filter)">
-                           {{filter.split('#')[1]}} <i class='delete icon'></i>
-                      </a>
-                 </span>
-             </div>
-        </div>
-        <!-- Search results -->
-        <div ng-cloak ng-show="ready" style="margin-top:30px;" class="ui container">
-            <div class="search-results ui equal width grid">
-                <!--Starting with facets-->
-                <div ng-cloak class="ng-cloak four wide column computer only">
-                    <div class="facets">
-                        <h2 translate="filters.heading"></h2>
-                        <h3 translate="filters.created"></h3>
-                        <hr>
-                        <div class="datePicker ui input">
-                            <input type="text" id="from_date" class="datePicker" ng-model="fromDate"
-                                   ng-change="search()" placeholder="FRA" title="Fra dato">
-                        </div>
-                        <br/><br/>
-                        <div class="datePicker ui input">
-                            <input type="text" id="to_date" class="datePicker" ng-model="toDate" ng-change="search()"
-                                   placeholder="TIL" title="Til dato">
-                        </div>
-                        <br/><br/>
-
-                        <!-- Document types facets-->
-                        <h3 translate="filters.type"></h3>
-                        <hr>
-                        <div class="ui list">
-                            <div class="ui checkbox item"
-                                 ng-repeat="bucket in results['aggregations']['type.exact']['buckets']">
-                                <input id="type-{{bucket.key}}" type="checkbox" checklist-model="selectedFilters"
-                                       checklist-value="getCheckedValue('type.exact', bucket.key)" ng-click="search()">
-                                <label for="type-{{bucket.key}}" ng-class="{'disabled': bucket.doc_count == 0}">
-                                    {{bucket.key}}
-                                    <span ng-if="bucket.doc_count > 0" class="doc-count"> ({{bucket.doc_count | number}})</span>
-                                </label>
-                            </div>
-                        </div>
-
-                        <!-- Topic facets-->
-                        <h3 translate="filter.concept"></h3>
-                        <hr>
-                        <div class="ui list">
-                            <div class="ui checkbox item"
-                                 ng-repeat="bucket in results['aggregations']['subject.exact']['buckets']">
-                                <input id="subject-{{bucket.key}}" type="checkbox" checklist-model="selectedFilters"
-                                       checklist-value="getCheckedValue('subject.exact', bucket.key)"
-                                       ng-click="search()">
-                                <label for="subject-{{bucket.key}}" class="row-fluid"> {{bucket.key}}
-                                    <span class="doc-count">({{bucket.doc_count | number}})</span>
-                                </label>
-                            </div>
-                        </div>
-
-                        <!-- Collection facets-->
-                        <h3 translate="filters.partOf"></h3>
-                        <hr>
-                        <div class="ui list">
-                            <div class="ui checkbox item"
-                                 ng-repeat="bucket in results['aggregations']['isPartOf.exact']['buckets']">
-                                <input id="isPartOf-{{bucket.key}}" type="checkbox" checklist-model="selectedFilters"
-                                       checklist-value="getCheckedValue('isPartOf.exact', bucket.key)"
-                                       ng-click="search()">
-                                <label for="isPartOf-{{bucket.key}}" ng-class="{'disabled': bucket.doc_count == 0}">
-                                    {{bucket.key}}
-                                    <span ng-if="bucket.doc_count > 0" class="doc-count"> ({{bucket.doc_count | number}})</span>
-                                </label>
-
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- No hits-->
-                <div ng-if="ready && results.hits.total === 0" style="margin-top:50px;" class="no-hits ui column">
-                    <div class="ui text ui center aligned">
-                        <div class="ui large blue message">
-                            <h1 style="font-size: 2em;" class="ui icon header" translate="results.emptyResult"></h1>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Internal error on executing search-->
-                <div ng-if="ready && results.error" style="margin-top:50px;" class="no-hits ui column">
-                    <div class='ui large red message'>
-                        <div class="header">
-                            Søket ditt kan ikke utføres
-                        </div>
-                        <ul class="list">
-                            <li>
-                                Det inneholder sannsynligvis disse spesialtegnene: <code> + - = && || > < ! ( ) { } [ ]
-                                ^ " ~ * ? : \ / </code>
+        <div class="ui container eight column grid">
+            <div class="row">
+            <!-- Reset search -->
+            <div class="column"><a href="/blackbox" target="_self" title="Nullstill søk"> <i class="delete circle icon"></i> <span translate="searchContainer.reset"></span></a></div>
+            <!-- Search tips -->
+            <div class="column"><a class="search-help-button" accesskey="72" title="Søketips"><i class="help icon"></i> <span translate="searchContainer.help"></span></a></div>
+            <!-- Search help info -->
+            <div class="search-help ui basic modal">
+                <i class="close icon"></i>
+                <div class="header">Søketips</div>
+                <div class="image content">
+                    <div class="image"><i class="search icon"></i></div>
+                    <div class="description">
+                        <h4 translate="searchHint.andOr"></h4>
+                        <ul>
+                            <li>Søket bruker i utgangspunktet "OG" mellom alle søketermer</li>
+                            <li>Bruk "OR" for å endre dette, for eksempel "vaksdal OR voss"</li>
+                        </ul>
+                        <h4 translate="searchHint.not"></h4>
+                        <ul>
+                            <li>Bruk minustegn foran søketermer du ikke vil ha med i trefflisten, for eksempel "husarbeid"
                             </li>
-                            <li>
-                                Hvis man skulle søke etter reserverte tegn, må man ha omvendt skråstrek foran.
-                                F.eks søk etter <code> D/S </code> må gjøres som <code> D\/S </code>
-                            </li>
+                        </ul>
+                        <h4 translate="searchHint.truncation"></h4>
+                        <ul>
+                            <li>Bruke * til å trunkere, for eksempel "*strand" eller "knu*sen"</li>
+                        </ul>
+                        <h4 translate="searchHint.fields"></h4>
+                        <ul>
+                            <li>Du kan søke i tittel, beskrivelse og mange andre felt ved å bruke <i>felt:</i></li>
+                            <li>subject:hund</li>
+                            <li>spatial:bergen</li>
+                            <li>description:fisketur</li>
+                            <li>maker:knudsen</li>
+                            <li>isPartOf:holm [OBS! Må være skrevet slik, såkalt camelCase]</li>
+                        </ul>
+                        <h4 translate="searchHint.fuzzy"></h4>
+                        <ul>
+                            <li>Du kan søke med en fuzzy-søketerm ved å sette ~ etter ordet du søker etter.</li>
+                            <li>”Fana~” -> gir treff på Tana, Anax, Fina, etc.</li>
                         </ul>
                     </div>
                 </div>
+            </div>
 
-                <!--Search hits -->
-                <div ng-show="results.hits.total > 0" class="ng-cloak column">
-                    <div class="search-hits">
-                        <div class="results-hit ng-cloak">
-                            <!--Pagination-->
-                            <uib-pagination class="pagination hidden-sm hidden-xs" total-items="results.hits.total"
-                                            items-per-page="pageSize"
-                                            ng-model="currentPage"
-                                            ng-change="search()"
-                                            next-text="Neste"
-                                            previous-text="Forrige"
-                                            max-size="4"
-                                            first-text="&laquo;"
-                                            last-text="&raquo;"
-                                            boundary-links="true"
-                                            force-ellipses="true">
-                            </uib-pagination>
+            <!-- Sorting -->
+            <div class="ui dropdown column">
+                <span translate="searchContainer.sortOptions"></span>
+                <i class="dropdown icon"></i>
+                <select id="sort_by"
+                        ng-model="sortBy"
+                        ng-change="search()"
+                        ng-options="item.value as item.displayName for item in sortOptions">
+                </select>
+            </div>
 
-                            <!-- Search results view--->
-                            <div class="ui container">
-                                <div class="ui divided items">
-                                    <div ng-repeat="doc in results.hits.hits track by $index" class="ui item">
-                                        <div include-replace ng-if='doc._type == "document"'
-                                             ng-include="'partials/document-hits.html'"
-                                             style="page-break-inside: avoid;" class="ui item fade"></div>
-                                        <div include-replace
-                                             ng-if='doc._source.type == "Person" || doc._source.type == "Organisajon" || doc._source.type == "Firma" || doc._source.type == "Katalogisator"'
-                                             ng-include="'partials/agent-hits.html'" style="page-break-inside: avoid;"
-                                             class="ui item"></div>
-                                        <div include-replace
-                                             ng-if='doc._source.type == "Monument" || doc._source.type == "Objekt"'
-                                             ng-include="'partials/object-hits.html'" style="page-break-inside: avoid;"
-                                             class="ui item fade"></div>
-                                        <div include-replace
-                                             ng-if='doc._source.type == "Skip" || doc._source.type == "Emne" || doc._source.type == "Fartøy"'
-                                             ng-include="'partials/vessel-hits.html'" style="page-break-inside: avoid;"
-                                             class="ui item fade"></div>
-                                        <div include-replace ng-if='doc._source.type == "Akkvisisjon"'
-                                             ng-include="'partials/acquisition-hits.html'"
-                                             style="page-break-inside: avoid;" class="ui item fade"></div>
-                                        <div include-replace ng-if='doc._source.type == "Arbeidsliste"'
-                                             ng-include="'partials/object-hits.html'" style="page-break-inside: avoid;"
-                                             class="ui item fade"></div>
-                                        <div include-replace ng-if='doc._source.type == "Aggregering"'
-                                             ng-include="'partials/aggregation-hits.html'"
-                                             style="page-break-inside: avoid;" class="ui item fade"></div>
-                                    </div>
+            <!-- Items per page -->
+            <div class="ui dropdown column">
+                <span translate="searchContainer.hitsPerPage"></span>
+                <i class="dropdown icon"></i>
+                <select id="docPerPage" ng-model="pageSize" ng-change="search()">
+                    <option value="10">10</option>
+                    <option value="20">20</option>
+                    <option value="30">30</option>
+                    <option value="100">100</option>
+                    <option value="200">200</option>
+                    <option value="250">250</option>
+                </select>
+            </div>
+            </div>
+        </div>
+
+        <div class="ui container four column grid">
+            <!-- Cataloguer facet as a dropdown-->
+            <div class="ui column">
+                <div class="ui multiple search normal selection dropdown">
+                    <i class="dropdown icon"></i>
+                    <div class="default text" translate="searchContainer.cataloguerFilter"></div>
+                    <div class="menu">
+                            <div ng-repeat="bucket in results['aggregations']['cataloguer.exact']['buckets']">
+                                <div class="checkbox ui item">
+                                    <input id="cataloguer-{{bucket.key}}" type="checkbox" checklist-model="selectedFilters" checklist-value="getCheckedValue('cataloguer.exact', bucket.key)" ng-click="search()">
+                                    <label for="cataloguer-{{bucket.key}}">{{bucket.key}} <span class="doc-count"> ({{bucket.doc_count | number}})</span></label>
+                                </div>
+                            </div>
+                    </div>
+                </div>
+            </div>
+
+            <!--Facet status as a dropdown -->
+            <div class="ui column">
+                <div class="ui multiple search normal selection dropdown">
+                    <i class="dropdown icon"></i>
+                    <div class="default text" translate="searchContainer.statusFilter"></div>
+                    <div class="menu">
+                            <div ng-repeat="bucket in results['aggregations']['hasZoom']['buckets']">
+                                <div class="checkbox ui item">
+                                    <input id="hasZoom-{{bucket.key}}" type="checkbox" checklist-model="selectedFilters" checklist-value="getCheckedValue('hasZoom', bucket.key)" ng-click="search()">
+                                    <label for="hasZoom-{{bucket.key}}">{{bucket.key}} <span class="doc-count"> ({{bucket.doc_count | number}})</span></label>
+                                </div>
+                            </div>
+                            <div ng-repeat="bucket in results['aggregations']['isDigitized']['buckets']">
+                                <div class="checkbox ui item">
+                                    <input id="isDigitized-{{bucket.key}}" type="checkbox" checklist-model="selectedFilters" checklist-value="getCheckedValue('isDigitized', bucket.key)" ng-click="search()">
+                                    <label for="isDigitized-{{bucket.key}}">{{bucket.key}} <span class="doc-count"> ({{bucket.doc_count | number}})</span></label>
+                                </div>
+                            </div>
+                            <div ng-repeat="bucket in results['aggregations']['isCatalogued']['buckets']">
+                                <div class="checkbox ui item">
+                                    <input id="isCatalogued-{{bucket.key}}" type="checkbox" checklist-model="selectedFilters" checklist-value="getCheckedValue('isCatalogued', bucket.key)" ng-click="search()">
+                                    <label for="isCatalogued-{{bucket.key}}">{{bucket.key}} <span class="doc-count"> ({{bucket.doc_count | number}})</span></label>
+                                </div>
+                            </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+            <!-- Loading gif -->
+            <img class="blackbox-loading" src="img/loading.gif" alt="Loading ...">
+            <!---uib-progressbar ng-show="show_loading" class="ui loading segment"  value="dynamic" style="height:100px;"></uib-progressbar-->
+        
+            <!-- Search results -->
+            <div ng-cloak ng-show="ready" style="margin-top:30px;" class="ui container">
+                <div class="search-results ui equal width grid">
+                    <!--Starting with facets-->
+                    <div ng-cloak class="ng-cloak four wide column computer only">
+                        <div class="facets">
+                            <h2 translate="filters.heading"></h2>
+                            <h3 translate="filters.created"></h3>
+                            <hr>
+                            <div class="datePicker ui input">
+                                <input type="text" id="from_date" class="datePicker" ng-model="fromDate"
+                                       ng-change="search()" placeholder="FRA" title="Fra dato">
+                            </div>
+                            <br/><br/>
+                            <div class="datePicker ui input">
+                                <input type="text" id="to_date" class="datePicker" ng-model="toDate" ng-change="search()"
+                                       placeholder="TIL" title="Til dato">
+                            </div>
+                            <br/><br/>
+
+                            <!-- Document types facets-->
+                            <h3 translate="filters.type"></h3>
+                            <hr>
+                            <div class="ui list">
+                                <div class="ui checkbox item"
+                                     ng-repeat="bucket in results['aggregations']['type.exact']['buckets']">
+                                    <input id="type-{{bucket.key}}" type="checkbox" checklist-model="selectedFilters"
+                                           checklist-value="getCheckedValue('type.exact', bucket.key)" ng-click="search()">
+                                    <label for="type-{{bucket.key}}" ng-class="{'disabled': bucket.doc_count == 0}">
+                                        {{bucket.key}}
+                                        <span ng-if="bucket.doc_count > 0" class="doc-count"> ({{bucket.doc_count | number}})</span>
+                                    </label>
                                 </div>
                             </div>
 
-                            <!--Bottom pagination -->
-                            <uib-pagination class="pagination" total-items="results.hits.total"
-                                            items-per-page="pageSize"
-                                            ng-model="currentPage"
-                                            ng-change="search()"
-                                            next-text="Neste"
-                                            previous-text="Forrige"
-                                            max-size="4"
-                                            first-text="&laquo;"
-                                            last-text="&raquo;"
-                                            boundary-links="true"
-                                            force-ellipses="true">
-                            </uib-pagination>
+                            <!-- Topic facets-->
+                            <h3 translate="filter.concept"></h3>
+                            <hr>
+                            <div class="ui list">
+                                <div class="ui checkbox item"
+                                     ng-repeat="bucket in results['aggregations']['subject.exact']['buckets']">
+                                    <input id="subject-{{bucket.key}}" type="checkbox" checklist-model="selectedFilters"
+                                           checklist-value="getCheckedValue('subject.exact', bucket.key)"
+                                           ng-click="search()">
+                                    <label for="subject-{{bucket.key}}" class="row-fluid"> {{bucket.key}}
+                                        <span class="doc-count">({{bucket.doc_count | number}})</span>
+                                    </label>
+                                </div>
+                            </div>
+
+                            <!-- Collection facets-->
+                            <h3 translate="filters.partOf"></h3>
+                            <hr>
+                            <div class="ui list">
+                                <div class="ui checkbox item"
+                                     ng-repeat="bucket in results['aggregations']['isPartOf.exact']['buckets']">
+                                    <input id="isPartOf-{{bucket.key}}" type="checkbox" checklist-model="selectedFilters"
+                                           checklist-value="getCheckedValue('isPartOf.exact', bucket.key)"
+                                           ng-click="search()">
+                                    <label for="isPartOf-{{bucket.key}}" ng-class="{'disabled': bucket.doc_count == 0}">
+                                        {{bucket.key}}
+                                        <span ng-if="bucket.doc_count > 0" class="doc-count"> ({{bucket.doc_count | number}})</span>
+                                    </label>
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- No hits-->
+                    <div ng-if="ready && results.hits.total === 0" style="margin-top:50px;" class="no-hits ui column">
+                        <div class="ui text ui center aligned">
+                            <div class="ui large blue message">
+                                <h1 style="font-size: 2em;" class="ui icon header" translate="results.emptyResult"></h1>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Internal error on executing search-->
+                    <div ng-if="ready && results.error" style="margin-top:50px;" class="no-hits ui column">
+                        <div class='ui large red message'>
+                            <div class="header">
+                                Søket ditt kan ikke utføres
+                            </div>
+                            <ul class="list">
+                                <li>
+                                    Det inneholder sannsynligvis disse spesialtegnene: <code> + - = && || > < ! ( ) { } [ ]
+                                    ^ " ~ * ? : \ / </code>
+                                </li>
+                                <li>
+                                    Hvis man skulle søke etter reserverte tegn, må man ha omvendt skråstrek foran.
+                                    F.eks søk etter <code> D/S </code> må gjøres som <code> D\/S </code>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <!--Search hits -->
+                    <div ng-show="results.hits.total > 0" class="ng-cloak column">
+                        <div class="ui container equal width grid hitlist-settings">
+                                    <div class="row">
+                                        <div class="column">
+                                            <!--Pagination-->
+                                <uib-pagination class="pagination hidden-sm hidden-xs" total-items="results.hits.total"
+                                                items-per-page="pageSize"
+                                                ng-model="currentPage"
+                                                ng-change="search()"
+                                                next-text="Neste"
+                                                previous-text="Forrige"
+                                                max-size="4"
+                                                first-text="&laquo;"
+                                                last-text="&raquo;"
+                                                boundary-links="true"
+                                                force-ellipses="true">
+                                </uib-pagination>
+                                        </div>
+                                        <!-- Sorting -->
+                                        <div class="three wide column">
+                                            <div class="ui dropdown ">
+                                                <span translate="searchContainer.sortOptions"></span>
+                                                <i class="dropdown icon"></i>
+                                                <select id="sort_by"
+                                                        ng-model="sortBy"
+                                                        ng-change="search()"
+                                                        ng-options="item.value as item.displayName for item in sortOptions">
+                                                </select>
+                                            </div>
+                                        </div>
+
+                                        <!-- Items per page -->
+                                        <div class="three wide column">
+                                            <div class="ui dropdown ">
+                                                <span translate="searchContainer.hitsPerPage"></span>
+                                                <i class="dropdown icon"></i>
+                                                <select id="docPerPage" ng-model="pageSize" ng-change="search()">
+                                                    <option value="10">10</option>
+                                                    <option value="20">20</option>
+                                                    <option value="30">30</option>
+                                                    <option value="100">100</option>
+                                                    <option value="200">200</option>
+                                                    <option value="250">250</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                        <div class="search-hits">
+                            <div class="results-hit ng-cloak">
+                                
+                                
+
+                                <!-- Search results view--->
+                                <div class="ui container">
+                                    <div class="ui divided items">
+                                        <div ng-repeat="doc in results.hits.hits track by $index" class="ui item">
+                                            <div include-replace ng-if='doc._type == "document"'
+                                                 ng-include="'partials/document-hits.html'"
+                                                 style="page-break-inside: avoid;" class="ui item fade"></div>
+                                            <div include-replace
+                                                 ng-if='doc._source.type == "Person" || doc._source.type == "Organisajon" || doc._source.type == "Firma" || doc._source.type == "Katalogisator"'
+                                                 ng-include="'partials/agent-hits.html'" style="page-break-inside: avoid;"
+                                                 class="ui item"></div>
+                                            <div include-replace
+                                                 ng-if='doc._source.type == "Monument" || doc._source.type == "Objekt"'
+                                                 ng-include="'partials/object-hits.html'" style="page-break-inside: avoid;"
+                                                 class="ui item fade"></div>
+                                            <div include-replace
+                                                 ng-if='doc._source.type == "Skip" || doc._source.type == "Emne" || doc._source.type == "Fartøy"'
+                                                 ng-include="'partials/vessel-hits.html'" style="page-break-inside: avoid;"
+                                                 class="ui item fade"></div>
+                                            <div include-replace ng-if='doc._source.type == "Akkvisisjon"'
+                                                 ng-include="'partials/acquisition-hits.html'"
+                                                 style="page-break-inside: avoid;" class="ui item fade"></div>
+                                            <div include-replace ng-if='doc._source.type == "Arbeidsliste"'
+                                                 ng-include="'partials/object-hits.html'" style="page-break-inside: avoid;"
+                                                 class="ui item fade"></div>
+                                            <div include-replace ng-if='doc._source.type == "Aggregering"'
+                                                 ng-include="'partials/aggregation-hits.html'"
+                                                 style="page-break-inside: avoid;" class="ui item fade"></div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!--Bottom pagination -->
+                                <uib-pagination class="pagination" total-items="results.hits.total"
+                                                items-per-page="pageSize"
+                                                ng-model="currentPage"
+                                                ng-change="search()"
+                                                next-text="Neste"
+                                                previous-text="Forrige"
+                                                max-size="4"
+                                                first-text="&laquo;"
+                                                last-text="&raquo;"
+                                                boundary-links="true"
+                                                force-ellipses="true">
+                                </uib-pagination>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
-</div>
 </div>
 
     <!--JavaScript files -->
