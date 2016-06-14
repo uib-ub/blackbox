@@ -154,7 +154,7 @@
             </div>
         </div>
 
-        <div class="ui container four column grid">
+        <div id="main-filters" class="ui container four column grid">
             <!-- Cataloguer facet as a dropdown-->
             <div class="ui column">
                 <div class="ui multiple search normal selection dropdown">
@@ -204,7 +204,7 @@
             <!---uib-progressbar ng-show="show_loading" class="ui loading segment"  value="dynamic" style="height:100px;"></uib-progressbar-->
         
             <!-- Search results -->
-            <div ng-cloak ng-show="ready" style="margin-top:30px;" class="ui container">
+            <div ng-cloak ng-show="ready" class="ui container">
                 <div class="search-results ui equal width grid">
                     <!--Starting with facets-->
                     <div ng-cloak class="ng-cloak four wide column computer only">
@@ -239,7 +239,7 @@
                             </div>
 
                             <!-- Topic facets-->
-                            <h3 translate="filter.concept"></h3>
+                            <h3 translate="filters.concept"></h3>
                             <hr>
                             <div class="ui list">
                                 <div class="ui checkbox item"
@@ -306,18 +306,18 @@
                                     <div class="row">
                                         <div class="column">
                                             <!--Pagination-->
-                                <uib-pagination class="pagination hidden-sm hidden-xs" total-items="results.hits.total"
-                                                items-per-page="pageSize"
-                                                ng-model="currentPage"
-                                                ng-change="search()"
-                                                next-text="Neste"
-                                                previous-text="Forrige"
-                                                max-size="4"
-                                                first-text="&laquo;"
-                                                last-text="&raquo;"
-                                                boundary-links="true"
-                                                force-ellipses="true">
-                                </uib-pagination>
+                                            <uib-pagination class="pagination hidden-sm hidden-xs" total-items="results.hits.total"
+                                                            items-per-page="pageSize"
+                                                            ng-model="currentPage"
+                                                            ng-change="search()"
+                                                            next-text="Neste"
+                                                            previous-text="Forrige"
+                                                            max-size="4"
+                                                            first-text="&laquo;"
+                                                            last-text="&raquo;"
+                                                            boundary-links="true"
+                                                            force-ellipses="true">
+                                            </uib-pagination>
                                         </div>
                                         <!-- Sorting -->
                                         <div class="three wide column">
