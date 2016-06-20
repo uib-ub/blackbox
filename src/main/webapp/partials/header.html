@@ -53,8 +53,8 @@
       </div>
       <div class="item">
         <div ng-controller="Ctrl"
-        class="ui dropdown">
-          <div class="text">Lang</div>
+        class="ui language dropdown">
+          <div class="text" translate="header.buttonLanguage"></div>
           <i class="dropdown icon"></i>
           <div class="menu">
             <div class="item" ng-click="changeLanguage('no')" translate="header.buttonLangNo"></div>
@@ -143,7 +143,7 @@ $('.menu-popup')
 ;
 
 // Download dropdown
-$('.ui.dropdown')
+$('.ui.language.dropdown')
   .dropdown()
 ;
 </script>

@@ -48,17 +48,3 @@ $('#show-menu').click(function() {
   $('.pusher').toggleClass('pusher-padding');
 });
 
-// Tab for digitalresources
-$('.dr-tab .item')
-  .tab()
-;
-
-// Download dropdown
-$('.download-dropdown')
-  .dropdown()
-;
-
-// Show/hide for all-data
-$('.ui.accordion')
-  .accordion()
-;

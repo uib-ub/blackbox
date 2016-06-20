@@ -1,6 +1,7 @@
 {
   "header": {
       "brand": "MARCUS ADMIN",
+      "buttonLanguage": "Choose Language",
       "buttonLangNo": "<i class=\"no flag\"></i> Norwegian",
       "buttonLangEn": "<i class=\"gb flag\"></i> English"
   },
@@ -9,8 +10,8 @@
       "reset": "Reset",
       "hitsFeedback": "{val, plural, 0{} one{One hit} other{# hits}}",
       "help": "Help",
-      "sortOptions": "Sort by",
-      "hitsPerPage": "Hits per page",
+      "sortOptions": "relevance",
+      "hitsPerPage": "10",
       "cataloguerFilter": "Cataloguer",
       "statusFilter": "Status"
   },

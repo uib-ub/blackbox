@@ -127,31 +127,6 @@
                 </div>
             </div>
 
-            <!-- Sorting -->
-            <div class="ui dropdown column">
-                <span translate="searchContainer.sortOptions"></span>
-                <i class="dropdown icon"></i>
-                <select id="sort_by"
-                        ng-model="sortBy"
-                        ng-change="search()"
-                        ng-options="item.value as item.displayName for item in sortOptions">
-                </select>
-            </div>
-
-            <!-- Items per page -->
-            <div class="ui dropdown selection column">
-                <span class="default text" translate="searchContainer.hitsPerPage"></span>
-                <i class="dropdown icon"></i>
-                <input type="hidden" name="hitsPerPage">
-                <select id="docPerPage" ng-model="pageSize" ng-change="search()">
-                    <option class="item" value="10">10</option>
-                    <option class="item" value="20">20</option>
-                    <option class="item" value="30">30</option>
-                    <option class="item" value="100">100</option>
-                    <option class="item" value="200">200</option>
-                    <option class="item" value="250">250</option>
-                </select>
-            </div>
             </div>
         </div>
 
@@ -224,23 +199,25 @@
                             </div>
                             <br/><br/>
 
-                            <!-- Document types facets-->
+                            <!-- Document types facets
+                                 TODO: change to modal?   
+                            -->
                             <h3 translate="filters.type"></h3>
                             <hr>
-                            <div class="ui multiple search fluid dropdown">
+                            <div class="ui multiple search fluid doctype dropdown">
                                 <span class="default text" translate="filters.type"></span><i class="dropdown icon"></i>
-                            <input type="hidden" name="type">
-                            <div class="menu">
-                                <div class="ui checkbox item"
-                                     ng-repeat="bucket in results['aggregations']['type.exact']['buckets']">
-                                    <input id="type-{{bucket.key}}" type="checkbox" checklist-model="selectedFilters"
-                                           checklist-value="getCheckedValue('type.exact', bucket.key)" ng-click="search()">
-                                    <label for="type-{{bucket.key}}" ng-class="{'disabled': bucket.doc_count == 0}">
-                                        {{bucket.key}}
-                                        <span ng-if="bucket.doc_count > 0" class="doc-count"> ({{bucket.doc_count | number}})</span>
-                                    </label>
+                                <input type="hidden" name="type">
+                                <div class="menu">
+                                    <div class="ui checkbox item"
+                                         ng-repeat="bucket in results['aggregations']['type.exact']['buckets']">
+                                        <input id="type-{{bucket.key}}" type="checkbox" checklist-model="selectedFilters"
+                                               checklist-value="getCheckedValue('type.exact', bucket.key)" ng-click="search()">
+                                        <label for="type-{{bucket.key}}" ng-class="{'disabled': bucket.doc_count == 0}">
+                                            {{bucket.key}}
+                                            <span ng-if="bucket.doc_count > 0" class="doc-count"> ({{bucket.doc_count | number}})</span>
+                                        </label>
+                                    </div>
                                 </div>
-                            </div>
                             </div>
 
                             <!-- Topic facets-->
@@ -325,25 +302,14 @@
                                             </uib-pagination>
                                         </div>
                                         <!-- Sorting -->
-                                        <div class="three wide column">
-                                            <div class="ui dropdown ">
-                                                <span translate="searchContainer.sortOptions"></span>
-                                                <i class="dropdown icon"></i>
-                                                <select id="sort_by"
-                                                        ng-model="sortBy"
-                                                        ng-change="search()"
-                                                        ng-options="item.value as item.displayName for item in sortOptions">
-                                                </select>
-                                            </div>
-                                        </div>
-
-                                        <!-- Items per page -->
-                                        <div class="three wide column">
-                                            <div class="ui dropdown ">
-                                                <span translate="searchContainer.hitsPerPage"></span>
-                                                <i class="dropdown icon"></i>
+                                        <div class="six wide column">
+                                            <span>Vis 
+                                                <!-- Items per page -->
+                                            <div class="ui inline dropdown">
+                                                <span class="text" translate="searchContainer.hitsPerPage"></span>
+                                                <i class="sort icon"></i>
                                                 <select id="docPerPage" ng-model="pageSize" ng-change="search()">
-                                                    <option value="10">10</option>
+                                                    <option data-value"default" value="10">10</option>
                                                     <option value="20">20</option>
                                                     <option value="30">30</option>
                                                     <option value="100">100</option>
@@ -351,6 +317,29 @@
                                                     <option value="250">250</option>
                                                 </select>
                                             </div>
+                                                
+                                               , sortert på 
+                                                
+                                            <div class="ui inline dropdown">
+                                                <span class="text" translate="searchContainer.sortOptions"></span>
+                                                <i class="sort icon"></i>
+                                                <!--<select id="sort_by"
+                                                        ng-model="sortBy"
+                                                        ng-change="search()"
+                                                        ng-options="item.value as item.displayName for item in sortOptions">
+                                                </select>-->
+                                                <select ng-model="sortBy" ng-change="search()">
+                                                    <option translate="filters.sortAsc" value="identifier:asc"></option>
+                                                    <option translate="filters.sortDesc" value="identifier:desc"></option>
+                                                    <option translate="filters.availableAsc" value="available:asc"></option>
+                                                    <option translate="filters.availableDesc" value="available:desc"></option>
+                                                    <option translate="filters.dateAsc" value="dateSort:asc"></option>
+                                                    <option translate="filters.dateDesc" value="dateSort:desc"></option>
+                                                </select>
+                                            </div>
+                                            </span>
+
+                                        
                                         </div>
                                     </div>
                                 </div>
@@ -423,7 +412,6 @@
     <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.5/angular.min.js"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.5/angular-route.min.js"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.5/angular-animate.min.js"></script>
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.1.8/semantic.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/angular-i18n/1.5.5/angular-locale_nb-no.min.js"></script>
     <script src="js/marcus-app.js"></script>
@@ -506,7 +494,12 @@
                 });
 
         $('.ui.dropdown').dropdown({
-            transition: 'drop'
+            transition: 'scale'
+        });
+        
+        $('.ui.doctype.dropdown').dropdown({
+            transition: 'scale',
+            context: '.search-hits'
         });
     </script>
   </body>

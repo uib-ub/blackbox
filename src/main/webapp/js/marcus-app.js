@@ -71,7 +71,9 @@ app.controller('freeTextSearch', function ($scope, $http, $location, mySetting) 
         {value: 'identifier:asc', displayName: 'Signatur ASC'},
         {value: 'identifier:desc', displayName: 'Signatur DES'},
         {value: 'available:asc', displayName: 'Tilgjengeliggort ASC'},
-        {value: 'available:desc', displayName: 'Tilgjengeliggort DES'}
+        {value: 'available:desc', displayName: 'Tilgjengeliggort DES'},
+        {value: 'dateSort:asc', displayName: 'Skapt ASC'},
+        {value: 'dateSort:desc', displayName: 'Skapt DES'}
     ];
     //Get parameters from the search URL
     var urlParams = $location.search();

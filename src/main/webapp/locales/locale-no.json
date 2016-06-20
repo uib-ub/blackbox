@@ -1,6 +1,7 @@
 {
   "header": {
       "brand": "MARCUS ADMIN",
+      "buttonLanguage": "Velg språk",
       "buttonLangNo": "<i class=\"no flag\"></i> Norsk",
       "buttonLangEn": "<i class=\"gb flag\"></i> Engelsk"
   },
@@ -9,8 +10,8 @@
       "reset": "Nullstill",
       "hitsFeedback": "{val, plural, 0{} one{Ett treff} other{# treff}}",
       "help": "Søketips",
-      "sortOptions": "Sortér på",
-      "hitsPerPage": "Antall treff",
+      "sortOptions": "relevans",
+      "hitsPerPage": "10",
       "cataloguerFilter": "Katalogisator",
       "statusFilter": "Status"
   },
@@ -26,7 +27,13 @@
       "created": "Skapt",
       "type": "Dokumenttype",
       "concept": "Emne",
-      "partOf": "Samling"
+      "partOf": "Samling",
+      "sortAsc": "signatur <i class=\"sort alphabet ascending icon\"></i>",
+      "sortDesc": "signatur <i class=\"sort alphabet descending icon\"></i>",
+      "availableAsc": "tilgjengelighet <i class=\"sort numeric ascending icon\"></i>",
+      "availableDesc": "tilgjengelighet <i class=\"sort numeric descending icon\"></i>",
+      "dateAsc": "skapelse <i class=\"sort numeric ascending icon\"></i>",
+      "dateDesc": "skapelse <i class=\"sort numeric descending icon\"></i>"
   },
   "results": {
       "emptyResult": "Vi fant ingen treff på søket ditt"
