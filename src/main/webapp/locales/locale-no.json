@@ -12,8 +12,8 @@
       "help": "Søketips",
       "sortOptions": "relevans",
       "hitsPerPage": "10",
-      "cataloguerFilter": "Katalogisator",
-      "statusFilter": "Status"
+      "cataloguerFilter": "<i class=\"icon user\"></i> Katalogisator",
+      "statusFilter": "<i class=\"icon certificate\"></i> Status"
   },
   "searchHint":{
       "andOr": "Og/Eller",

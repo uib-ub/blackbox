@@ -12,8 +12,8 @@
       "help": "Help",
       "sortOptions": "relevance",
       "hitsPerPage": "10",
-      "cataloguerFilter": "Cataloguer",
-      "statusFilter": "Status"
+      "cataloguerFilter": "<i class=\"icon user\"></i> Cataloguer",
+      "statusFilter": "<i class=\"icon certificate\"></i> Status"
   },
   "searchHint":{
       "andOr": "And/Or",
@@ -27,7 +27,13 @@
       "created": "Created",
       "type": "Type",
       "concept": "Subject",
-      "partOf": "Collection"
+      "partOf": "Collection",
+      "sortAsc": "signature <i class=\"sort alphabet ascending icon\"></i>",
+      "sortDesc": "signature <i class=\"sort alphabet descending icon\"></i>",
+      "availableAsc": "availability <i class=\"sort numeric ascending icon\"></i>",
+      "availableDesc": "availability <i class=\"sort numeric descending icon\"></i>",
+      "dateAsc": "creation <i class=\"sort numeric ascending icon\"></i>",
+      "dateDesc": "creation <i class=\"sort numeric descending icon\"></i>"
   },
   "results": {
       "emptyResult": "We did not find anything"

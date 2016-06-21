@@ -10,7 +10,7 @@
     <link rel="shortcut icon" type="image/x-icon" href="http://marcus.uib.no/img/favicon.ico"/>
     <link rel="stylesheet" href="js/lib/typeahead/css/main.css"/>
     <link rel="stylesheet" href="js/lib/typeahead/css/normalize.min.css"/>
-    
+    <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.6.3/css/font-awesome.min.css" rel="stylesheet" integrity="sha384-T8Gy5hrqNKT+hzMclPo118YTQO6cYprQmhrYwIiQ/3axmI1hQomh7Ud2hPOy8SP1" crossorigin="anonymous">
     <link rel="stylesheet" href="//code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css"/>
     <link href="http://fonts.googleapis.com/css?family=IM+Fell+Great+Primer" rel="stylesheet" type="text/css">
     <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.1.8/semantic.min.css"/>
@@ -133,12 +133,12 @@
         <div id="main-filters" class="ui container four column grid">
             <!-- Cataloguer facet as a dropdown-->
             <div class="ui column">
-                <div class="ui multiple search normal selection dropdown">
+                <div class="ui multiple search normal selection fluid dropdown">
                     <i class="dropdown icon"></i>
                     <div class="default text" translate="searchContainer.cataloguerFilter"></div>
-                    <div class="menu">
-                            <div ng-repeat="bucket in results['aggregations']['cataloguer.exact']['buckets']">
-                                <div class="checkbox ui item">
+                    <div id="setting-cataloguer" class="menu">
+                            <div class="compact item" ng-repeat="bucket in results['aggregations']['cataloguer.exact']['buckets']">
+                                <div class="checkbox ui">
                                     <input id="cataloguer-{{bucket.key}}" type="checkbox" checklist-model="selectedFilters" checklist-value="getCheckedValue('cataloguer.exact', bucket.key)" ng-click="search()">
                                     <label for="cataloguer-{{bucket.key}}">{{bucket.key}} <span class="doc-count"> ({{bucket.doc_count | number}})</span></label>
                                 </div>
@@ -149,23 +149,23 @@
 
             <!--Facet status as a dropdown -->
             <div class="ui column">
-                <div class="ui multiple search normal selection dropdown">
+                <div class="ui multiple search normal selection fluid dropdown">
                     <i class="dropdown icon"></i>
                     <span class="default text" translate="searchContainer.statusFilter"></span>
-                    <div class="menu">
-                            <div ng-repeat="bucket in results['aggregations']['hasZoom']['buckets']">
+                    <div id="setting-status" class="menu">
+                            <div class="compact item" ng-repeat="bucket in results['aggregations']['hasZoom']['buckets']">
                                 <div class="checkbox ui item">
                                     <input id="hasZoom-{{bucket.key}}" type="checkbox" checklist-model="selectedFilters" checklist-value="getCheckedValue('hasZoom', bucket.key)" ng-click="search()">
                                     <label for="hasZoom-{{bucket.key}}">{{bucket.key}} <span class="doc-count"> ({{bucket.doc_count | number}})</span></label>
                                 </div>
                             </div>
-                            <div ng-repeat="bucket in results['aggregations']['isDigitized']['buckets']">
+                            <div class="compact item" ng-repeat="bucket in results['aggregations']['isDigitized']['buckets']">
                                 <div class="checkbox ui item">
                                     <input id="isDigitized-{{bucket.key}}" type="checkbox" checklist-model="selectedFilters" checklist-value="getCheckedValue('isDigitized', bucket.key)" ng-click="search()">
                                     <label for="isDigitized-{{bucket.key}}">{{bucket.key}} <span class="doc-count"> ({{bucket.doc_count | number}})</span></label>
                                 </div>
                             </div>
-                            <div ng-repeat="bucket in results['aggregations']['isCatalogued']['buckets']">
+                            <div class="compact item" ng-repeat="bucket in results['aggregations']['isCatalogued']['buckets']">
                                 <div class="checkbox ui item">
                                     <input id="isCatalogued-{{bucket.key}}" type="checkbox" checklist-model="selectedFilters" checklist-value="getCheckedValue('isCatalogued', bucket.key)" ng-click="search()">
                                     <label for="isCatalogued-{{bucket.key}}">{{bucket.key}} <span class="doc-count"> ({{bucket.doc_count | number}})</span></label>
@@ -318,7 +318,7 @@
                                                 </select>
                                             </div>
                                                 
-                                               , sortert på 
+                                            sortert på 
                                                 
                                             <div class="ui inline dropdown">
                                                 <span class="text" translate="searchContainer.sortOptions"></span>
