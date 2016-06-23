@@ -80,13 +80,13 @@ app.controller('freeTextSearch', function ($scope, $http, $location, mySetting) 
 
     //Initialize scope variables to default values
     $scope.queryString = null;
-    $scope.sortBy = null;
+    $scope.sortBy = '';
     $scope.settingFilter = [];
     $scope.selectedFilters = [];
     $scope.fromDate = null;
     $scope.toDate = null;
     $scope.currentPage = 1;
-    $scope.pageSize = 10;
+    $scope.pageSize = '10';
     $scope.from =  0;
     $scope.ready = false;
 

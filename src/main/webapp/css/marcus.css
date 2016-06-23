@@ -15,6 +15,10 @@ html, body {
     margin-top: 100px;
 }
 
+#active-filters-reset-help {
+    margin: 0.8rem 0;
+} 
+
 .search-hits, .facets {
     padding: 10px;
 }
@@ -69,6 +73,7 @@ html, body {
 
 .hitlist-settings {
     margin-bottom: 20px !important;
+    border-bottom: 1px #ccc solid;
 }
 
 .pagination {

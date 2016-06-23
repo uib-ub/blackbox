@@ -28,12 +28,19 @@
       "type": "Type",
       "concept": "Subject",
       "partOf": "Collection",
-      "sortAsc": "signature <i class=\"sort alphabet ascending icon\"></i>",
-      "sortDesc": "signature <i class=\"sort alphabet descending icon\"></i>",
-      "availableAsc": "availability <i class=\"sort numeric ascending icon\"></i>",
-      "availableDesc": "availability <i class=\"sort numeric descending icon\"></i>",
-      "dateAsc": "creation <i class=\"sort numeric ascending icon\"></i>",
-      "dateDesc": "creation <i class=\"sort numeric descending icon\"></i>"
+      "relevance": "relevance",
+      "_sortAsc": "signature <i class=\"sort alphabet ascending icon\"></i>",
+      "_sortDesc": "signature <i class=\"sort alphabet descending icon\"></i>",
+      "_availableAsc": "availability <i class=\"sort numeric ascending icon\"></i>",
+      "_availableDesc": "availability <i class=\"sort numeric descending icon\"></i>",
+      "_dateAsc": "creation <i class=\"sort numeric ascending icon\"></i>",
+      "_dateDesc": "creation <i class=\"sort numeric descending icon\"></i>",
+      "sortAsc": "signature (asc)",
+      "sortDesc": "signature (desc)",
+      "availableAsc": "availability (asc)",
+      "availableDesc": "availability (desc)",
+      "dateAsc": "creation (asc)",
+      "dateDesc": "creation (desc)"
   },
   "results": {
       "emptyResult": "We did not find anything"

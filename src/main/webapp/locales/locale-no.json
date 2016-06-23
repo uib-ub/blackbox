@@ -28,12 +28,19 @@
       "type": "Dokumenttype",
       "concept": "Emne",
       "partOf": "Samling",
-      "sortAsc": "signatur <i class=\"sort alphabet ascending icon\"></i>",
-      "sortDesc": "signatur <i class=\"sort alphabet descending icon\"></i>",
-      "availableAsc": "tilgjengelighet <i class=\"sort numeric ascending icon\"></i>",
-      "availableDesc": "tilgjengelighet <i class=\"sort numeric descending icon\"></i>",
-      "dateAsc": "skapelse <i class=\"sort numeric ascending icon\"></i>",
-      "dateDesc": "skapelse <i class=\"sort numeric descending icon\"></i>"
+      "relevance": "relevans",
+      "_sortAsc": "signatur <i class=\"sort alphabet ascending icon\"></i>",
+      "_sortDesc": "signatur <i class=\"sort alphabet descending icon\"></i>",
+      "_availableAsc": "tilgjengelighet <i class=\"sort numeric ascending icon\"></i>",
+      "_availableDesc": "tilgjengelighet <i class=\"sort numeric descending icon\"></i>",
+      "_dateAsc": "skapelse <i class=\"sort numeric ascending icon\"></i>",
+      "_dateDesc": "skapelse <i class=\"sort numeric descending icon\"></i>",
+      "sortAsc": "signatur (stigende)",
+      "sortDesc": "signatur (synkende)",
+      "availableAsc": "tilgjengelighet (eldste først)",
+      "availableDesc": "tilgjengelighet (nyeste først)",
+      "dateAsc": "skapelse (eldste først)",
+      "dateDesc": "skapelse (nyeste først)"
   },
   "results": {
       "emptyResult": "Vi fant ingen treff på søket ditt"
