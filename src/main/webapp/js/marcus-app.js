@@ -209,7 +209,7 @@ app.controller('freeTextSearch', function ($scope, $http, $location, mySetting) 
                     $location.search('from', null);
 
                 //Hide "size" from the URL params, if it has a default value (10).
-                if(responseParams.size === 10)
+                if(parseInt(responseParams.size) === 10)
                     $location.search('size', null);
 
             //Hide loading
