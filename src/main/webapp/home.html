@@ -73,7 +73,7 @@
                 <div id="active-filters-reset-help" class="ui container">
                     <!--Selected filters -->
                     <div style="display: inline;" ng-cloak ng-if="selectedFilters.length > 0" class="selected-filter">
-                        <strong>Aktive filter: </strong>
+                        <strong translate="filters.active"></strong>
                          <span ng-repeat="filter in selectedFilters">
                               <a class="ui purple label relaxed" ng-click="removeFilter(filter)">
                                    {{filter.split('#')[1]}} <i class='delete icon'></i>
@@ -94,43 +94,30 @@
                     <!-- Search help info -->
                     <div class="search-help ui basic modal">
                         <i class="close icon"></i>
-                        <div class="header">Søketips</div>
-                            <div class="image content">
-                                <div class="image"><i class="search icon"></i></div>
-                                    <div class="description">
-                                        <h4 translate="searchHint.andOr"></h4>
-                                        <ul>
-                                            <li>Søket bruker i utgangspunktet "OG" mellom alle søketermer</li>
-                                            <li>Bruk "OR" for å endre dette, for eksempel "vaksdal OR voss"</li>
-                                        </ul>
-                                        <h4 translate="searchHint.not"></h4>
-                                        <ul>
-                                            <li>Bruk minustegn foran søketermer du ikke vil ha med i trefflisten, for eksempel
-                                                "husarbeid"
-                                            </li>
-                                        </ul>
-                                        <h4 translate="searchHint.truncation"></h4>
-                                        <ul>
-                                            <li>Bruke * til å trunkere, for eksempel "*strand" eller "knu*sen"</li>
-                                        </ul>
-                                        <h4 translate="searchHint.fields"></h4>
-                                        <ul>
-                                            <li>Du kan søke i tittel, beskrivelse og mange andre felt ved å bruke <i>felt:</i></li>
-                                            <li>subject:hund</li>
-                                            <li>spatial:bergen</li>
-                                            <li>description:fisketur</li>
-                                            <li>maker:knudsen</li>
-                                            <li>isPartOf:holm [OBS! Må være skrevet slik, såkalt camelCase]</li>
-                                        </ul>
-                                        <h4 translate="searchHint.fuzzy"></h4>
-                                        <ul>
-                                            <li>Du kan søke med en fuzzy-søketerm ved å sette ~ etter ordet du søker etter.</li>
-                                            <li>”Fana~” -> gir treff på Tana, Anax, Fina, etc.</li>
-                                        </ul>
-                                    </div>
+                        <div class="header" translate="searchHint.header"></div>
+                        <div class="image content">
+                            <div class="image">
+                                <i class="search icon"></i>
+                            </div>
+                            <div class="description">
+                                <h4 translate="searchHint.andOr"></h4>
+                                <ul translate="searchHint.andOrTxt"></ul>
+                                
+                                <h4 translate="searchHint.not"></h4>
+                                <ul translate="searchHint.notTxt"></ul>
+                                
+                                <h4 translate="searchHint.truncation"></h4>
+                                <ul translate="searchHint.truncationTxt"></ul>
+                                
+                                <h4 translate="searchHint.fields"></h4>
+                                <ul translate="searchHint.fieldsTxt"></ul>
+                                
+                                <h4 translate="searchHint.fuzzy"></h4>
+                                <ul translate="searchHint.fuzzyTxt"></ul>
                             </div>
                         </div>
-                 </div>
+                    </div>
+                </div>
 
                 <div id="main-filters" class="ui container four column grid">
                     <!-- Cataloguer facet as a dropdown-->
@@ -217,11 +204,11 @@
                                 <h3 translate="filters.created"></h3>
                                 <hr>
                                 <div class="datePicker ui input">
-                                    <input type="text" id="from_date" class="datePicker" ng-model="fromDate" ng-change="search()" placeholder="FRA" title="Fra dato">
+                                    <input type="text" id="from_date" class="datePicker" ng-model="fromDate" ng-change="search()" placeholder="{{ 'filters.fromDate' | translate }}" title="Fra dato">
                                 </div>
                                 <br/><br/>
                                 <div class="datePicker ui input">
-                                    <input type="text" id="to_date" class="datePicker" ng-model="toDate" ng-change="search()" placeholder="TIL" title="Til dato">
+                                    <input type="text" id="to_date" class="datePicker" ng-model="toDate" ng-change="search()" placeholder="{{ 'filters.toDate' | translate }}" title="Til dato">
                                 </div>
                                 <br/><br/>
 
@@ -333,7 +320,17 @@
                                     <!-- Sorting -->
                                     <div class="right floated seven wide column computer only">
                                                 <span>
-                                                    <label for="sort"><strong>Sortert på:</strong></label>
+                                                    <label for="docPerPage"><strong translate="filters.show"></strong></label>
+                                                    <select id="docPerPage" style="display:inline" ng-model="pageSize" ng-change="search()">
+                                                        <option value="10">10</option>
+                                                        <option value="20">20</option>
+                                                        <option value="30">30</option>
+                                                        <option value="100">100</option>
+                                                        <option value="200">200</option>
+                                                        <option value="250">250</option>
+                                                    </select>
+                                                    
+                                                    <label for="sort"><strong translate="filters.sort"></strong></label>
                                                     <select id="sort" style="display:inline;" ng-model="sortBy" ng-change="search()">
                                                         <option selected="selected" translate="filters.relevance" value=""></option>
                                                         <option translate="filters.sortAsc" value="identifier:asc"></option>
@@ -342,16 +339,6 @@
                                                         <option translate="filters.availableDesc" value="available:desc"></option>
                                                         <option translate="filters.dateAsc" value="dateSort:asc"></option>
                                                         <option translate="filters.dateDesc" value="dateSort:desc"></option>
-                                                    </select>
-
-                                                    <label for="docPerPage"><strong>&nbsp;Vis:</strong></label>
-                                                    <select id="docPerPage" style="display:inline" ng-model="pageSize" ng-change="search()">
-                                                        <option value="10">10</option>
-                                                        <option value="20">20</option>
-                                                        <option value="30">30</option>
-                                                        <option value="100">100</option>
-                                                        <option value="200">200</option>
-                                                        <option value="250">250</option>
                                                     </select>
                                                 </span>
                                         </div>
