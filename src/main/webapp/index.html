@@ -59,6 +59,7 @@
                                            ng-model="queryString"
                                            ng-keyup="($event.keyCode==13 || queryString==='')&&search()"
                                            placeholder="{{ 'searchContainer.placeholder' | translate }}"
+                                           autofocus
                                            autocomplete="off"/>
                                     <i ng-click="search()" class="search link icon"></i>
                                   </div>
@@ -160,8 +161,8 @@
                                         <input id="showWeb-{{bucket.key}}" type="checkbox" checklist-model="selectedFilters"
                                                checklist-value="getCheckedValue('showWeb', bucket.key)" ng-click="search()">
                                         <label for="showWeb-{{bucket.key}}">
-                                            <span ng-if="bucket.key==='T'">Publisert</span>
-                                            <span ng-if="bucket.key==='F'">Ikke publisert</span>
+                                            <span ng-if="bucket.key=='T' || bucket.key=='false'">Publisert</span>
+                                            <span ng-if="bucket.key=='F' || bucket.key=='false'">Ikke publisert</span>
                                             <span class="doc-count">({{bucket.doc_count | number}})</span>
                                         </label>
                                     </div>
@@ -310,7 +311,7 @@
                                                         ng-change="search()"
                                                         next-text="Neste"
                                                         previous-text="Forrige"
-                                                        max-size="4"
+                                                        max-size="3"
                                                         first-text="&laquo;"
                                                         last-text="&raquo;"
                                                         boundary-links="true"
@@ -318,7 +319,7 @@
                                         </uib-pagination>
                                     </div>
                                     <!-- Sorting -->
-                                    <div class="right floated seven wide column computer only">
+                                    <div class="right floated eight wide column computer only">
                                                 <span>
                                                     <label for="docPerPage"><strong translate="filters.show"></strong></label>
                                                     <select id="docPerPage" style="display:inline" ng-model="pageSize" ng-change="search()">
@@ -331,7 +332,7 @@
                                                     </select>
                                                     
                                                     <label for="sort"><strong translate="filters.sort"></strong></label>
-                                                    <select id="sort" style="display:inline;" ng-model="sortBy" ng-change="search()">
+                                                    <select id="sort" ng-model="sortBy" ng-change="search()">
                                                         <option selected="selected" translate="filters.relevance" value=""></option>
                                                         <option translate="filters.sortAsc" value="identifier:asc"></option>
                                                         <option translate="filters.sortDesc" value="identifier:desc"></option>
@@ -395,7 +396,7 @@
                                                     ng-change="search()"
                                                     next-text="Neste"
                                                     previous-text="Forrige"
-                                                    max-size="4"
+                                                    max-size="5"
                                                     first-text="&laquo;"
                                                     last-text="&raquo;"
                                                     boundary-links="true"
