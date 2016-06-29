@@ -37,7 +37,7 @@
       "type": "Dokumenttype",
       "concept": "Emne",
       "partOf": "Samling",
-      "sort": "sortért på",
+      "sort": "Sortért på",
       "show": "Vis",
       "relevance": "relevans",
       "_sortAsc": "signatur <i class=\"sort alphabet ascending icon\"></i>",

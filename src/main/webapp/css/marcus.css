@@ -144,4 +144,8 @@ body {
     padding: 0.4rem 0.6rem !important;
 }
 
+#sort {
+    display: inline-block;
+}
+
 

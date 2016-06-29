@@ -37,7 +37,7 @@
       "type": "Type",
       "concept": "Subject",
       "partOf": "Collection",
-      "sort": "sorted by",
+      "sort": "Sorted by",
       "show": "Show",
       "relevance": "relevance",
       "_sortAsc": "signature <i class=\"sort alphabet ascending icon\"></i>",
