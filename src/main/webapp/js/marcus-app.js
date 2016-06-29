@@ -10,7 +10,11 @@ var app = angular.module('marcus', ["checklist-model" , "ui.bootstrap", "setting
 //Configure URL rooting
 app.config(["$routeProvider", function($routeProvider) {
     $routeProvider
-        .when('/search', {
+        .when('/', {
+            templateUrl : 'index.html',
+            controller  : 'freeTextSearch'
+        })
+        .when('/s', {
             templateUrl : 'index.html',
             controller  : 'freeTextSearch'
         })
