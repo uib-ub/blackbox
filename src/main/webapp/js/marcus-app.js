@@ -11,22 +11,21 @@ var app = angular.module('marcus', ["checklist-model" , "ui.bootstrap", "setting
 app.config(["$routeProvider", function($routeProvider) {
     $routeProvider
         .when('/search', {
-            templateUrl : 'home.html',
-            controller  : 'freeTextSearch'
-        })
-        .when('/', {
-            templateUrl : 'home.html',
+            templateUrl : 'index.html',
             controller  : 'freeTextSearch'
         })
         .otherwise({
-            redirectTo: 'home.html',
+            redirectTo: 'index.html',
             controller  : 'freeTextSearch'
         });
 }]);
 
 //Enable HTML5 mode for browser history
 app.config(function($locationProvider) {
-    $locationProvider.html5Mode(true);
+    $locationProvider.html5Mode({
+        enabled : true,
+        requireBase: false,
+        rewriteLinks : false});
 });
 
 
