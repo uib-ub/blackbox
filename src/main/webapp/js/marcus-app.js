@@ -10,23 +10,26 @@ var app = angular.module('marcus', ["checklist-model" , "ui.bootstrap", "setting
 //Configure URL rooting
 app.config(["$routeProvider", function($routeProvider) {
     $routeProvider
-        .when('/search', {
-            templateUrl : 'home.html',
+        .when('/', {
+            templateUrl : 'index.html',
             controller  : 'freeTextSearch'
         })
-        .when('/', {
-            templateUrl : 'home.html',
+        .when('/s', {
+            templateUrl : 'index.html',
             controller  : 'freeTextSearch'
         })
         .otherwise({
-            redirectTo: 'home.html',
+            redirectTo: 'index.html',
             controller  : 'freeTextSearch'
         });
 }]);
 
 //Enable HTML5 mode for browser history
 app.config(function($locationProvider) {
-    $locationProvider.html5Mode(true);
+    $locationProvider.html5Mode({
+        enabled : true,
+        requireBase: false,
+        rewriteLinks : false});
 });
 
 
@@ -43,8 +46,10 @@ app.config(['$translateProvider', function ($translateProvider) {
   });
   $translateProvider.preferredLanguage('no');
   $translateProvider.fallbackLanguage('en');
-  $translateProvider.useSanitizeValueStrategy('escape');
+  $translateProvider.useSanitizeValueStrategy('sanitizeParameters');
   $translateProvider.forceAsyncReload(true);
+  $translateProvider.useMessageFormatInterpolation();
+  $translateProvider.addInterpolation('$translateMessageFormatInterpolation');
 }]);
  
 app.controller('Ctrl', ['$translate', '$scope', function ($translate, $scope) {
@@ -69,20 +74,22 @@ app.controller('freeTextSearch', function ($scope, $http, $location, mySetting) 
         {value: 'identifier:asc', displayName: 'Signatur ASC'},
         {value: 'identifier:desc', displayName: 'Signatur DES'},
         {value: 'available:asc', displayName: 'Tilgjengeliggort ASC'},
-        {value: 'available:desc', displayName: 'Tilgjengeliggort DES'}
+        {value: 'available:desc', displayName: 'Tilgjengeliggort DES'},
+        {value: 'dateSort:asc', displayName: 'Skapt ASC'},
+        {value: 'dateSort:desc', displayName: 'Skapt DES'}
     ];
     //Get parameters from the search URL
     var urlParams = $location.search();
 
     //Initialize scope variables to default values
     $scope.queryString = null;
-    $scope.sortBy = null;
+    $scope.sortBy = '';
     $scope.settingFilter = [];
     $scope.selectedFilters = [];
     $scope.fromDate = null;
     $scope.toDate = null;
     $scope.currentPage = 1;
-    $scope.pageSize = 10;
+    $scope.pageSize = '10';
     $scope.from =  0;
     $scope.ready = false;
 
@@ -205,7 +212,7 @@ app.controller('freeTextSearch', function ($scope, $http, $location, mySetting) 
                     $location.search('from', null);
 
                 //Hide "size" from the URL params, if it has a default value (10).
-                if(responseParams.size === 10)
+                if(parseInt(responseParams.size) === 10)
                     $location.search('size', null);
 
             //Hide loading

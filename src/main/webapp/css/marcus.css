@@ -2,18 +2,17 @@ html{
     overflow: hidden;
 }
 
-html, body {
-    /**background: #f2f9ff repeat scroll 0 0; /**Tyeahead**/
-    /**background: #e7e9ec repeat scroll 0 0;/**Linked In**/
-    /**background: #e9eff5 repeat scroll 0 0;/**FINN**/
-    /**background-color: #f5f8fa;/**Twitter**/
-    /**background: #f8f8f8 repeat scroll 0 0;**/
-    background: whitesmoke repeat scroll 0 0;
+body {
+     overflow: hidden !important;
 }
 
 #search-header {
     margin-top: 100px;
 }
+
+#active-filters-reset-help {
+    margin: 0.8rem 0;
+} 
 
 .search-hits, .facets {
     padding: 10px;
@@ -24,9 +23,19 @@ html, body {
     margin-bottom: 8px;
 }
 
-.selected-filter{
-    margin-bottom: 10px;
+#main-filters {
+    margin-top: -1rem;
 }
+
+.selected-filter {
+    margin-bottom: 10px;
+    margin-top: 10px !important;
+}
+
+.selected-filter strong {
+    margin-right: 10px;
+}
+
 .search-results .facets {
     overflow-x: hidden;
     overflow-y: auto;
@@ -36,7 +45,7 @@ html, body {
 
 .search-results .search-hits {
     background: white;
-    border: 1px solid #e1e8ed;
+    /*border: 1px solid #e1e8ed;*/
 }
 
 .doc-count {
@@ -57,8 +66,14 @@ html, body {
     color : orange;**/
 }
 
+.hitlist-settings {
+    margin-bottom: 20px !important;
+    border-bottom: 1px #ccc solid;
+}
+
 .pagination {
     font-weight: bold;
+    margin: 0 !important;
 }
 
 .blackbox-loading {
@@ -125,6 +140,8 @@ html, body {
     font-size: 2em;
 }
 
-
+#setting-cataloguer .compact.item, #setting-status .compact.item {
+    padding: 0.4rem 0.6rem !important;
+}
 
 

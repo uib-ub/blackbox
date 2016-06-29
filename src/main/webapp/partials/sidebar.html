@@ -1,0 +1,61 @@
+<div style="padding-top: 50px;" class="ui raised vertical sidebar menu uncover push visible">
+  <div class="list">
+    <div class="item">
+      <i class="fa fa-dashboard fa-fw"></i> <a href="http://admin.marcus.uib.no/home">Kontrollpanel</a>
+    </div>
+    <div class="item">
+      <i class="fa fa-check-square-o fa-fw"></i> <a href="http://admin.marcus.uib.no/cataloguers">Siste 500</a>
+    </div>
+    <div class="item">
+      <i class="fa fa-upload fa-fw"></i> <a href="http://marcus.uib.no/admin/upload.html">Last opp filer</a>
+    </div>    
+    <div class="item">
+      <i class="fa fa-plus fa-fw"></i> <a href='http://admin.marcus.uib.no/search?source={"query":{"filtered":{"filter":{"bool":{"must":[{"term":{"iscatalogued":"Ikke katalogisert"}}]}},"query":{"match_all":{}}}},"from":0,"size":25,"facets":{"showweb":{"terms":{"field":"showweb","size":110,"order":"count"}},"isdigitized":{"terms":{"field":"isdigitized","size":110,"order":"count"}},"haszoom":{"terms":{"field":"haszoom","size":110,"order":"count"}},"iscatalogued":{"terms":{"field":"iscatalogued","size":110,"order":"count"}},"cataloguer.exact":{"terms":{"field":"cataloguer.exact","size":115,"order":"count"}},"type.exact":{"terms":{"field":"type.exact","size":170,"order":"count"}},"storedat":{"terms":{"field":"storedat","size":125,"order":"count"}},"subject.exact":{"terms":{"field":"subject.exact","size":125,"order":"count"}},"ispartof.exact":{"terms":{"field":"ispartof.exact","size":125,"order":"count"}},"maker.exact":{"terms":{"field":"maker.exact","size":125,"order":"count"}}}}'>Filer klare for registrering</a><br>
+      <small><a href="http://admin.marcus.uib.no/new-resource">Filer klare for registrering</a> (gammel listevisning)</small>
+
+      
+    </div>
+    <div class="item">
+      <i class="fa fa-edit fa-fw"></i> <a href='http://admin.marcus.uib.no/search?source={"query":{"filtered":{"filter":{"bool":{"must":[{"term":{"showweb":"false"}},{"term":{"isdigitized":"Digitalisert"}}]}},"query":{"match_all":{}}}},"from":0,"size":25,"facets":{"showweb":{"terms":{"field":"showweb","size":110,"order":"count"}},"isdigitized":{"terms":{"field":"isdigitized","size":110,"order":"count"}},"haszoom":{"terms":{"field":"haszoom","size":110,"order":"count"}},"iscatalogued":{"terms":{"field":"iscatalogued","size":110,"order":"count"}},"cataloguer.exact":{"terms":{"field":"cataloguer.exact","size":115,"order":"count"}},"type.exact":{"terms":{"field":"type.exact","size":170,"order":"count"}},"storedat":{"terms":{"field":"storedat","size":125,"order":"count"}},"subject.exact":{"terms":{"field":"subject.exact","size":125,"order":"count"}},"ispartof.exact":{"terms":{"field":"ispartof.exact","size":125,"order":"count"}},"maker.exact":{"terms":{"field":"maker.exact","size":125,"order":"count"}}}}'>Objekt klare for publisering</a>
+    </div>
+    <div class="item">
+      <i class="fa fa-edit fa-fw"></i> <a href='http://admin.marcus.uib.no/search?source={"query":{"filtered":{"filter":{"bool":{"must":[{"term":{"showweb":"false"}},{"term":{"haszoom":"Med%20DeepZoom"}}]}},"query":{"match_all":{}}}},"from":0,"size":25,"facets":{"showweb":{"terms":{"field":"showweb","size":110,"order":"count"}},"isdigitized":{"terms":{"field":"isdigitized","size":110,"order":"count"}},"haszoom":{"terms":{"field":"haszoom","size":110,"order":"count"}},"iscatalogued":{"terms":{"field":"iscatalogued","size":110,"order":"count"}},"cataloguer.exact":{"terms":{"field":"cataloguer.exact","size":115,"order":"count"}},"type.exact":{"terms":{"field":"type.exact","size":170,"order":"count"}},"storedat":{"terms":{"field":"storedat","size":125,"order":"count"}},"subject.exact":{"terms":{"field":"subject.exact","size":125,"order":"count"}},"ispartof.exact":{"terms":{"field":"ispartof.exact","size":125,"order":"count"}},"maker.exact":{"terms":{"field":"maker.exact","size":125,"order":"count"}}}}'>Upubliserte med nye filer</a>
+    </div>
+    <div class="item">
+      <i class="fa fa-tags fa-fw"></i> <a href="http://admin.marcus.uib.no/topics-hierarchy">Emneregister - oversikt</a>
+    </div>
+    <div class="item">
+      <i class="fa fa-search fa-fw"></i> <a href="http://admin.marcus.uib.no/orders">Oppdrag</a>
+    </div>
+    <div class="item">
+      <i class="fa fa-print fa-fw"></i> <a href="http://admin.marcus.uib.no/orders-printlabel">Etiketter (bruk <i class="fa fa-opera" style="color: red;" aria-hidden="true"></i>)</a>
+    </div>
+    <div class="item">
+      <i class="fa fa-exclamation-triangle fa-fw"></i> <a href="http://admin.marcus.uib.no/errors">Feil i datasettet</a>
+    </div>
+    <div class="item">
+      <i class="fa fa-compass fa-fw"></i> <a href="http://admin.marcus.uib.no/marcus-statistics">Statistikk for Marcus</a>
+    </div>
+    <div class="item">
+      <i class="fa fa-compass fa-fw"></i> <a href="http://admin.marcus.uib.no/stats">Statistikk for datasettet</a>
+    </div>
+    <div class="item">
+      <i class="fa fa-book fa-fw"></i> <a href="http://admin.marcus.uib.no/manual">Veiledning</a>
+    </div>        
+  </div>
+</div>
+
+<script>
+    // Sidebar
+    $('.ui.sidebar')
+      .sidebar({
+        context: $('.bottom.segment'),
+        dimPage: false,
+        closable: false
+      })
+      .sidebar('attach events', '#show-menu')
+    ;
+    $('#show-menu').click(function() {
+      $('.pusher').toggleClass('pusher-padding');
+    });
+</script>

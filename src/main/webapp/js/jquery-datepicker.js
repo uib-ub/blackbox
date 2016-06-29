@@ -10,7 +10,7 @@ $(function () {
         buttonText : '<i class="ui icon calendar"></i>',
         changeMonth: true,
         changeYear: true,
-        yearRange: "1400:+1",
+        yearRange: "1200:+1",
         numberOfMonths: 1,
         showButtonPanel: true,
         onClose: function (selectedDate) {
@@ -26,7 +26,7 @@ $(function () {
         buttonText: '<i class="ui icon calendar"></i>',
         changeMonth: true,
         changeYear: true,
-        yearRange: "1400:+1",
+        yearRange: "1200:+1",
         numberOfMonths: 1,
         showButtonPanel: true,
         onClose: function (selectedDate) {

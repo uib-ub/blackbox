@@ -8,13 +8,15 @@
    xmlns="http://www.w3.org/2000/svg"
    xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
-   viewBox="0 0 100 125"
+   viewBox="0 0 63 99"
    version="1.1"
    x="0px"
    y="0px"
    id="svg138"
    inkscape:version="0.91 r13725"
-   sodipodi:docname="noun_346839_cc.svg">
+   sodipodi:docname="noun_346839_cc.svg"
+   width="63"
+   height="99">
   <metadata
      id="metadata156">
     <rdf:RDF>
@@ -23,6 +25,7 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title>Curly Bracket-18</dc:title>
       </cc:Work>
     </rdf:RDF>
   </metadata>
@@ -44,8 +47,8 @@
      inkscape:zoom="1.888"
      inkscape:cx="50"
      inkscape:cy="62.5"
-     inkscape:window-x="0"
-     inkscape:window-y="0"
+     inkscape:window-x="20"
+     inkscape:window-y="43"
      inkscape:window-maximized="0"
      inkscape:current-layer="svg138" />
   <title
@@ -53,16 +56,15 @@
   <desc
      id="desc142">Created with Sketch.</desc>
   <g
-     stroke="none"
-     stroke-width="1"
-     fill="none"
-     fill-rule="evenodd"
      sketch:type="MSPage"
-     id="g144">
+     id="g144"
+     style="fill:none;fill-rule:evenodd;stroke:none;stroke-width:1"
+     transform="translate(-19.597458,2.072034)">
     <path
-       d="M43,5 L43,11.0520218 L52.1559534,11.0520218 L52.1559534,88.9485388 L43,88.9485388 L43,95 L44.492264,95 C48.643359,95 53.9357949,94.9971971 57.7617535,94.9943942 L57.7617535,5.0056058 C53.9357949,5.0028029 43.455191,5 43,5 L43,5 Z"
-       fill="#000000"
+       d="m 43,5 0,6.052022 9.155953,0 0,77.896517 -9.155953,0 L 43,95 l 1.492264,0 c 4.151095,0 9.443531,-0.0028 13.269489,-0.0056 l 0,-89.9887882 C 53.935795,5.0028029 43.455191,5 43,5 l 0,0 z"
        sketch:type="MSShapeGroup"
-       id="path146" />
+       id="path146"
+       inkscape:connector-curvature="0"
+       style="fill:#000000" />
   </g>
 </svg>

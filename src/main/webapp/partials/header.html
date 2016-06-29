@@ -1,0 +1,150 @@
+<div class="ui fixed menu">
+  <div class="ui container fluid header-wrap">
+    <a id="show-menu" class="item">
+      <i class="sidebar icon"></i>
+    </a>
+    <div href="#" class="header item">
+      <!-- <img class="logo" src="assets/images/logo.png">-->
+      <a href="/">Marcus admin</a>
+    </div>
+    <div class="menu left">
+      <div class="item">
+        <div class="ui icon input">
+          <form class="ui form" role="search" method="get" action="/">
+            <input class="facetview_freetext facetview_searchfield" type="text" placeholder="Søk ..." name="q">
+          </form>
+          <i class="search icon"></i>
+        </div>
+      </div>
+      <a class="menu-popup item">
+        Bla i ...
+        <i class="dropdown icon"></i>
+      </a>
+      <div class="ui flowing popup menu-popup-content">
+        <div style="width: 500px;" class="ui three column divided grid">
+          <div class="column">
+            <div class="ui link list">
+              <a class="item" href="http://admin.marcus.uib.no/works" target="_self"><i class="icon fa fa-beer fa-fw"></i> <div class="content">Verk</div></a>
+              <a class="item" href="http://admin.marcus.uib.no/collections" target="_self"><i class="icon fa fa-th fa-fw"></i> <div class="content">Samlinger</div></a>
+              <a class="item" href="http://admin.marcus.uib.no/events" target="_self"><i class="icon fa fa-calendar fa-fw"></i> <div class="content">Hendelser</div></a>
+              <a class="item" href="http://admin.marcus.uib.no/exhibitions" target="_self"><i class="icon fa fa-university fa-fw"></i> <div class="content">Utstillinger</div></a>
+            </div>
+          </div>
+          <div class="column">
+            <div class="ui link list">
+              <!-- <a class="item" href="http://admin.marcus.uib.no/images"><i class="icon fa fa-picture-o fa-fw"></i>  <div class="content">Bilder</div></a>
+              <a class="item" href="http://admin.marcus.uib.no/albums"><i class="icon fa fa-book fa-fw"></i>  <div class="content">Album</div></a> -->
+              <a class="item" href="http://admin.marcus.uib.no/conceptschemes" target="_self"><i class="icon fa fa-tags fa-fw"></i> <div class="content">Register</div></a>
+              <a class="item" href="http://admin.marcus.uib.no/topics" target="_self"><i class="icon fa fa-tags fa-fw"></i> <div class="content">Emner</div></a>
+              <a class="item" href="http://admin.marcus.uib.no/places" target="_self"><i class="icon fa fa-map-marker fa-fw"></i> <div class="content">Steder</div></a>
+              <a class="item" href="http://admin.marcus.uib.no/techniques" target="_self"><i class="icon fa fa-book fa-fw"></i> <div class="content">Teknikker</div></a>
+
+            </div>
+          </div>
+          <div class="column">
+            <div class="ui link list">
+              <!-- <a class="item" href="http://admin.marcus.uib.no/agents"><i class="icon fa fa-users fa-fw"></i> <div class="content">Aktører</div></a> -->
+              <a class="item" href="http://admin.marcus.uib.no/worklists" target="_self"><i class="icon fa fa-edit fa-fw"></i> <div class="content">Arbeidslister</div> </a>
+              <a class="item" href="http://admin.marcus.uib.no/acquisitions" target="_self"><i class="icon fa fa-gift fa-fw"></i> <div class="content">Akkvisisjoner</div></a>
+              <a class="item" href="http://admin.marcus.uib.no/storageunits" target="_self"><i class="icon fa fa-bank fa-fw"></i> <div class="content">Lagringsenheter</div></a>              
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="item">
+        <div ng-controller="Ctrl"
+        class="ui language dropdown">
+          <div class="text" translate="header.buttonLanguage"></div>
+          <i class="dropdown icon"></i>
+          <div class="menu">
+            <div class="item" ng-click="changeLanguage('no')" translate="header.buttonLangNo"></div>
+            <div class="item" ng-click="changeLanguage('en')" translate="header.buttonLangEn"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+
+    <div class="menu right">
+      <a class="item" target="blank" href="https://prosjekt.uib.no/projects/pw0/issues/new">
+        <i class="fa fa-plus-square icon"></i> <strong>Opprett feilmelding</strong>
+      </a>
+      <a class="item" href="https://oppdrag.ub.uib.no" target="_self">
+        <i class="fa fa-bullseye fa-fw"></i> Oppdrag
+      </a>
+      <a class="item" href="https://ubblod.disqus.com/admin/moderate/" target="_self">
+        <i class="fa fa-comments fa-fw"></i> Disqus
+      </a>
+      <a class="item" href="http://marcus.uib.no" target="_self">
+        <i class="fa fa-bullseye fa-fw"></i> Marcus
+      </a>
+      <a class="help-popup item">
+        Hjelp
+        <i class="dropdown icon"></i>
+      </a>
+      <div class="ui flowing basic popup">
+        <div class="ui three column relaxed divided grid">
+          <div class="column">
+            <h4 class="ui header">Tarje - Webdesign</h4>
+            <i class="fa fa-envelope fa-fw"></i><a href="mailto:tarje.lavik@uib.no">Epost</a><br>
+            <i class="fa fa-phone"></i> 55 58 25 38
+          </div>
+          <div class="column">
+            <h4 class="ui header">Øyvind - Altmuligmann</h4>
+            <i class="fa fa-envelope fa-fw"></i> <a href="mailto:Oyvind.Gjesdal@uib.no">Epost</a><br>
+            <i class="fa fa-phone"></i> 55 58 25 42
+          </div>
+          <div class="column">
+            <h4 class="ui header">Hemed - Søk</h4>
+            <i class="fa fa-envelope fa-fw"></i> <a href="mailto:Hemed.Ruwehy@uib.no">Epost</a><br>
+            <i class="fa fa-phone"></i> 55 58 45 84
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<script>
+/* 
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
+
+// Hjelp, menu item in header-common
+$('.help-popup')
+  .popup({
+    inline   : true,
+    hoverable: true,
+    position : 'bottom right',
+    inverted: true,
+    offset: -15,
+    delay: {
+      show: 300,
+      hide: 800
+    }
+  })
+;
+
+// Menu item in header-common
+$('.menu-popup')
+  .popup({
+    inline   : true,
+    hoverable: true,
+    position : 'bottom left',
+    inverted: false,
+    variation:'large',
+    offset: 0,
+    delay: {
+      show: 300,
+      hide: 800
+    }
+  })
+;
+
+// Download dropdown
+$('.ui.language.dropdown')
+  .dropdown()
+;
+</script>
+    
