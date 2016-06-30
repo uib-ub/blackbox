@@ -58,7 +58,7 @@
                                            name="q"
                                            ng-model="queryString"
                                            ng-keyup="($event.keyCode==13 || queryString==='')&&search()"
-                                           placeholder="{{ 'searchContainer.placeholder' | translate }}"
+                                           /**placeholder="{{ 'searchContainer.placeholder' | translate }}"**/
                                            autofocus
                                            autocomplete="off"/>
                                     <i ng-click="search()" class="search link icon"></i>
