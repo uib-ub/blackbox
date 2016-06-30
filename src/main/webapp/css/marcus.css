@@ -77,8 +77,12 @@ body {
 }
 
 .blackbox-loading {
-    margin-left: 48%;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
 }
+
 
 .fancyinput-temp {
     cursor: default;

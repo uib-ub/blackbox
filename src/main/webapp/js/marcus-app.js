@@ -29,7 +29,7 @@ app.config(function($locationProvider) {
     $locationProvider.html5Mode({
         enabled : true,
         requireBase: false,
-        rewriteLinks : false});
+        rewriteLinks : false });
 });
 
 
@@ -58,7 +58,6 @@ app.controller('Ctrl', ['$translate', '$scope', function ($translate, $scope) {
     $translate.use(langKey);
   };
 }]);
-
 
 /**
  * ==============================
