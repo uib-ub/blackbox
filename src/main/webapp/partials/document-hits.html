@@ -1,26 +1,19 @@
 <div class="ui image" style="margin-bottom: 15px;">
     <div class="ui blue ribbon label">{{doc._source.type}}</div>
     
-    <a ng-if="doc._source.hasThumbnail" target="_blank" href="{{doc._source.uri}}">
-        <img alt="{{doc._source.title}}" class="small image" src="{{doc._source.hasThumbnail}}">
-    </a>
-    <div ng-if="doc._source.hasThumbnail" class="ui bottom attached label marcus pushup">
-        <div style="text-align: left;">{{doc._source.identifier}}<br>
-        <i>{{doc._source.cataloguer}}</i></div>
+    <a target="_blank" href="{{doc._source.uri}}">
+        <img ng-if="doc._source.hasThumbnail" alt="{{doc._source.title}}" class="small image" src="{{doc._source.hasThumbnail}}">
+        <div class="small image"><i style="margin-right: 0;" ng-if="!doc._source.hasThumbnail" class="ui bordered inverted grey icon massive camera retro"></i></div>
+    </a>    
+    <div class="ui bottom attached label marcus pushup">
+        <p style="margin-bottom: 0;">{{doc._source.identifier}}<br>
+        <i>{{doc._source.cataloguer}}</i></p>
         <div class="ui ms-corner">
-            <i ng-show='doc._source.showWeb == "true"' class="circular inverted green unlock icon"></i>
+            <i ng-show='doc._source.showWeb == "true" || doc._source.showWeb == undefined' class="circular inverted green unlock icon"></i>
             <i ng-show='doc._source.showWeb == "false"' class="circular inverted red lock icon"></i>
-            <i ng-show='doc._source.showWeb == undefined' class="circular inverted help icon"></i>
             <i style="right: 2em;" ng-show='doc._source.hasZoom == "Med DeepZoom"' class="circular inverted orange zoom icon"></i>
         </div>
     </div>
-    <i ng-if="!doc._source.hasThumbnail" class="ui bordered inverted grey icon massive camera retro"></i>
-    <div ng-if="!doc._source.hasThumbnail" class="ui ms-corner">
-            <i ng-show='doc._source.showWeb == "true"' class="circular inverted green unlock icon"></i>
-            <i ng-show='doc._source.showWeb == "false"' class="circular inverted red lock icon"></i>
-            <i ng-show='doc._source.showWeb == undefined' class="circular inverted help icon"></i>
-            <i style="right: 2em;" ng-show='doc._source.hasZoom == "Med DeepZoom"' class="circular inverted orange zoom icon"></i>
-        </div>
 </div>
 <div class="content">
     <a class="header" target="_blank" href="{{doc._source.uri}}">{{doc._source.title||doc._source.label}}</a>
