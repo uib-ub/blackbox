@@ -14,7 +14,8 @@
     <link rel="stylesheet" href="//code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css"/>
     <link href="http://fonts.googleapis.com/css?family=IM+Fell+Great+Primer" rel="stylesheet" type="text/css">
     <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.2.1/semantic.min.css"/>
-    <link rel="stylesheet" href="css/marcus.css"/>
+    <link rel="stylesheet" rel="stylesheet" type="text/css" media="screen" href="css/marcus.css"/>
+    <link rel="stylesheet" rel="stylesheet" type="text/css" media="print" href="css/print.css"/>
     <link rel="stylesheet" href="css/bootstrap-pagination.css"/>
     <style>
         .pusher {
@@ -38,7 +39,7 @@
     </style>
 </head>
 <body>
-    <div include-replace ng-include="'partials/header.html'"></div>
+    <div id="header" include-replace ng-include="'partials/header.html'"></div>
     <div class="ui bottom attached segment">
         <div include-replace ng-include="'partials/sidebar.html'"></div>
         <div class="pusher">
@@ -198,7 +199,7 @@
                 <div ng-cloak ng-show="ready" class="ui container">
                     <div class="search-results ui equal width grid">
                         <!--Starting with facets-->
-                        <div ng-cloak class="ng-cloak four wide column computer only">
+                        <div id="filters" ng-cloak class="ng-cloak four wide column computer only">
                             <div class="facets">
                                 <h2 translate="filters.heading"></h2>
                                 <h3 translate="filters.created"></h3>

@@ -1,9 +1,10 @@
-<div class="ui image" style="margin-bottom: 15px;">
-    <div class="ui blue ribbon label">{{doc._source.type}}</div>
+<div class="ui medium image" style="margin-bottom: 15px;">
+    <div style="z-index: 999;" class="ui blue ribbon label">{{doc._source.type}}</div>
     
     <a target="_blank" href="{{doc._source.uri}}">
-        <img ng-if="doc._source.hasThumbnail" alt="{{doc._source.title}}" class="small image" src="{{doc._source.hasThumbnail}}">
-        <div class="small image"><i style="margin-right: 0;" ng-if="!doc._source.hasThumbnail" class="ui bordered inverted grey icon massive camera retro"></i></div>
+        <img ng-if="doc._source.img && doc._source.hasThumbnail" alt="{{doc._source.title}}" class="ui fluid image" src="{{doc._source.img}}">
+        <img ng-if="!doc._source.img && doc._source.hasThumbnail" alt="{{doc._source.title}}" class="ui fluid image" src="{{doc._source.hasThumbnail}}">
+        <div ng-if="!doc._source.hasThumbnail && !doc._source.img" style="display: block;" class="ui image"><i style="margin-right: 0; width: 100%;" class="ui bordered inverted grey icon massive camera retro"></i></div>
     </a>    
     <div class="ui bottom attached label marcus pushup">
         <p style="margin-bottom: 0;">{{doc._source.identifier}}<br>
