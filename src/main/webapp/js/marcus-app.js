@@ -246,6 +246,16 @@ app.filter('unsafe', function ($sce) {
 });
 
 /**
+ * A filter.
+ */
+
+app.filter('iif', function () {
+   return function(input, trueValue, falseValue) {
+        return input ? trueValue : falseValue;
+   };
+});
+
+/**
  * A directive.
  */
 app.directive('includeReplace', function () {
@@ -257,6 +267,3 @@ app.directive('includeReplace', function () {
         }
     };
 });
-
-
-

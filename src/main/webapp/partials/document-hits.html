@@ -1,5 +1,5 @@
 <div class="ui medium image" style="margin-bottom: 15px;">
-    <div style="z-index: 999;" class="ui blue ribbon label">{{doc._source.type}}</div>
+    <div style="z-index: 1;" class="ui blue ribbon label">{{doc._source.type}}</div>
     
     <a target="_blank" href="{{doc._source.uri}}">
         <img ng-if="doc._source.img && doc._source.hasThumbnail" alt="{{doc._source.title}}" class="ui fluid image" src="{{doc._source.img}}">

@@ -36,6 +36,15 @@
         .ui.items > .item .image .ui.attached.label {
             position: relative;
         }
+        
+        /*@media print {
+            header h1:after {
+               content: url(https://chart.googleapis.com/chart?cht=qr&chs=150x150&chl=http://yourdomain.com&choe=UTF-8);
+               position: absolute;
+               right: 0;
+               top: 0;
+            }
+         }*/
     </style>
 </head>
 <body>
@@ -368,8 +377,14 @@
                                                      class="ui item fade">
                                                 </div>
                                                 <div include-replace
-                                                     ng-if='doc._source.type == "Skip" || doc._source.type == "Emne" || doc._source.type == "Fartøy"'
+                                                     ng-if='doc._source.type == "Skip" || doc._source.type == "Fartøy"'
                                                      ng-include="'partials/vessel-hits.html'"
+                                                     style="page-break-inside: avoid;"
+                                                     class="ui item fade">
+                                                </div>
+                                                <div include-replace
+                                                     ng-if='doc._source.type == "Emne"'
+                                                     ng-include="'partials/concept-hits.html'"
                                                      style="page-break-inside: avoid;"
                                                      class="ui item fade">
                                                 </div>
@@ -384,7 +399,8 @@
                                                 </div>
                                                 <div include-replace ng-if='doc._source.type == "Aggregering"'
                                                      ng-include="'partials/aggregation-hits.html'"
-                                                     style="page-break-inside: avoid;" class="ui item fade">
+                                                     style="page-break-inside: avoid; background-color: #ddd !important;" 
+                                                     class="ui item fade">
                                                 </div>
                                             </div>
                                         </div>

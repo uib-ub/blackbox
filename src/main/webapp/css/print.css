@@ -7,13 +7,59 @@ and open the template in the editor.
     Created on : 05.jul.2016, 11:51:35
     Author     : st10938
 */
+@media print {
+   h1 {
+      color: #000;
+      background: none;
+   }
+   h2, h3 {
+   page-break-after: avoid;
+}
 
-#header, #sidebar, #filters, #main-filters, #active-filters-reset-help, .hitlist-settings {
+   nav, aside {
+      display: none;
+   }
+
+   body, article {
+      width: 100%;
+      margin: 0;
+      padding: 0;
+   }
+   
+   img {
+   max-width: 100% !important;
+}
+   
+article {
+   page-break-before: always;
+}
+
+ul, img {
+   page-break-inside: avoid;
+}
+
+   article a {
+      font-weight: bolder;
+      text-decoration: none;
+   }
+
+   article a[href^=http]:after {
+      content:" <" attr(href) "> ";
+   }
+
+   #header, #sidebar, #filters, #main-filters, #active-filters-reset-help, .hitlist-settings {
     display: none !important;
+    }
+    .pusher {
+        margin-right: 0px !important;
+        margin-left: 0px !important;
+        width: 100%;
+    }
+
+   @page {
+      margin: 2cm;
+   }
 }
-.pusher {
-    margin-right: 0px !important;
-    margin-left: 0px !important;
-    width: 100%;
-}
+
+
 
