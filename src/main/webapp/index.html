@@ -356,7 +356,7 @@
                               </div>
                             <div class="search-hits">
                                 <div class="results-hit ng-cloak">
-                                    <!-- Search results view--->
+                                    <!-- Search results view -->
                                     <div class="ui container">
                                         <div class="ui divided items">
                                             <div ng-repeat="doc in results.hits.hits track by $index" class="ui item">
@@ -384,8 +384,14 @@
                                                      class="ui item fade">
                                                 </div>
                                                 <div include-replace
-                                                     ng-if='doc._source.type == "Emne" || doc._source.type == "Sted" || doc._source.type == "Samling" || doc._source.type == "Manuskriptsamling"'
+                                                     ng-if='doc._source.type == "Emne" || doc._source.type == "Sted"'
                                                      ng-include="'partials/concept-hits.html'"
+                                                     style="page-break-inside: avoid;"
+                                                     class="ui item fade">
+                                                </div>
+                                                <div include-replace
+                                                     ng-if='doc._source.type == "Samling" || doc._source.type == "Manuskriptsamling"'
+                                                     ng-include="'partials/collection-hits.html'"
                                                      style="page-break-inside: avoid;"
                                                      class="ui item fade">
                                                 </div>

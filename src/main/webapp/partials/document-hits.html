@@ -31,7 +31,11 @@
         </div>
     </div>
     <div class="description">
-        <p ng-bind-html="doc._source.description | unsafe"></p>
+        <p ng-if="doc._source.description" ng-bind-html="doc._source.description | unsafe"></p>
+        <div ng-if="doc._source.internalNote" class="internalnote ui brown message">
+            <div class="header">Intern note:</div>
+            <p ng-bind-html="doc._source.internalNote | unsafe"></p>
+        </div>
     </div>
     <hr>
     <div class="extra">
