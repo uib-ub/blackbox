@@ -360,12 +360,13 @@
                                     <div class="ui container">
                                         <div class="ui divided items">
                                             <div ng-repeat="doc in results.hits.hits track by $index" class="ui item">
-                                                <div include-replace ng-if='doc._type == "document"'
+                                                <div include-replace 
+                                                     ng-if='doc._type == "document"'
                                                      ng-include="'partials/document-hits.html'"
                                                      style="page-break-inside: avoid;" class="ui item fade">
                                                 </div>
                                                 <div include-replace
-                                                     ng-if='doc._source.type == "Person" || doc._source.type == "Organisajon" || doc._source.type == "Firma" || doc._source.type == "Katalogisator"'
+                                                     ng-if='doc._source.type == "Person" || doc._source.type == "Organisasjon" || doc._source.type == "Selskap" || doc._source.type == "Katalogisator"'
                                                      ng-include="'partials/agent-hits.html'"
                                                      style="page-break-inside: avoid;"
                                                      class="ui item">
@@ -383,21 +384,24 @@
                                                      class="ui item fade">
                                                 </div>
                                                 <div include-replace
-                                                     ng-if='doc._source.type == "Emne"'
+                                                     ng-if='doc._source.type == "Emne" || doc._source.type == "Sted" || doc._source.type == "Samling" || doc._source.type == "Manuskriptsamling"'
                                                      ng-include="'partials/concept-hits.html'"
                                                      style="page-break-inside: avoid;"
                                                      class="ui item fade">
                                                 </div>
-                                                <div include-replace ng-if='doc._source.type == "Akkvisisjon"'
+                                                <div include-replace 
+                                                     ng-if='doc._source.type == "Akkvisisjon"'
                                                      ng-include="'partials/acquisition-hits.html'"
                                                      style="page-break-inside: avoid;" class="ui item fade">
                                                 </div>
-                                                <div include-replace ng-if='doc._source.type == "Arbeidsliste"'
+                                                <div include-replace 
+                                                     ng-if='doc._source.type == "Arbeidsliste"'
                                                      ng-include="'partials/object-hits.html'"
                                                      style="page-break-inside: avoid;"
                                                      class="ui item fade">
                                                 </div>
-                                                <div include-replace ng-if='doc._source.type == "Aggregering"'
+                                                <div include-replace 
+                                                     ng-if='doc._source.type == "Aggregering"'
                                                      ng-include="'partials/aggregation-hits.html'"
                                                      style="page-break-inside: avoid; background-color: #ddd !important;" 
                                                      class="ui item fade">
