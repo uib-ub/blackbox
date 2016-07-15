@@ -6,15 +6,8 @@
     <div  class="content">
         <a ng-if="doc._source.preferredLabel" target="_blank" href="{{doc._source.uri}}" class="header">{{doc._source.preferredLabel}}</a>
         <div class="meta">
-            <div ng-if="isString(doc._source.maker)">
-                <div class="content"><i class="ui icon user"></i><span class="header">{{doc._source.maker}}</span> </div>
-            </div>
-            <div ng-if="isArray(doc._source.maker)">
-                <div class="ui horizontal list">
-                    <div ng-repeat="maker in doc._source.maker track by $index" class="item">
-                        <i class="ui icon user"></i><span>{{maker}}</span>
-                    </div>
-                </div>
+            <div ng-if="doc._source.inScheme">
+                <div class="content"><span class="header">Del av: {{doc._source.inScheme}}</span> </div>
             </div>
             <span ng-if="doc._source.created"><i class="icon wait"></i> {{doc._source.created}}</span>
         </div>
