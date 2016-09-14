@@ -1,14 +1,8 @@
 /nbproject/
-
 /logs/
-
 /target/
-
 /nb-configuration.xml
-
-/.idea/
+.idea/
 build-idea/
-
 /out/
-
 *.iml
