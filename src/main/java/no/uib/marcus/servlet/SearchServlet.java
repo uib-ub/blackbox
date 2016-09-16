@@ -112,7 +112,7 @@ public class SearchServlet extends HttpServlet {
             Map<String, String[]> parameterMapCopy = new HashMap<>(request.getParameterMap());
             //Remove those that we are not interested in logging.
             parameterMapCopy.remove("aggs");
-            parameterMapCopy.remove("index");
+            //At one point, we need to log where the request is coming from
             XContentBuilder builder = XContentFactory.jsonBuilder()
                     .startObject()
                     //.field("host", request.getRemoteAddr().equals("0:0:0:0:0:0:0:1") ? InetAddress.getLocalHost() : request.getRemoteAddr())
