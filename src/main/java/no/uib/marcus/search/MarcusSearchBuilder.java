@@ -177,15 +177,15 @@ public class MarcusSearchBuilder extends AbstractSearchBuilder<MarcusSearchBuild
                         QueryUtils.buildQueryString(getQueryString()));
             } else {
                 //Match all documents
-                functionScoreQueryBuilder = QueryBuilders.functionScoreQuery(
-                        QueryBuilders.matchAllQuery());
+                functionScoreQueryBuilder = QueryBuilders.functionScoreQuery(QueryBuilders.matchAllQuery());
             }
-            //Boost documents of type "fotographi" and those that have showWeb=true, if exist
+
+            //Boost documents of type "fotografi", with subject "Flyfoto" and has "showWeb" true.
+            //This is just for coolness and it has no harm if they don't exist
             query = functionScoreQueryBuilder
-                    .add(FilterBuilders.termFilter("type", "fotografi"),
-                            ScoreFunctionBuilders.weightFactorFunction(2))
-                    .add(FilterBuilders.termFilter("showWeb", true),
-                            ScoreFunctionBuilders.weightFactorFunction(2));
+                    .add(FilterBuilders.termFilter("type", "fotografi"), ScoreFunctionBuilders.weightFactorFunction(2))
+                    .add(FilterBuilders.termFilter("subject", "Flyfoto"), ScoreFunctionBuilders.weightFactorFunction(2))
+                    .add(FilterBuilders.termFilter("showWeb", true), ScoreFunctionBuilders.weightFactorFunction(2));
 
 
             //Set Query, whether with or without filter
