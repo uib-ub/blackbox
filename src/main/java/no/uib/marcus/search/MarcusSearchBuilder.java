@@ -184,7 +184,7 @@ public class MarcusSearchBuilder extends AbstractSearchBuilder<MarcusSearchBuild
             //This is just for coolness and it has no harm if they don't exist
             query = functionScoreQueryBuilder
                     .add(FilterBuilders.termFilter("type", "fotografi"), ScoreFunctionBuilders.weightFactorFunction(2))
-                    .add(FilterBuilders.termFilter("subject", "Flyfoto"), ScoreFunctionBuilders.weightFactorFunction(2))
+                    .add(FilterBuilders.termFilter("subject.exact", "Flyfoto"), ScoreFunctionBuilders.weightFactorFunction(2))
                     .add(FilterBuilders.termFilter("showWeb", true), ScoreFunctionBuilders.weightFactorFunction(2));
 
 
