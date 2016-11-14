@@ -179,7 +179,8 @@ public class MarcusSearchBuilder extends AbstractSearchBuilder<MarcusSearchBuild
                 //are colored photo and they beautify the page.
                 // This is just for coolness and it has no harm if they don't exist
                 functionScoreQueryBuilder = QueryBuilders.functionScoreQuery(QueryBuilders.matchAllQuery())
-                        .add(FilterBuilders.queryFilter(QueryBuilders.queryStringQuery("title:fana")), ScoreFunctionBuilders.weightFactorFunction(2));
+                        .add(FilterBuilders.queryFilter(QueryBuilders.queryStringQuery("title:\"fana\"")), ScoreFunctionBuilders.weightFactorFunction(2))
+                        .add(FilterBuilders.termFilter("subject.exact", "Flyfoto"), ScoreFunctionBuilders.weightFactorFunction(2));
             }
 
             //Boost documents of type "fotografi"
