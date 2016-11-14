@@ -183,9 +183,9 @@ public class MarcusSearchBuilder extends AbstractSearchBuilder<MarcusSearchBuild
             //Boost documents of type "fotografi", with subject "Flyfoto" and has "showWeb" true.
             //This is just for coolness and it has no harm if they don't exist
             query = functionScoreQueryBuilder
-                    .add(FilterBuilders.termFilter("type", "fotografi"), ScoreFunctionBuilders.weightFactorFunction(2))
-                    .add(FilterBuilders.termFilter("subject.exact", "Flyfoto"), ScoreFunctionBuilders.weightFactorFunction(2))
-                    .add(FilterBuilders.termFilter("showWeb", true), ScoreFunctionBuilders.weightFactorFunction(2));
+                    .add(FilterBuilders.termFilter("type.exact", "Fotografi"), ScoreFunctionBuilders.weightFactorFunction(2))
+                    .add(FilterBuilders.termFilter("subject.exact", "Flyfoto"), ScoreFunctionBuilders.weightFactorFunction(3));
+                    //.add(FilterBuilders.termFilter("showWeb", true), ScoreFunctionBuilders.weightFactorFunction(2));
 
 
             //Set Query, whether with or without filter
