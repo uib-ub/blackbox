@@ -27,6 +27,7 @@ import org.elasticsearch.search.sort.SortBuilder;
 import javax.validation.constraints.NotNull;
 import java.io.IOException;
 import java.util.Optional;
+import java.util.Random;
 
 /**
  * Builder for Marcus search service
@@ -157,6 +158,8 @@ public class MarcusSearchBuilder extends AbstractSearchBuilder<MarcusSearchBuild
         SearchRequestBuilder searchRequest;
         QueryBuilder query;
         FunctionScoreQueryBuilder functionScoreQueryBuilder;
+        //A list of cool images
+        String[] randomList = {"Gaupås", "fana" , "nyborg", "flaktveit"};
         try {
             //Prepare search request
             searchRequest = getClient().prepareSearch();
@@ -175,11 +178,11 @@ public class MarcusSearchBuilder extends AbstractSearchBuilder<MarcusSearchBuild
                 //Use query_string query with AND operator
                 functionScoreQueryBuilder = QueryBuilders.functionScoreQuery(QueryUtils.buildQueryString(getQueryString()));
             } else {
-                //Match all documents and boost the documents with label "Gaupås" because they
+                //Match all documents and boost the documents inside the random list because they
                 //are colored photo and they beautify the page.
-                // This is just for coolness and it has no harm if they don't exist
+                // This is just for coolness and it has no harm if the query has no results
                 functionScoreQueryBuilder = QueryBuilders.functionScoreQuery(QueryBuilders.matchAllQuery())
-                        .add(FilterBuilders.queryFilter(QueryBuilders.queryStringQuery("title:\"Gaupås\"")), ScoreFunctionBuilders.weightFactorFunction(2))
+                        .add(FilterBuilders.queryFilter(QueryBuilders.queryStringQuery(randomList[new Random().nextInt(randomList.length)])), ScoreFunctionBuilders.weightFactorFunction(2))
                         .add(FilterBuilders.termFilter("subject.exact", "Flyfoto"), ScoreFunctionBuilders.weightFactorFunction(2));
             }
 
@@ -209,7 +212,7 @@ public class MarcusSearchBuilder extends AbstractSearchBuilder<MarcusSearchBuild
             }
 
             //Show builder for debugging purpose
-            //logger.info(searchRequest.toString());
+            logger.info(searchRequest.toString());
 
             //Execute the response
             response = searchRequest.execute().actionGet();
