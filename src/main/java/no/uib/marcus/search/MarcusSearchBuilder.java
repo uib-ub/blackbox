@@ -175,11 +175,11 @@ public class MarcusSearchBuilder extends AbstractSearchBuilder<MarcusSearchBuild
                 //Use query_string query with AND operator
                 functionScoreQueryBuilder = QueryBuilders.functionScoreQuery(QueryUtils.buildQueryString(getQueryString()));
             } else {
-                //Match all documents and boost the documents with label "fana" because they
+                //Match all documents and boost the documents with label "Gaupås" because they
                 //are colored photo and they beautify the page.
                 // This is just for coolness and it has no harm if they don't exist
                 functionScoreQueryBuilder = QueryBuilders.functionScoreQuery(QueryBuilders.matchAllQuery())
-                        .add(FilterBuilders.queryFilter(QueryBuilders.queryStringQuery("title:\"fana\"")), ScoreFunctionBuilders.weightFactorFunction(2))
+                        .add(FilterBuilders.queryFilter(QueryBuilders.queryStringQuery("title:\"Gaupås\"")), ScoreFunctionBuilders.weightFactorFunction(2))
                         .add(FilterBuilders.termFilter("subject.exact", "Flyfoto"), ScoreFunctionBuilders.weightFactorFunction(2));
             }
 
