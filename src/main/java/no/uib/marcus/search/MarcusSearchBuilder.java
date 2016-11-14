@@ -175,17 +175,16 @@ public class MarcusSearchBuilder extends AbstractSearchBuilder<MarcusSearchBuild
                 //Use query_string query with AND operator
                 functionScoreQueryBuilder = QueryBuilders.functionScoreQuery(QueryUtils.buildQueryString(getQueryString()));
             } else {
-                //Match all documents
-                functionScoreQueryBuilder = QueryBuilders.functionScoreQuery(QueryBuilders.matchAllQuery());
+                //Match all documents and boost the documents with label "fana" because they
+                //are colored photo and they beautify the page.
+                // This is just for coolness and it has no harm if they don't exist
+                functionScoreQueryBuilder = QueryBuilders.functionScoreQuery(QueryBuilders.matchAllQuery())
+                        .add(FilterBuilders.queryFilter(QueryBuilders.simpleQueryStringQuery("fana")), ScoreFunctionBuilders.weightFactorFunction(2));
             }
 
-            //Boost documents of type "fotografi", with subject "Flyfoto" and has "showWeb" true.
-            //This is just for coolness and it has no harm if they don't exist
+            //Boost documents of type "fotografi"
             query = functionScoreQueryBuilder
-                    .add(FilterBuilders.termFilter("type", "fotografi"), ScoreFunctionBuilders.weightFactorFunction(3));
-                    //.add(FilterBuilders.termFilter("subject.exact", "Flyfoto"), ScoreFunctionBuilders.weightFactorFunction(2))
-                    //.add(FilterBuilders.termFilter("showWeb", true), ScoreFunctionBuilders.weightFactorFunction(2));
-
+                    .add(FilterBuilders.termFilter("type", "fotografi"), ScoreFunctionBuilders.weightFactorFunction(2));
 
             //Set Query, whether with or without filter
             if(filterBuilder != null){
