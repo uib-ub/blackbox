@@ -3,6 +3,7 @@ package no.uib.marcus.search;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
 import no.uib.marcus.client.ClientFactory;
+import no.uib.marcus.common.Settings;
 import no.uib.marcus.common.util.AggregationUtils;
 import no.uib.marcus.common.util.QueryUtils;
 import org.apache.log4j.Logger;
@@ -158,8 +159,6 @@ public class MarcusSearchBuilder extends AbstractSearchBuilder<MarcusSearchBuild
         SearchRequestBuilder searchRequest;
         QueryBuilder query;
         FunctionScoreQueryBuilder functionScoreQueryBuilder;
-        //A list of cool images
-        String[] randomList = {"Gaupås", "fana" , "nyborg", "flaktveit"};
         try {
             //Prepare search request
             searchRequest = getClient().prepareSearch();
@@ -178,18 +177,21 @@ public class MarcusSearchBuilder extends AbstractSearchBuilder<MarcusSearchBuild
                 //Use query_string query with AND operator
                 functionScoreQueryBuilder = QueryBuilders.functionScoreQuery(QueryUtils.buildQueryString(getQueryString()));
             } else if (!Strings.hasText(getQueryString()) && filterBuilder == null ){
-                //Match all documents and boost the documents inside the random list because they
-                //are colored photo and they beautify the page.
-                // This is just for coolness and it has no harm if the query has no results
+                //Boost documents inside the "random list" of places because these places have colorful images
+                // and hence they beautify the front page.
+                //This is just for coolness and it has no effect if the query yields no results
                 functionScoreQueryBuilder = QueryBuilders.functionScoreQuery(QueryBuilders.matchAllQuery())
-                        .add(FilterBuilders.queryFilter(QueryBuilders.simpleQueryStringQuery(randomList[new Random().nextInt(randomList.length)])), ScoreFunctionBuilders.weightFactorFunction(2))
-                        .add(FilterBuilders.termFilter("subject.exact", "Flyfoto"), ScoreFunctionBuilders.weightFactorFunction(2));
+                        .add(FilterBuilders.queryFilter(
+                                QueryBuilders.simpleQueryStringQuery(
+                                        Settings.randomList[new Random().nextInt(Settings.randomList.length)])),
+                                ScoreFunctionBuilders.weightFactorFunction(2))
+                        .add(FilterBuilders.termFilter("subject.exact", "Flyfoto"),
+                                ScoreFunctionBuilders.weightFactorFunction(2));
             }
             else {
                 functionScoreQueryBuilder = QueryBuilders.functionScoreQuery(QueryBuilders.matchAllQuery());
             }
-
-            //Boost documents of type "fotografi"
+            //Boost documents of type "Fotografi" for every query performed.
             query = functionScoreQueryBuilder
                     .add(FilterBuilders.termFilter("type", "fotografi"), ScoreFunctionBuilders.weightFactorFunction(2));
 
