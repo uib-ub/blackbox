@@ -3,6 +3,7 @@ package no.uib.marcus.servlet;
 import no.uib.marcus.client.ClientFactory;
 import no.uib.marcus.common.RequestParams;
 import no.uib.marcus.common.util.FilterUtils;
+import no.uib.marcus.common.util.LogUtils;
 import no.uib.marcus.common.util.QueryUtils;
 import no.uib.marcus.common.util.SortUtils;
 import no.uib.marcus.search.MarcusSearchBuilder;
@@ -12,8 +13,6 @@ import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.client.Client;
 import org.elasticsearch.common.Booleans;
 import org.elasticsearch.common.Strings;
-import org.elasticsearch.common.xcontent.XContentBuilder;
-import org.elasticsearch.common.xcontent.XContentFactory;
 import org.elasticsearch.index.query.BoolFilterBuilder;
 import org.elasticsearch.search.sort.SortBuilder;
 
@@ -24,8 +23,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * This servlet processes all HTTP requests coming from "/search" endpoint
@@ -108,19 +105,8 @@ public class SearchServlet extends HttpServlet {
             //Write response to the client
             out.write(searchResponseString);
 
-            //Log what has been queried
-            Map<String, String[]> parameterMapCopy = new HashMap<>(request.getParameterMap());
-            //Remove those that we are not interested in logging.
-            parameterMapCopy.remove("aggs");
-            //At one point, we need to log where the request is coming from
-            XContentBuilder builder = XContentFactory.jsonBuilder()
-                    .startObject()
-                    //.field("host", request.getRemoteAddr().equals("0:0:0:0:0:0:0:1") ? InetAddress.getLocalHost() : request.getRemoteAddr())
-                    .field("params", parameterMapCopy)
-                    .field("hits", searchResponse.getHits().getTotalHits())
-                    .field("took", searchResponse.getTook())
-                    .endObject();
-            logger.info(builder.string());
+            //Log search response
+            logger.info(LogUtils.logSearchResponse(request, searchResponse));
         }
     }
 
