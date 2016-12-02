@@ -56,7 +56,15 @@ public final class FilterUtils {
                     if (AggregationUtils.contains(aggregations, entry.getKey(), "operator", "AND")) {
                         for (Object value : entry.getValue()) {
                             //Building "AND" filter.
-                            boolFilter.must(FilterBuilders.termFilter(entry.getKey(), value));
+                            //Exclude any filter that begins with minus sign ("-");
+                            if(entry.getKey().startsWith("-")){
+                                String field = entry.getKey().substring(1);
+                                boolFilter.mustNot(FilterBuilders.termFilter(field, value));
+                            }
+                            else{
+                                boolFilter.must(FilterBuilders.termFilter(entry.getKey(), value));
+                            }
+
                         }
                     } else {
                         //Building "OR" filter.

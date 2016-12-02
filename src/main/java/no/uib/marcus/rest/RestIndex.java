@@ -32,7 +32,7 @@ public class RestIndex extends RestConfig {
                             "Server path: " + servletContext.getContextPath() + "/rest" +
                             "<h2>Index</h2>" +
                                  "<ul>" +
-                                    "<li>GET /rest - Returns this page.</li>" +
+                                    "<li>GET /api - Returns this page.</li>" +
                                     "<li>GET /test - Returns a test page.</li>" +
                                 "</ul>" +
                     "</body>" +

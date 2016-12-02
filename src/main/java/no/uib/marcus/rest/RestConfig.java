@@ -7,5 +7,5 @@ import javax.ws.rs.core.Application;
 /**
  * A class that register REST application path 
  **/
-@ApplicationPath("rest")
+@ApplicationPath("api")
 public class RestConfig extends Application {}

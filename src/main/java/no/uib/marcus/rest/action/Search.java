@@ -29,7 +29,7 @@ import javax.ws.rs.core.Response;
  * Date: 27 Nov 2016
  **/
 
-@Path("/search")
+@Path("/v1/search")
 public class Search {
         
     /**
