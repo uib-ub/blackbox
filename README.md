@@ -1,12 +1,12 @@
 # About Blackbox #
 
-Blackbox is a server side application that acts as a bridge between Elasticsearch and client applications. It is developed using OOP best practices and uses Elasticsearch core API to communicate with a cluster.
+Blackbox is a server side application that acts as a bridge between Elasticsearch and client applications to simplify search experience that were before difficult to meet by the University of Bergen Library, department of Special Collections. It is developed using Object Oriented Programming best practices and uses Elasticsearch core API to communicate with a cluster.
 
-Blackbox communicates with our Elasticsearch cluster in round-robbin fashion through Transport client. 
+Blackbox communicates with Elasticsearch cluster in round-robbin fashion through Transport client that has full priviledge as one of the Elasticsearch nodes in the cluster. 
 
-It runs as a tomcat application at http://kirishima.uib.no/blackbox/ and all client applications can communicate with it through HTTP transport.
+It runs as a [tomcat application](http://kirishima.uib.no/blackbox) and all client applications can communicate with it through HTTP transport.
 
-In this version, we are making it independent from the client implementations and hence can be queried separately. See f.eg http://kirishima.uib.no/blackbox/search?pretty=1
+In this version, we are making it independent from the client implementations and hence can be queried separately. See f.eg http://kirishima.uib.no/blackbox/search?index=ska2&pretty=1
 
 ### Usage ###
 Blackbox can be queried by specifying parameters in a respective endpoint.
