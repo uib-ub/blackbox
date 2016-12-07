@@ -16,9 +16,7 @@ import java.util.Map;
 
 public final class FilterUtils {
     private static final Logger logger = Logger.getLogger(FilterUtils.class);
-
-    private FilterUtils(){}
-
+    private FilterUtils() {}
     /**
      * A method for building BoolFilter based on the aggregation settings.
      */
@@ -27,7 +25,6 @@ public final class FilterUtils {
         String fromDate = request.getParameter(RequestParams.FROM_DATE);
         String toDate = request.getParameter(RequestParams.TO_DATE);
         String[] selectedFilters = request.getParameterValues(RequestParams.SELECTED_FILTERS);
-        String[] settingFilters = request.getParameterValues(RequestParams.SETTING_FILTER);
         String aggregations = request.getParameter(RequestParams.AGGREGATIONS);
 
         //In this map, keys are "fields" and values are "terms"
@@ -57,17 +54,16 @@ public final class FilterUtils {
                         for (Object value : entry.getValue()) {
                             //Building "AND" filter.
                             //Exclude any filter that begins with minus sign ("-");
-                            if(entry.getKey().startsWith("-")){
+                            if (entry.getKey().startsWith("-")) {
                                 String field = entry.getKey().substring(1);
                                 boolFilter.mustNot(FilterBuilders.termFilter(field, value));
-                            }
-                            else{
+                            } else {
                                 boolFilter.must(FilterBuilders.termFilter(entry.getKey(), value));
                             }
-
                         }
+                    } else if (entry.getKey().startsWith("-")) {
+                        boolFilter.mustNot(FilterBuilders.termsFilter(entry.getKey().substring(1), entry.getValue()));
                     } else {
-                        //Building "OR" filter.
                         boolFilter.must(FilterBuilders.termsFilter(entry.getKey(), entry.getValue()));
                     }
                 }
