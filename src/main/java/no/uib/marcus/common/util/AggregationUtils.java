@@ -7,6 +7,7 @@ import com.google.gson.JsonParser;
 import org.apache.log4j.Logger;
 import org.elasticsearch.action.search.SearchRequestBuilder;
 import org.elasticsearch.common.Nullable;
+import org.elasticsearch.common.Strings;
 import org.elasticsearch.search.aggregations.AggregationBuilders;
 import org.elasticsearch.search.aggregations.bucket.histogram.DateHistogram;
 import org.elasticsearch.search.aggregations.bucket.histogram.DateHistogramBuilder;
@@ -42,6 +43,10 @@ public final class AggregationUtils {
      */
     public static boolean contains(String aggregations, String field, String key, String value) {
         try {
+            //If there is no aggregations, no need to continue.
+            if(!Strings.hasText(aggregations)){
+                return false;
+            }
             JsonElement facets = new JsonParser().parse(aggregations);
             for (JsonElement e : facets.getAsJsonArray()) {
                 JsonObject facet = e.getAsJsonObject();

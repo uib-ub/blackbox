@@ -54,17 +54,15 @@ public final class FilterUtils {
                         for (Object value : entry.getValue()) {
                             //Building "AND" filter with "term" filter.
                             if (entry.getKey().startsWith("-")) {
-                                String field = entry.getKey().substring(1);
                                 //Exclude any filter that begins with minus sign ("-") by using MUST NOT filter;
-                                boolFilter.mustNot(FilterBuilders.termFilter(field, value));
+                                boolFilter.mustNot(FilterBuilders.termFilter(entry.getKey().substring(1), value));
                             } else {
                                 boolFilter.must(FilterBuilders.termFilter(entry.getKey(), value));
                             }
                         }
-                    }//Building "OR" filter with "terms" filter
+                    }//Building "OR" filter using "terms" filter (which is default)
                     else if (entry.getKey().startsWith("-")) {
-                        logger.info("============\nKey " + entry.getKey() + " Value " + entry.getValue());
-                        //Exclude any filter that begins with minus sign ("-") by using MUST NO filter;
+                        //Exclude any filter that begins with minus sign ("-") by using MUST NOT filter;
                         boolFilter.mustNot(FilterBuilders.termsFilter(entry.getKey().substring(1), entry.getValue()));
                     }
                     else {
@@ -73,7 +71,7 @@ public final class FilterUtils {
                 }
             }
         } catch (Exception ex) {
-            logger.error("Exception occurred while constructing Bool filter" + ex.getLocalizedMessage());
+            logger.error("Exception occurred while constructing Bool filter [" + ex.getLocalizedMessage() + " ]");
         }
         return boolFilter;
     }
