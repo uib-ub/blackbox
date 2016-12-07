@@ -52,18 +52,22 @@ public final class FilterUtils {
                 if (!entry.getValue().isEmpty()) {
                     if (AggregationUtils.contains(aggregations, entry.getKey(), "operator", "AND")) {
                         for (Object value : entry.getValue()) {
-                            //Building "AND" filter.
-                            //Exclude any filter that begins with minus sign ("-");
+                            //Building "AND" filter with "term" filter.
                             if (entry.getKey().startsWith("-")) {
                                 String field = entry.getKey().substring(1);
+                                //Exclude any filter that begins with minus sign ("-") by using MUST NOT filter;
                                 boolFilter.mustNot(FilterBuilders.termFilter(field, value));
                             } else {
                                 boolFilter.must(FilterBuilders.termFilter(entry.getKey(), value));
                             }
                         }
-                    } else if (entry.getKey().startsWith("-")) {
+                    }//Building "OR" filter with "terms" filter
+                    else if (entry.getKey().startsWith("-")) {
+                        logger.info("============\nKey " + entry.getKey() + " Value " + entry.getValue());
+                        //Exclude any filter that begins with minus sign ("-") by using MUST NO filter;
                         boolFilter.mustNot(FilterBuilders.termsFilter(entry.getKey().substring(1), entry.getValue()));
-                    } else {
+                    }
+                    else {
                         boolFilter.must(FilterBuilders.termsFilter(entry.getKey(), entry.getValue()));
                     }
                 }
