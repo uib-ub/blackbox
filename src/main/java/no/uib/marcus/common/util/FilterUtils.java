@@ -27,8 +27,7 @@ public final class FilterUtils {
         String[] selectedFilters = request.getParameterValues(RequestParams.SELECTED_FILTERS);
         String aggregations = request.getParameter(RequestParams.AGGREGATIONS);
 
-        //In this map, keys are "fields" and values are "terms"
-        Map<String, List<String>> filterMap = AggregationUtils.getFilterMap(selectedFilters);
+
         BoolFilterBuilder boolFilter = FilterBuilders.boolFilter();
         try {
             //Building date filter
@@ -47,6 +46,10 @@ public final class FilterUtils {
                                 .must(FilterBuilders.rangeFilter(RequestParams.DateField.MADE_AFTER).gte(fromDate))
                                 .must(FilterBuilders.rangeFilter(RequestParams.DateField.MADE_AFTER).lte(toDate)));
             }
+
+            //In this map, keys are "fields" and values are "terms"
+            //e.g {"subject.exact" = ["Flyfoto" , "Birkeland"]}
+            Map<String, List<String>> filterMap = AggregationUtils.getFilterMap(selectedFilters);
             //Building a filter based on the user selected facets
             for (Map.Entry<String, List<String>> entry : filterMap.entrySet()) {
                 if (!entry.getValue().isEmpty()) {
@@ -71,7 +74,7 @@ public final class FilterUtils {
                 }
             }
         } catch (Exception ex) {
-            logger.error("Exception occurred while constructing Bool filter [" + ex.getLocalizedMessage() + " ]");
+            logger.error("Exception occurred when constructing Bool filter [ " + ex + " ]");
         }
         return boolFilter;
     }
