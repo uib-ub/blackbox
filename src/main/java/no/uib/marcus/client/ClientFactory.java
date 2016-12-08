@@ -44,8 +44,8 @@ public class ClientFactory {
                     .build();
             client = new TransportClient(settings)
                     //You can add more than one addresses here, depending on the number of your servers.
-                    .addTransportAddress(new InetSocketTransportAddress(InetAddress.getLocalHost(), 9300));
-                    //.addTransportAddress(new InetSocketTransportAddress(InetAddress.getByName("kirishima.uib.no"), 9300));
+                    //.addTransportAddress(new InetSocketTransportAddress(InetAddress.getLocalHost(), 9300));
+                    .addTransportAddress(new InetSocketTransportAddress(InetAddress.getByName("kirishima.uib.no"), 9300));
 
             ClusterHealthResponse hr = client.admin().cluster().prepareHealth().get();
             logger.info("Connected to Elasticsearch cluster: " + hr);
