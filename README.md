@@ -1,12 +1,12 @@
 # Blackbox #
 
-Blackbox is a server side application that acts as a bridge between Elasticsearch and client applications to simplify search experience that were before difficult to meet by the University of Bergen Library, department of Special Collections. It is developed using Object Oriented Programming best practices and uses Elasticsearch core API to communicate with a cluster.
+Blackbox is a server side application that acts as a bridge between Elasticsearch and client applications to simplify search experience that were before difficult to meet. It is developed to meet the University of Bergen Library requirements. It is developed using OOP best practices and uses Elasticsearch core API to communicate with a cluster.
 
-Blackbox communicates with Elasticsearch cluster in round-robbin fashion through Transport client that has full priviledge as one of the Elasticsearch nodes in the cluster. 
+Blackbox communicates with Elasticsearch cluster in round-robbin fashion through Transport client that has full privilege as one of the Elasticsearch nodes in the cluster. 
 
 It runs as a [tomcat application](http://kirishima.uib.no/blackbox) and all client applications can communicate with it through HTTP transport.
 
-In this version, we are making it independent from the client implementations and hence can be queried separately. See f.eg http://kirishima.uib.no/blackbox/search?index=ska2&pretty=1
+It independent from the client implementations and hence can be queried separately. See f.eg http://kirishima.uib.no/blackbox/search?index=ska2&pretty=1
 
 ### Usage ###
 Blackbox can be queried by specifying parameters in a respective endpoint.
@@ -17,7 +17,7 @@ http://kirishima.uib.no/blackbox/search?index=ska2&index=admin-test. If not spec
 * type : Same as index, See Elasticsearch type.
 * q : A query string. 
 * size : The size of the returned results. Default is 10
-* date_from/date_to : Search for created date in the form of yyyy-MM-dd
+* date_from / date_to : Search for created date in the form of yyyy-MM-dd
 * filter : A terms filter if you want to limit the search results. e.g 
 ```
 filter=type.exact#Brev
