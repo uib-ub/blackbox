@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   xmlns:sketch="http://www.bohemiancoding.com/sketch/ns"
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   viewBox="0 0 63 99"
+   version="1.1"
+   x="0px"
+   y="0px"
+   id="svg138"
+   inkscape:version="0.91 r13725"
+   sodipodi:docname="noun_346839_cc.svg"
+   width="63"
+   height="99">
+  <metadata
+     id="metadata156">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title>Curly Bracket-18</dc:title>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <defs
+     id="defs154" />
+  <sodipodi:namedview
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1"
+     objecttolerance="10"
+     gridtolerance="10"
+     guidetolerance="10"
+     inkscape:pageopacity="0"
+     inkscape:pageshadow="2"
+     inkscape:window-width="640"
+     inkscape:window-height="480"
+     id="namedview152"
+     showgrid="false"
+     inkscape:zoom="1.888"
+     inkscape:cx="50"
+     inkscape:cy="62.5"
+     inkscape:window-x="20"
+     inkscape:window-y="43"
+     inkscape:window-maximized="0"
+     inkscape:current-layer="svg138" />
+  <title
+     id="title140">Curly Bracket-18</title>
+  <desc
+     id="desc142">Created with Sketch.</desc>
+  <g
+     sketch:type="MSPage"
+     id="g144"
+     style="fill:none;fill-rule:evenodd;stroke:none;stroke-width:1"
+     transform="translate(-19.597458,2.072034)">
+    <path
+       d="m 43,5 0,6.052022 9.155953,0 0,77.896517 -9.155953,0 L 43,95 l 1.492264,0 c 4.151095,0 9.443531,-0.0028 13.269489,-0.0056 l 0,-89.9887882 C 53.935795,5.0028029 43.455191,5 43,5 l 0,0 z"
+       sketch:type="MSShapeGroup"
+       id="path146"
+       inkscape:connector-curvature="0"
+       style="fill:#000000" />
+  </g>
+</svg>

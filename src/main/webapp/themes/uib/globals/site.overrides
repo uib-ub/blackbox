@@ -1,0 +1,173 @@
+/*******************************
+        Global Overrides
+*******************************/
+
+.ui.simple.main-nav-dropdown.active.dropdown>.menu, 
+.ui.simple.main-nav-dropdown.dropdown:hover>.menu {
+    margin-left: -160px !important;
+}
+
+/*
+ * Sticky footer (se https://philipwalton.github.io/solved-by-flexbox/demos/sticky-footer/)
+ */
+.site { height: 100%; }
+
+.pusher {
+  display: flex;
+  min-height: 100vh;
+  flex-direction: column;
+}
+.pusher > .ui.container {
+  /* flex: 1; denne oedela for IE */  
+  height: 100%;
+}
+.pusher > .ui.container::after {
+  content: '\00a0'; /* &nbsp; */
+  display: block;
+  margin-top: var(--space);
+  height: 0px;
+  visibility: hidden;
+}
+
+/*
+ * Posisjoner språklenker slik UiB gjør
+ */
+
+.language {
+  position: absolute;
+  top: 10px;
+  right: 2rem;
+  color: white;
+}
+.language span {
+  padding-left: 1rem;
+}
+
+/*
+ * Flytt søkeboksen unna header
+ */
+
+#search-header {
+    margin-top: 50px;
+}
+
+/*
+ * Paginering style
+ */
+
+.hitlist-settings-top {
+    margin-bottom: 20px !important;
+    border-bottom: 1px #ccc solid;
+}
+
+.hitlist-settings-bottom {
+    margin: 20px 0 !important;
+    border-top: 1px #ccc solid;
+}
+
+/*
+ * Padding for no hits message box
+ */
+
+.no-hits {
+  margin-top: 20px;
+}
+
+/*
+ * Fix for some Semantic UI and Datepicker clashes
+ */
+
+.to_date, .from_date {
+  width: 80% !important;
+}
+
+/*
+ * UiB footer
+ */
+
+footer {
+  width: 100%;
+  background-color: #dcd5cf;
+  padding: 50px 0;
+  margin-top: 20px;
+}
+
+footer * a {
+  color: black;
+}
+
+footer .uib-logo {
+  margin-top: -2.8rem
+}
+
+/*
+ * Extra responsive show hide helper classes
+ */
+
+// Semantic UI has these classes, however they're only applicable to
+// grids, containers, rows and columns.
+// plus, there isn't any `mobile uihidden`, `X uihidden` class.
+// this snippet is using the same class names and same approach
+// plus a bit more but to all elements.
+//
+// see https://github.com/Semantic-Org/Semantic-UI/issues/1114
+
+/* Mobile */
+@media only screen and (max-width: (@tabletBreakpoint - 1)) {
+  [class*="mobile uihidden"],
+  [class*="tablet only"]:not(.mobile),
+  [class*="computer only"]:not(.mobile),
+  [class*="large screen only"]:not(.mobile),
+  [class*="widescreen only"]:not(.mobile),
+  [class*="or lower uihidden"] {
+    display: none !important;
+  }
+}
+
+/* Tablet / iPad Portrait */
+@media only screen and (min-width: @tabletBreakpoint) and (max-width: (@computerBreakpoint - 1)) {
+  [class*="mobile only"]:not(.tablet),
+  [class*="tablet uihidden"],
+  [class*="computer only"]:not(.tablet),
+  [class*="large screen only"]:not(.tablet),
+  [class*="widescreen only"]:not(.tablet),
+  [class*="or lower uihidden"]:not(.mobile) {
+    display: none !important;
+  }
+}
+
+/* Computer / Desktop / iPad Landscape */
+@media only screen and (min-width: @computerBreakpoint) and (max-width: (@largeMonitorBreakpoint - 1)) {
+  [class*="mobile only"]:not(.computer),
+  [class*="tablet only"]:not(.computer),
+  [class*="computer uihidden"],
+  [class*="large screen only"]:not(.computer),
+  [class*="widescreen only"]:not(.computer),
+  [class*="or lower uihidden"]:not(.tablet):not(.mobile) {
+    display: none !important;
+  }
+}
+
+/* Large Monitor */
+@media only screen and (min-width: @largeMonitorBreakpoint) and (max-width: (@widescreenMonitorBreakpoint - 1)) {
+  [class*="mobile only"]:not([class*="large screen"]),
+  [class*="tablet only"]:not([class*="large screen"]),
+  [class*="computer only"]:not([class*="large screen"]),
+  [class*="large screen uihidden"],
+  [class*="widescreen only"]:not([class*="large screen"]),
+  [class*="or lower uihidden"]:not(.computer):not(.tablet):not(.mobile) {
+    display: none !important;
+  }
+}
+
+/* Widescreen Monitor */
+@media only screen and (min-width: @widescreenMonitorBreakpoint) {
+  [class*="mobile only"]:not([class*="widescreen"]),
+  [class*="tablet only"]:not([class*="widescreen"]),
+  [class*="computer only"]:not([class*="widescreen"]),
+  [class*="large screen only"]:not([class*="widescreen"]),
+  [class*="widescreen uihidden"],
+  [class*="widescreen or lower uihidden"] {
+    display: none !important;
+  }
+}

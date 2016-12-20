@@ -1,0 +1,63 @@
+{
+  "header": {
+      "brand": "MARCUS",
+      "buttonLanguage": "Choose Language",
+      "buttonLangNo": "<i class=\"no flag\"></i> Norwegian",
+      "buttonLangEn": "<i class=\"gb flag\"></i> English"
+  },
+  "searchContainer": {
+      "placeholder": "Search Marcus",
+      "reset": "Reset",
+      "hitsFeedback": "{val, plural, 0{} one{hit} other{hits}}",
+      "help": "Help",
+      "sortOptions": "relevance",
+      "hitsPerPage": "10",
+      "cataloguerFilter": "<i class=\"icon user\"></i> Cataloguer",
+      "statusFilter": "Status"
+  },
+  "searchHint":{
+      "header": "Help",
+      "andOr": "And/Or",
+      "andOrTxt": "<li>The search use \"AND\" as default.</li><li>Use \"OR\" to combine results from multible terms, ex. \"vaksdal OR voss\"</li>",
+      "not": "Not",
+      "notTxt": "<li>Use minus to filter terms you do not want, ex. \"-husarbeid\"</li>",
+      "truncation": "Truncation",
+      "truncationTxt": "<li>Use * to truncate, ex. \"*strand\" eller \"knu*sen\"</li>",
+      "fuzzy": "Fuzzy",
+      "fuzzyTxt": "<li>You can search fuzzy with ~ after your search term.</li><li>\"Fana~\" -> will also include Tana, Anax, Fina, etc.</li>",
+      "fields": "Field search",
+      "fieldsTxt": "<li>In the search box you search in title, description and other fields in this way, <i>field:</i></li><li>subject:hund</li><li>spatial:bergen</li><li>description:fisketur</li><li>maker:knudsen</li><li>isPartOf:holm [NB! Use camelCase]</li>"
+  },
+  "filters": {
+      "heading": "<i class=\"fa fa-filter\" aria-hidden=\"true\"></i> Filter",
+      "active": "Active filters: ",
+      "created": "Created",
+      "fromDate": "From",
+      "toDate": "To",
+      "type": "Type",
+      "tag" : "Tag",
+      "place" : "Place",
+      "author" : "Author",
+      "concept": "Subject",
+      "partOf": "Collection",
+      "sort": "Sorted by",
+      "show": "Show",
+      "relevance": "relevance",
+      "_sortAsc": "signature <i class=\"sort alphabet ascending icon\"></i>",
+      "_sortDesc": "signature <i class=\"sort alphabet descending icon\"></i>",
+      "_availableAsc": "availability <i class=\"sort numeric ascending icon\"></i>",
+      "_availableDesc": "availability <i class=\"sort numeric descending icon\"></i>",
+      "_dateAsc": "creation <i class=\"sort numeric ascending icon\"></i>",
+      "_dateDesc": "creation <i class=\"sort numeric descending icon\"></i>",
+      "sortAsc": "signature (asc)",
+      "sortDesc": "signature (desc)",
+      "availableAsc": "availability (asc)",
+      "availableDesc": "availability (desc)",
+      "dateAsc": "creation (asc)",
+      "dateDesc": "creation (desc)",
+      "event" :  "Events"
+  },
+  "results": {
+      "emptyResult": "We did not find anything"
+  }
+}

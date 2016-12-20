@@ -1,0 +1,23 @@
+    <div class="ui image">
+        <a target="_blank" href="{{doc._source.uri}}">
+            <i class="fa fa-tag fa-3x" aria-hidden="true"></i>
+        </a>
+    </div>
+    <div  class="content">
+        <a ng-if="doc._source.preferredLabel" target="_blank" href="{{doc._source.uri}}" class="header">
+            <qrcode class="qrcode hidden right floated" data="{{doc._source.uri}}"></qrcode>
+            {{doc._source.preferredLabel}}
+        </a>
+        <div class="meta">
+            <div ng-if="doc._source.inScheme">
+                <div class="content"><span class="header">Del av: {{doc._source.inScheme}}</span> </div>
+            </div>
+            <span ng-if="doc._source.created"><i class="icon wait"></i> {{doc._source.created}}</span>
+        </div>
+        <div class="description">
+            <p ng-bind-html="doc._source.description | unsafe"></p>
+        </div>
+        <div class="extra">
+            <div class="ui label">{{doc._source.type}}</div>
+        </div>
+    </div>

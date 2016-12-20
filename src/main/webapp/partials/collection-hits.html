@@ -1,0 +1,38 @@
+    <div class="ui image">
+        <div ng-if="doc._source.hasThumbnail || doc._source.img" style="z-index: 1;" class="ui green ribbon label">{{doc._source.type}}</div>
+        <a target="_blank" href="{{doc._source.uri}}">
+            <img ng-if='doc._source.img && doc._source.logo' alt="{{doc._source.title}}" class="ui fluid image" src="{{doc._source.img}}">
+            <img ng-if="!doc._source.img && doc._source.hasThumbnail" alt="{{doc._source.title}}" class="ui fluid image" src="{{doc._source.hasThumbnail}}">
+            
+            <a g-if="!doc._source.hasThumbnail && !doc._source.img" target="_blank" href="{{doc._source.uri}}">
+                <i class="fa fa-archive fa-3x" aria-hidden="true"></i>
+            </a>
+        </a>
+    </div>
+    <div  class="content">
+        <a ng-if="doc._source.title" target="_blank" href="{{doc._source.uri}}" class="header">
+            <qrcode class="qrcode hidden right floated" data="{{doc._source.uri}}"></qrcode>
+            {{doc._source.title}}
+        </a>
+        <div class="meta">
+            <div ng-if="isString(doc._source.maker)">
+                <div class="content"><i class="ui icon user"></i><span class="header">{{doc._source.maker}}</span> </div>
+            </div>
+            <div ng-if="isArray(doc._source.maker)">
+                <div class="ui horizontal list">
+                    <div ng-repeat="maker in doc._source.maker track by $index" class="item">
+                        <i class="ui icon user"></i><span>{{maker}}</span>
+                    </div>
+                </div>
+            </div>
+            <span ng-if="doc._source.created"><i class="icon wait"></i> {{doc._source.created}}</span>
+        </div>
+        <div class="description">
+            <p ng-bind-html="doc._source.description | unsafe"></p>
+        </div>
+        <div class="extra">
+             <div ng-if="!doc._source.hasThumbnail && !doc._source.img">
+                <div class="ui label">{{doc._source.type}}</div>
+             </div>
+        </div>
+    </div>

@@ -1,0 +1,82 @@
+<div class="ui medium image" style="margin-bottom: 15px;">
+    <div style="z-index: 1;" class="ui blue ribbon label">{{doc._source.type}}</div>
+    <a target="_blank" href="{{doc._source.uri}}">
+        <img ng-if="doc._source.img && doc._source.hasThumbnail" alt="{{doc._source.title}}" class="ui fluid image" src="{{doc._source.img}}">
+        <img ng-if="!doc._source.img && doc._source.hasThumbnail" alt="{{doc._source.title}}" class="ui fluid image" src="{{doc._source.hasThumbnail}}">
+        <div ng-if="!doc._source.hasThumbnail && !doc._source.img" style="display: block;" class="ui image"><i style="margin-right: 0; width: 100%;" class="ui bordered inverted grey icon massive camera retro"></i></div>
+    </a>    
+    <div class="ui bottom attached label marcus pushup">
+        <p style="margin-bottom: 0;">{{doc._source.identifier}}<br>
+        <div class="ui ms-corner">
+            <i style="right: 2em;" ng-show='doc._source.hasZoom == "Med DeepZoom"' class="circular inverted red zoom icon"></i>
+        </div>
+    </div>
+</div>
+<div class="content" tag-controller>
+    <a class="header" target="_blank" href="{{doc._source.uri}}">
+        <qrcode class="qrcode hidden right floated" data="{{doc._source.uri}}"></qrcode>
+        {{doc._source.title||doc._source.label}}
+    </a>
+    <div class="meta">
+        <div class="ui list">
+            <selectable type="maker" class="content"></selectable>
+        </div>
+    </div>
+    <div class="description">
+        <p ng-if="doc._source.description" ng-bind-html="doc._source.description | unsafe"></p>
+    </div>
+    <hr>
+    <div class="extra">        
+        <div class="ui list">
+            <selectable type="collection"></selectable>
+            <selectable type="spatial"></selectable>
+            <selectable type="subject"></selectable>
+        </div>
+        <div>
+            <div>
+                <div class="ui horizontal list events">
+                    <!--<div class="item event dateDigitized">
+                        <img src="img/noun_16508_cc.svg">
+                        <span class="year{{from_date| date:'yyyy'}}"></span>
+                        <span>{{from_date|| '&infin;'}}</span>
+                    </div>-->
+                    <div ng-if="from_date" class="item event dateDigitized">
+                        <!--span class="year{{from_date| date:'yyyy'}}"></span-->
+                        <i class="fa fa-birthday-cake"></i>
+                        <span>Digitalisert {{from_date| date:'yyyy'}}</span>
+                    </div>
+                    <div ng-if="doc._source.created" class="item event dateDigitized">
+                        <!--span class="year{{doc._source.created| date:'yyyy'}}"></span-->
+                        <i class="fa fa-calendar"></i>
+                        <span>{{doc._source.created}}</span>
+                    </div>
+                    <div class="item">
+                        <i ng-if="doc._source.madeAfter || doc._source.madeBefore" class="fa fa-calendar"></i>
+                        <span ng-if="doc._source.madeAfter" class="event dateDigitized">
+                            <!--span class="year{{doc._source.madeAfter| date:'yyyy'}}"></span-->
+                            <span>{{doc._source.madeAfter}}</span>
+                        </span>
+                        <span ng-if="doc._source.madeAfter || doc._source.madeBefore" class="event dateDigitized">
+                            <span>&harr;</span>
+                        </span>
+                        <span ng-if="doc._source.madeBefore" class="event dateDigitized">
+                            <!--span class="year{{doc._source.madeBefore| date:'yyyy'}}"></span-->
+                            <span>{{doc._source.madeBefore}}</span>
+                        </span>
+                    </div>
+                    <div ng-if="doc._source.available" class="item event dateDigitized">
+                        <!--span class="year{{doc._source.available| date:'yyyy'}}"></span-->
+                        <span>Tilgjengelig fra: {{doc._source.available}}</span>
+                    </div>                    
+                    <div ng-if="to_date" class="item event dateDigitized">
+                        <span class="year{{from_date| date:'yyyy'}}"></span>
+                        <!--span>Til: {{to_date| date:'yyyy'}}</span-->
+                    </div>
+                    <!--<div class="item event now">
+                        <span ng-controller="nextYear" class="year{{nextYear}}">{{nextYear}}</span>
+                    </div>-->
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,113 @@
+/*
+To change this license header, choose License Headers in Project Properties.
+To change this template file, choose Tools | Templates
+and open the template in the editor.
+*/
+/* 
+    Created on : 05.jul.2016, 11:51:35
+    Author     : st10938
+*/
+@media print {
+  h1 {
+    color: #000;
+    background: none;
+  }
+
+  h2, h3 {
+    page-break-after: avoid;
+  }
+
+  nav, aside {
+    display: none;
+  }
+
+  body, article {
+    width: 100%;
+    margin: 0;
+    padding: 0;
+  }
+     
+  img {
+    max-width: 100% !important;
+  }
+     
+  article {
+     page-break-before: always;
+  }
+  
+  .item {
+     page-break-inside: avoid;
+  }
+
+  .item .image {
+    width: 170px !important;
+  }
+
+  .item .image .noun-icon {
+    width: 100px !important;
+  }
+
+  .item .content .header {
+    display: block !important;
+  }
+
+  .item .content .label {
+    background-color: #eee !important;
+    -webkit-print-color-adjust: exact;
+  }
+
+  .item .qrcode {
+    display: inline !important;
+    margin-left: 20px;
+  }
+
+  ul, img {
+     page-break-inside: avoid;
+  }
+
+  article a, item a {
+    font-weight: bolder;
+    text-decoration: none;
+  }
+
+  article a[href^=http]:after, .item a.header[href^=http]:after {
+    content:" \A <" attr(href) "> ";
+    font-size: 11px;
+    font-weight: normal;
+    white-space: pre-wrap;
+  }
+
+  .tag {
+    background-color: #eee !important;
+    margin: 0 15px 5px 0 !important;
+    -webkit-print-color-adjust: exact;
+  }
+
+  #header, 
+  #sidebar,
+  #search-header, 
+  #filters, 
+  #main-filters, 
+  #active-filters-reset-help, 
+  .hitlist-settings, 
+  #active-filters-reset-help,
+  .hitlist-settings-top,
+  .image .ribbon.label,
+  .hitlist-settings-bottom,
+  footer {
+    display: none !important;
+  }
+
+  .pusher {
+      margin-right: 0px !important;
+      margin-left: 0px !important;
+      width: 100%;
+  }
+
+  @page {
+    margin: 2cm;
+  }
+}
+
+
+

@@ -1,0 +1,46 @@
+    <div class="ui image">
+        <div ng-if="doc._source.img" class="ui blue ribbon label">{{doc._source.type}}</div>
+        <a ng-if="doc._source.img" target="_blank" href="{{doc._source.uri}}">
+            <img alt="{{doc._source.title}}" class="small image" src="{{doc._source.img}}">
+        </a>
+        <div ng-if="doc._source.img" class="ui bottom attached label marcus pushup">
+            <span class="ui floated right">{{doc._source.available}}</span><br>
+            <span class="ui floated right"><i>{{doc._source.cataloguer}}</i></span>
+        </div>
+        
+        <a ng-if="!doc._source.img" target="_blank" href="{{doc._source.uri}}">
+            <img class="noun-icon" style="width: 70px;" class="ui image" src="img/noun_291202_cc.svg"/>
+        </a>
+    </div>
+    <div  class="content" tag-controller>
+        <a ng-if="doc._source.preferredLabel" target="_blank" href="{{doc._source.uri}}" class="header">
+            <qrcode class="qrcode hidden right floated" data="{{doc._source.uri}}"></qrcode>
+            {{doc._source.preferredLabel}}
+        </a>
+        <a ng-if="doc._source.name" target="_blank" href="{{doc._source.uri}}" class="header">
+            <qrcode class="qrcode hidden right floated" data="{{doc._source.uri}}"></qrcode>
+            {{doc._source.name}}
+        </a>
+        <a ng-if="doc._source.label" target="_blank" href="{{doc._source.uri}}" class="header">
+            <qrcode class="qrcode hidden right floated" data="{{doc._source.uri}}"></qrcode>
+            {{doc._source.label}}
+        </a>
+        <div class="meta">
+            <div class="ui list">
+                <selectable type="maker"></selectable>
+            </div>
+        </div>
+        <div class="description">
+            <p ng-bind-html="doc._source.description | unsafe"></p>
+        </div>
+        <div class="extra" ng-init="typeController = tagControllerFactory('type.exact', doc._source.type)">
+            <div class="ui list">
+                <selectable type="type"></selectable>
+            </div>
+            <div class="ui horizontal list">
+                <div ng-if="doc._source.created" class="item">
+                    <i class="icon calendar"></i> {{doc._source.created}}
+                </div>
+            </div>
+        </div>
+    </div>

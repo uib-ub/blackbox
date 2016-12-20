@@ -1,0 +1,105 @@
+/*******************************
+         Theme Overrides
+*******************************/
+
+@makerColor: @orange;
+@typeColor: @grey;
+@statusColor: @black;
+@collectionColor: @purple;
+@spatialColor: @olive;
+@subjectColor: @lightBlue;
+
+// Filters at top
+.filter {
+    margin-right: @horizontalPadding;
+    color: white !important;
+}
+
+// alignment of icon and tag
+.selectable > i.ui.icon {padding-top: 4px !important}
+
+// to cancel margin on tags
+.item.selectable {padding: 0 !important}
+
+// spacing around delete icon
+.selectable a i.delete, a.filter i.delete {margin-right: 0; margin-left: 4px;}
+
+// generic ruleset for tags on hits
+.selectable(@tagColor) {
+    i { color: @tagColor; }
+    a {
+        .ui.label; //mixin
+        background-color: @offWhite;
+        &:hover {
+            background-color: @darkWhite;
+        }
+        margin-bottom: @verticalPadding;
+    }
+    a.selected {
+        background-color: @darkWhite;
+        &:hover {
+            background-color: @midWhite;
+        }
+    }
+};
+
+// generic ruleset for selected filters
+.filter(@tagColor) {
+   .ui.label;
+   background-color: @tagColor;
+   &:hover {
+       background-color: darken(@tagColor, 10) !important;
+   } 
+}
+
+/** Maker **/
+.selectable.maker {
+    .selectable(@makerColor);
+}
+
+.filter.maker {
+    .filter(@makerColor);
+}
+
+/** Collection **/
+.selectable.collection {
+    .selectable(@collectionColor);
+}
+
+.filter.collection {
+    .filter(@collectionColor);
+}
+
+/** Spatial **/
+.selectable.spatial {
+    .selectable(@spatialColor);
+}
+
+.filter.spatial {
+    .filter(@spatialColor);
+}
+
+/** Subject **/
+.selectable.subject {
+    .selectable(@subjectColor);
+}
+
+.filter.subject {
+    .filter(@subjectColor);
+}
+
+/** Status **/
+.filter.status {
+    .filter(@statusColor);
+}
+
+/** Type **/
+.selectable.type {
+    .selectable(@typeColor);
+}
+
+.filter.type {
+    .filter(@typeColor);
+}
+
+

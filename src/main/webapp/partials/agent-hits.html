@@ -1,0 +1,63 @@
+    <div class="ui image">
+        <div ng-if="doc._source.img" class="ui blue ribbon label">{{doc._source.type}}</div>
+            <a ng-if="doc._source.img" target="_blank" href="{{doc._source.uri}}">
+                <img alt="{{doc._source.title}}" class="small image" src="{{doc._source.img}}">
+            </a>
+        <div ng-if="doc._source.img" class="ui bottom attached label marcus pushup">
+            <span class="ui floated right">{{doc._source.available}}</span>
+        </div>
+
+        <a ng-if="!doc._source.img" target="_blank" href="{{doc._source.uri}}">
+            <i class="fa fa-user-circle fa-3x" aria-hidden="true"></i>
+        </a>  
+    </div>
+    <div class="content">
+        <a ng-if="doc._source.name" class="header" target="_blank" href="{{doc._source.uri}}">
+            <span class="header" >
+                <qrcode class="qrcode hidden right floated" data="{{doc._source.uri}}"></qrcode>
+                {{doc._source.name}}
+            </span>
+            <small ng-if="isString(doc._source.alternativeLabel)">
+                <br>{{doc._source.alternativeLabel}}
+            </small>
+            <small ng-if="isArray(doc._source.alternativeLabel)">
+                <br>
+                <div class="ui horizontal list">
+                    <div ng-repeat="alternativeLabel in doc._source.alternativeLabel" class="item">
+                        {{alternativeLabel}}
+                    </div>
+                </div>
+            </small>
+        </a>
+
+        <a ng-if="doc._source.label" target="_blank" href="{{doc._source.uri}}" class="header">
+            <span class="header" ng-if="doc._source.label">
+                <qrcode class="qrcode hidden right floated" data="{{doc._source.uri}}"></qrcode>
+                {{doc._source.label}}
+            </span>
+            <small ng-if="isString(doc._source.alternativeLabel)">
+                <br>{{doc._source.alternativeLabel}}
+            </small>
+            <small ng-if="isArray(doc._source.alternativeLabel)">
+                <br>
+                <div class="ui horizontal list">
+                    <div ng-repeat="alternativeLabel in doc._source.alternativeLabel" class="item">
+                        {{alternativeLabel}}
+                    </div>
+                </div>
+            </small>
+        </a>
+
+        <div class="meta">
+            <span ng-if="doc._source.birthYear || doc._source.deathYear" class="ui floated right"><i class="icon wait"></i> <span ng-if="doc._source.birthYear && !doc._source.birthDate">{{doc._source.birthYear}}</span>
+                <span ng-if="doc._source.birthDate">{{doc._source.birthDate}}</span> - <span ng-if="doc._source.deathYear && !doc._source.deathDate">{{doc._source.deathYear}}</span>
+                <span ng-if="doc._source.deathDate">{{doc._source.deathDate}}</span>
+            </span>
+        </div>
+        <div class="description">
+            <p ng-bind-html="doc._source.description | unsafe"></p>
+        </div>
+        <div class="extra">
+            <div ng-if="!doc._source.img" class="ui label">{{doc._source.type}}</div>
+        </div>
+    </div>
