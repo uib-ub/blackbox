@@ -40,6 +40,7 @@ public class MarcusSearchBuilder extends AbstractSearchBuilder<MarcusSearchBuild
 
     private static final Logger logger = Logger.getLogger(MarcusSearchBuilder.class);
     private FilterBuilder filterBuilder;
+    private FilterBuilder postFilterBuilder;
     private String aggregations;
     private SortBuilder sortBuilder;
     private int from = -1;
@@ -112,6 +113,17 @@ public class MarcusSearchBuilder extends AbstractSearchBuilder<MarcusSearchBuild
      */
     public MarcusSearchBuilder setFilter(FilterBuilder filter) {
         this.filterBuilder = filter;
+        return this;
+    }
+
+    /**
+     * Set a filterBuilder
+     * @param filter
+     *
+     * @return this object where filter has been set
+     */
+    public MarcusSearchBuilder setPostFilter(FilterBuilder filter) {
+        this.postFilterBuilder = filter;
         return this;
     }
 
@@ -198,8 +210,18 @@ public class MarcusSearchBuilder extends AbstractSearchBuilder<MarcusSearchBuild
             //Set Query, whether with or without filter
             if(filterBuilder != null){
                 searchRequest.setQuery(QueryBuilders.filteredQuery(query, filterBuilder));
+
+                if(postFilterBuilder != null){
+                    searchRequest.setPostFilter(postFilterBuilder);
+                }
             }
-            else {
+
+            if(filterBuilder == null && postFilterBuilder != null){
+                searchRequest.setQuery(query);
+                searchRequest.setPostFilter(postFilterBuilder);
+            }
+
+            if(filterBuilder == null && postFilterBuilder == null){
                 searchRequest.setQuery(query);
             }
 
@@ -217,7 +239,7 @@ public class MarcusSearchBuilder extends AbstractSearchBuilder<MarcusSearchBuild
             }
 
             //Show builder for debugging purpose
-            //logger.info(searchRequest.toString());
+            logger.info(searchRequest.toString());
 
             //Execute the response
             response = searchRequest.execute().actionGet();

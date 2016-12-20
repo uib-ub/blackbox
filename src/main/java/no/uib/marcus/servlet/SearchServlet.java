@@ -23,6 +23,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.Map;
 
 /**
  * This servlet processes all HTTP requests coming from "/search" endpoint
@@ -90,10 +91,19 @@ public class SearchServlet extends HttpServlet {
                     .setSortBuilder(fieldSort);
 
             //Build a bool filter
-            BoolFilterBuilder boolFilter = FilterUtils.buildBoolFilter(request);
-            if (boolFilter.hasClauses()) {
-                searchService.setFilter(boolFilter);
+            Map<String, BoolFilterBuilder> boolFilterMap = FilterUtils.buildBoolFilter(request);
+
+            //Set filter
+            if (boolFilterMap.get(RequestParams.AND_BOOL_FILTER).hasClauses()) {
+                searchService.setFilter(boolFilterMap.get(RequestParams.AND_BOOL_FILTER));
             }
+
+            //Set post_filter, so that aggregation counts should not be affected
+            if (boolFilterMap.get(RequestParams.OR_BOOL_FILTER).hasClauses()) {
+                searchService.setPostFilter(boolFilterMap.get(RequestParams.OR_BOOL_FILTER));
+            }
+
+
             //Get all documents from the service
             SearchResponse searchResponse = searchService.getDocuments();
 

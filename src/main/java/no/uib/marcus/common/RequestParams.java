@@ -18,6 +18,8 @@ public class RequestParams {
     public static final String TO_DATE = "to_date";
     public static final String SORT = "sort";
     public static final String PRETTY_PRINT = "pretty";
+    public static final String AND_BOOL_FILTER = "and_bool_filter";
+    public static final String OR_BOOL_FILTER = "or_bool_filter";
 
     /**
      * A static inner class for holding date fields to perform date ranges.
