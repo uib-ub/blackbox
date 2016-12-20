@@ -528,7 +528,7 @@ app.directive('facet', function() {
         template:
         '<span ng-class="{selected: isSelected}" ng-click="toggle()">' +
             '<a>' +
-                '<i class="icon" ng-class="{toggle: isSelected, on: isSelected, toggle off: !isSelected}"></i>' +
+                '<i class="icon" ng-class="{check: isSelected, square: isSelected, add: !isSelected}"></i>' +
             '</a>' +
             '{{key}} ' +
             '<span ng-if="count != 0" class="doc-count">({{count}})</span>' +
