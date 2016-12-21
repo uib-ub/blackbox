@@ -76,9 +76,11 @@ public final class FilterUtils {
                     else if (entry.getKey().startsWith("-")) {
                         //Exclude any filter that begins with minus sign ("-") by using MUST NOT filter;
                         orBoolFilter.mustNot(FilterBuilders.termsFilter(entry.getKey().substring(1), entry.getValue()));
+                        //andBoolFilter.mustNot(FilterBuilders.termsFilter(entry.getKey().substring(1), entry.getValue()));
                     }
                     else {
                         orBoolFilter.must(FilterBuilders.termsFilter(entry.getKey(), entry.getValue()));
+                        //andBoolFilter.must(FilterBuilders.termsFilter(entry.getKey(), entry.getValue()));
                     }
                 }
             }

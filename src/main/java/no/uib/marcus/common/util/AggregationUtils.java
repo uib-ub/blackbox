@@ -8,6 +8,7 @@ import org.apache.log4j.Logger;
 import org.elasticsearch.action.search.SearchRequestBuilder;
 import org.elasticsearch.common.Nullable;
 import org.elasticsearch.common.Strings;
+import org.elasticsearch.index.query.FilterBuilder;
 import org.elasticsearch.index.query.FilterBuilders;
 import org.elasticsearch.search.aggregations.AggregationBuilders;
 import org.elasticsearch.search.aggregations.bucket.histogram.DateHistogram;
@@ -129,19 +130,20 @@ public final class AggregationUtils {
                     }
                     else {
 
-                        searchRequest.addAggregation(
-                                AggregationUtils.getTermsAggregation(currentFacet)
-                                        .subAggregation(AggregationBuilders.filter("type")
-                                                .filter(FilterBuilders.termFilter("type.exact", "Fotografi")))
-                        );
-
-                        //Add terms aggregations to the search request builder (this is default)
                         /**searchRequest.addAggregation(
                                 AggregationUtils.getTermsAggregation(currentFacet)
-                                        .subAggregation(AggregationBuilders.filter("type")
-                                                .filter(FilterBuilders.boolFilter()
-                                                        .must(FilterBuilders.termFilter("type.exact", "Fotografi"))))
+                                        .subAggregation(AggregationBuilders.filter("filter")
+                                                .filter(FilterBuilders.termsFilter("type.exact", "Fotografi", "Brev")))
                         );**/
+
+                        //Add terms aggregations to the search request builder (this is default)
+                        searchRequest.addAggregation(
+                                AggregationUtils.getTermsAggregation(currentFacet)
+                                        .subAggregation(AggregationBuilders.filter("inner_filter")
+                                                .filter(FilterBuilders.boolFilter()
+                                                        .must(FilterBuilders.termFilter("type.exact", "Fotografi"))
+                                                        .must(FilterBuilders.termsFilter("type.exact" , "Brev"))))
+                        );
                     }
                 }
             }

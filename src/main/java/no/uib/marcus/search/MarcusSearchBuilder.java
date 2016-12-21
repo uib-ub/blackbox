@@ -16,10 +16,7 @@ import org.elasticsearch.common.Nullable;
 import org.elasticsearch.common.Strings;
 import org.elasticsearch.common.xcontent.XContentBuilder;
 import org.elasticsearch.common.xcontent.XContentFactory;
-import org.elasticsearch.index.query.FilterBuilder;
-import org.elasticsearch.index.query.FilterBuilders;
-import org.elasticsearch.index.query.QueryBuilder;
-import org.elasticsearch.index.query.QueryBuilders;
+import org.elasticsearch.index.query.*;
 import org.elasticsearch.index.query.functionscore.FunctionScoreQueryBuilder;
 import org.elasticsearch.index.query.functionscore.ScoreFunctionBuilders;
 import org.elasticsearch.search.builder.SearchSourceBuilderException;
@@ -244,7 +241,8 @@ public class MarcusSearchBuilder extends AbstractSearchBuilder<MarcusSearchBuild
             //Execute the response
             response = searchRequest.execute().actionGet();
 
-            //logger.info(response.toString());
+            //Show response
+            logger.info(response.toString());
         } catch (SearchSourceBuilderException e) {
             logger.error("Exception occurred when building search request: " + e.getDetailedMessage());
         } catch (SearchPhaseExecutionException e) {
