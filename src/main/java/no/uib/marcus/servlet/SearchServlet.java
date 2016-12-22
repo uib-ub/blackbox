@@ -2,10 +2,7 @@ package no.uib.marcus.servlet;
 
 import no.uib.marcus.client.ClientFactory;
 import no.uib.marcus.common.Params;
-import no.uib.marcus.common.util.FilterUtils;
-import no.uib.marcus.common.util.LogUtils;
-import no.uib.marcus.common.util.QueryUtils;
-import no.uib.marcus.common.util.SortUtils;
+import no.uib.marcus.common.util.*;
 import no.uib.marcus.search.MarcusSearchBuilder;
 import no.uib.marcus.search.ServiceFactory;
 import org.apache.log4j.Logger;
@@ -23,6 +20,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -67,6 +65,10 @@ public class SearchServlet extends HttpServlet {
         String size = request.getParameter(Params.SIZE);
         String sortString = request.getParameter(Params.SORT);
         String isPretty = request.getParameter(Params.PRETTY_PRINT);
+        String[] selectedFilters = request.getParameterValues(Params.SELECTED_FILTERS);
+        String fromDate = request.getParameter(Params.FROM_DATE);
+        String toDate = request.getParameter(Params.TO_DATE);
+        String aggregations = request.getParameter(Params.AGGREGATIONS);
 
         try (PrintWriter out = response.getWriter()) {
             Client client = ClientFactory.getTransportClient();
@@ -80,6 +82,9 @@ public class SearchServlet extends HttpServlet {
                     ? SortUtils.getFieldSort(sortString)
                     : null;
 
+            //Build a filter map based on selected facets
+            Map<String, List<String>> filterMap = AggregationUtils.buildFilterMap(selectedFilters);
+
             //Build a search service
             MarcusSearchBuilder searchService = ServiceFactory.createMarcusSearchService(client)
                     .setIndices(indices)
@@ -88,10 +93,12 @@ public class SearchServlet extends HttpServlet {
                     .setAggregations(aggs)
                     .setFrom(_from)
                     .setSize(_size)
+                    .setSelectedFilters(filterMap)
                     .setSortBuilder(fieldSort);
 
-            //Build a bool filter
-            Map<String, BoolFilterBuilder> boolFilterMap = FilterUtils.buildBoolFilter(request);
+            //Build a top level filter
+            Map<String, BoolFilterBuilder> boolFilterMap = FilterUtils
+                    .buildBoolFilter(filterMap, aggs, fromDate, toDate);
 
             //Set filter
             if (boolFilterMap.get(Params.AND_BOOL_FILTER).hasClauses()) {

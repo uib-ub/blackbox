@@ -2,11 +2,13 @@ package no.uib.marcus.common.util;
 
 import no.uib.marcus.common.Params;
 import org.apache.log4j.Logger;
+import org.elasticsearch.common.Nullable;
 import org.elasticsearch.common.Strings;
 import org.elasticsearch.index.query.BoolFilterBuilder;
 import org.elasticsearch.index.query.FilterBuilders;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.validation.constraints.NotNull;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -48,30 +50,45 @@ public final class FilterUtils {
         return boolFilter;
     }
 
+    /**
+     * A wrapper for building OR filter
+     **/
+    public static Map<String, BoolFilterBuilder> buildBoolFilter(@NotNull Map<String, List<String>> filterMap) {
+       return  buildBoolFilter(filterMap, null, null, null);
+    }
+
+    /**
+     * A wrapper for building filter without dates
+     ***/
+    public static Map<String, BoolFilterBuilder> buildBoolFilter(@NotNull Map<String, List<String>> filterMap, String aggs) {
+        return  buildBoolFilter(filterMap, aggs, null, null);
+    }
+
+
 
     /**
      * A method for building BoolFilter based on the aggregation settings.
+    *                  @param filterMap a list of selected filters
+    *                  @param aggs
+    *                  @param fromDate
+    *                  @param toDate
      */
-    public static Map<String, BoolFilterBuilder> buildBoolFilter(HttpServletRequest request) {
-        //Get corresponding request parameters
-        String fromDate = request.getParameter(Params.FROM_DATE);
-        String toDate = request.getParameter(Params.TO_DATE);
-        String[] selectedFilters = request.getParameterValues(Params.SELECTED_FILTERS);
-        String aggregations = request.getParameter(Params.AGGREGATIONS);
-
+    public static Map<String, BoolFilterBuilder> buildBoolFilter(@NotNull Map<String, List<String>> filterMap,
+                                                                 @Nullable String aggs,
+                                                                 @Nullable String fromDate,
+                                                                 @Nullable String toDate) {
         Map<String, BoolFilterBuilder> boolFilterMap = new HashMap();
         BoolFilterBuilder andBoolFilter = FilterBuilders.boolFilter();
         BoolFilterBuilder orBoolFilter = FilterBuilders.boolFilter();
-
         try {
             //TODO: Make AND as a default filter?.
             //In this map, keys are "fields" and values are "terms"
             //e.g {"subject.exact" = ["Flyfoto" , "Birkeland"], "type" = ["Brev"]}
-            Map<String, List<String>> filterMap = AggregationUtils.getFilterMap(selectedFilters);
+            //Map<String, List<String>> filterMap = AggregationUtils.buildFilterMap(selectedFilters);
             //Building a filter based on the user selected facets
             for (Map.Entry<String, List<String>> entry : filterMap.entrySet()) {
                 if (!entry.getValue().isEmpty()) {
-                    if (AggregationUtils.contains(aggregations, entry.getKey(), "operator", "AND")) {
+                    if (AggregationUtils.contains(aggs, entry.getKey(), "operator", "AND")) {
                         for (Object value : entry.getValue()) {
                             //Building "AND" filter with "term" filter.
                             if (entry.getKey().startsWith("-")) {
@@ -96,17 +113,11 @@ public final class FilterUtils {
         } catch (Exception ex) {
             logger.error("Exception occurred when constructing bool_filter [ " + ex + " ]");
         }
+        //Append date range filter to this filter
+        appendDateRangeFilter(andBoolFilter, fromDate, toDate);
 
          boolFilterMap.put(Params.AND_BOOL_FILTER , andBoolFilter);
          boolFilterMap.put(Params.OR_BOOL_FILTER , orBoolFilter);
-
-        //Also, append date range filter to this filter
-        appendDateRangeFilter(andBoolFilter, fromDate, toDate);
-
-         //TODO:
-        // Whenever the user selects a value from a facet,
-        // you add a corresponding filter to all facets (via facet_filter / aggs_filter)
-        // EXCEPT the facet that the selection was done in, as well as to the top-level filter to filter the query results.
 
         return boolFilterMap;
     }

@@ -24,8 +24,7 @@ import org.elasticsearch.search.sort.SortBuilder;
 
 import javax.validation.constraints.NotNull;
 import java.io.IOException;
-import java.util.Optional;
-import java.util.Random;
+import java.util.*;
 
 /**
  * Builder for Marcus search service
@@ -38,7 +37,7 @@ public class MarcusSearchBuilder extends AbstractSearchBuilder<MarcusSearchBuild
     private static final Logger logger = Logger.getLogger(MarcusSearchBuilder.class);
     private FilterBuilder filter;
     private FilterBuilder postFilter;
-    private FilterBuilder dateRangeFilter;
+    private Map<String, List<String>> selectedFilters;
     private String aggregations;
     private SortBuilder sortBuilder;
     private int from = -1;
@@ -104,8 +103,7 @@ public class MarcusSearchBuilder extends AbstractSearchBuilder<MarcusSearchBuild
     }
 
     /**
-     * Set a filter that would affect both search results and aggregations
-     * You would set this on "AND" terms aggregations
+     * Set a top-level filter that would filter both search results and aggregations
      * @param filter
      *
      * @return this object where filter has been set
@@ -116,8 +114,7 @@ public class MarcusSearchBuilder extends AbstractSearchBuilder<MarcusSearchBuild
     }
 
     /**
-     * Set a a post filter.
-     * post_filter affects only search results but NOT the aggregations.
+     * Set a post_filter that would affect only search results but NOT aggregations.
      * You would use this on "OR" terms aggregations
      * @param filter
      *
@@ -129,12 +126,12 @@ public class MarcusSearchBuilder extends AbstractSearchBuilder<MarcusSearchBuild
     }
 
     /**
-     * Set a date range filter.
-     * @param filter
+     * Set a selected filters map so that we can build filters out of them
+     * @param selectedFilters selected filters
      * @return this object where a date range filter has been set
      */
-    public MarcusSearchBuilder setDateRangeFilter(FilterBuilder filter) {
-        this.dateRangeFilter = filter;
+    public MarcusSearchBuilder setSelectedFilters(Map<String, List<String>> selectedFilters) {
+        this.selectedFilters = selectedFilters;
         return this;
     }
 
@@ -221,21 +218,17 @@ public class MarcusSearchBuilder extends AbstractSearchBuilder<MarcusSearchBuild
             //Set Query, whether with or without filter
             if(filter != null){
                 searchRequest.setQuery(QueryBuilders.filteredQuery(query, filter));
-
                 if(postFilter != null){
                     searchRequest.setPostFilter(postFilter);
                 }
             }
-
             if(filter == null && postFilter != null){
                 searchRequest.setQuery(query);
                 searchRequest.setPostFilter(postFilter);
             }
-
             if(filter == null && postFilter == null){
                 searchRequest.setQuery(query);
             }
-
             //Set from and size
             searchRequest.setFrom(from);
             searchRequest.setSize(size);
@@ -246,7 +239,7 @@ public class MarcusSearchBuilder extends AbstractSearchBuilder<MarcusSearchBuild
             }
             //Append aggregations to the request builder
             if (Strings.hasText(aggregations)) {
-                AggregationUtils.addAggregations(searchRequest, aggregations, postFilter);
+                AggregationUtils.addAggregations(searchRequest, aggregations, selectedFilters);
             }
 
             //Show builder for debugging purpose
@@ -256,7 +249,7 @@ public class MarcusSearchBuilder extends AbstractSearchBuilder<MarcusSearchBuild
             response = searchRequest.execute().actionGet();
 
             //Show response
-            logger.info(response.toString());
+            //logger.info(response.toString());
         } catch (SearchSourceBuilderException e) {
             logger.error("Exception occurred when building search request: " + e.getDetailedMessage());
         } catch (SearchPhaseExecutionException e) {

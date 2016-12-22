@@ -63,7 +63,7 @@ public class AggregationUtilsTest extends RandomizedTest {
                 expectedMap.put("hemed", Arrays.asList("ali"));
                 expectedMap.put("status", Arrays.asList("sent", "draft"));
 
-                assertEquals(AggregationUtils.getFilterMap(selectedFilter), expectedMap);
+                assertEquals(AggregationUtils.buildFilterMap(selectedFilter), expectedMap);
         }
 
         /**
@@ -74,9 +74,9 @@ public class AggregationUtilsTest extends RandomizedTest {
                 //Separate keys with "_", it should return null.
                 String[] selectedFilter = {"hemed", "status_sent_draft", "status_draft"};
 
-                assertEquals(Collections.emptyMap(), AggregationUtils.getFilterMap(selectedFilter));
-                assertEquals(Collections.emptyMap(), AggregationUtils.getFilterMap(new String[0]));
-                assertEquals(Collections.emptyMap(), AggregationUtils.getFilterMap(null));
+                assertEquals(Collections.emptyMap(), AggregationUtils.buildFilterMap(selectedFilter));
+                assertEquals(Collections.emptyMap(), AggregationUtils.buildFilterMap(new String[0]));
+                assertEquals(Collections.emptyMap(), AggregationUtils.buildFilterMap(null));
         }
 
         @Test
@@ -85,7 +85,7 @@ public class AggregationUtilsTest extends RandomizedTest {
                 String[] selectedFilter = {"http://marcus.uib.no#photography", "status_sent", "status_draft"};
                 Map<String, List<String>> expectedMap = new HashMap<>();
                 expectedMap.put("http://marcus.uib.no", Arrays.asList("photography"));
-                assertEquals(AggregationUtils.getFilterMap(selectedFilter), expectedMap);
+                assertEquals(AggregationUtils.buildFilterMap(selectedFilter), expectedMap);
 
         }
 
@@ -100,7 +100,7 @@ public class AggregationUtilsTest extends RandomizedTest {
                 Map<String, List<String>> expectedMap = new HashMap<>();
                 expectedMap.put("status", Arrays.asList("sent", "draft", "makame", "bee"));
 
-                assertEquals(AggregationUtils.getFilterMap(input), expectedMap);
+                assertEquals(AggregationUtils.buildFilterMap(input), expectedMap);
 
         }
 }
