@@ -1,7 +1,7 @@
 package no.uib.marcus.servlet;
 
 import no.uib.marcus.client.ClientFactory;
-import no.uib.marcus.common.RequestParams;
+import no.uib.marcus.common.Params;
 import no.uib.marcus.common.util.FilterUtils;
 import no.uib.marcus.common.util.LogUtils;
 import no.uib.marcus.common.util.QueryUtils;
@@ -59,14 +59,14 @@ public class SearchServlet extends HttpServlet {
         response.setContentType("application/json;charset=UTF-8");
 
         //Get parameters from the request
-        String queryString = request.getParameter(RequestParams.QUERY_STRING);
-        String aggs = request.getParameter(RequestParams.AGGREGATIONS);
-        String[] indices = request.getParameterValues(RequestParams.INDICES);
-        String[] types = request.getParameterValues(RequestParams.INDEX_TYPES);
-        String from = request.getParameter(RequestParams.FROM);
-        String size = request.getParameter(RequestParams.SIZE);
-        String sortString = request.getParameter(RequestParams.SORT);
-        String isPretty = request.getParameter(RequestParams.PRETTY_PRINT);
+        String queryString = request.getParameter(Params.QUERY_STRING);
+        String aggs = request.getParameter(Params.AGGREGATIONS);
+        String[] indices = request.getParameterValues(Params.INDICES);
+        String[] types = request.getParameterValues(Params.INDEX_TYPES);
+        String from = request.getParameter(Params.FROM);
+        String size = request.getParameter(Params.SIZE);
+        String sortString = request.getParameter(Params.SORT);
+        String isPretty = request.getParameter(Params.PRETTY_PRINT);
 
         try (PrintWriter out = response.getWriter()) {
             Client client = ClientFactory.getTransportClient();
@@ -94,13 +94,14 @@ public class SearchServlet extends HttpServlet {
             Map<String, BoolFilterBuilder> boolFilterMap = FilterUtils.buildBoolFilter(request);
 
             //Set filter
-            if (boolFilterMap.get(RequestParams.AND_BOOL_FILTER).hasClauses()) {
-                searchService.setFilter(boolFilterMap.get(RequestParams.AND_BOOL_FILTER));
+            if (boolFilterMap.get(Params.AND_BOOL_FILTER).hasClauses()) {
+                searchService.setFilter(boolFilterMap.get(Params.AND_BOOL_FILTER));
             }
 
-            //Set post_filter, so that aggregation counts should not be affected
-            if (boolFilterMap.get(RequestParams.OR_BOOL_FILTER).hasClauses()) {
-                searchService.setPostFilter(boolFilterMap.get(RequestParams.OR_BOOL_FILTER));
+            //Set post_filter, so that aggregations should not be affected by the query.
+            //post_filter only affects search results but NOT the aggregations
+            if (boolFilterMap.get(Params.OR_BOOL_FILTER).hasClauses()) {
+                searchService.setPostFilter(boolFilterMap.get(Params.OR_BOOL_FILTER));
             }
 
 

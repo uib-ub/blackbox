@@ -267,6 +267,19 @@ app.controller('freeTextSearch', function ($scope, $http, $location, $timeout, m
         return false;
     }
 
+
+    /**
+     * Get Aggregation document count
+     **/
+    $scope.getDocCount = function(bucket){
+        //console.log("Bucket: " + JSON.stringify(bucket));
+        if("aggs_filter" in bucket){
+            return bucket['aggs_filter']['doc_count'];
+        }
+        return bucket['doc_count'];
+    }
+
+
     /**
      * Getters and setters for dates
      */
@@ -531,7 +544,7 @@ app.directive('facet', function() {
                 '<i class="icon" ng-class="{check: isSelected, square: isSelected, add: !isSelected}"></i>' +
             '</a>' +
             '{{key}} ' +
-            '<span ng-if="count != 0" class="doc-count">({{count}})</span>' +
+            '<span class="doc-count">({{count}})</span>' +
         '</span>',
         link: function(scope, element, attrs) {
             var update = function() {

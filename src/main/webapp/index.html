@@ -489,28 +489,28 @@
                     "field": "subject.exact",
                     "size": 15,
                     "operator": "AND",
-                    "min_doc_count": 1
+                    "min_doc_count": 0
                 },
                 {
                     "field": "isPartOf.exact",
                     "size": 15,
                     "operator": "OR",
                     "order": "count_desc",
-                    "min_doc_count": 1
+                    "min_doc_count": 0
                 },
                 {
                     "field": "producedIn.exact",
                     "size": 10,
                     "operator": "AND",
                     "order": "count_desc",
-                    "min_doc_count": 1
+                    "min_doc_count": 0
                 },
                 {
                     "field": "maker.exact",
                     "size": 10,
                     "operator": "AND",
                     "order": "count_desc",
-                    "min_doc_count": 1
+                    "min_doc_count": 0
                 }
                 //OBS: Supported intervals: weeks(w), days(d), hours(h), minutes(m), seconds(s)
                 /*{

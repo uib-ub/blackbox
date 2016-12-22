@@ -20,7 +20,7 @@
         <facet id='hasZoom-{{bucket.key}}'
                value='{{value}}'
                key='{{bucket.key}}'
-               count='{{bucket.doc_count | number}}'>
+               count='{{getDocCount(bucket) | number}}'>
         </facet>
     </span>
     <span class="item"
@@ -29,7 +29,7 @@
         <facet id='isDigitized-{{bucket.key}}'
                value='{{value}}'
                key='{{bucket.key}}'
-               count='{{bucket.doc_count | number}}'>
+               count='{{getDocCount(bucket) | number}}'>
         </facet>
     </span>
 </div>
@@ -46,7 +46,7 @@
         <facet id='type-{{bucket.key}}'
                value='{{value}}'
                key='{{bucket.key}}'
-               count='{{bucket.doc_count | number}}'>
+               count='{{getDocCount(bucket) | number}}'>
         </facet>
     </span>
 </div>
@@ -63,7 +63,7 @@
         <facet id="subject-{{bucket.key}}"
                value='{{value}}'
                key='{{bucket.key}}'
-               count='{{bucket.doc_count | number}}'>
+               count='{{getDocCount(bucket) | number}}'>
         </facet>
     </span>
 </div>
@@ -80,7 +80,7 @@
         <facet id="isPartOf-{{bucket.key}}"
                value='{{value}}'
                key='{{bucket.key}}'
-               count='{{bucket.doc_count | number}}'>
+               count='{{getDocCount(bucket) | number}}'>
         </facet>
     </span>
 </div>
@@ -97,7 +97,7 @@
         <facet id="producedIn-{{bucket.key}}"
                value='{{value}}'
                key='{{bucket.key}}'
-               count='{{bucket.doc_count | number}}'>
+               count='{{getDocCount(bucket) | number}}'>
         </facet>
      </span>
 </div>

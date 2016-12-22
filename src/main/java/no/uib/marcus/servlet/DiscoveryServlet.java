@@ -1,7 +1,7 @@
 package no.uib.marcus.servlet;
 
 import no.uib.marcus.client.ClientFactory;
-import no.uib.marcus.common.RequestParams;
+import no.uib.marcus.common.Params;
 import no.uib.marcus.common.util.QueryUtils;
 import no.uib.marcus.search.MarcusDiscoveryBuilder;
 import no.uib.marcus.search.ServiceFactory;
@@ -37,11 +37,11 @@ public class DiscoveryServlet extends HttpServlet {
             throws ServletException, IOException {
         request.setCharacterEncoding("UTF-8");
         response.setContentType("application/json;charset=UTF-8");
-        String[] indices = request.getParameterValues(RequestParams.INDICES);
-        String[] types = request.getParameterValues(RequestParams.INDEX_TYPES);
-        String queryString = request.getParameter(RequestParams.QUERY_STRING);
-        String from = request.getParameter(RequestParams.FROM);
-        String size = request.getParameter(RequestParams.SIZE);
+        String[] indices = request.getParameterValues(Params.INDICES);
+        String[] types = request.getParameterValues(Params.INDEX_TYPES);
+        String queryString = request.getParameter(Params.QUERY_STRING);
+        String from = request.getParameter(Params.FROM);
+        String size = request.getParameter(Params.SIZE);
 
         int _from = Strings.hasText(from) ? Integer.parseInt(from) : 0;
         int _size = Strings.hasText(size) ? Integer.parseInt(size) : 10;

@@ -36,8 +36,9 @@ import java.util.Random;
 public class MarcusSearchBuilder extends AbstractSearchBuilder<MarcusSearchBuilder> {
 
     private static final Logger logger = Logger.getLogger(MarcusSearchBuilder.class);
-    private FilterBuilder filterBuilder;
-    private FilterBuilder postFilterBuilder;
+    private FilterBuilder filter;
+    private FilterBuilder postFilter;
+    private FilterBuilder dateRangeFilter;
     private String aggregations;
     private SortBuilder sortBuilder;
     private int from = -1;
@@ -103,24 +104,37 @@ public class MarcusSearchBuilder extends AbstractSearchBuilder<MarcusSearchBuild
     }
 
     /**
-     * Set a filterBuilder
+     * Set a filter that would affect both search results and aggregations
+     * You would set this on "AND" terms aggregations
      * @param filter
      *
      * @return this object where filter has been set
      */
     public MarcusSearchBuilder setFilter(FilterBuilder filter) {
-        this.filterBuilder = filter;
+        this.filter = filter;
         return this;
     }
 
     /**
-     * Set a filterBuilder
+     * Set a a post filter.
+     * post_filter affects only search results but NOT the aggregations.
+     * You would use this on "OR" terms aggregations
      * @param filter
      *
-     * @return this object where filter has been set
+     * @return this object where post_filter has been set
      */
     public MarcusSearchBuilder setPostFilter(FilterBuilder filter) {
-        this.postFilterBuilder = filter;
+        this.postFilter = filter;
+        return this;
+    }
+
+    /**
+     * Set a date range filter.
+     * @param filter
+     * @return this object where a date range filter has been set
+     */
+    public MarcusSearchBuilder setDateRangeFilter(FilterBuilder filter) {
+        this.dateRangeFilter = filter;
         return this;
     }
 
@@ -185,7 +199,7 @@ public class MarcusSearchBuilder extends AbstractSearchBuilder<MarcusSearchBuild
             if (Strings.hasText(getQueryString())) {
                 //Use query_string query with AND operator
                 functionScoreQueryBuilder = QueryBuilders.functionScoreQuery(QueryUtils.buildQueryString(getQueryString()));
-            } else if (!Strings.hasText(getQueryString()) && filterBuilder == null ){
+            } else if (!Strings.hasText(getQueryString()) && filter == null ){
                 //Boost documents inside the "random list" of places because these places have colorful images
                 // and hence they beautify the front page.
                 //This is just for coolness and it has no effect if the query yields no results
@@ -205,20 +219,20 @@ public class MarcusSearchBuilder extends AbstractSearchBuilder<MarcusSearchBuild
                     .add(FilterBuilders.termFilter("type", "fotografi"), ScoreFunctionBuilders.weightFactorFunction(2));
 
             //Set Query, whether with or without filter
-            if(filterBuilder != null){
-                searchRequest.setQuery(QueryBuilders.filteredQuery(query, filterBuilder));
+            if(filter != null){
+                searchRequest.setQuery(QueryBuilders.filteredQuery(query, filter));
 
-                if(postFilterBuilder != null){
-                    searchRequest.setPostFilter(postFilterBuilder);
+                if(postFilter != null){
+                    searchRequest.setPostFilter(postFilter);
                 }
             }
 
-            if(filterBuilder == null && postFilterBuilder != null){
+            if(filter == null && postFilter != null){
                 searchRequest.setQuery(query);
-                searchRequest.setPostFilter(postFilterBuilder);
+                searchRequest.setPostFilter(postFilter);
             }
 
-            if(filterBuilder == null && postFilterBuilder == null){
+            if(filter == null && postFilter == null){
                 searchRequest.setQuery(query);
             }
 
@@ -232,7 +246,7 @@ public class MarcusSearchBuilder extends AbstractSearchBuilder<MarcusSearchBuild
             }
             //Append aggregations to the request builder
             if (Strings.hasText(aggregations)) {
-                AggregationUtils.addAggregations(searchRequest, aggregations);
+                AggregationUtils.addAggregations(searchRequest, aggregations, postFilter);
             }
 
             //Show builder for debugging purpose

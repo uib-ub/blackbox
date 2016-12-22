@@ -4,7 +4,7 @@ package no.uib.marcus.common;
  * List of request parameters.
  * Servlets use these parameters to process the requests,
  */
-public class RequestParams {
+public class Params {
 
     public static final String QUERY_STRING = "q";
     public static final String SELECTED_FILTERS = "filter";

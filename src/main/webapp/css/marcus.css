@@ -71,8 +71,8 @@
 
 .doc-count {
     color: #9ba8b1;
-    font-size: 85%;
-    font-style: italic;
+    font-size: 90%;
+    /**font-style: italic;**/
 }
 
 .pagination {

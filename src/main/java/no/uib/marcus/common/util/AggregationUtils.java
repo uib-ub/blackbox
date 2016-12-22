@@ -9,7 +9,7 @@ import org.elasticsearch.action.search.SearchRequestBuilder;
 import org.elasticsearch.common.Nullable;
 import org.elasticsearch.common.Strings;
 import org.elasticsearch.index.query.FilterBuilder;
-import org.elasticsearch.index.query.FilterBuilders;
+import org.elasticsearch.search.aggregations.AggregationBuilder;
 import org.elasticsearch.search.aggregations.AggregationBuilders;
 import org.elasticsearch.search.aggregations.bucket.histogram.DateHistogram;
 import org.elasticsearch.search.aggregations.bucket.histogram.DateHistogramBuilder;
@@ -71,8 +71,9 @@ public final class AggregationUtils {
      * A method to get a map based on the selected filters. If no filter is
      * selected, return an empty map.
      *
-     * @param selectedFilters a string of selected filters in the form of "field.value"
+     * @param selectedFilters a string of selected filters in the form of "field#value"
      * @return a map of selected filters as field-value pair
+     * @return a filter map in the form of e.g {"subject.exact" = ["Flyfoto" , "Birkeland"], "type.exact" = ["Brev"]}
      */
     @NotNull
     public static Map<String, List<String>> getFilterMap(@Nullable String[] selectedFilters) {
@@ -98,7 +99,7 @@ public final class AggregationUtils {
                 }
             }
         } catch (Exception ex) {
-            logger.error("Exception occurred while constructing a map setFrom selected filters: " + ex.getMessage());
+            logger.error("Exception occurred while constructing a map from selected filters: " + ex.getMessage());
         }
         return filters;
     }
@@ -111,7 +112,19 @@ public final class AggregationUtils {
      * @return the same search request where aggregations have been added to
      * it.
      */
-    public static SearchRequestBuilder addAggregations(SearchRequestBuilder searchRequest, String aggregations)
+    public static SearchRequestBuilder addAggregations(SearchRequestBuilder searchRequest, String aggregations){
+      return addAggregations(searchRequest, aggregations, null);
+    }
+
+    /**
+     * A method to append aggregations to the search request builder.
+     *
+     * @param searchRequest a search request builder
+     * @param aggFilter a filter that will be applied to every aggregations
+     * @return the same search request where aggregations have been added to
+     * it.
+     */
+    public static SearchRequestBuilder addAggregations(SearchRequestBuilder searchRequest, String aggregations, FilterBuilder aggFilter)
             throws JsonParseException, IllegalStateException {
         JsonElement jsonElement = new JsonParser().parse(aggregations);
         for (JsonElement facets : jsonElement.getAsJsonArray()) {
@@ -123,28 +136,30 @@ public final class AggregationUtils {
                             AggregationUtils.getDateHistogramAggregation(currentFacet)
                     );
                 } else {
-
+                    //TODO: This is hardcoding, find a good way to put it here!
+                    AggregationBuilder  termsBuilder;
                     if(currentFacet.get("field").getAsString().equals("type.exact")){
-                        searchRequest.addAggregation(
-                                AggregationUtils.getTermsAggregation(currentFacet));
+                        termsBuilder = AggregationUtils.getTermsAggregation(currentFacet);
                     }
                     else {
-
-                        /**searchRequest.addAggregation(
-                                AggregationUtils.getTermsAggregation(currentFacet)
-                                        .subAggregation(AggregationBuilders.filter("filter")
-                                                .filter(FilterBuilders.termsFilter("type.exact", "Fotografi", "Brev")))
-                        );**/
-
+                        termsBuilder = AggregationUtils.getTermsAggregation(currentFacet);
+                        if(aggFilter != null){
+                           termsBuilder.subAggregation(
+                                   AggregationBuilders.filter("aggs_filter").filter(aggFilter)
+                           );
+                        }
+                        searchRequest.addAggregation(termsBuilder);
                         //Add terms aggregations to the search request builder (this is default)
-                        searchRequest.addAggregation(
+                        /**searchRequest.addAggregation(
                                 AggregationUtils.getTermsAggregation(currentFacet)
                                         .subAggregation(AggregationBuilders.filter("inner_filter")
                                                 .filter(FilterBuilders.boolFilter()
                                                         .must(FilterBuilders.termFilter("type.exact", "Fotografi"))
                                                         .must(FilterBuilders.termsFilter("type.exact" , "Brev"))))
-                        );
+                        );**/
                     }
+                    searchRequest.addAggregation(termsBuilder);
+
                 }
             }
 

@@ -4,6 +4,7 @@ import com.carrotsearch.randomizedtesting.RandomizedTest;
 import com.carrotsearch.randomizedtesting.annotations.Repeat;
 import com.carrotsearch.randomizedtesting.annotations.Seed;
 import no.uib.marcus.common.util.AggregationUtils;
+import no.uib.marcus.common.util.FilterUtils;
 import org.junit.Test;
 
 import java.util.*;
@@ -86,6 +87,10 @@ public class AggregationUtilsTest extends RandomizedTest {
                 expectedMap.put("http://marcus.uib.no", Arrays.asList("photography"));
                 assertEquals(AggregationUtils.getFilterMap(selectedFilter), expectedMap);
 
+        }
+
+        @Test public void testNullBoolFilterOnDates(){
+            assertFalse(FilterUtils.appendDateRangeFilter(null, "1999", "200").hasClauses());
         }
 
         @Test
