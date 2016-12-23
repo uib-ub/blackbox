@@ -81,7 +81,7 @@ public final class AggregationUtils {
     public static Map<String, List<String>> buildFilterMap(@Nullable String[] selectedFilters) {
         Map<String, List<String>> filters = new HashMap<>();
         try {
-            if (selectedFilters == null) {
+            if (selectedFilters == null || selectedFilters.length == 0) {
                 return Collections.emptyMap();
             }
             for (String entry : selectedFilters) {
@@ -142,7 +142,7 @@ public final class AggregationUtils {
                 } else {
                     AggregationBuilder termsAggs = AggregationUtils.getTermsAggregation(currentFacet);
 
-                    if (selectedFacets != null) {
+                    if (selectedFacets != null && !selectedFacets.isEmpty()) {
                         //Get current field
                         String facetField = currentFacet.get("field").getAsString();
 

@@ -37,7 +37,7 @@ public class MarcusSearchBuilder extends AbstractSearchBuilder<MarcusSearchBuild
     private static final Logger logger = Logger.getLogger(MarcusSearchBuilder.class);
     private FilterBuilder filter;
     private FilterBuilder postFilter;
-    private Map<String, List<String>> selectedFilters;
+    private Map<String, List<String>> selectedFacets;
     private String aggregations;
     private SortBuilder sortBuilder;
     private int from = -1;
@@ -127,11 +127,13 @@ public class MarcusSearchBuilder extends AbstractSearchBuilder<MarcusSearchBuild
 
     /**
      * Set a selected filters map so that we can build filters out of them
-     * @param selectedFilters selected filters
+     * @param selectedFacets selected filters
      * @return this object where a date range filter has been set
      */
-    public MarcusSearchBuilder setSelectedFilters(Map<String, List<String>> selectedFilters) {
-        this.selectedFilters = selectedFilters;
+    public MarcusSearchBuilder setSelectedFacets(Map<String, List<String>> selectedFacets) {
+        if(!selectedFacets.isEmpty() && selectedFacets != null) {
+            this.selectedFacets = selectedFacets;
+        }
         return this;
     }
 
@@ -217,16 +219,17 @@ public class MarcusSearchBuilder extends AbstractSearchBuilder<MarcusSearchBuild
 
             //Set Query, whether with or without filter
             if(filter != null){
+                //Note: Filtered query from v2.0
+                //in favour of a new filter clause on the bool query
+                //Read: https://www.elastic.co/blog/better-query-execution-coming-elasticsearch-2-0
                 searchRequest.setQuery(QueryBuilders.filteredQuery(query, filter));
                 if(postFilter != null){
                     searchRequest.setPostFilter(postFilter);
                 }
-            }
-            if(filter == null && postFilter != null){
+            }else if(filter == null && postFilter != null){
                 searchRequest.setQuery(query);
                 searchRequest.setPostFilter(postFilter);
-            }
-            if(filter == null && postFilter == null){
+            }else{
                 searchRequest.setQuery(query);
             }
             //Set from and size
@@ -239,7 +242,7 @@ public class MarcusSearchBuilder extends AbstractSearchBuilder<MarcusSearchBuild
             }
             //Append aggregations to the request builder
             if (Strings.hasText(aggregations)) {
-                AggregationUtils.addAggregations(searchRequest, aggregations, selectedFilters);
+                AggregationUtils.addAggregations(searchRequest, aggregations, selectedFacets);
             }
 
             //Show builder for debugging purpose

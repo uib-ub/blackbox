@@ -94,7 +94,7 @@ public class SearchServlet extends HttpServlet {
                     .setAggregations(aggs)
                     .setFrom(_from)
                     .setSize(_size)
-                    .setSelectedFilters(selectedFacetMap)
+                    .setSelectedFacets(selectedFacetMap)
                     .setSortBuilder(fieldSort);
 
             //Build a top level filter
