@@ -111,6 +111,7 @@ public final class AggregationUtils {
      * A method to append aggregations to the search request builder.
      *
      * @param searchRequest a search request builder
+     *                      @param aggregations aggregations as JSON array string
      * @return the same search request where aggregations have been added to
      * it.
      */
@@ -122,11 +123,13 @@ public final class AggregationUtils {
      * A method to append aggregations to the search request builder.
      *
      * @param searchRequest a search request builder
-     * @param aggFilter     a filter that will be applied to every aggregations
+     * @param selectedFacets     a map that contains selected facets
      * @return the same search request where aggregations have been added to
      * it.
      */
-    public static SearchRequestBuilder addAggregations(SearchRequestBuilder searchRequest, String aggregations, Map<String, List<String>> aggFilter)
+    public static SearchRequestBuilder addAggregations(SearchRequestBuilder searchRequest,
+                                                       String aggregations,
+                                                       Map<String, List<String>> selectedFacets)
             throws JsonParseException, IllegalStateException {
         JsonElement jsonElement = new JsonParser().parse(aggregations);
         for (JsonElement facets : jsonElement.getAsJsonArray()) {
@@ -139,39 +142,39 @@ public final class AggregationUtils {
                 } else {
                     AggregationBuilder termsAggs = AggregationUtils.getTermsAggregation(currentFacet);
 
-                    if (aggFilter != null) {
-                        logger.info("Before removal: " + aggFilter.toString());
+                    if (selectedFacets != null) {
                         //Get current field
                         String facetField = currentFacet.get("field").getAsString();
 
-                        // Whenever the user selects a value from an "OR" facet,
-                        // you add a corresponding filter to all facets as sub aggregations (here aggs_filter)
-                        // EXCEPT for the facet in which the selection was done in.
-                        if (aggFilter.containsKey(facetField)) {
+                        // Logic: Whenever a user selects value from an "OR" aggregations,
+                        // you add a corresponding filter to all aggregations as sub aggregations (here aggs_filter)
+                        // EXCEPT for the aggregation in which the selection was done in.
+                        if (selectedFacets.containsKey(facetField)) {
                             //&& currentFacet.has("operator")
                             //&& currentFacet.get("operator").getAsString().equalsIgnoreCase("OR")){
                             //Make a copy of this map.
-                            Map<String, List<String>> copy = new HashMap<>(aggFilter);
-                            copy.remove(facetField);
-                            logger.info("After removal: " + aggFilter.toString());
-                            Map<String, BoolFilterBuilder> boolFilterCopy = FilterUtils.buildBoolFilter(copy);
-                            if (boolFilterCopy.get(Params.OR_BOOL_FILTER).hasClauses()) {
+                            Map<String, List<String>> selectedFacetCopy = new HashMap<>(selectedFacets);
+                            //Remove the facet that aggregation was performed in from the map
+                            selectedFacetCopy.remove(facetField);
+
+                            //Build bool_filter for the copy of the selected facets.
+                            //Since we did not pass aggregations as argument in buildBolFilter() method,
+                            // we are sure it is an OR_BOOL_FILTER (terms bool_filter)
+                            BoolFilterBuilder boolFilterCopy = FilterUtils.buildBoolFilter(selectedFacetCopy).get(Params.OR_BOOL_FILTER);
+                            if (boolFilterCopy.hasClauses()) {
                                 termsAggs.subAggregation(
-                                        AggregationBuilders.filter("aggs_filter")
-                                                .filter(boolFilterCopy.get(Params.OR_BOOL_FILTER)));
+                                        AggregationBuilders.filter("aggs_filter").filter(boolFilterCopy));
                             }
                         } else {
                             //Build a top level filter
-                            Map<String, BoolFilterBuilder> boolFilterMap = FilterUtils.buildBoolFilter(aggFilter);
-                            if (boolFilterMap.get(Params.OR_BOOL_FILTER).hasClauses()) {
+                            BoolFilterBuilder boolFilter = FilterUtils.buildBoolFilter(selectedFacets).get(Params.OR_BOOL_FILTER);
+                            if (boolFilter.hasClauses()) {
                                 termsAggs.subAggregation(
-                                        AggregationBuilders.filter("aggs_filter")
-                                                .filter(boolFilterMap.get(Params.OR_BOOL_FILTER)));
-
+                                        AggregationBuilders.filter("aggs_filter").filter(boolFilter)
+                                );
                             }
                         }
                     }
-
                     searchRequest.addAggregation(termsAggs);
                 }
 
@@ -253,7 +256,6 @@ public final class AggregationUtils {
             long minDocCount = facet.get("min_doc_count").getAsLong();
             termsBuilder.minDocCount(minDocCount);
         }
-
         return termsBuilder;
     }
 

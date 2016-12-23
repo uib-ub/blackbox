@@ -68,7 +68,6 @@ public class SearchServlet extends HttpServlet {
         String[] selectedFilters = request.getParameterValues(Params.SELECTED_FILTERS);
         String fromDate = request.getParameter(Params.FROM_DATE);
         String toDate = request.getParameter(Params.TO_DATE);
-        String aggregations = request.getParameter(Params.AGGREGATIONS);
 
         try (PrintWriter out = response.getWriter()) {
             Client client = ClientFactory.getTransportClient();
@@ -82,8 +81,10 @@ public class SearchServlet extends HttpServlet {
                     ? SortUtils.getFieldSort(sortString)
                     : null;
 
-            //Build a filter map based on selected facets
-            Map<String, List<String>> filterMap = AggregationUtils.buildFilterMap(selectedFilters);
+            //Build a filter map based on selected facets. In the result map
+            //keys are "fields" and values are "terms"
+            //e.g {"subject.exact" = ["Flyfoto" , "Birkeland"], "type" = ["Brev"]}
+            Map<String, List<String>> selectedFacetMap = AggregationUtils.buildFilterMap(selectedFilters);
 
             //Build a search service
             MarcusSearchBuilder searchService = ServiceFactory.createMarcusSearchService(client)
@@ -93,14 +94,14 @@ public class SearchServlet extends HttpServlet {
                     .setAggregations(aggs)
                     .setFrom(_from)
                     .setSize(_size)
-                    .setSelectedFilters(filterMap)
+                    .setSelectedFilters(selectedFacetMap)
                     .setSortBuilder(fieldSort);
 
             //Build a top level filter
             Map<String, BoolFilterBuilder> boolFilterMap = FilterUtils
-                    .buildBoolFilter(filterMap, aggs, fromDate, toDate);
+                    .buildBoolFilter(selectedFacetMap, aggs, fromDate, toDate);
 
-            //Set filter
+            //Set top level filter
             if (boolFilterMap.get(Params.AND_BOOL_FILTER).hasClauses()) {
                 searchService.setFilter(boolFilterMap.get(Params.AND_BOOL_FILTER));
             }
@@ -110,7 +111,6 @@ public class SearchServlet extends HttpServlet {
             if (boolFilterMap.get(Params.OR_BOOL_FILTER).hasClauses()) {
                 searchService.setPostFilter(boolFilterMap.get(Params.OR_BOOL_FILTER));
             }
-
 
             //Get all documents from the service
             SearchResponse searchResponse = searchService.getDocuments();
@@ -144,7 +144,7 @@ public class SearchServlet extends HttpServlet {
 
     @Override
     public String getServletInfo() {
-        return "SearchServlet servlet";
+        return "Search servlet";
     }
 
 }

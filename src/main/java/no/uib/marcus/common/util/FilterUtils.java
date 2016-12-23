@@ -7,7 +7,6 @@ import org.elasticsearch.common.Strings;
 import org.elasticsearch.index.query.BoolFilterBuilder;
 import org.elasticsearch.index.query.FilterBuilders;
 
-import javax.servlet.http.HttpServletRequest;
 import javax.validation.constraints.NotNull;
 import java.util.HashMap;
 import java.util.List;
@@ -68,22 +67,20 @@ public final class FilterUtils {
 
     /**
      * A method for building BoolFilter based on the aggregation settings.
-    *                  @param filterMap a list of selected filters
-    *                  @param aggs
-    *                  @param fromDate
-    *                  @param toDate
+     *  @param filterMap a list of selected filters
+     *  @param aggs
+     *  @param fromDate
+     *  @param toDate
      */
     public static Map<String, BoolFilterBuilder> buildBoolFilter(@NotNull Map<String, List<String>> filterMap,
                                                                  @Nullable String aggs,
                                                                  @Nullable String fromDate,
                                                                  @Nullable String toDate) {
-        Map<String, BoolFilterBuilder> boolFilterMap = new HashMap();
+        Map<String, BoolFilterBuilder> boolFilterMap = new HashMap<>();
         BoolFilterBuilder andBoolFilter = FilterBuilders.boolFilter();
         BoolFilterBuilder orBoolFilter = FilterBuilders.boolFilter();
         try {
             //TODO: Make AND as a default filter?.
-            //In this map, keys are "fields" and values are "terms"
-            //e.g {"subject.exact" = ["Flyfoto" , "Birkeland"], "type" = ["Brev"]}
             //Map<String, List<String>> filterMap = AggregationUtils.buildFilterMap(selectedFilters);
             //Building a filter based on the user selected facets
             for (Map.Entry<String, List<String>> entry : filterMap.entrySet()) {
@@ -102,11 +99,9 @@ public final class FilterUtils {
                     else if (entry.getKey().startsWith("-")) {
                         //Exclude any filter that begins with minus sign ("-") by using MUST NOT filter;
                         orBoolFilter.mustNot(FilterBuilders.termsFilter(entry.getKey().substring(1), entry.getValue()));
-                        //andBoolFilter.mustNot(FilterBuilders.termsFilter(entry.getKey().substring(1), entry.getValue()));
                     }
                     else {
                         orBoolFilter.must(FilterBuilders.termsFilter(entry.getKey(), entry.getValue()));
-                        //andBoolFilter.must(FilterBuilders.termsFilter(entry.getKey(), entry.getValue()));
                     }
                 }
             }

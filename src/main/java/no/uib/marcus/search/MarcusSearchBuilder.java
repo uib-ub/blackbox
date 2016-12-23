@@ -249,7 +249,7 @@ public class MarcusSearchBuilder extends AbstractSearchBuilder<MarcusSearchBuild
             response = searchRequest.execute().actionGet();
 
             //Show response
-            //logger.info(response.toString());
+            logger.info(response.toString());
         } catch (SearchSourceBuilderException e) {
             logger.error("Exception occurred when building search request: " + e.getDetailedMessage());
         } catch (SearchPhaseExecutionException e) {

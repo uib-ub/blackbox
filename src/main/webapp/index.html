@@ -469,48 +469,48 @@
                     "size": 30,
                     "operator": "OR",
                     "order": "count_desc",
-                    "min_doc_count": 0
+                    "min_doc_count": 1
                 },
                 {
                     "field": "hasZoom",
                     "size": 10,
                     "operator": "AND",
                     "order": "term_asc",
-                    "min_doc_count": 0
+                    "min_doc_count": 1
                 },
                 {
                     "field": "isDigitized",
                     "size": 10,
                     "operator": "AND",
                     "order": "count_desc",
-                    "min_doc_count": 0
+                    "min_doc_count": 1
                 },
                 {
                     "field": "subject.exact",
                     "size": 15,
                     "operator": "AND",
-                    "min_doc_count": 0
+                    "min_doc_count": 1
                 },
                 {
                     "field": "isPartOf.exact",
                     "size": 15,
                     "operator": "OR",
                     "order": "count_desc",
-                    "min_doc_count": 0
+                    "min_doc_count": 1
                 },
                 {
                     "field": "producedIn.exact",
                     "size": 10,
                     "operator": "AND",
                     "order": "count_desc",
-                    "min_doc_count": 0
+                    "min_doc_count": 1
                 },
                 {
                     "field": "maker.exact",
                     "size": 10,
                     "operator": "AND",
                     "order": "count_desc",
-                    "min_doc_count": 0
+                    "min_doc_count": 1
                 }
                 //OBS: Supported intervals: weeks(w), days(d), hours(h), minutes(m), seconds(s)
                 /*{
