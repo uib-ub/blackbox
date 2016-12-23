@@ -5,6 +5,8 @@ import com.carrotsearch.randomizedtesting.annotations.Repeat;
 import com.carrotsearch.randomizedtesting.annotations.Seed;
 import no.uib.marcus.common.util.AggregationUtils;
 import no.uib.marcus.common.util.FilterUtils;
+import org.elasticsearch.index.query.BoolFilterBuilder;
+import org.elasticsearch.index.query.FilterBuilders;
 import org.junit.Test;
 
 import java.util.*;
@@ -73,10 +75,14 @@ public class AggregationUtilsTest extends RandomizedTest {
         public void testGetFilterMap02() throws Exception {
                 //Separate keys with "_", it should return null.
                 String[] selectedFilter = {"hemed", "status_sent_draft", "status_draft"};
+                String[] selectedFilter2 = {"type#Fotografi"};
 
+                //Test for empty map
                 assertEquals(Collections.emptyMap(), AggregationUtils.buildFilterMap(selectedFilter));
                 assertEquals(Collections.emptyMap(), AggregationUtils.buildFilterMap(new String[0]));
                 assertEquals(Collections.emptyMap(), AggregationUtils.buildFilterMap(null));
+                //Test if a filter map contains a key
+                assertTrue(AggregationUtils.buildFilterMap(selectedFilter2).containsKey("type"));
         }
 
         @Test
@@ -89,18 +95,21 @@ public class AggregationUtilsTest extends RandomizedTest {
 
         }
 
-        @Test public void testNullBoolFilterOnDates(){
-            assertFalse(FilterUtils.appendDateRangeFilter(null, "1999", "200").hasClauses());
+        @Test
+        public void testBoolFilterOnDates(){
+            BoolFilterBuilder boolFilter = FilterBuilders.boolFilter();
+            //Filter will not contain any clause because dates are empty
+            assertFalse(FilterUtils.appendDateRangeFilter(boolFilter, "","").hasClauses());
+            //Filter shall contain must or should clauses
+            assertTrue(FilterUtils.appendDateRangeFilter(boolFilter, "1999", "2000").hasClauses());
         }
+
 
         @Test
         public void testGetFilterMap05() {
                 String[] input = {"status#sent", "status#draft", "status#makame", "status#bee"};
-
                 Map<String, List<String>> expectedMap = new HashMap<>();
                 expectedMap.put("status", Arrays.asList("sent", "draft", "makame", "bee"));
-
                 assertEquals(AggregationUtils.buildFilterMap(input), expectedMap);
-
         }
 }

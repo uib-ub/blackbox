@@ -16,7 +16,10 @@ import org.elasticsearch.common.Nullable;
 import org.elasticsearch.common.Strings;
 import org.elasticsearch.common.xcontent.XContentBuilder;
 import org.elasticsearch.common.xcontent.XContentFactory;
-import org.elasticsearch.index.query.*;
+import org.elasticsearch.index.query.FilterBuilder;
+import org.elasticsearch.index.query.FilterBuilders;
+import org.elasticsearch.index.query.QueryBuilder;
+import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.index.query.functionscore.FunctionScoreQueryBuilder;
 import org.elasticsearch.index.query.functionscore.ScoreFunctionBuilders;
 import org.elasticsearch.search.builder.SearchSourceBuilderException;
@@ -24,10 +27,14 @@ import org.elasticsearch.search.sort.SortBuilder;
 
 import javax.validation.constraints.NotNull;
 import java.io.IOException;
-import java.util.*;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Random;
 
 /**
  * Builder for Marcus search service
+ *
  * @author Hemed A. Al Ruwehy
  * @since 0.1
  * 2016-01-24, University of Bergen Library.
@@ -48,106 +55,9 @@ public class MarcusSearchBuilder extends AbstractSearchBuilder<MarcusSearchBuild
      *
      * @param client Elasticsearch client to communicate with a cluster.
      */
-    public MarcusSearchBuilder(@NotNull Client client){
-       super(client);
+    public MarcusSearchBuilder(@NotNull Client client) {
+        super(client);
     }
-
-    /**
-     * Set aggregations to be applied
-     * @param aggregations a JSON string of aggregations
-     *
-     * @return this object where aggregations have been set
-     */
-    public MarcusSearchBuilder setAggregations(String aggregations) {
-        if(aggregations != null && isValidJSONArray(aggregations)) {
-            this.aggregations = aggregations;
-        }
-        return this;
-    }
-
-    /**
-     * Set from, a start of a document, default to 0
-     * @param from
-     *
-     * @return this object where from is set
-     */
-    public MarcusSearchBuilder setFrom(int from) {
-        if(from >= 0) {
-            this.from = from;
-        }
-        return this;
-    }
-
-    /**
-     * Set how many documents to be returned.
-     * @param size
-     *
-     * @return this object where size has been set
-     */
-    public MarcusSearchBuilder setSize(int size) {
-        if(size >= 0) {
-            this.size = size;
-        }
-        return this;
-    }
-
-    /**
-     * Set a sortBuilder order
-     * @param sortBuilder
-     *
-     * @return this object where sort has been set
-     */
-    public MarcusSearchBuilder setSortBuilder(SortBuilder sortBuilder) {
-        this.sortBuilder = sortBuilder;
-        return this;
-    }
-
-    /**
-     * Set a top-level filter that would filter both search results and aggregations
-     * @param filter
-     *
-     * @return this object where filter has been set
-     */
-    public MarcusSearchBuilder setFilter(FilterBuilder filter) {
-        this.filter = filter;
-        return this;
-    }
-
-    /**
-     * Set a post_filter that would affect only search results but NOT aggregations.
-     * You would use this on "OR" terms aggregations
-     * @param filter
-     *
-     * @return this object where post_filter has been set
-     */
-    public MarcusSearchBuilder setPostFilter(FilterBuilder filter) {
-        this.postFilter = filter;
-        return this;
-    }
-
-    /**
-     * Set a selected filters map so that we can build filters out of them
-     * @param selectedFacets selected filters
-     * @return this object where a date range filter has been set
-     */
-    public MarcusSearchBuilder setSelectedFacets(Map<String, List<String>> selectedFacets) {
-        if(!selectedFacets.isEmpty() && selectedFacets != null) {
-            this.selectedFacets = selectedFacets;
-        }
-        return this;
-    }
-
-    /**
-     * Validate aggregations
-     **/
-     private boolean isValidJSONArray(String jsonString){
-         JsonElement element =  new JsonParser().parse(jsonString);
-             if(!element.isJsonArray()){
-                 throw new IllegalParameterException(
-                         "Aggregations must be valid JSON. Expected JSON Array of objects but found : ["+ jsonString + "]");
-             }
-         return true;
-     }
 
     /**
      * Experimental search response
@@ -166,6 +76,104 @@ public class MarcusSearchBuilder extends AbstractSearchBuilder<MarcusSearchBuild
             logger.error(e.getDetailedMessage());
         }
         return optionalResponse;
+    }
+
+    /**
+     * Set aggregations to be applied
+     *
+     * @param aggregations a JSON string of aggregations
+     * @return this object where aggregations have been set
+     */
+    public MarcusSearchBuilder setAggregations(String aggregations) {
+        if (aggregations != null && isValidJSONArray(aggregations)) {
+            this.aggregations = aggregations;
+        }
+        return this;
+    }
+
+    /**
+     * Set from, a start of a document, default to 0
+     *
+     * @param from
+     * @return this object where from is set
+     */
+    public MarcusSearchBuilder setFrom(int from) {
+        if (from >= 0) {
+            this.from = from;
+        }
+        return this;
+    }
+
+    /**
+     * Set how many documents to be returned.
+     *
+     * @param size
+     * @return this object where size has been set
+     */
+    public MarcusSearchBuilder setSize(int size) {
+        if (size >= 0) {
+            this.size = size;
+        }
+        return this;
+    }
+
+    /**
+     * Set a sortBuilder order
+     *
+     * @param sortBuilder
+     * @return this object where sort has been set
+     */
+    public MarcusSearchBuilder setSortBuilder(SortBuilder sortBuilder) {
+        this.sortBuilder = sortBuilder;
+        return this;
+    }
+
+    /**
+     * Set a top-level filter that would filter both search results and aggregations
+     *
+     * @param filter
+     * @return this object where filter has been set
+     */
+    public MarcusSearchBuilder setFilter(FilterBuilder filter) {
+        this.filter = filter;
+        return this;
+    }
+
+    /**
+     * Set a post_filter that would affect only search results but NOT aggregations.
+     * You would use this on "OR" terms aggregations
+     *
+     * @param filter
+     * @return this object where post_filter has been set
+     */
+    public MarcusSearchBuilder setPostFilter(FilterBuilder filter) {
+        this.postFilter = filter;
+        return this;
+    }
+
+    /**
+     * Set a selected filters map so that we can build filters out of them
+     *
+     * @param selectedFacets selected filters
+     * @return this object where a date range filter has been set
+     */
+    public MarcusSearchBuilder setSelectedFacets(Map<String, List<String>> selectedFacets) {
+        if (!selectedFacets.isEmpty() && selectedFacets != null) {
+            this.selectedFacets = selectedFacets;
+        }
+        return this;
+    }
+
+    /**
+     * Validate aggregations
+     **/
+    private boolean isValidJSONArray(String jsonString) {
+        JsonElement element = new JsonParser().parse(jsonString);
+        if (!element.isJsonArray()) {
+            throw new IllegalParameterException(
+                    "Aggregations must be valid JSON. Expected JSON Array of objects but found : [" + jsonString + "]");
+        }
+        return true;
     }
 
     /**
@@ -197,39 +205,38 @@ public class MarcusSearchBuilder extends AbstractSearchBuilder<MarcusSearchBuild
             //Set query
             if (Strings.hasText(getQueryString())) {
                 //Use query_string query with AND operator
-                functionScoreQueryBuilder = QueryBuilders.functionScoreQuery(QueryUtils.buildQueryString(getQueryString()));
-            } else if (!Strings.hasText(getQueryString()) && filter == null ){
+                functionScoreQueryBuilder = QueryBuilders.functionScoreQuery(
+                        QueryUtils.buildQueryString(getQueryString())
+                );
+            } else {
                 //Boost documents inside the "random list" of places because these places have colorful images
                 // and hence they beautify the front page.
                 //This is just for coolness and it has no effect if the query yields no results
+                String randomQueryString = Settings.randomList[new Random().nextInt(Settings.randomList.length)];
                 functionScoreQueryBuilder = QueryBuilders.functionScoreQuery(QueryBuilders.matchAllQuery())
                         .add(FilterBuilders.queryFilter(
-                                QueryBuilders.simpleQueryStringQuery(
-                                        Settings.randomList[new Random().nextInt(Settings.randomList.length)])),
-                                ScoreFunctionBuilders.weightFactorFunction(2))
-                        .add(FilterBuilders.termFilter("subject.exact", "Flyfoto"),
-                                ScoreFunctionBuilders.weightFactorFunction(2));
-            }
-            else {
-                functionScoreQueryBuilder = QueryBuilders.functionScoreQuery(QueryBuilders.matchAllQuery());
+                                QueryBuilders.simpleQueryStringQuery(randomQueryString)),
+                                ScoreFunctionBuilders.weightFactorFunction(2)
+                        );
             }
             //Boost documents of type "Fotografi" for every query performed.
             query = functionScoreQueryBuilder
-                    .add(FilterBuilders.termFilter("type", "fotografi"), ScoreFunctionBuilders.weightFactorFunction(2));
+                    .add(FilterBuilders.termFilter("type", "fotografi"),
+                            ScoreFunctionBuilders.weightFactorFunction(3));
 
             //Set Query, whether with or without filter
-            if(filter != null){
-                //Note: Filtered query from v2.0
+            if (filter != null) {
+                //Note: Filtered query is deprecated from ES v2.0
                 //in favour of a new filter clause on the bool query
-                //Read: https://www.elastic.co/blog/better-query-execution-coming-elasticsearch-2-0
+                //Read https://www.elastic.co/blog/better-query-execution-coming-elasticsearch-2-0
                 searchRequest.setQuery(QueryBuilders.filteredQuery(query, filter));
-                if(postFilter != null){
+                if (postFilter != null) {
                     searchRequest.setPostFilter(postFilter);
                 }
-            }else if(filter == null && postFilter != null){
+            } else if (filter == null && postFilter != null) {
                 searchRequest.setQuery(query);
                 searchRequest.setPostFilter(postFilter);
-            }else{
+            } else {
                 searchRequest.setQuery(query);
             }
             //Set from and size
@@ -251,8 +258,8 @@ public class MarcusSearchBuilder extends AbstractSearchBuilder<MarcusSearchBuild
             //Execute the response
             response = searchRequest.execute().actionGet();
 
-            //Show response
-            logger.info(response.toString());
+            //Show response for debugging purpose
+            //logger.info(response.toString());
         } catch (SearchSourceBuilderException e) {
             logger.error("Exception occurred when building search request: " + e.getDetailedMessage());
         } catch (SearchPhaseExecutionException e) {
@@ -294,18 +301,6 @@ public class MarcusSearchBuilder extends AbstractSearchBuilder<MarcusSearchBuild
         service.setClient(null);
         service.setQueryString("~ana");
         System.out.println(QueryUtils.toJsonString(service.getDocuments(), true));
-        /**try {
-         //System.out.println(QueryUtils.toJsonString(service.getDocuments(), true));
-         SearchRequestBuilder sr = c.prepareSearch("admin-test").setQuery(QueryBuilders.queryStringQuery("~ana"));
-         //System.out.println(sr.execute().actionGet().toString());
-         System.out.println(getSearchResponse(sr));
-         }
-         catch(org.elasticsearch.index.query.QueryParsingException ex){
-         logger.error("Your query was fucked up: " + service.getQueryString());
-         }
-         /**catch (org.elasticsearch.action.search.SearchPhaseExecutionException ex){
-         logger.error("Unable to execute search : " + ex.getMessage());
-         }**/
     }
 }
 
