@@ -215,14 +215,13 @@ public class MarcusSearchBuilder extends AbstractSearchBuilder<MarcusSearchBuild
                 String randomQueryString = Settings.randomList[new Random().nextInt(Settings.randomList.length)];
                 functionScoreQueryBuilder = QueryBuilders.functionScoreQuery(QueryBuilders.matchAllQuery())
                         .add(FilterBuilders.queryFilter(
-                                QueryBuilders.simpleQueryStringQuery(randomQueryString)),
-                                ScoreFunctionBuilders.weightFactorFunction(2)
+                                QueryBuilders.simpleQueryStringQuery(randomQueryString)), ScoreFunctionBuilders.weightFactorFunction(2)
                         );
             }
             //Boost documents of type "Fotografi" for every query performed.
-            query = functionScoreQueryBuilder
-                    .add(FilterBuilders.termFilter("type", "fotografi"),
-                            ScoreFunctionBuilders.weightFactorFunction(3));
+            query = functionScoreQueryBuilder.add(
+                    FilterBuilders.termFilter("type", "fotografi"), ScoreFunctionBuilders.weightFactorFunction(3)
+            );
 
             //Set Query, whether with or without filter
             if (filter != null) {
@@ -253,7 +252,7 @@ public class MarcusSearchBuilder extends AbstractSearchBuilder<MarcusSearchBuild
             }
 
             //Show builder for debugging purpose
-            logger.info(searchRequest.toString());
+            //logger.info(searchRequest.toString());
 
             //Execute the response
             response = searchRequest.execute().actionGet();
@@ -291,7 +290,6 @@ public class MarcusSearchBuilder extends AbstractSearchBuilder<MarcusSearchBuild
             return "{ \"error\" : \"" + e.getMessage() + "\"}";
         }
     }
-
 
     //Main method for easy debugging
     public static void main(String[] args) throws IOException {

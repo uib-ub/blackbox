@@ -131,6 +131,7 @@ public final class AggregationUtils {
                                                        String aggregations,
                                                        Map<String, List<String>> selectedFacets)
             throws JsonParseException, IllegalStateException {
+
         JsonElement jsonElement = new JsonParser().parse(aggregations);
         for (JsonElement facets : jsonElement.getAsJsonArray()) {
             JsonObject currentFacet = facets.getAsJsonObject();
