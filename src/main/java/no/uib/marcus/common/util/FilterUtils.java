@@ -13,11 +13,14 @@ import java.util.List;
 import java.util.Map;
 
 /**
+ * Utility class for building Elasticsearch filters
  * @author Hemed Ali
  */
 
 public final class FilterUtils {
     private static final Logger logger = Logger.getLogger(FilterUtils.class);
+
+    /**Prevent this class be initialized**/
     private FilterUtils() {}
 
     /**
@@ -25,6 +28,8 @@ public final class FilterUtils {
      * @param boolFilter  a filter in which date ranges will be appended to.
      * @param fromDate from_date as a string in the form of YYYY or YYYY-MM or YYYY-MM-DD
      * @param toDate to_date as a string in the form of YYYY or YYYY-MM or YYYY-MM-DD
+     *
+     * @return a bool_filter with date ranges
      ***/
     public static BoolFilterBuilder appendDateRangeFilter(BoolFilterBuilder boolFilter, String fromDate, String toDate){
         if(boolFilter == null){
@@ -51,6 +56,8 @@ public final class FilterUtils {
 
     /**
      * A wrapper for building OR filter
+     * @param filterMap a map of selected facets with keys as fields and values as terms.
+     * @see FilterUtils#buildBoolFilter(Map, String, String, String)
      **/
     public static Map<String, BoolFilterBuilder> buildBoolFilter(@NotNull Map<String, List<String>> filterMap) {
        return  buildBoolFilter(filterMap, null, null, null);
@@ -67,10 +74,12 @@ public final class FilterUtils {
 
     /**
      * A method for building BoolFilter based on the aggregation settings.
-     *  @param filterMap a list of selected filters
+     *  @param filterMap a map of selected facets with keys as fields and values as terms.
      *  @param aggs
      *  @param fromDate
      *  @param toDate
+     *
+     *  @return  a map which contains AND and OR bool filters based on the aggregations
      */
     public static Map<String, BoolFilterBuilder> buildBoolFilter(@NotNull Map<String, List<String>> filterMap,
                                                                  @Nullable String aggs,
@@ -116,5 +125,4 @@ public final class FilterUtils {
 
         return boolFilterMap;
     }
-
 }
