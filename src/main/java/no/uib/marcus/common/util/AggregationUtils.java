@@ -31,8 +31,7 @@ public final class AggregationUtils {
     private static final Logger logger = Logger.getLogger(AggregationUtils.class);
     private static final char AGGS_KEY_VALUE_SEPARATOR = '#';
 
-    public AggregationUtils() {
-    }
+    public AggregationUtils() {}
 
     /**
      * The method checks if the facets/aggregations contain a key that has a specified value.

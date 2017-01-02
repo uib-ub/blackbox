@@ -89,9 +89,8 @@ public final class FilterUtils {
         BoolFilterBuilder andBoolFilter = FilterBuilders.boolFilter();
         BoolFilterBuilder orBoolFilter = FilterBuilders.boolFilter();
         try {
-            //TODO: Make AND as a default filter?.
-            //Map<String, List<String>> filterMap = AggregationUtils.buildFilterMap(selectedFilters);
-            //Building a filter based on the user selected facets
+            //Building a filter based on the user selected facets.
+            //Starting with AND filter
             for (Map.Entry<String, List<String>> entry : filterMap.entrySet()) {
                 if (!entry.getValue().isEmpty()) {
                     if (AggregationUtils.contains(aggs, entry.getKey(), "operator", "AND")) {
@@ -117,8 +116,9 @@ public final class FilterUtils {
         } catch (Exception ex) {
             logger.error("Exception occurred when constructing bool_filter [ " + ex + " ]");
         }
+
         //Append date range filter to this filter
-        appendDateRangeFilter(andBoolFilter, fromDate, toDate);
+        FilterUtils.appendDateRangeFilter(andBoolFilter, fromDate, toDate);
 
          boolFilterMap.put(Params.AND_BOOL_FILTER , andBoolFilter);
          boolFilterMap.put(Params.OR_BOOL_FILTER , orBoolFilter);

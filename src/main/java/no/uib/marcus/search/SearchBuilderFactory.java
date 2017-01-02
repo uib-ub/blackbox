@@ -5,8 +5,8 @@ import org.elasticsearch.client.Client;
 /**
  * Creation factory for search services.
  */
-public class ServiceFactory {
-    private ServiceFactory() {}
+public class SearchBuilderFactory {
+    private SearchBuilderFactory() {}
 
     /**
      * Create a new search service for Marcus data set
@@ -18,7 +18,7 @@ public class ServiceFactory {
     /**
      * Create a new discovery service for Marcus data set.
      * It is a subset of search service with minimal capabilities.
-     * For search, @see ServiceFactory#createMarcusSearchService(Client)
+     * For search, @see SearchBuilderFactory#createMarcusSearchService(Client)
      **/
     public static MarcusDiscoveryBuilder createMarcusDiscoveryService(Client client) {
         return new MarcusDiscoveryBuilder(client);

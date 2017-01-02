@@ -4,7 +4,7 @@ import no.uib.marcus.client.ClientFactory;
 import no.uib.marcus.common.Params;
 import no.uib.marcus.common.util.*;
 import no.uib.marcus.search.MarcusSearchBuilder;
-import no.uib.marcus.search.ServiceFactory;
+import no.uib.marcus.search.SearchBuilderFactory;
 import org.apache.log4j.Logger;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.client.Client;
@@ -88,7 +88,7 @@ public class SearchServlet extends HttpServlet {
             Map<String, List<String>> selectedFacetMap = AggregationUtils.buildFilterMap(selectedFilters);
 
             //Build a search service
-            MarcusSearchBuilder searchService = ServiceFactory.createMarcusSearchService(client)
+            MarcusSearchBuilder searchService = SearchBuilderFactory.createMarcusSearchService(client)
                     .setIndices(indices)
                     .setTypes(types)
                     .setQueryString(queryString)
