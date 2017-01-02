@@ -47,8 +47,6 @@ public class MarcusSearchBuilder extends AbstractSearchBuilder<MarcusSearchBuild
     private Map<String, List<String>> selectedFacets;
     private String aggregations;
     private SortBuilder sortBuilder;
-    private int from = -1;
-    private int size = -1;
 
     /**
      * Constructor
@@ -87,32 +85,6 @@ public class MarcusSearchBuilder extends AbstractSearchBuilder<MarcusSearchBuild
     public MarcusSearchBuilder setAggregations(String aggregations) {
         if (aggregations != null && isValidJSONArray(aggregations)) {
             this.aggregations = aggregations;
-        }
-        return this;
-    }
-
-    /**
-     * Set from, a start of a document, default to 0
-     *
-     * @param from
-     * @return this object where from is set
-     */
-    public MarcusSearchBuilder setFrom(int from) {
-        if (from >= 0) {
-            this.from = from;
-        }
-        return this;
-    }
-
-    /**
-     * Set how many documents to be returned.
-     *
-     * @param size
-     * @return this object where size has been set
-     */
-    public MarcusSearchBuilder setSize(int size) {
-        if (size >= 0) {
-            this.size = size;
         }
         return this;
     }
@@ -210,7 +182,7 @@ public class MarcusSearchBuilder extends AbstractSearchBuilder<MarcusSearchBuild
                 );
             } else {
                 //Boost documents inside the "random list" of places because these places have colorful images
-                // and hence they beautify the front page.
+                // and hence they convertToString the front page.
                 //This is just for coolness and it has no effect if the query yields no results
                 String randomQueryString = Settings.randomList[new Random().nextInt(Settings.randomList.length)];
                 functionScoreQueryBuilder = QueryBuilders.functionScoreQuery(QueryBuilders.matchAllQuery())
@@ -239,8 +211,8 @@ public class MarcusSearchBuilder extends AbstractSearchBuilder<MarcusSearchBuild
                 searchRequest.setQuery(query);
             }
             //Set from and size
-            searchRequest.setFrom(from);
-            searchRequest.setSize(size);
+            searchRequest.setFrom(getFrom());
+            searchRequest.setSize(getSize());
 
             //Set sortBuilder
             if (sortBuilder != null) {
@@ -281,8 +253,8 @@ public class MarcusSearchBuilder extends AbstractSearchBuilder<MarcusSearchBuild
                     .startObject()
                     .field("indices", getIndices() == null ? Strings.EMPTY_ARRAY : getIndices())
                     .field("type", getTypes() == null ? Strings.EMPTY_ARRAY : getTypes())
-                    .field("from", from)
-                    .field("size", size)
+                    .field("from", getFrom())
+                    .field("size", getSize())
                     .field("aggregations", aggregations == null ? Strings.EMPTY_ARRAY : aggregations)
                     .endObject();
             return jsonObj.string();

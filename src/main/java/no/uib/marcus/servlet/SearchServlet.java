@@ -20,7 +20,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.io.UnsupportedEncodingException;
 import java.util.List;
 import java.util.Map;
 
@@ -52,7 +51,7 @@ public class SearchServlet extends HttpServlet {
      **/
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException, UnsupportedEncodingException
+            throws ServletException, IOException
     {
         request.setCharacterEncoding("UTF-8");
         response.setContentType("application/json;charset=UTF-8");
@@ -72,10 +71,10 @@ public class SearchServlet extends HttpServlet {
 
         try (PrintWriter out = response.getWriter()) {
             Client client = ClientFactory.getTransportClient();
-            int _from = Strings.hasText(from)
+            int offset = Strings.hasText(from)
                     ? Integer.parseInt(from)
                     : 0;
-            int _size = Strings.hasText(size)
+            int resultSize = Strings.hasText(size)
                     ? Integer.parseInt(size)
                     : 10;
             SortBuilder fieldSort = Strings.hasText(sortString)
@@ -93,8 +92,8 @@ public class SearchServlet extends HttpServlet {
                     .setTypes(types)
                     .setQueryString(queryString)
                     .setAggregations(aggs)
-                    .setFrom(_from)
-                    .setSize(_size)
+                    .setFrom(offset)
+                    .setSize(resultSize)
                     .setSelectedFacets(selectedFacetMap)
                     .setSortBuilder(fieldSort);
 

@@ -3,11 +3,16 @@ package no.uib.marcus.search;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.client.Client;
 import org.elasticsearch.common.Nullable;
+import org.elasticsearch.common.Strings;
+import org.elasticsearch.common.xcontent.XContentBuilder;
+import org.elasticsearch.common.xcontent.XContentFactory;
 
 import javax.validation.constraints.NotNull;
+import java.io.IOException;
 
 /**
- * Abstract search service builder. The idea is all search service builders to inherit from this class.
+ * Abstract builder for search services.
+ * The idea here is that, all search service builders should inherit this class.
  * @author Hemed Ali Al Ruwehy
  *
  * University of Bergen Library.
@@ -21,6 +26,8 @@ public abstract class AbstractSearchBuilder<T extends AbstractSearchBuilder<T>> 
     private String[] types;
     @Nullable
     private String queryString;
+    private int from = 0;
+    private int size = 10;
 
     /**
      * Constructor
@@ -101,6 +108,48 @@ public abstract class AbstractSearchBuilder<T extends AbstractSearchBuilder<T>> 
     }
 
     /**
+     * Get documents offset, default to 0.
+     */
+    public int getFrom() {
+        return from;
+    }
+
+    /**
+     * Set from (offset), a start of a document, default to 0
+     *
+     * @param from an offset
+     * @return this object where from is set
+     */
+    @SuppressWarnings("unchecked")
+    public T setFrom(int from) {
+        if (from >= 0) {
+            this.from = from;
+        }
+        return (T)this;
+    }
+
+    /**
+     * Set how many documents to be returned, default to 10.
+     *
+     * @param size a size of document returned
+     * @return this object where size has been set
+     */
+    @SuppressWarnings("unchecked")
+    public T setSize(int size) {
+        if (size >= 0) {
+            this.size = size;
+        }
+        return (T)this;
+    }
+
+    /**
+     * Get size of the returned documents, default to 10.
+     **/
+    public int getSize() {
+        return size;
+    }
+
+    /**
      * Set a query string
      *
      * @param queryString a query string
@@ -121,9 +170,30 @@ public abstract class AbstractSearchBuilder<T extends AbstractSearchBuilder<T>> 
 
     /**
      * Get documents based on the service settings.
-     *
+     * The method <tt>must</tt> be implemented by subclasses.
      * @return a search response.
      */
     @Override
     public abstract SearchResponse getDocuments();
+
+    /**
+     * Print out properties of this instance as a JSON string
+     *
+     * @return a JSON string of service properties
+     */
+    @Override
+    public String toString() {
+        try {
+            XContentBuilder jsonObj = XContentFactory.jsonBuilder().prettyPrint()
+                    .startObject()
+                    .field("indices", indices == null ? Strings.EMPTY_ARRAY : indices)
+                    .field("type", types == null ? Strings.EMPTY_ARRAY : types)
+                    .field("from", from)
+                    .field("size", size)
+                    .endObject();
+            return jsonObj.string();
+        } catch (IOException e) {
+            return "{ \"error\" : \"" + e.getMessage() + "\"}";
+        }
+    }
 }
