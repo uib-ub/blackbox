@@ -17,33 +17,10 @@ import org.elasticsearch.search.builder.SearchSourceBuilderException;
 public class MarcusDiscoveryBuilder extends AbstractSearchBuilder<MarcusDiscoveryBuilder>
 {
     private static final Logger logger = Logger.getLogger(MarcusDiscoveryBuilder.class);
-    private int from = -1;
-    private int size = -1;
 
     MarcusDiscoveryBuilder(Client client){
         super(client);
     }
-
-    /**
-     * Index to start the search from, defaults to 0
-     **/
-    public MarcusDiscoveryBuilder setFrom(int from) {
-        if(from >= 0) {
-            this.from = from;
-        }
-        return this;
-    }
-
-    /**
-     * Size of documents that will be returned, defaults to 10
-     **/
-    public MarcusDiscoveryBuilder setSize(int size) {
-        if(size >= 0) {
-            this.size = size;
-        }
-        return this;
-    }
-
 
     /**
      * Get documents based on the service settings
@@ -72,8 +49,8 @@ public class MarcusDiscoveryBuilder extends AbstractSearchBuilder<MarcusDiscover
                 searchRequest.setQuery(QueryBuilders.matchAllQuery());
             }
             //Set from and size
-            searchRequest.setFrom(from);
-            searchRequest.setSize(size);
+            searchRequest.setFrom(getFrom());
+            searchRequest.setSize(getSize());
 
             //Show SearchRequest builder for debugging purpose
             //logger.info(searchRequest.toString());
