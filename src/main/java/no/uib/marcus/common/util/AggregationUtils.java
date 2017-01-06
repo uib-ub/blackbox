@@ -5,6 +5,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
 import com.google.gson.JsonParser;
 import no.uib.marcus.common.Params;
+import no.uib.marcus.search.IllegalParameterException;
 import org.apache.log4j.Logger;
 import org.elasticsearch.action.search.SearchRequestBuilder;
 import org.elasticsearch.common.Nullable;
@@ -31,7 +32,23 @@ public final class AggregationUtils {
     private static final Logger logger = Logger.getLogger(AggregationUtils.class);
     private static final char AGGS_KEY_VALUE_SEPARATOR = '#';
 
-    public AggregationUtils() {}
+    private AggregationUtils() {}
+
+    /**
+     * Validate aggregations
+     * @param jsonString aggregations as JSON string
+     * @throws IllegalParameterException if string is not JSON array
+     * @throws JsonParseException is string is not valid JSON
+     * @return true if string is JSON array
+     **/
+    public static boolean isValidJSONArray(String jsonString) {
+        JsonElement element = new JsonParser().parse(jsonString);
+        if (!element.isJsonArray()) {
+            throw new IllegalParameterException(
+                    "Aggregations must be valid JSON. Expected JSON Array of objects but found : [" + jsonString + "]");
+        }
+        return true;
+    }
 
     /**
      * The method checks if the facets/aggregations contain a key that has a specified value.

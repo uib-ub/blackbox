@@ -83,7 +83,7 @@ public class MarcusSearchBuilder extends AbstractSearchBuilder<MarcusSearchBuild
      * @return this object where aggregations have been set
      */
     public MarcusSearchBuilder setAggregations(String aggregations) {
-        if (aggregations != null && isValidJSONArray(aggregations)) {
+        if (aggregations != null && AggregationUtils.isValidJSONArray(aggregations)) {
             this.aggregations = aggregations;
         }
         return this;
@@ -130,23 +130,12 @@ public class MarcusSearchBuilder extends AbstractSearchBuilder<MarcusSearchBuild
      * @return this object where a date range filter has been set
      */
     public MarcusSearchBuilder setSelectedFacets(Map<String, List<String>> selectedFacets) {
-        if (!selectedFacets.isEmpty() && selectedFacets != null) {
+        if (selectedFacets != null && !selectedFacets.isEmpty()) {
             this.selectedFacets = selectedFacets;
         }
         return this;
     }
 
-    /**
-     * Validate aggregations
-     **/
-    private boolean isValidJSONArray(String jsonString) {
-        JsonElement element = new JsonParser().parse(jsonString);
-        if (!element.isJsonArray()) {
-            throw new IllegalParameterException(
-                    "Aggregations must be valid JSON. Expected JSON Array of objects but found : [" + jsonString + "]");
-        }
-        return true;
-    }
 
     /**
      * Get all documents based on the service settings.
@@ -224,7 +213,7 @@ public class MarcusSearchBuilder extends AbstractSearchBuilder<MarcusSearchBuild
             }
 
             //Show builder for debugging purpose
-            //logger.info(searchRequest.toString());
+            logger.info(searchRequest.toString());
 
             //Execute the response
             response = searchRequest.execute().actionGet();
