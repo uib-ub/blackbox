@@ -1,6 +1,7 @@
 package no.uib.marcus.common.util;
 
 import no.uib.marcus.common.Params;
+import no.uib.marcus.common.Settings;
 import org.apache.log4j.Logger;
 import org.elasticsearch.common.Nullable;
 import org.elasticsearch.common.Strings;
@@ -96,7 +97,7 @@ public final class FilterUtils {
                     if (AggregationUtils.contains(aggs, entry.getKey(), "operator", "AND")) {
                         for (Object value : entry.getValue()) {
                             //Building "AND" filter with "term" filter.
-                            if (entry.getKey().startsWith("-")) {
+                            if (entry.getKey().startsWith(Settings.MINUS)) {
                                 //Exclude any filter that begins with minus sign ("-") by using MUST NOT filter;
                                 andBoolFilter.mustNot(FilterBuilders.termFilter(entry.getKey().substring(1), value));
                             } else {
@@ -104,7 +105,7 @@ public final class FilterUtils {
                             }
                         }
                     }//Building "OR" filter using "terms" filter (which is default)
-                    else if (entry.getKey().startsWith("-")) {
+                    else if (entry.getKey().startsWith(Settings.MINUS)) {
                         //Exclude any filter that begins with minus sign ("-") by using MUST NOT filter;
                         orBoolFilter.mustNot(FilterBuilders.termsFilter(entry.getKey().substring(1), entry.getValue()));
                     }

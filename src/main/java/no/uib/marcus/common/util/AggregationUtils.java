@@ -5,6 +5,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
 import com.google.gson.JsonParser;
 import no.uib.marcus.common.Params;
+import no.uib.marcus.common.Settings;
 import no.uib.marcus.search.IllegalParameterException;
 import org.apache.log4j.Logger;
 import org.elasticsearch.action.search.SearchRequestBuilder;
@@ -37,6 +38,7 @@ public final class AggregationUtils {
     /**
      * Validate aggregations
      * @param jsonString aggregations as JSON string
+     *
      * @throws IllegalParameterException if string is not JSON array
      * @throws JsonParseException is string is not valid JSON
      * @return true if string is JSON array
@@ -149,6 +151,7 @@ public final class AggregationUtils {
             throws JsonParseException, IllegalStateException {
 
         JsonElement jsonElement = new JsonParser().parse(aggregations);
+       logger.info("Selected map: " + selectedFacets.toString());
         for (JsonElement facets : jsonElement.getAsJsonArray()) {
             JsonObject currentFacet = facets.getAsJsonObject();
             if (currentFacet.has("field")) {
@@ -159,30 +162,31 @@ public final class AggregationUtils {
                 } else {
                     AggregationBuilder termsAggs = AggregationUtils.getTermsAggregation(currentFacet);
 
-                    if (selectedFacets != null && !selectedFacets.isEmpty()) {
+                    if (!selectedFacets.isEmpty()) {
                         //Get current field
                         String facetField = currentFacet.get("field").getAsString();
 
                         // Logic: Whenever a user selects value from an "OR" aggregations,
                         // you add a corresponding filter to all aggregations as sub aggregations (here aggs_filter)
                         // EXCEPT for the aggregation in which the selection was done in.
-                        if (selectedFacets.containsKey(facetField)) {
-                            //&& currentFacet.has("operator")
-                            //&& currentFacet.get("operator").getAsString().equalsIgnoreCase("OR")){
-                            //Make a copy of this map.
+                        if (selectedFacets.containsKey(facetField) || selectedFacets.containsKey(Settings.MINUS + facetField)) {
+                            //Make a copy of the map.
                             Map<String, List<String>> selectedFacetCopy = new HashMap<>(selectedFacets);
                             //Remove the facet that aggregation was performed in from the map
+
                             selectedFacetCopy.remove(facetField);
+                            selectedFacetCopy.remove(Settings.MINUS + facetField);
 
                             //Build bool_filter for the copy of the selected facets.
                             //Since we did not pass aggregations as argument in buildBolFilter() method,
-                            // we are sure it is an OR_BOOL_FILTER (terms bool_filter)
+                            //we are sure it is an OR_BOOL_FILTER (terms bool_filter)
                             BoolFilterBuilder boolFilterCopy = FilterUtils.buildBoolFilter(selectedFacetCopy).get(Params.OR_BOOL_FILTER);
                             if (boolFilterCopy.hasClauses()) {
                                 termsAggs.subAggregation(
                                         AggregationBuilders.filter("aggs_filter").filter(boolFilterCopy));
                             }
-                        } else {
+                        }
+                        else {
                             //Build a top level filter
                             BoolFilterBuilder boolFilter = FilterUtils.buildBoolFilter(selectedFacets).get(Params.OR_BOOL_FILTER);
                             if (boolFilter.hasClauses()) {

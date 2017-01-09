@@ -10,7 +10,7 @@ import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.search.builder.SearchSourceBuilderException;
 
 /**
- * A builder to explore Marcus data set
+ * A basic builder to explore Marcus dataset
  *
  * @author Hemed Ali
  */

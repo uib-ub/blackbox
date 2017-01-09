@@ -3,8 +3,13 @@ package no.uib.marcus.common;
 import com.carrotsearch.randomizedtesting.RandomizedTest;
 import com.carrotsearch.randomizedtesting.annotations.Repeat;
 import com.carrotsearch.randomizedtesting.annotations.Seed;
+import com.google.gson.JsonParseException;
 import no.uib.marcus.common.util.AggregationUtils;
 import no.uib.marcus.common.util.FilterUtils;
+import no.uib.marcus.search.IllegalParameterException;
+import no.uib.marcus.search.MarcusDiscoveryBuilder;
+import org.apache.log4j.Logger;
+import org.elasticsearch.common.netty.channel.ExceptionEvent;
 import org.elasticsearch.index.query.BoolFilterBuilder;
 import org.elasticsearch.index.query.FilterBuilders;
 import org.junit.Test;
@@ -17,6 +22,7 @@ import static no.uib.marcus.common.util.AggregationUtils.contains;
  * @author Hemed Ali
  */
 public class AggregationUtilsTest extends RandomizedTest {
+    private final Logger logger = Logger.getLogger(getClass().getName());
         private static final String AGGS = "["
                 + "{\"field\": \"assigned_to\", \"order\": \"term_asc\"},"
                 + "{\"field\": \"subject.exact\", \"size\": 10}," + "                              "
@@ -28,14 +34,19 @@ public class AggregationUtilsTest extends RandomizedTest {
          */
         @Test
         public void testContains01() throws Exception {
-                assertTrue(AggregationUtils.contains(AGGS, "assigned_to", "order", "term_asc"));
-                assertFalse(AggregationUtils.contains(AGGS, "assigned_to", "operator", "blabla"));
-                assertFalse(AggregationUtils.contains(AGGS, "hemed", "order", "term_asc"));
-                assertTrue(AggregationUtils.contains(AGGS, "subject.exact", "size", "10"));
-                assertFalse(AggregationUtils.contains(AGGS, "subject.exact", "size", "infinity"));
-                assertFalse(AggregationUtils.contains("Test facets", "subject.exact", "size", "10"));
-
+            assertTrue(AggregationUtils.contains(AGGS, "assigned_to", "order", "term_asc"));
+            assertFalse(AggregationUtils.contains(AGGS, "assigned_to", "operator", "blabla"));
+            assertFalse(AggregationUtils.contains(AGGS, "hemed", "order", "term_asc"));
+            assertTrue(AggregationUtils.contains(AGGS, "subject.exact", "size", "10"));
+            assertFalse(AggregationUtils.contains(AGGS, "subject.exact", "size", "infinity"));
+            //Here exception will be thrown, because aggregations are not valid.
+            assertFalse(AggregationUtils.contains("Test facets", "subject.exact", "size", "10"));
+            //Check for null and and empty string
+            assertFalse(AggregationUtils.contains(null, "subject", "size", "10"));
+            assertFalse(AggregationUtils.contains("", "subject", "size", "10"));
         }
+
+
 
         /**
          * Test for random size values

@@ -9,6 +9,7 @@ import java.util.Map;
 public class Settings {
     //A list of places with colorful images.
     public static final String[] randomList = {"Gaupås", "fana" , "nyborg", "flaktveit", "Birkeland"};
+    public static final String MINUS = "-";
 
     /**
      * If input map contains an array of only one element, then convert the
