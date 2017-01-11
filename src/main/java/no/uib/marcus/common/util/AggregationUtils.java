@@ -151,7 +151,6 @@ public final class AggregationUtils {
             throws JsonParseException, IllegalStateException {
 
         JsonElement jsonElement = new JsonParser().parse(aggregations);
-       logger.info("Selected map: " + selectedFacets.toString());
         for (JsonElement facets : jsonElement.getAsJsonArray()) {
             JsonObject currentFacet = facets.getAsJsonObject();
             if (currentFacet.has("field")) {
@@ -169,18 +168,15 @@ public final class AggregationUtils {
                         // Logic: Whenever a user selects value from an "OR" aggregations,
                         // you add a corresponding filter to all aggregations as sub aggregations (here aggs_filter)
                         // EXCEPT for the aggregation in which the selection was done in.
-                        if (selectedFacets.containsKey(facetField) || selectedFacets.containsKey(Settings.MINUS + facetField)) {
+                        if (selectedFacets.containsKey(facetField)) {
                             //Make a copy of the map.
                             Map<String, List<String>> selectedFacetCopy = new HashMap<>(selectedFacets);
                             //Remove the facet that aggregation was performed in from the map
-
                             selectedFacetCopy.remove(facetField);
-                            selectedFacetCopy.remove(Settings.MINUS + facetField);
-
                             //Build bool_filter for the copy of the selected facets.
                             //Since we did not pass aggregations as argument in buildBolFilter() method,
-                            //we are sure it is an OR_BOOL_FILTER (terms bool_filter)
-                            BoolFilterBuilder boolFilterCopy = FilterUtils.buildBoolFilter(selectedFacetCopy).get(Params.OR_BOOL_FILTER);
+                            //we are sure it is an POST_FILTER (terms bool_filter)
+                            BoolFilterBuilder boolFilterCopy = FilterUtils.buildBoolFilter(selectedFacetCopy).get(Params.POST_FILTER);
                             if (boolFilterCopy.hasClauses()) {
                                 termsAggs.subAggregation(
                                         AggregationBuilders.filter("aggs_filter").filter(boolFilterCopy));
@@ -188,7 +184,7 @@ public final class AggregationUtils {
                         }
                         else {
                             //Build a top level filter
-                            BoolFilterBuilder boolFilter = FilterUtils.buildBoolFilter(selectedFacets).get(Params.OR_BOOL_FILTER);
+                            BoolFilterBuilder boolFilter = FilterUtils.buildBoolFilter(selectedFacets).get(Params.POST_FILTER);
                             if (boolFilter.hasClauses()) {
                                 termsAggs.subAggregation(
                                         AggregationBuilders.filter("aggs_filter").filter(boolFilter)

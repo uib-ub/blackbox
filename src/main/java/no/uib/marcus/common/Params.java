@@ -18,9 +18,8 @@ public class Params {
     public static final String TO_DATE = "to_date";
     public static final String SORT = "sort";
     public static final String PRETTY_PRINT = "pretty";
-    public static final String AND_BOOL_FILTER = "and_bool_filter";
-    public static final String OR_BOOL_FILTER = "or_bool_filter";
-    public static final String AGGREGATION_FILTER_NAME = "aggs_filter";
+    public static final String TOP_FILTER = "top_filter";
+    public static final String POST_FILTER = "post_filter";
 
     /**
      * A static inner class for holding date fields to perform date ranges.

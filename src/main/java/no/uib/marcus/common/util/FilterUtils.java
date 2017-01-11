@@ -86,9 +86,11 @@ public final class FilterUtils {
                                                                  @Nullable String aggs,
                                                                  @Nullable String fromDate,
                                                                  @Nullable String toDate) {
+
+
         Map<String, BoolFilterBuilder> boolFilterMap = new HashMap<>();
-        BoolFilterBuilder andBoolFilter = FilterBuilders.boolFilter();
-        BoolFilterBuilder orBoolFilter = FilterBuilders.boolFilter();
+        BoolFilterBuilder filter = FilterBuilders.boolFilter();
+        BoolFilterBuilder postFilter = FilterBuilders.boolFilter();
         try {
             //Building a filter based on the user selected facets.
             //Starting with AND filter
@@ -99,30 +101,31 @@ public final class FilterUtils {
                             //Building "AND" filter with "term" filter.
                             if (entry.getKey().startsWith(Settings.MINUS)) {
                                 //Exclude any filter that begins with minus sign ("-") by using MUST NOT filter;
-                                andBoolFilter.mustNot(FilterBuilders.termFilter(entry.getKey().substring(1), value));
+                                filter.mustNot(FilterBuilders.termFilter(entry.getKey().substring(1), value));
                             } else {
-                                andBoolFilter.must(FilterBuilders.termFilter(entry.getKey(), value));
+                                filter.must(FilterBuilders.termFilter(entry.getKey(), value));
                             }
                         }
-                    }//Building "OR" filter using "terms" filter (which is default)
-                    else if (entry.getKey().startsWith(Settings.MINUS)) {
-                        //Exclude any filter that begins with minus sign ("-") by using MUST NOT filter;
-                        orBoolFilter.mustNot(FilterBuilders.termsFilter(entry.getKey().substring(1), entry.getValue()));
                     }
+                    //Exclude any filter that begins with minus sign ("-") by using MUST NOT filter;
+                    else if (entry.getKey().startsWith(Settings.MINUS)) {
+                        filter.mustNot(FilterBuilders.termsFilter(entry.getKey().substring(1), entry.getValue()));
+                    }
+                    //Building "OR" filter using "terms" filter (default).
+                    //Since it is OR, we will use it as post_filter.
+                    //post_filter only affects search results but NOT aggregations.
                     else {
-                        orBoolFilter.must(FilterBuilders.termsFilter(entry.getKey(), entry.getValue()));
+                        postFilter.must(FilterBuilders.termsFilter(entry.getKey(), entry.getValue()));
                     }
                 }
             }
         } catch (Exception ex) {
             logger.error("Exception occurred when constructing bool_filter [ " + ex + " ]");
         }
-
-        //Append date range filter to this filter
-        FilterUtils.appendDateRangeFilter(andBoolFilter, fromDate, toDate);
-
-         boolFilterMap.put(Params.AND_BOOL_FILTER , andBoolFilter);
-         boolFilterMap.put(Params.OR_BOOL_FILTER , orBoolFilter);
+         //Append date range filter to this filter
+         appendDateRangeFilter(filter, fromDate, toDate);
+         boolFilterMap.put(Params.TOP_FILTER, filter);
+         boolFilterMap.put(Params.POST_FILTER, postFilter);
 
         return boolFilterMap;
     }

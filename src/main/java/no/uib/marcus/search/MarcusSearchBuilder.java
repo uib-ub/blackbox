@@ -111,6 +111,7 @@ public class MarcusSearchBuilder extends AbstractSearchBuilder<MarcusSearchBuild
         return this;
     }
 
+
     /**
      * Set a post_filter that would affect only search results but NOT aggregations.
      * You would use this on "OR" terms aggregations

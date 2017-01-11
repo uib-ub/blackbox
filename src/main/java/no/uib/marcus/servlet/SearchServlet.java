@@ -102,14 +102,14 @@ public class SearchServlet extends HttpServlet {
                     .buildBoolFilter(selectedFacetMap, aggs, fromDate, toDate);
 
             //Set top level filter
-            if (boolFilterMap.get(Params.AND_BOOL_FILTER).hasClauses()) {
-                searchService.setFilter(boolFilterMap.get(Params.AND_BOOL_FILTER));
+            if (boolFilterMap.get(Params.TOP_FILTER).hasClauses()) {
+                searchService.setFilter(boolFilterMap.get(Params.TOP_FILTER));
             }
 
             //Set post_filter, so that aggregations should not be affected by the query.
-            //post_filter only affects search results but NOT the aggregations
-            if (boolFilterMap.get(Params.OR_BOOL_FILTER).hasClauses()) {
-                searchService.setPostFilter(boolFilterMap.get(Params.OR_BOOL_FILTER));
+            //post_filter only affects search results but NOT aggregations
+            if (boolFilterMap.get(Params.POST_FILTER).hasClauses()) {
+                searchService.setPostFilter(boolFilterMap.get(Params.POST_FILTER));
             }
 
             //Get all documents from the service
