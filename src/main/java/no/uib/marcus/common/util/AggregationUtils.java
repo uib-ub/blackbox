@@ -5,7 +5,6 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
 import com.google.gson.JsonParser;
 import no.uib.marcus.common.Params;
-import no.uib.marcus.common.Settings;
 import no.uib.marcus.search.IllegalParameterException;
 import org.apache.log4j.Logger;
 import org.elasticsearch.action.search.SearchRequestBuilder;
@@ -33,15 +32,16 @@ public final class AggregationUtils {
     private static final Logger logger = Logger.getLogger(AggregationUtils.class);
     private static final char AGGS_KEY_VALUE_SEPARATOR = '#';
 
-    private AggregationUtils() {}
+    private AggregationUtils() {
+    }
 
     /**
      * Validate aggregations
-     * @param jsonString aggregations as JSON string
      *
-     * @throws IllegalParameterException if string is not JSON array
-     * @throws JsonParseException is string is not valid JSON
+     * @param jsonString aggregations as JSON string
      * @return true if string is JSON array
+     * @throws IllegalParameterException if string is not JSON array
+     * @throws JsonParseException        is string is not valid JSON
      **/
     public static boolean isValidJSONArray(String jsonString) {
         JsonElement element = new JsonParser().parse(jsonString);
@@ -93,7 +93,8 @@ public final class AggregationUtils {
      * selected, return an empty map.
      *
      * @param selectedFilters a string of selected filters in the form of "field#value"
-     * @return a filter map in the form of e.g {"subject.exact" = ["Flyfoto" , "Birkeland"], "type.exact" = ["Brev"]}
+     * @return a filter map in the form of
+     * e.g {"subject.exact" = ["Flyfoto" , "Birkeland"], "type.exact" = ["Brev"]}
      */
     @NotNull
     public static Map<String, List<String>> buildFilterMap(@Nullable String[] selectedFilters) {
@@ -129,7 +130,7 @@ public final class AggregationUtils {
      * A method to append aggregations to the search request builder.
      *
      * @param searchRequest a search request builder
-     *                      @param aggregations aggregations as JSON array string
+     * @param aggregations  aggregations as JSON array string
      * @return the same search request where aggregations have been added to
      * it.
      */
@@ -140,8 +141,8 @@ public final class AggregationUtils {
     /**
      * A method to append aggregations to the search request builder.
      *
-     * @param searchRequest a search request builder
-     * @param selectedFacets     a map that contains selected facets
+     * @param searchRequest  a search request builder
+     * @param selectedFacets a map that contains selected facets
      * @return the same search request where aggregations have been added to
      * it.
      */
@@ -161,7 +162,7 @@ public final class AggregationUtils {
                 } else {
                     AggregationBuilder termsAggs = AggregationUtils.getTermsAggregation(currentFacet);
 
-                    if (!selectedFacets.isEmpty()) {
+                    if (selectedFacets != null && !selectedFacets.isEmpty()) {
                         //Get current field
                         String facetField = currentFacet.get("field").getAsString();
 
@@ -181,8 +182,7 @@ public final class AggregationUtils {
                                 termsAggs.subAggregation(
                                         AggregationBuilders.filter("aggs_filter").filter(boolFilterCopy));
                             }
-                        }
-                        else {
+                        } else {
                             //Build a top level filter
                             BoolFilterBuilder boolFilter = FilterUtils.buildBoolFilter(selectedFacets).get(Params.POST_FILTER);
                             if (boolFilter.hasClauses()) {

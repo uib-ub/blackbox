@@ -86,8 +86,6 @@ public final class FilterUtils {
                                                                  @Nullable String aggs,
                                                                  @Nullable String fromDate,
                                                                  @Nullable String toDate) {
-
-
         Map<String, BoolFilterBuilder> boolFilterMap = new HashMap<>();
         BoolFilterBuilder filter = FilterBuilders.boolFilter();
         BoolFilterBuilder postFilter = FilterBuilders.boolFilter();

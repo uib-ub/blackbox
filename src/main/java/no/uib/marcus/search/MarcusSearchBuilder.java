@@ -1,7 +1,5 @@
 package no.uib.marcus.search;
 
-import com.google.gson.JsonElement;
-import com.google.gson.JsonParser;
 import no.uib.marcus.client.ClientFactory;
 import no.uib.marcus.common.Settings;
 import no.uib.marcus.common.util.AggregationUtils;
@@ -47,10 +45,21 @@ public class MarcusSearchBuilder extends AbstractSearchBuilder<MarcusSearchBuild
     private Map<String, List<String>> selectedFacets;
     private String aggregations;
     private SortBuilder sortBuilder;
+    //A list of places with colorful images.
+    private static final String[] randomList =
+            {
+                    "Knud Knudsen",
+                    "Sophus Tromholt",
+                    "Marcus Selmer",
+                    "Gaupås",
+                    "fana" ,
+                    "nyborg",
+                    "flaktveit",
+                    "Birkeland"
+            };
 
     /**
-     * Constructor
-     *
+     * Build Marcus search service
      * @param client Elasticsearch client to communicate with a cluster.
      */
     public MarcusSearchBuilder(@NotNull Client client) {
@@ -76,6 +85,7 @@ public class MarcusSearchBuilder extends AbstractSearchBuilder<MarcusSearchBuild
         return optionalResponse;
     }
 
+
     /**
      * Set aggregations to be applied
      *
@@ -90,6 +100,13 @@ public class MarcusSearchBuilder extends AbstractSearchBuilder<MarcusSearchBuild
     }
 
     /**
+     * Get aggregations or <tt>null</tt> if not set
+     **/
+    public String getAggregations() {
+        return aggregations;
+    }
+
+    /**
      * Set a sortBuilder order
      *
      * @param sortBuilder
@@ -101,6 +118,13 @@ public class MarcusSearchBuilder extends AbstractSearchBuilder<MarcusSearchBuild
     }
 
     /**
+     * Get sort builder or <tt>null</tt> if not set
+     */
+    public SortBuilder getSortBuilder() {
+        return sortBuilder;
+    }
+
+    /**
      * Set a top-level filter that would filter both search results and aggregations
      *
      * @param filter
@@ -109,6 +133,13 @@ public class MarcusSearchBuilder extends AbstractSearchBuilder<MarcusSearchBuild
     public MarcusSearchBuilder setFilter(FilterBuilder filter) {
         this.filter = filter;
         return this;
+    }
+
+    /**
+     * Get sort builder or <tt>null</tt> if not set
+     **/
+    public FilterBuilder getFilter() {
+        return filter;
     }
 
 
@@ -125,6 +156,13 @@ public class MarcusSearchBuilder extends AbstractSearchBuilder<MarcusSearchBuild
     }
 
     /**
+     * Get post filter or <tt>null</tt> if not set
+     */
+    public FilterBuilder getPostFilter() {
+        return postFilter;
+    }
+
+    /**
      * Set a selected filters map so that we can build filters out of them
      *
      * @param selectedFacets selected filters
@@ -137,6 +175,13 @@ public class MarcusSearchBuilder extends AbstractSearchBuilder<MarcusSearchBuild
         return this;
     }
 
+    /**
+     * Get selected filters or <tt>null</tt> if not set
+     * @return a map containing selected filters
+     */
+    public Map<String, List<String>> getSelectedFacets() {
+        return selectedFacets;
+    }
 
     /**
      * Get all documents based on the service settings.
@@ -148,13 +193,11 @@ public class MarcusSearchBuilder extends AbstractSearchBuilder<MarcusSearchBuild
     public SearchResponse getDocuments() {
         assert super.getClient() != null;
         SearchResponse response = null;
-        SearchRequestBuilder searchRequest;
         QueryBuilder query;
         FunctionScoreQueryBuilder functionScoreQueryBuilder;
-        try {
-            //Prepare search request
-            searchRequest = getClient().prepareSearch();
+        SearchRequestBuilder searchRequest = getClient().prepareSearch();
 
+        try {
             //Set indices
             if (getIndices() != null && getIndices().length > 0) {
                 searchRequest.setIndices(getIndices());
@@ -172,17 +215,19 @@ public class MarcusSearchBuilder extends AbstractSearchBuilder<MarcusSearchBuild
                 );
             } else {
                 //Boost documents inside the "random list" of places because these places have colorful images
-                // and hence they convertToString the front page.
+                //and hence they convertToString the front page.
                 //This is just for coolness and it has no effect if the query yields no results
-                String randomQueryString = Settings.randomList[new Random().nextInt(Settings.randomList.length)];
+                String randomQueryString = randomList[new Random().nextInt(randomList.length)];
                 functionScoreQueryBuilder = QueryBuilders.functionScoreQuery(QueryBuilders.matchAllQuery())
                         .add(FilterBuilders.queryFilter(
-                                QueryBuilders.simpleQueryStringQuery(randomQueryString)), ScoreFunctionBuilders.weightFactorFunction(2)
+                                QueryBuilders.simpleQueryStringQuery(randomQueryString)),
+                                ScoreFunctionBuilders.weightFactorFunction(2)
                         );
             }
             //Boost documents of type "Fotografi" for every query performed.
             query = functionScoreQueryBuilder.add(
-                    FilterBuilders.termFilter("type", "fotografi"), ScoreFunctionBuilders.weightFactorFunction(3)
+                    FilterBuilders.termFilter("type", "fotografi"),
+                    ScoreFunctionBuilders.weightFactorFunction(3)
             );
 
             //Set Query, whether with or without filter
@@ -208,13 +253,16 @@ public class MarcusSearchBuilder extends AbstractSearchBuilder<MarcusSearchBuild
             if (sortBuilder != null) {
                 searchRequest.addSort(sortBuilder);
             }
+
             //Append aggregations to the request builder
             if (Strings.hasText(aggregations)) {
-                AggregationUtils.addAggregations(searchRequest, aggregations, selectedFacets);
+                AggregationUtils.addAggregations(
+                        searchRequest, aggregations, selectedFacets
+                );
             }
 
             //Show builder for debugging purpose
-            logger.info(searchRequest.toString());
+            //logger.info(searchRequest.toString());
 
             //Execute the response
             response = searchRequest.execute().actionGet();
@@ -256,7 +304,7 @@ public class MarcusSearchBuilder extends AbstractSearchBuilder<MarcusSearchBuild
     //Main method for easy debugging
     public static void main(String[] args) throws IOException {
         Client c = ClientFactory.getTransportClient();
-        MarcusSearchBuilder service = SearchBuilderFactory.createMarcusSearchService(c);
+        MarcusSearchBuilder service = SearchBuilderFactory.marcusSearch(c);
         service.setAggregations("koba"); //Invalid aggs, it should fail.
         service.setClient(null);
         service.setQueryString("~ana");

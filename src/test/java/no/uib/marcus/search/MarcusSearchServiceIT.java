@@ -93,7 +93,7 @@ public class MarcusSearchServiceIT extends TestCase {
         logger.info("************Testing getDocuments()*****************");
         logger.info("Indexing documents to index: " + indexName);
 
-        final MarcusSearchBuilder searchService = SearchBuilderFactory.createMarcusSearchService(client)
+        final MarcusSearchBuilder searchService = SearchBuilderFactory.marcusSearch(client)
                 .setIndices(indexName);
 
         //Index 1 document
@@ -132,7 +132,7 @@ public class MarcusSearchServiceIT extends TestCase {
         logger.info("************Testing getDocuments()*****************");
         logger.info("Indexing documents to index: " + indexName);
 
-        final MarcusSearchBuilder searchService = SearchBuilderFactory.createMarcusSearchService(client)
+        final MarcusSearchBuilder searchService = SearchBuilderFactory.marcusSearch(client)
                 .setIndices(indexName);
 
         //Index 1 document

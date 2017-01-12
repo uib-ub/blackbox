@@ -2,6 +2,7 @@ package no.uib.marcus.servlet;
 
 import no.uib.marcus.client.ClientFactory;
 import no.uib.marcus.common.Params;
+import no.uib.marcus.common.Services;
 import no.uib.marcus.common.util.*;
 import no.uib.marcus.search.MarcusSearchBuilder;
 import no.uib.marcus.search.SearchBuilderFactory;
@@ -68,9 +69,12 @@ public class SearchServlet extends HttpServlet {
         String[] selectedFilters = request.getParameterValues(Params.SELECTED_FILTERS);
         String fromDate = request.getParameter(Params.FROM_DATE);
         String toDate = request.getParameter(Params.TO_DATE);
+        String service = request.getParameter(Params.SERVICE);
 
         try (PrintWriter out = response.getWriter()) {
+            MarcusSearchBuilder searchService;
             Client client = ClientFactory.getTransportClient();
+
             int offset = Strings.hasText(from)
                     ? Integer.parseInt(from)
                     : 0;
@@ -86,16 +90,22 @@ public class SearchServlet extends HttpServlet {
             //e.g {"subject.exact" = ["Flyfoto" , "Birkeland"], "type" = ["Brev"]}
             Map<String, List<String>> selectedFacetMap = AggregationUtils.buildFilterMap(selectedFilters);
 
-            //Build a search service
-            MarcusSearchBuilder searchService = SearchBuilderFactory.createMarcusSearchService(client)
-                    .setIndices(indices)
-                    .setTypes(types)
-                    .setQueryString(queryString)
-                    .setAggregations(aggs)
-                    .setFrom(offset)
-                    .setSize(resultSize)
-                    .setSelectedFacets(selectedFacetMap)
-                    .setSortBuilder(fieldSort);
+            //Decide which service to use
+            if(Strings.hasText(service) && service.equals(Services.SKA.toString())) {
+                searchService = SearchBuilderFactory.skaSearch(client);
+            }
+            else {
+                searchService = SearchBuilderFactory.marcusSearch(client);
+            }
+            //Build search services
+          searchService.setIndices(indices)
+                  .setTypes(types)
+                  .setQueryString(queryString)
+                  .setAggregations(aggs)
+                  .setFrom(offset)
+                  .setSize(resultSize)
+                  .setSelectedFacets(selectedFacetMap)
+                  .setSortBuilder(fieldSort);
 
             //Build a top level filter
             Map<String, BoolFilterBuilder> boolFilterMap = FilterUtils

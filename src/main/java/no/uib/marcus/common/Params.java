@@ -6,9 +6,9 @@ package no.uib.marcus.common;
  */
 public class Params {
 
+    public static final String SERVICE = "service";
     public static final String QUERY_STRING = "q";
     public static final String SELECTED_FILTERS = "filter";
-    public static final String SETTING_FILTER = "setting_filter";
     public static final String AGGREGATIONS = "aggs";
     public static final String INDICES = "index";
     public static final String INDEX_TYPES = "type";
@@ -30,5 +30,6 @@ public class Params {
         public static final String MADE_BEFORE = "madeBefore";
         public static final String MADE_AFTER = "madeAfter";
     }
+
 
 }

@@ -48,7 +48,7 @@ public class DiscoveryServlet extends HttpServlet {
         Client client = ClientFactory.getTransportClient();
 
         //Build a discovery service
-        MarcusDiscoveryBuilder service = SearchBuilderFactory.createMarcusDiscoveryService(client)
+        MarcusDiscoveryBuilder service = SearchBuilderFactory.marcusDiscovery(client)
                 .setIndices(indices)
                 .setTypes(types)
                 .setFrom(_from)
