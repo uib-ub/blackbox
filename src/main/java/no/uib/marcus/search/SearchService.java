@@ -1,5 +1,6 @@
 package no.uib.marcus.search;
 
+import org.elasticsearch.action.search.SearchRequestBuilder;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.client.Client;
 
@@ -52,5 +53,10 @@ public interface SearchService<S extends SearchService> {
      *
      * @return a search response.
      */
-    SearchResponse getDocuments();
+    SearchResponse executeSearch();
+
+    /**
+     * Build search requests
+     **/
+    SearchRequestBuilder constructSearchRequest();
 }

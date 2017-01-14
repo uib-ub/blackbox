@@ -1,11 +1,16 @@
 package no.uib.marcus.search;
 
+import org.apache.log4j.Logger;
+import org.elasticsearch.ElasticsearchException;
+import org.elasticsearch.action.search.SearchRequestBuilder;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.client.Client;
 import org.elasticsearch.common.Nullable;
 import org.elasticsearch.common.Strings;
 import org.elasticsearch.common.xcontent.XContentBuilder;
 import org.elasticsearch.common.xcontent.XContentFactory;
+import org.elasticsearch.index.query.QueryBuilders;
+import org.elasticsearch.search.builder.SearchSourceBuilderException;
 
 import javax.validation.constraints.NotNull;
 import java.io.IOException;
@@ -19,6 +24,7 @@ import java.io.IOException;
  * 2016-04-15
  */
 public abstract class AbstractSearchBuilder<T extends AbstractSearchBuilder<T>> implements SearchService<T> {
+    private final Logger logger = Logger.getLogger(getClass().getName());
     private Client client;
     @Nullable
     private String[] indices;
@@ -168,13 +174,48 @@ public abstract class AbstractSearchBuilder<T extends AbstractSearchBuilder<T>> 
         return queryString;
     }
 
+
     /**
-     * Get documents based on the service settings.
-     * The method <tt>must</tt> be implemented by subclasses.
-     * @return a search response.
+     * Get all documents based on the service settings.
+     *
+     * @return a SearchResponse, can be <code>null</code>, which means search was not successfully executed.
      */
     @Override
-    public abstract SearchResponse getDocuments();
+    public abstract SearchResponse executeSearch();
+
+
+    /**
+     * Get documents based on the service settings
+     **/
+    @Override
+    public SearchRequestBuilder constructSearchRequest() {
+        SearchRequestBuilder searchRequest = client.prepareSearch();
+        try {
+            //Set indices
+            if (indices != null && indices.length > 0) {
+                searchRequest.setIndices(getIndices());
+            }
+            //Set types
+            if (types != null && types.length > 0) {
+                searchRequest.setTypes(getTypes());
+            }
+            //Set query
+            if(Strings.hasText(queryString)){
+                searchRequest.setQuery(QueryBuilders.queryStringQuery(queryString));
+            }else {
+                searchRequest.setQuery(QueryBuilders.matchAllQuery());
+            }
+            //Set from and size
+            searchRequest.setFrom(from);
+            searchRequest.setSize(size);
+
+        } catch (SearchSourceBuilderException se) {
+            logger.error("Exception on preparing the request: " + se.getDetailedMessage());
+        } catch (ElasticsearchException ex) {
+            logger.error(ex.getDetailedMessage());
+        }
+        return searchRequest;
+    }
 
     /**
      * Print out properties of this instance as a JSON string

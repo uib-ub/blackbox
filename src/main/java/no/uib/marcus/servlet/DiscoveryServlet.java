@@ -56,7 +56,7 @@ public class DiscoveryServlet extends HttpServlet {
                 .setQueryString(queryString);
 
         try (PrintWriter out = response.getWriter()) {
-            SearchResponse searchResponse = service.getDocuments();
+            SearchResponse searchResponse = service.executeSearch();
             out.write(QueryUtils.toJsonString(searchResponse, true));
         }
     }

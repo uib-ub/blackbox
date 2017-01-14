@@ -123,7 +123,7 @@ public class SearchServlet extends HttpServlet {
             }
 
             //Get all documents from the service
-            SearchResponse searchResponse = searchService.getDocuments();
+            SearchResponse searchResponse = searchService.executeSearch();
 
             //Decide whether to get a pretty JSON output or not
             String searchResponseString = Booleans.isExplicitTrue(isPretty)

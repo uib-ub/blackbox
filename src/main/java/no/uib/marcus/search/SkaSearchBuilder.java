@@ -3,11 +3,8 @@ package no.uib.marcus.search;
 import no.uib.marcus.common.util.AggregationUtils;
 import no.uib.marcus.common.util.QueryUtils;
 import org.apache.log4j.Logger;
-import org.elasticsearch.action.search.SearchPhaseExecutionException;
 import org.elasticsearch.action.search.SearchRequestBuilder;
-import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.client.Client;
-import org.elasticsearch.common.Nullable;
 import org.elasticsearch.common.Strings;
 import org.elasticsearch.index.query.FilterBuilders;
 import org.elasticsearch.index.query.QueryBuilder;
@@ -27,14 +24,13 @@ public class SkaSearchBuilder extends MarcusSearchBuilder {
         super(client);
     }
 
+
     /**
-     * Get documents based on the service settings
+     * Construct a specific search request for SkA dataset
      **/
     @Override
-    @Nullable
-    public SearchResponse getDocuments() {
+    public SearchRequestBuilder constructSearchRequest() {
         QueryBuilder query;
-        SearchResponse response = null;
         SearchRequestBuilder searchRequest = getClient().prepareSearch();
         try {
 
@@ -81,17 +77,10 @@ public class SkaSearchBuilder extends MarcusSearchBuilder {
             }
             //Show builder for debugging purpose
             //logger.info(searchRequest.toString());
-
-            //Execute the response
-            response = searchRequest.execute().actionGet();
-
-            //Show response for debugging purpose
-            //logger.info(response.toString());
         } catch (SearchSourceBuilderException e) {
             logger.error("Exception occurred when building search request: " + e.getDetailedMessage());
-        } catch (SearchPhaseExecutionException e) {
-            logger.error("Could not execute search: " + e.getDetailedMessage());
         }
-        return response;
+        return searchRequest;
     }
+
 }

@@ -4,7 +4,6 @@ package no.uib.marcus.rest.action;
 import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 import no.uib.marcus.client.ClientFactory;
-import no.uib.marcus.rest.RestConfig;
 import no.uib.marcus.search.MarcusSearchBuilder;
 
 import javax.ws.rs.Consumes;
@@ -50,7 +49,7 @@ public class Search {
         System.out.println("Request: " + request.getParameter("q"));
         searchBuilder.setQueryString(queryString);
         return  Response
-                .ok(searchBuilder.getDocuments().toString())
+                .ok(searchBuilder.executeSearch().toString())
                 .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_TYPE.withCharset("UTF-8"))
                 .build();
      }

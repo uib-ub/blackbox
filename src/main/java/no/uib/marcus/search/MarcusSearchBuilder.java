@@ -1,7 +1,6 @@
 package no.uib.marcus.search;
 
 import no.uib.marcus.client.ClientFactory;
-import no.uib.marcus.common.Settings;
 import no.uib.marcus.common.util.AggregationUtils;
 import no.uib.marcus.common.util.QueryUtils;
 import org.apache.log4j.Logger;
@@ -39,23 +38,22 @@ import java.util.Random;
  */
 public class MarcusSearchBuilder extends AbstractSearchBuilder<MarcusSearchBuilder> {
 
-    private static final Logger logger = Logger.getLogger(MarcusSearchBuilder.class);
+    private final Logger logger = Logger.getLogger(getClass().getName());
     private FilterBuilder filter;
     private FilterBuilder postFilter;
     private Map<String, List<String>> selectedFacets;
     private String aggregations;
     private SortBuilder sortBuilder;
+
     //A list of places with colorful images.
-    private static final String[] randomList =
+    private final String[] randomList =
             {
                     "Knud Knudsen",
                     "Sophus Tromholt",
                     "Marcus Selmer",
                     "Gaupås",
-                    "fana" ,
                     "nyborg",
-                    "flaktveit",
-                    "Birkeland"
+                    "flaktveit"
             };
 
     /**
@@ -72,7 +70,7 @@ public class MarcusSearchBuilder extends AbstractSearchBuilder<MarcusSearchBuild
      * @param request
      * @return optional search response
      */
-    private static Optional<SearchResponse> getSearchResponse(SearchRequestBuilder request) {
+    private Optional<SearchResponse> getSearchResponse(SearchRequestBuilder request) {
         Optional<SearchResponse> optionalResponse = Optional.empty();
         try {
             SearchResponse response = request.execute().actionGet();
@@ -190,9 +188,27 @@ public class MarcusSearchBuilder extends AbstractSearchBuilder<MarcusSearchBuild
      */
     @Override
     @Nullable
-    public SearchResponse getDocuments() {
-        assert super.getClient() != null;
+    public SearchResponse executeSearch() {
         SearchResponse response = null;
+        try {
+            response = constructSearchRequest().execute().actionGet();
+            //Show response for debugging purpose
+            //logger.info(response.toString());
+        }
+           catch (SearchPhaseExecutionException e) {
+            //I've not found a direct way to validate a query string. Therefore, the idea here is to catch any
+            //exception that is related to search execution.
+            logger.error("Could not execute search: " + e.getDetailedMessage());
+        }
+        return response;
+    }
+
+
+    /**
+     * Construct search request based on the service settings.
+     **/
+    @Override
+    public SearchRequestBuilder constructSearchRequest() {
         QueryBuilder query;
         FunctionScoreQueryBuilder functionScoreQueryBuilder;
         SearchRequestBuilder searchRequest = getClient().prepareSearch();
@@ -260,23 +276,12 @@ public class MarcusSearchBuilder extends AbstractSearchBuilder<MarcusSearchBuild
                         searchRequest, aggregations, selectedFacets
                 );
             }
-
             //Show builder for debugging purpose
             //logger.info(searchRequest.toString());
-
-            //Execute the response
-            response = searchRequest.execute().actionGet();
-
-            //Show response for debugging purpose
-            //logger.info(response.toString());
         } catch (SearchSourceBuilderException e) {
             logger.error("Exception occurred when building search request: " + e.getDetailedMessage());
-        } catch (SearchPhaseExecutionException e) {
-            //I've not found a direct way to validate a query string. Therefore, the idea here is to catch any
-            //exception that is related to search execution.
-            logger.error("Could not execute search: " + e.getDetailedMessage());
         }
-        return response;
+        return searchRequest;
     }
 
     /**
@@ -308,7 +313,7 @@ public class MarcusSearchBuilder extends AbstractSearchBuilder<MarcusSearchBuild
         service.setAggregations("koba"); //Invalid aggs, it should fail.
         service.setClient(null);
         service.setQueryString("~ana");
-        System.out.println(QueryUtils.toJsonString(service.getDocuments(), true));
+        System.out.println(QueryUtils.toJsonString(service.executeSearch(), true));
     }
 }
 

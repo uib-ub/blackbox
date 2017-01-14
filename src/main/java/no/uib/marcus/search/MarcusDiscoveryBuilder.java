@@ -1,13 +1,10 @@
 package no.uib.marcus.search;
 
 import org.apache.log4j.Logger;
-import org.elasticsearch.ElasticsearchException;
-import org.elasticsearch.action.search.SearchRequestBuilder;
+import org.elasticsearch.action.search.SearchPhaseExecutionException;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.client.Client;
-import org.elasticsearch.common.Strings;
-import org.elasticsearch.index.query.QueryBuilders;
-import org.elasticsearch.search.builder.SearchSourceBuilderException;
+import org.elasticsearch.common.Nullable;
 
 /**
  * A basic builder to explore Marcus dataset
@@ -22,45 +19,23 @@ public class MarcusDiscoveryBuilder extends AbstractSearchBuilder<MarcusDiscover
         super(client);
     }
 
+
     /**
-     * Get documents based on the service settings
-     **/
+     * Get all documents based on the service settings.
+     *
+     * @return a SearchResponse, can be <code>null</code>, which means search was not successfully executed.
+     */
     @Override
-    public SearchResponse getDocuments() {
-        assert super.getClient() != null;
+    @Nullable
+    public SearchResponse executeSearch() {
         SearchResponse response = null;
-        SearchRequestBuilder searchRequest;
         try {
-            //Prepare search request
-            searchRequest = super.getClient().prepareSearch();
-
-            //Set indices
-            if (getIndices() != null && getIndices().length > 0) {
-                searchRequest.setIndices(getIndices());
-            }
-            //Set types
-            if (getTypes() != null && getTypes().length > 0) {
-                searchRequest.setTypes(getTypes());
-            }
-            //Set query
-            if(Strings.hasText(getQueryString())){
-                searchRequest.setQuery(QueryBuilders.queryStringQuery(getQueryString()));
-            }else {
-                searchRequest.setQuery(QueryBuilders.matchAllQuery());
-            }
-            //Set from and size
-            searchRequest.setFrom(getFrom());
-            searchRequest.setSize(getSize());
-
-            //Show SearchRequest builder for debugging purpose
-            //logger.info(searchRequest.toString());
-            response = searchRequest.execute().actionGet();
+            response = constructSearchRequest().execute().actionGet();
+            //Show response for debugging purpose
             //logger.info(response.toString());
-        } catch (SearchSourceBuilderException se) {
-            logger.error("Exception on preparing the request: "
-                    + se.getDetailedMessage());
-        } catch (ElasticsearchException ex) {
-            logger.error(ex.getDetailedMessage());
+        }
+        catch (SearchPhaseExecutionException e) {
+            logger.error("Could not execute search: " + e.getDetailedMessage());
         }
         return response;
     }
