@@ -7,9 +7,7 @@ import java.util.Map;
  * Date: 15/11/2016.
  */
 public class Settings {
-    //A list of places with colorful images.
-    public static final String[] randomList = {"Gaupås", "fana" , "nyborg", "flaktveit", "Birkeland"};
-
+    public static final String MINUS = "-";
     /**
      * If input map contains an array of only one element, then convert the
      * the array to string.
@@ -17,7 +15,7 @@ public class Settings {
      * @param map input map
      * @return a map where a value of type Array that has only one element is converted to a string.
      */
-    public static Map<String, Object> beautify(Map<String, Object> map) {
+    public static Map<String, Object> convertToString(Map<String, Object> map) {
         for (Map.Entry<String, Object> entry : map.entrySet()) {
             if (entry.getValue().getClass().isArray()) {
                 String[] valueArray = (String[]) entry.getValue();

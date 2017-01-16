@@ -1,7 +1,7 @@
 package no.uib.marcus.servlet;
 
 import com.google.gson.Gson;
-import no.uib.marcus.common.RequestParams;
+import no.uib.marcus.common.Params;
 import no.uib.marcus.search.suggestion.CompletionSuggestion;
 
 import javax.servlet.ServletException;
@@ -29,8 +29,8 @@ public class SuggestionServlet extends HttpServlet {
     {
         request.setCharacterEncoding("UTF-8");
         response.setContentType("application/json;charset=UTF-8");
-        String suggestText = request.getParameter(RequestParams.QUERY_STRING);
-        String[] indices = request.getParameterValues(RequestParams.INDICES);
+        String suggestText = request.getParameter(Params.QUERY_STRING);
+        String[] indices = request.getParameterValues(Params.INDICES);
         String jsonString;
 
         try (PrintWriter out = response.getWriter()) {

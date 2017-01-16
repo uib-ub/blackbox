@@ -1,13 +1,11 @@
 package no.uib.marcus.servlet;
 
 import no.uib.marcus.client.ClientFactory;
-import no.uib.marcus.common.RequestParams;
-import no.uib.marcus.common.util.FilterUtils;
-import no.uib.marcus.common.util.LogUtils;
-import no.uib.marcus.common.util.QueryUtils;
-import no.uib.marcus.common.util.SortUtils;
+import no.uib.marcus.common.Params;
+import no.uib.marcus.common.Services;
+import no.uib.marcus.common.util.*;
 import no.uib.marcus.search.MarcusSearchBuilder;
-import no.uib.marcus.search.ServiceFactory;
+import no.uib.marcus.search.SearchBuilderFactory;
 import org.apache.log4j.Logger;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.client.Client;
@@ -23,6 +21,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.List;
+import java.util.Map;
 
 /**
  * This servlet processes all HTTP requests coming from "/search" endpoint
@@ -58,44 +58,72 @@ public class SearchServlet extends HttpServlet {
         response.setContentType("application/json;charset=UTF-8");
 
         //Get parameters from the request
-        String queryString = request.getParameter(RequestParams.QUERY_STRING);
-        String aggs = request.getParameter(RequestParams.AGGREGATIONS);
-        String[] indices = request.getParameterValues(RequestParams.INDICES);
-        String[] types = request.getParameterValues(RequestParams.INDEX_TYPES);
-        String from = request.getParameter(RequestParams.FROM);
-        String size = request.getParameter(RequestParams.SIZE);
-        String sortString = request.getParameter(RequestParams.SORT);
-        String isPretty = request.getParameter(RequestParams.PRETTY_PRINT);
+        String queryString = request.getParameter(Params.QUERY_STRING);
+        String aggs = request.getParameter(Params.AGGREGATIONS);
+        String[] indices = request.getParameterValues(Params.INDICES);
+        String[] types = request.getParameterValues(Params.INDEX_TYPES);
+        String from = request.getParameter(Params.FROM);
+        String size = request.getParameter(Params.SIZE);
+        String sortString = request.getParameter(Params.SORT);
+        String isPretty = request.getParameter(Params.PRETTY_PRINT);
+        String[] selectedFilters = request.getParameterValues(Params.SELECTED_FILTERS);
+        String fromDate = request.getParameter(Params.FROM_DATE);
+        String toDate = request.getParameter(Params.TO_DATE);
+        String service = request.getParameter(Params.SERVICE);
 
         try (PrintWriter out = response.getWriter()) {
+            MarcusSearchBuilder searchService;
             Client client = ClientFactory.getTransportClient();
-            int _from = Strings.hasText(from)
+
+            int offset = Strings.hasText(from)
                     ? Integer.parseInt(from)
                     : 0;
-            int _size = Strings.hasText(size)
+            int resultSize = Strings.hasText(size)
                     ? Integer.parseInt(size)
                     : 10;
             SortBuilder fieldSort = Strings.hasText(sortString)
                     ? SortUtils.getFieldSort(sortString)
                     : null;
 
-            //Build a search service
-            MarcusSearchBuilder searchService = ServiceFactory.createMarcusSearchService(client)
-                    .setIndices(indices)
-                    .setTypes(types)
-                    .setQueryString(queryString)
-                    .setAggregations(aggs)
-                    .setFrom(_from)
-                    .setSize(_size)
-                    .setSortBuilder(fieldSort);
+            //Build a filter map based on selected facets. In the result map
+            //keys are "fields" and values are "terms"
+            //e.g {"subject.exact" = ["Flyfoto" , "Birkeland"], "type" = ["Brev"]}
+            Map<String, List<String>> selectedFacetMap = AggregationUtils.buildFilterMap(selectedFilters);
 
-            //Build a bool filter
-            BoolFilterBuilder boolFilter = FilterUtils.buildBoolFilter(request);
-            if (boolFilter.hasClauses()) {
-                searchService.setFilter(boolFilter);
+            //Decide which service to use
+            if(Strings.hasText(service) && service.equals(Services.SKA.toString())) {
+                searchService = SearchBuilderFactory.skaSearch(client);
             }
+            else {
+                searchService = SearchBuilderFactory.marcusSearch(client);
+            }
+            //Build search services
+          searchService.setIndices(indices)
+                  .setTypes(types)
+                  .setQueryString(queryString)
+                  .setAggregations(aggs)
+                  .setFrom(offset)
+                  .setSize(resultSize)
+                  .setSelectedFacets(selectedFacetMap)
+                  .setSortBuilder(fieldSort);
+
+            //Build a top level filter
+            Map<String, BoolFilterBuilder> boolFilterMap = FilterUtils
+                    .buildBoolFilter(selectedFacetMap, aggs, fromDate, toDate);
+
+            //Set top level filter
+            if (boolFilterMap.get(Params.TOP_FILTER).hasClauses()) {
+                searchService.setFilter(boolFilterMap.get(Params.TOP_FILTER));
+            }
+
+            //Set post_filter, so that aggregations should not be affected by the query.
+            //post_filter only affects search results but NOT aggregations
+            if (boolFilterMap.get(Params.POST_FILTER).hasClauses()) {
+                searchService.setPostFilter(boolFilterMap.get(Params.POST_FILTER));
+            }
+
             //Get all documents from the service
-            SearchResponse searchResponse = searchService.getDocuments();
+            SearchResponse searchResponse = searchService.executeSearch();
 
             //Decide whether to get a pretty JSON output or not
             String searchResponseString = Booleans.isExplicitTrue(isPretty)
@@ -126,7 +154,7 @@ public class SearchServlet extends HttpServlet {
 
     @Override
     public String getServletInfo() {
-        return "SearchServlet servlet";
+        return "Search servlet";
     }
 
 }

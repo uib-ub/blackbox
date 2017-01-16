@@ -4,10 +4,14 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
 import com.google.gson.JsonParser;
+import no.uib.marcus.common.Params;
+import no.uib.marcus.search.IllegalParameterException;
 import org.apache.log4j.Logger;
 import org.elasticsearch.action.search.SearchRequestBuilder;
 import org.elasticsearch.common.Nullable;
 import org.elasticsearch.common.Strings;
+import org.elasticsearch.index.query.BoolFilterBuilder;
+import org.elasticsearch.search.aggregations.AggregationBuilder;
 import org.elasticsearch.search.aggregations.AggregationBuilders;
 import org.elasticsearch.search.aggregations.bucket.histogram.DateHistogram;
 import org.elasticsearch.search.aggregations.bucket.histogram.DateHistogramBuilder;
@@ -20,14 +24,33 @@ import java.util.*;
 
 /**
  * Utility class for constructing aggregations.
+ *
  * @author Hemed Ali Al Ruwehy
- * University of Bergen
+ *         University of Bergen
  */
 public final class AggregationUtils {
     private static final Logger logger = Logger.getLogger(AggregationUtils.class);
     private static final char AGGS_KEY_VALUE_SEPARATOR = '#';
 
-     public AggregationUtils(){}
+    private AggregationUtils() {
+    }
+
+    /**
+     * Validate aggregations
+     *
+     * @param jsonString aggregations as JSON string
+     * @return true if string is JSON array
+     * @throws IllegalParameterException if string is not JSON array
+     * @throws JsonParseException        is string is not valid JSON
+     **/
+    public static boolean isValidJSONArray(String jsonString) {
+        JsonElement element = new JsonParser().parse(jsonString);
+        if (!element.isJsonArray()) {
+            throw new IllegalParameterException(
+                    "Aggregations must be valid JSON. Expected JSON Array of objects but found : [" + jsonString + "]");
+        }
+        return true;
+    }
 
     /**
      * The method checks if the facets/aggregations contain a key that has a specified value.
@@ -44,7 +67,7 @@ public final class AggregationUtils {
     public static boolean contains(String aggregations, String field, String key, String value) {
         try {
             //If there is no aggregations, no need to continue.
-            if(!Strings.hasText(aggregations)){
+            if (!Strings.hasText(aggregations)) {
                 return false;
             }
             JsonElement facets = new JsonParser().parse(aggregations);
@@ -66,17 +89,18 @@ public final class AggregationUtils {
     }
 
     /**
-     * A method to get a map based on the selected filters. If no filter is
+     * A method to build a map based on the selected filters. If no filter is
      * selected, return an empty map.
      *
-     * @param selectedFilters a string of selected filters in the form of "field.value"
-     * @return a map of selected filters as field-value pair
+     * @param selectedFilters a string of selected filters in the form of "field#value"
+     * @return a filter map in the form of
+     * e.g {"subject.exact" = ["Flyfoto" , "Birkeland"], "type.exact" = ["Brev"]}
      */
     @NotNull
-    public static Map<String, List<String>> getFilterMap(@Nullable String[] selectedFilters) {
+    public static Map<String, List<String>> buildFilterMap(@Nullable String[] selectedFilters) {
         Map<String, List<String>> filters = new HashMap<>();
         try {
-            if (selectedFilters == null) {
+            if (selectedFilters == null || selectedFilters.length == 0) {
                 return Collections.emptyMap();
             }
             for (String entry : selectedFilters) {
@@ -96,7 +120,7 @@ public final class AggregationUtils {
                 }
             }
         } catch (Exception ex) {
-            logger.error("Exception occurred while constructing a map setFrom selected filters: " + ex.getMessage());
+            logger.error("Exception occurred while constructing a map from selected filters: " + ex.getMessage());
         }
         return filters;
     }
@@ -106,11 +130,27 @@ public final class AggregationUtils {
      * A method to append aggregations to the search request builder.
      *
      * @param searchRequest a search request builder
+     * @param aggregations  aggregations as JSON array string
      * @return the same search request where aggregations have been added to
      * it.
      */
-    public static SearchRequestBuilder addAggregations(SearchRequestBuilder searchRequest, String aggregations)
+    public static SearchRequestBuilder addAggregations(SearchRequestBuilder searchRequest, String aggregations) {
+        return addAggregations(searchRequest, aggregations, null);
+    }
+
+    /**
+     * A method to append aggregations to the search request builder.
+     *
+     * @param searchRequest  a search request builder
+     * @param selectedFacets a map that contains selected facets
+     * @return the same search request where aggregations have been added to
+     * it.
+     */
+    public static SearchRequestBuilder addAggregations(SearchRequestBuilder searchRequest,
+                                                       String aggregations,
+                                                       Map<String, List<String>> selectedFacets)
             throws JsonParseException, IllegalStateException {
+
         JsonElement jsonElement = new JsonParser().parse(aggregations);
         for (JsonElement facets : jsonElement.getAsJsonArray()) {
             JsonObject currentFacet = facets.getAsJsonObject();
@@ -118,19 +158,48 @@ public final class AggregationUtils {
                 //Add DateHistogram aggregations
                 if (currentFacet.has("type") && currentFacet.get("type").getAsString().equals("date_histogram")) {
                     searchRequest.addAggregation(
-                            AggregationUtils.getDateHistogramAggregation(currentFacet)
-                    );
+                            AggregationUtils.getDateHistogramAggregation(currentFacet));
                 } else {
-                    //Add terms aggregations to the search request builder (this is default)
-                    searchRequest.addAggregation(
-                            AggregationUtils.getTermsAggregation(currentFacet)
-                    );
-                }
-            }
+                    AggregationBuilder termsAggs = AggregationUtils.getTermsAggregation(currentFacet);
 
+                    if (selectedFacets != null && !selectedFacets.isEmpty()) {
+                        //Get current field
+                        String facetField = currentFacet.get("field").getAsString();
+
+                        // Logic: Whenever a user selects value from an "OR" aggregations,
+                        // you add a corresponding filter to all aggregations as sub aggregations (here aggs_filter)
+                        // EXCEPT for the aggregation in which the selection was done in.
+                        if (selectedFacets.containsKey(facetField)) {
+                            //Make a copy of the map.
+                            Map<String, List<String>> selectedFacetCopy = new HashMap<>(selectedFacets);
+                            //Remove the facet that aggregation was performed in from the map
+                            selectedFacetCopy.remove(facetField);
+                            //Build bool_filter for the copy of the selected facets.
+                            //Since we did not pass aggregations as argument in buildBolFilter() method,
+                            //we are sure it is an POST_FILTER (terms bool_filter)
+                            BoolFilterBuilder boolFilterCopy = FilterUtils.buildBoolFilter(selectedFacetCopy).get(Params.POST_FILTER);
+                            if (boolFilterCopy.hasClauses()) {
+                                termsAggs.subAggregation(
+                                        AggregationBuilders.filter("aggs_filter").filter(boolFilterCopy));
+                            }
+                        } else {
+                            //Build a top level filter
+                            BoolFilterBuilder boolFilter = FilterUtils.buildBoolFilter(selectedFacets).get(Params.POST_FILTER);
+                            if (boolFilter.hasClauses()) {
+                                termsAggs.subAggregation(
+                                        AggregationBuilders.filter("aggs_filter").filter(boolFilter)
+                                );
+                            }
+                        }
+                    }
+                    searchRequest.addAggregation(termsAggs);
+                }
+
+            }
         }
         return searchRequest;
     }
+
 
     /**
      * A method to build a date histogram aggregation
@@ -204,7 +273,6 @@ public final class AggregationUtils {
             long minDocCount = facet.get("min_doc_count").getAsLong();
             termsBuilder.minDocCount(minDocCount);
         }
-
         return termsBuilder;
     }
 

@@ -82,7 +82,7 @@ public class MarcusSearchServiceIT extends TestCase {
     }
 
     /**
-     * Test of getDocuments() method, of class
+     * Test of executeSearch() method, of class
      * MarcusSearchServiceOld.
      *
      * @throws java.io.IOException
@@ -90,10 +90,10 @@ public class MarcusSearchServiceIT extends TestCase {
      */
     @Test
     public void testGetDocumentsIsNull() throws IOException, InterruptedException {
-        logger.info("************Testing getDocuments()*****************");
+        logger.info("************Testing executeSearch()*****************");
         logger.info("Indexing documents to index: " + indexName);
 
-        final MarcusSearchBuilder searchService = ServiceFactory.createMarcusSearchService(client)
+        final MarcusSearchBuilder searchService = SearchBuilderFactory.marcusSearch(client)
                 .setIndices(indexName);
 
         //Index 1 document
@@ -110,7 +110,7 @@ public class MarcusSearchServiceIT extends TestCase {
         assertTrue(awaitBusy(new Predicate<Object>() {
             @Override
             public boolean apply(Object o) {
-                SearchResponse res = searchService.getDocuments();
+                SearchResponse res = searchService.executeSearch();
                 logger.info("Total documents found: " + res.getHits().getTotalHits());
 
                 return res.getHits().getTotalHits() == 1;
@@ -121,7 +121,7 @@ public class MarcusSearchServiceIT extends TestCase {
 
 
     /**
-     * Test of getDocuments () method, of class
+     * Test of executeSearch () method, of class
      * MarcusSearchBuilder.
      *
      * @throws java.io.IOException
@@ -129,10 +129,10 @@ public class MarcusSearchServiceIT extends TestCase {
      */
     @Test
     public void testGetDocumentsBoolFilter() throws IOException, InterruptedException {
-        logger.info("************Testing getDocuments()*****************");
+        logger.info("************Testing executeSearch()*****************");
         logger.info("Indexing documents to index: " + indexName);
 
-        final MarcusSearchBuilder searchService = ServiceFactory.createMarcusSearchService(client)
+        final MarcusSearchBuilder searchService = SearchBuilderFactory.marcusSearch(client)
                 .setIndices(indexName);
 
         //Index 1 document
@@ -152,7 +152,7 @@ public class MarcusSearchServiceIT extends TestCase {
             public boolean apply(Object o) {
                 searchService.setQueryString("stone*");
                 searchService.setFilter(FilterBuilders.matchAllFilter());
-                SearchResponse res = searchService.getDocuments();
+                SearchResponse res = searchService.executeSearch();
                 logger.info("Total documents found: " + res.getHits().getTotalHits());
 
                 return res.getHits().getTotalHits() == 1;

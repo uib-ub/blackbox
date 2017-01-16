@@ -1,6 +1,6 @@
 package no.uib.marcus.common.util;
 
-import no.uib.marcus.common.RequestParams;
+import no.uib.marcus.common.Params;
 import no.uib.marcus.common.Settings;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.common.xcontent.XContentBuilder;
@@ -28,11 +28,11 @@ public final class LogUtils {
         //Get a copy of a parameter map
         Map<String, Object> parameterMapCopy = new HashMap<>(request.getParameterMap());
         //Remove aggregations from the logs
-        parameterMapCopy.remove(RequestParams.AGGREGATIONS);
+        parameterMapCopy.remove(Params.AGGREGATIONS);
         XContentBuilder builder = XContentFactory.jsonBuilder()
                 .startObject()
                 //.field("host", request.getRemoteAddr().equals("0:0:0:0:0:0:0:1") ? InetAddress.getLocalHost() : request.getRemoteAddr())
-                .field("params", Settings.beautify(parameterMapCopy))
+                .field("params", Settings.convertToString(parameterMapCopy))
                 .field("hits", searchResponse.getHits().getTotalHits())
                 .field("took", searchResponse.getTook())
                 .endObject();
