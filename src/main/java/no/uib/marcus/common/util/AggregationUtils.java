@@ -109,7 +109,6 @@ public final class AggregationUtils {
                     int lastIndex = entry.lastIndexOf(AGGS_KEY_VALUE_SEPARATOR);
                     String key = entry.substring(0, lastIndex).trim();
                     String value = entry.substring(lastIndex + 1, entry.length()).trim();
-                    //Should we allow empty values? maybe :)
                     if (!filters.containsKey(key)) {
                         List<String> valuesList = new ArrayList<>();
                         valuesList.add(value);

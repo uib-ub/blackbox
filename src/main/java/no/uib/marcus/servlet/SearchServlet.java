@@ -67,8 +67,6 @@ public class SearchServlet extends HttpServlet {
         String sortString = request.getParameter(Params.SORT);
         String isPretty = request.getParameter(Params.PRETTY_PRINT);
         String[] selectedFilters = request.getParameterValues(Params.SELECTED_FILTERS);
-        String fromDate = request.getParameter(Params.FROM_DATE);
-        String toDate = request.getParameter(Params.TO_DATE);
         String service = request.getParameter(Params.SERVICE);
 
         try (PrintWriter out = response.getWriter()) {
@@ -107,11 +105,10 @@ public class SearchServlet extends HttpServlet {
                   .setSelectedFacets(selectedFacetMap)
                   .setSortBuilder(fieldSort);
 
-            //Build a top level filter
-            Map<String, BoolFilterBuilder> boolFilterMap = FilterUtils
-                    .buildBoolFilter(selectedFacetMap, aggs, fromDate, toDate);
+            //Build a bool filter
+            Map<String, BoolFilterBuilder> boolFilterMap = FilterUtils.buildBoolFilter(request);
 
-            //Set top level filter
+            //Set top level filter if any
             if (boolFilterMap.get(Params.TOP_FILTER).hasClauses()) {
                 searchService.setFilter(boolFilterMap.get(Params.TOP_FILTER));
             }
@@ -122,7 +119,7 @@ public class SearchServlet extends HttpServlet {
                 searchService.setPostFilter(boolFilterMap.get(Params.POST_FILTER));
             }
 
-            //Get all documents from the service
+            //Send search request to Elasticsearch and execute
             SearchResponse searchResponse = searchService.executeSearch();
 
             //Decide whether to get a pretty JSON output or not

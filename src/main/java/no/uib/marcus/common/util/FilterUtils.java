@@ -8,6 +8,7 @@ import org.elasticsearch.common.Strings;
 import org.elasticsearch.index.query.BoolFilterBuilder;
 import org.elasticsearch.index.query.FilterBuilders;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.validation.constraints.NotNull;
 import java.util.HashMap;
 import java.util.List;
@@ -71,17 +72,36 @@ public final class FilterUtils {
         return  buildBoolFilter(filterMap, aggs, null, null);
     }
 
-
-
     /**
-     * A method for building BoolFilter based on the aggregation settings.
-     *  @param filterMap a map of selected facets with keys as fields and values as terms.
-     *  @param aggs
-     *  @param fromDate
-     *  @param toDate
-     *
-     *  @return  a map which contains AND and OR bool filters based on the aggregations
+     * A wrapper method for building BoolFilter based on the aggregation settings.
      */
+    public static Map<String, BoolFilterBuilder> buildBoolFilter(HttpServletRequest request){
+        //Get corresponding request parameters
+        String fromDate = request.getParameter(Params.FROM_DATE);
+        String toDate = request.getParameter(Params.TO_DATE);
+        String[] selectedFilters = request.getParameterValues(Params.SELECTED_FILTERS);
+        String aggregations = request.getParameter(Params.AGGREGATIONS);
+
+        //Build a filter map based on selected facets. In the result map
+        //keys are "fields" and values are "terms"
+        //e.g {"subject.exact" = ["Flyfoto" , "Birkeland"], "type" = ["Brev"]}
+        Map<String, List<String>> selectedFacetMap = AggregationUtils.buildFilterMap(selectedFilters);
+
+        return buildBoolFilter(selectedFacetMap, aggregations, fromDate, toDate);
+    }
+
+
+
+
+        /**
+         * A method for building BoolFilter based on the aggregation settings.
+         *  @param filterMap a map of selected facets with keys as fields and values as terms.
+         *  @param aggs
+         *  @param fromDate
+         *  @param toDate
+         *
+         *  @return  a map which contains AND and OR bool filters based on the aggregations
+         */
     public static Map<String, BoolFilterBuilder> buildBoolFilter(@NotNull Map<String, List<String>> filterMap,
                                                                  @Nullable String aggs,
                                                                  @Nullable String fromDate,
