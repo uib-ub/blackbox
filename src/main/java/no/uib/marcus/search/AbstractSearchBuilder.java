@@ -185,7 +185,7 @@ public abstract class AbstractSearchBuilder<T extends AbstractSearchBuilder<T>> 
 
 
     /**
-     * Get documents based on the service settings
+     * Construct search request based on the service settings
      **/
     @Override
     public SearchRequestBuilder constructSearchRequest() {

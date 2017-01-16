@@ -56,7 +56,7 @@ public interface SearchService<S extends SearchService> {
     SearchResponse executeSearch();
 
     /**
-     * Build search requests
+     * Construct search request based on the service settings
      **/
     SearchRequestBuilder constructSearchRequest();
 }
