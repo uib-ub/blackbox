@@ -1,5 +1,7 @@
 # Blackbox #
 
+![Alt text](src/main/webapp/images/class_diagram.png?raw=true "Class diagrams")
+
 Blackbox is a server side application that acts as a bridge between Elasticsearch and client applications to simplify search experience that were before difficult to meet. It is developed to meet the University of Bergen Library requirements and adheres to OOP best practices and uses Elasticsearch core API to communicate with a cluster.
 
 Blackbox communicates with Elasticsearch cluster in round-robbin fashion through Transport client which acts as one of the Elasticsearch nodes in the cluster. 
