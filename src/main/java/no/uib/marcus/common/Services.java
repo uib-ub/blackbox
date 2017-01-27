@@ -23,7 +23,7 @@ public enum Services {
         }
     },
     /**
-     * Marcus Admin service name
+     * Wittgenstein Archives service name
      */
     WAB {
         @Override

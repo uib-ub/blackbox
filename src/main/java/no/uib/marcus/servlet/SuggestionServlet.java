@@ -29,6 +29,7 @@ public class SuggestionServlet extends HttpServlet {
     {
         request.setCharacterEncoding("UTF-8");
         response.setContentType("application/json;charset=UTF-8");
+
         String suggestText = request.getParameter(Params.QUERY_STRING);
         String[] indices = request.getParameterValues(Params.INDICES);
         String size = request.getParameter(Params.SIZE);
@@ -40,9 +41,7 @@ public class SuggestionServlet extends HttpServlet {
                     : 5;
             Gson gson = new Gson();
 
-            jsonString = gson.toJson(
-                    CompletionSuggestion.getSuggestions(suggestText, suggestSize, indices)
-            );
+            jsonString = gson.toJson(CompletionSuggestion.getSuggestions(suggestText, suggestSize, indices));
             out.write(jsonString);
         }
     }

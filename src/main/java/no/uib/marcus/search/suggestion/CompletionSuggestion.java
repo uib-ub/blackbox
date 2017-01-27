@@ -10,13 +10,10 @@ import org.elasticsearch.search.suggest.Suggest;
 import org.elasticsearch.search.suggest.SuggestBuilder.SuggestionBuilder;
 import org.elasticsearch.search.suggest.completion.CompletionSuggestionBuilder;
 
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.Set;
-import java.util.TreeSet;
+import java.util.*;
 
 /**
- * A class for handling auto-suggestion.
+ * A class for handling Completion suggestion (auto-suggestion).
  * @author Hemed Ali Al Ruwehy (hemed.ruwehy@uib.no)
  * <p>
  * University of Bergen Library
@@ -33,7 +30,8 @@ public class CompletionSuggestion {
      * @return a set of suggestion texts.
      **/
     public static Set<String> getSuggestions(String text, int size, @Nullable String... indices) {
-        Set<String> items = new TreeSet<>();
+        //We want suggestion values to be sorted.
+        SortedSet<String> items = new TreeSet<>();
         try {
             SuggestResponse suggestResponse = getSuggestionResponse(text, size, indices);
             Iterator<? extends Suggest.Suggestion.Entry.Option> iter = suggestResponse

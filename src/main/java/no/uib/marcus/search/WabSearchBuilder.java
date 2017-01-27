@@ -58,8 +58,6 @@ public class WabSearchBuilder extends MarcusSearchBuilder {
                     searchRequest.setPostFilter(getPostFilter());
                 }
             }
-
-            //Set from and size
             searchRequest.setFrom(getFrom());
             searchRequest.setSize(getSize());
 
