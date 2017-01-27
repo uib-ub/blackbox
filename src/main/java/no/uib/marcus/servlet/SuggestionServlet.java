@@ -3,6 +3,7 @@ package no.uib.marcus.servlet;
 import com.google.gson.Gson;
 import no.uib.marcus.common.Params;
 import no.uib.marcus.search.suggestion.CompletionSuggestion;
+import org.elasticsearch.common.Strings;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -22,7 +23,6 @@ import java.io.PrintWriter;
 public class SuggestionServlet extends HttpServlet {
 
     private static final long serialVersionUID = 2L;
-    private static final String SUGGEST_FIELD = "suggest";
 
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException
@@ -31,12 +31,17 @@ public class SuggestionServlet extends HttpServlet {
         response.setContentType("application/json;charset=UTF-8");
         String suggestText = request.getParameter(Params.QUERY_STRING);
         String[] indices = request.getParameterValues(Params.INDICES);
+        String size = request.getParameter(Params.SIZE);
         String jsonString;
 
         try (PrintWriter out = response.getWriter()) {
+            int suggestSize = Strings.hasText(size)
+                    ? Integer.parseInt(size)
+                    : 5;
             Gson gson = new Gson();
+
             jsonString = gson.toJson(
-                    CompletionSuggestion.getSuggestions(suggestText, SUGGEST_FIELD, indices)
+                    CompletionSuggestion.getSuggestions(suggestText, suggestSize, indices)
             );
             out.write(jsonString);
         }

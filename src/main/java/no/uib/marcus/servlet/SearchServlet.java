@@ -92,6 +92,9 @@ public class SearchServlet extends HttpServlet {
             if(Strings.hasText(service) && service.equals(Services.SKA.toString())) {
                 searchService = SearchBuilderFactory.skaSearch(client);
             }
+            else if(Strings.hasText(service) && service.equals(Services.WAB.toString())) {
+                searchService = SearchBuilderFactory.wabSearch(client);
+            }
             else {
                 searchService = SearchBuilderFactory.marcusSearch(client);
             }

@@ -24,6 +24,13 @@ public class SearchBuilderFactory {
     }
 
     /**
+     * Create a Wittgenstein Archives search builder
+     **/
+    public static WabSearchBuilder wabSearch(Client client) {
+        return new WabSearchBuilder(client);
+    }
+
+    /**
      * Create a new discovery service for Marcus data set.
      * It is a subset of search service with minimal capabilities.
      * For search, @see SearchBuilderFactory#marcusSearch(Client)

@@ -13,6 +13,7 @@ import org.elasticsearch.search.suggest.completion.CompletionSuggestionBuilder;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
+import java.util.TreeSet;
 
 /**
  * A class for handling auto-suggestion.
@@ -23,17 +24,18 @@ import java.util.Set;
 public class CompletionSuggestion {
 
     private static final Logger logger = Logger.getLogger(CompletionSuggestion.class);
+    private static final String SUGGEST_FIELD = "suggest";
 
     /**A method to get a list of suggestions.
      * @param text input text
-     * @param suggestField a suggestion field
+     * @param size Sets the maximum suggestions to be returned per suggest text term.
      * @param indices array of one or more setIndices, can be <code>null</code>
      * @return a set of suggestion texts.
      **/
-    public static Set<String> getSuggestions(String text, String suggestField, @Nullable String... indices) {
-        Set<String> items = new HashSet<>();
+    public static Set<String> getSuggestions(String text, int size, @Nullable String... indices) {
+        Set<String> items = new TreeSet<>();
         try {
-            SuggestResponse suggestResponse = getSuggestionResponse(text, suggestField, indices);
+            SuggestResponse suggestResponse = getSuggestionResponse(text, size, indices);
             Iterator<? extends Suggest.Suggestion.Entry.Option> iter = suggestResponse
                     .getSuggest()
                     .getSuggestion("completion_suggestion")
@@ -54,35 +56,32 @@ public class CompletionSuggestion {
 
     /**A method to get a list of suggestions.
      * @param text input text
-     * @param suggestField a suggestion field
+     * @param size Sets the maximum suggestions to be returned per suggest text term.
      * @param indices array of one or more setIndices, can be <code>null</code>
      * @return a suggestion response.
      **/
-    public static SuggestResponse getSuggestionResponse(String text, String suggestField, @Nullable String... indices) {
+    public static SuggestResponse getSuggestionResponse(String text, int size, @Nullable String... indices) {
         SuggestionBuilder suggestionsBuilder = new CompletionSuggestionBuilder("completion_suggestion");
         SuggestResponse suggestResponse = null;
         SuggestRequestBuilder suggestRequest;
 
         try {
+            suggestionsBuilder.field(SUGGEST_FIELD);
             suggestionsBuilder.text(text);
-            suggestionsBuilder.field(suggestField);
-            //suggestionsBuilder.size(50);
+            suggestionsBuilder.size(size);
 
-            suggestRequest = ClientFactory
-                    .getTransportClient()
-                    .prepareSuggest();
-
+            suggestRequest = ClientFactory.getTransportClient().prepareSuggest();
             suggestRequest.addSuggestion(suggestionsBuilder);
 
             if (indices != null && indices.length > 0) {
                 suggestRequest.setIndices(indices);
             }
-            suggestResponse = suggestRequest
-                    .execute()
-                    .actionGet();
+
+            //Execute suggestions
+            suggestResponse = suggestRequest.execute().actionGet();
 
         } catch (Exception e) {
-            e.getLocalizedMessage();
+           logger.error("Exception " +  e.getLocalizedMessage());
         }
         return suggestResponse;
     }
@@ -92,7 +91,7 @@ public class CompletionSuggestion {
         Gson gson = new Gson();
         String jsonString = gson.toJson(
                 CompletionSuggestion
-                        .getSuggestions("t", "suggest", "admin"));
+                        .getSuggestions("Ms-114,120v[7]", 10, "wab"));
 
         logger.info(jsonString);
     }

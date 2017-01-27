@@ -22,6 +22,15 @@ public enum Services {
             return "ska";
         }
     },
+    /**
+     * Marcus Admin service name
+     */
+    WAB {
+        @Override
+        public String toString() {
+            return "wab";
+        }
+    },
 
     /**
      * Marcus Admin service name
