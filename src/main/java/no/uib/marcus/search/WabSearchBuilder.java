@@ -35,11 +35,12 @@ public class WabSearchBuilder extends MarcusSearchBuilder {
 
             //Set query
             if (Strings.hasText(getQueryString())) {
-                String queryString = getQueryString(); //+ "*";
-                query = QueryBuilders.simpleQueryStringQuery(queryString)
-                        .field("label")//Not analyzed field.
+                query = QueryBuilders.simpleQueryStringQuery(getQueryString())
+                        .field("label")//whitespace analyzed
+                        .field("publishedIn")//whitespace analyzed
+                        //.field("hasPart")
+                        //.field("refersTo")
                         .field("_all")
-                        .analyzer("default")
                         .defaultOperator(SimpleQueryStringBuilder.Operator.AND);
             } else {
                 query = QueryBuilders.matchAllQuery();
@@ -70,7 +71,7 @@ public class WabSearchBuilder extends MarcusSearchBuilder {
                 AggregationUtils.addAggregations(searchRequest, getAggregations(), getSelectedFacets());
             }
             //Show builder for debugging purpose
-            //logger.info(searchRequest.toString());
+            logger.info(searchRequest.toString());
         } catch (SearchSourceBuilderException e) {
             logger.error("Exception occurred when building search request: " + e.getDetailedMessage());
         }
