@@ -31,7 +31,7 @@ public class CompletionSuggestion {
      **/
     public static Set<String> getSuggestions(String text, int size, @Nullable String... indices) {
         //We want suggestion values to be sorted.
-        SortedSet<String> items = new TreeSet<>();
+        SortedSet<String> suggestValues = new TreeSet<>();
         try {
             SuggestResponse suggestResponse = getSuggestionResponse(text, size, indices);
             Iterator<? extends Suggest.Suggestion.Entry.Option> iter = suggestResponse
@@ -44,12 +44,12 @@ public class CompletionSuggestion {
 
             while (iter.hasNext()) {
                 Suggest.Suggestion.Entry.Option next = iter.next();
-                items.add(next.getText().string());
+                suggestValues.add(next.getText().string().toLowerCase());
             }
         } catch (Exception e) {
             logger.error("Unable to perform suggestion for text: [" + text + "]") ;
         }
-        return items;
+        return suggestValues;
     }
 
     /**A method to get a list of suggestions.
