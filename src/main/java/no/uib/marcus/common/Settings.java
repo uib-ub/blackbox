@@ -10,20 +10,27 @@ public class Settings {
     public static final String MINUS = "-";
     /**
      * If input map contains an array of only one element, then convert the
-     * the array to string.
+     * the array to string making it a proper JSON string.
      *
      * @param map input map
      * @return a map where a value of type Array that has only one element is converted to a string.
      */
-    public static Map<String, Object> convertToString(Map<String, Object> map) {
+    public static Map<String, Object> jsonify(Map<String, Object> map) {
         for (Map.Entry<String, Object> entry : map.entrySet()) {
             if (entry.getValue().getClass().isArray()) {
-                String[] valueArray = (String[]) entry.getValue();
+                String[] valueArray = (String[])entry.getValue();
                 if (valueArray.length == 1) {
                     String value = valueArray[0];
                     if (isNumeric(value)) {
                         map.put(entry.getKey(), Integer.parseInt(value));
-                    } else {
+                    }
+                    else if (value.equalsIgnoreCase("true")){
+                      map.put(entry.getKey(), true);
+                    }
+                    else if(value.equalsIgnoreCase("false")){
+                        map.put(entry.getKey(), false);
+                    }
+                    else {
                         map.put(entry.getKey(), value);
                     }
 

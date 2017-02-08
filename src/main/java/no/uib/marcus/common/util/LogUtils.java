@@ -32,7 +32,7 @@ public final class LogUtils {
         XContentBuilder builder = XContentFactory.jsonBuilder()
                 .startObject()
                 //.field("host", request.getRemoteAddr().equals("0:0:0:0:0:0:0:1") ? InetAddress.getLocalHost() : request.getRemoteAddr())
-                .field("params", Settings.convertToString(parameterMapCopy))
+                .field("params", Settings.jsonify(parameterMapCopy))
                 .field("hits", searchResponse.getHits().getTotalHits())
                 .field("took", searchResponse.getTook())
                 .endObject();

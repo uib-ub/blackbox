@@ -231,7 +231,7 @@ public class MarcusSearchBuilder extends AbstractSearchBuilder<MarcusSearchBuild
                 );
             } else {
                 //Boost documents inside the "random list" of places because these places have colorful images
-                //and hence they convertToString the front page.
+                //and hence they beautify the front page.
                 //This is just for coolness and it has no effect if the query yields no results
                 String randomQueryString = randomList[new Random().nextInt(randomList.length)];
                 functionScoreQueryBuilder = QueryBuilders.functionScoreQuery(QueryBuilders.matchAllQuery())
