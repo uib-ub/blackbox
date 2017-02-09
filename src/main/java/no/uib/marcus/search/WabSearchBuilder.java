@@ -45,23 +45,16 @@ public class WabSearchBuilder extends MarcusSearchBuilder {
             } else {
                 query = QueryBuilders.matchAllQuery();
             }
-
             //Set Query, whether with or without filter
             if (getFilter() != null) {
                 searchRequest.setQuery(QueryBuilders.filteredQuery(query, getFilter()));
-                if (getPostFilter() != null) {
-                    searchRequest.setPostFilter(getPostFilter());
-                }
             } else {
                 searchRequest.setQuery(query);
-                //Set post filter
-                if (getPostFilter() != null) {
-                    searchRequest.setPostFilter(getPostFilter());
-                }
             }
-            searchRequest.setFrom(getFrom());
-            searchRequest.setSize(getSize());
-
+            //Set post filter
+            if (getPostFilter() != null) {
+                searchRequest.setPostFilter(getPostFilter());
+            }
             //Set sortBuilder
             if (getSortBuilder() != null) {
                 searchRequest.addSort(getSortBuilder());
@@ -70,6 +63,11 @@ public class WabSearchBuilder extends MarcusSearchBuilder {
             if (Strings.hasText(getAggregations())) {
                 AggregationUtils.addAggregations(searchRequest, getAggregations(), getSelectedFacets());
             }
+
+            //Set from and size
+            searchRequest.setFrom(getFrom());
+            searchRequest.setSize(getSize());
+
             //Show builder for debugging purpose
             //logger.info(searchRequest.toString());
         } catch (SearchSourceBuilderException e) {

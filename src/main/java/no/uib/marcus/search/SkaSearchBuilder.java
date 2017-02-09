@@ -48,17 +48,18 @@ public class SkaSearchBuilder extends MarcusSearchBuilder {
                         FilterBuilders.termFilter("type", "skeivopedia"),
                         ScoreFunctionBuilders.weightFactorFunction(2));
             }
-            //Set Query, whether with or without filter
+            //Set query whether with or without filter
             if (getFilter() != null) {
                 searchRequest.setQuery(QueryBuilders.filteredQuery(query, getFilter()));
-                if (getPostFilter() != null) {
-                    searchRequest.setPostFilter(getPostFilter());
-                }
-            } else if (getPostFilter() != null && getFilter() == null) {
-                searchRequest.setQuery(query).setPostFilter(getPostFilter());
-            } else {
+            }  else {
                 searchRequest.setQuery(query);
             }
+
+            //Set post filter
+            if(getPostFilter() != null){
+                searchRequest.setPostFilter(getPostFilter());
+            }
+
             //Set from and size
             searchRequest.setFrom(getFrom());
             searchRequest.setSize(getSize());
@@ -67,8 +68,9 @@ public class SkaSearchBuilder extends MarcusSearchBuilder {
             if (getSortBuilder() != null) {
                 searchRequest.addSort(getSortBuilder());
             }
+            //Boost specific index
             if(getIndexToBoost() != null){
-                searchRequest.addIndexBoost(getIndexToBoost(), 4.0f);
+                searchRequest.addIndexBoost(getIndexToBoost(), 5.0f);
             }
             //Append aggregations to the request builder
             if (Strings.hasText(getAggregations())) {

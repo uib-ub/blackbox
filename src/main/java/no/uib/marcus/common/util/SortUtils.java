@@ -60,7 +60,7 @@ public final class SortUtils {
             if(sortString.equals("_score")){
                 return getScoreSort();
             }
-            //If it's not score sort, it's field sort
+            //If it's not score sort, treat it as field sort
             String field = extractSortField(sortString).get(SORT_FIELD);
             String order = extractSortField(sortString).get(SORT_ORDER);
 
@@ -91,9 +91,8 @@ public final class SortUtils {
     public static SortBuilder getScoreSort() {
         SortBuilder sortBuilder = null;
         try {
-            //Build socre sorting
-            sortBuilder = SortBuilders
-                    .scoreSort()
+            //Build score sorting
+            sortBuilder = SortBuilders.scoreSort()
                     .missing("_last");
         } catch (ElasticsearchException e) {
             logger.error("Score sorting cannot be constructed. " + e.getMostSpecificCause());

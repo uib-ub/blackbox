@@ -174,6 +174,11 @@ public class MarcusSearchBuilder extends AbstractSearchBuilder<MarcusSearchBuild
         return this;
     }
 
+    /**
+     * Set index that need to be boosted
+     * @param indexToBoost
+     * @return
+     */
     public MarcusSearchBuilder setIndexToBoost(String indexToBoost) {
         this.indexToBoost = indexToBoost;
         return this;
@@ -256,24 +261,20 @@ public class MarcusSearchBuilder extends AbstractSearchBuilder<MarcusSearchBuild
                     ScoreFunctionBuilders.weightFactorFunction(3)
             );
 
-            //Set Query, whether with or without filter
+            //Set filtered query, whether with or without filter
             if (filter != null) {
                 //Note: Filtered query is deprecated from ES v2.0
                 //in favour of a new filter clause on the bool query
                 //Read https://www.elastic.co/blog/better-query-execution-coming-elasticsearch-2-0
                 searchRequest.setQuery(QueryBuilders.filteredQuery(query, filter));
-                if (postFilter != null) {
-                    searchRequest.setPostFilter(postFilter);
-                }
-            } else if (filter == null && postFilter != null) {
-                searchRequest.setQuery(query);
-                searchRequest.setPostFilter(postFilter);
             } else {
                 searchRequest.setQuery(query);
             }
-            //Set from and size
-            searchRequest.setFrom(getFrom());
-            searchRequest.setSize(getSize());
+
+            //Set post filter
+            if (postFilter != null) {
+                searchRequest.setPostFilter(postFilter);
+            }
 
             //Set sortBuilder
             if (sortBuilder != null) {
@@ -289,8 +290,12 @@ public class MarcusSearchBuilder extends AbstractSearchBuilder<MarcusSearchBuild
                         searchRequest, aggregations, selectedFacets
                 );
             }
+            //Set from and size
+            searchRequest.setFrom(getFrom());
+            searchRequest.setSize(getSize());
+
             //Show builder for debugging purpose
-            //logger.info(searchRequest.toString());
+            logger.info(searchRequest.toString());
         } catch (SearchSourceBuilderException e) {
             logger.error("Exception occurred when building search request: " + e.getMostSpecificCause());
         }
