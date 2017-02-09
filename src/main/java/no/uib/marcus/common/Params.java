@@ -20,6 +20,7 @@ public class Params {
     public static final String PRETTY_PRINT = "pretty";
     public static final String TOP_FILTER = "top_filter";
     public static final String POST_FILTER = "post_filter";
+    public static final String INDEX_BOOST = "index_boost";
 
     /**
      * A static inner class for holding date fields to perform date ranges.

@@ -30,7 +30,7 @@ import java.util.Map;
  * <p/>
  *
  * @author Hemed Al Ruwehy
- * 2016-01-24, University of Bergen Library.
+ *         2016-01-24, University of Bergen Library.
  */
 @WebServlet(
         name = "SearchServlet",
@@ -52,8 +52,7 @@ public class SearchServlet extends HttpServlet {
      **/
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException
-    {
+            throws ServletException, IOException {
         request.setCharacterEncoding("UTF-8");
         response.setContentType("application/json;charset=UTF-8");
 
@@ -68,6 +67,7 @@ public class SearchServlet extends HttpServlet {
         String isPretty = request.getParameter(Params.PRETTY_PRINT);
         String[] selectedFilters = request.getParameterValues(Params.SELECTED_FILTERS);
         String service = request.getParameter(Params.SERVICE);
+        String indexToBoost = request.getParameter(Params.INDEX_BOOST);
 
         try (PrintWriter out = response.getWriter()) {
             MarcusSearchBuilder searchService;
@@ -89,24 +89,23 @@ public class SearchServlet extends HttpServlet {
             Map<String, List<String>> selectedFacetMap = AggregationUtils.buildFilterMap(selectedFilters);
 
             //Decide which service to use
-            if(Strings.hasText(service) && service.equals(Services.SKA.toString())) {
+            if (Strings.hasText(service) && service.equals(Services.SKA.toString())) {
                 searchService = SearchBuilderFactory.skaSearch(client);
-            }
-            else if(Strings.hasText(service) && service.equals(Services.WAB.toString())) {
+            } else if (Strings.hasText(service) && service.equals(Services.WAB.toString())) {
                 searchService = SearchBuilderFactory.wabSearch(client);
-            }
-            else {
+            } else {
                 searchService = SearchBuilderFactory.marcusSearch(client);
             }
             //Build search services
-          searchService.setIndices(indices)
-                  .setTypes(types)
-                  .setQueryString(queryString)
-                  .setAggregations(aggs)
-                  .setFrom(offset)
-                  .setSize(resultSize)
-                  .setSelectedFacets(selectedFacetMap)
-                  .setSortBuilder(fieldSort);
+            searchService.setIndices(indices)
+                    .setTypes(types)
+                    .setQueryString(queryString)
+                    .setAggregations(aggs)
+                    .setFrom(offset)
+                    .setSize(resultSize)
+                    .setSelectedFacets(selectedFacetMap)
+                    .setSortBuilder(fieldSort)
+                    .setIndexToBoost(indexToBoost);
 
             //Build a bool filter
             Map<String, BoolFilterBuilder> boolFilterMap = FilterUtils.buildBoolFilter(request);

@@ -41,10 +41,9 @@ public class CompletionSuggestion {
                     .next()
                     .getOptions()
                     .iterator();
-
             while (iter.hasNext()) {
                 Suggest.Suggestion.Entry.Option next = iter.next();
-                suggestValues.add(next.getText().string().toLowerCase());
+                suggestValues.add(next.getText().string().trim());
             }
         } catch (Exception e) {
             logger.error("Unable to perform suggestion for text: [" + text + "]") ;

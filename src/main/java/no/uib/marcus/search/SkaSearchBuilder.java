@@ -19,11 +19,9 @@ import org.elasticsearch.search.builder.SearchSourceBuilderException;
 public class SkaSearchBuilder extends MarcusSearchBuilder {
     private final Logger logger = Logger.getLogger(getClass().getName());
 
-
     SkaSearchBuilder(Client client){
         super(client);
     }
-
 
     /**
      * Construct a specific search request for SkA dataset
@@ -33,7 +31,6 @@ public class SkaSearchBuilder extends MarcusSearchBuilder {
         QueryBuilder query;
         SearchRequestBuilder searchRequest = getClient().prepareSearch();
         try {
-
             //Set indices
             if (getIndices() != null && getIndices().length > 0) {
                 searchRequest.setIndices(getIndices());
@@ -42,7 +39,6 @@ public class SkaSearchBuilder extends MarcusSearchBuilder {
             if (getTypes() != null && getTypes().length > 0) {
                 searchRequest.setTypes(getTypes());
             }
-
             //Set query
             if (Strings.hasText(getQueryString())) {
                 query = QueryUtils.buildQueryString(getQueryString());
@@ -71,14 +67,17 @@ public class SkaSearchBuilder extends MarcusSearchBuilder {
             if (getSortBuilder() != null) {
                 searchRequest.addSort(getSortBuilder());
             }
+            if(getIndexToBoost() != null){
+                searchRequest.addIndexBoost(getIndexToBoost(), 4.0f);
+            }
             //Append aggregations to the request builder
             if (Strings.hasText(getAggregations())) {
                 AggregationUtils.addAggregations(searchRequest, getAggregations(), getSelectedFacets());
             }
             //Show builder for debugging purpose
-            //logger.info(searchRequest.toString());
+            logger.info(searchRequest.toString());
         } catch (SearchSourceBuilderException e) {
-            logger.error("Exception occurred when building search request: " + e.getDetailedMessage());
+            logger.error("Exception occurred when building search request: " + e.getMostSpecificCause());
         }
         return searchRequest;
     }

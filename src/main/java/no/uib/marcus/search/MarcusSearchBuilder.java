@@ -44,6 +44,7 @@ public class MarcusSearchBuilder extends AbstractSearchBuilder<MarcusSearchBuild
     private Map<String, List<String>> selectedFacets;
     private String aggregations;
     private SortBuilder sortBuilder;
+    private String indexToBoost;
 
     //A list of places with colorful images.
     private final String[] randomList =
@@ -173,6 +174,15 @@ public class MarcusSearchBuilder extends AbstractSearchBuilder<MarcusSearchBuild
         return this;
     }
 
+    public MarcusSearchBuilder setIndexToBoost(String indexToBoost) {
+        this.indexToBoost = indexToBoost;
+        return this;
+    }
+
+    public String getIndexToBoost(){
+        return indexToBoost;
+    }
+
     /**
      * Get selected filters or <tt>null</tt> if not set
      * @return a map containing selected filters
@@ -269,6 +279,9 @@ public class MarcusSearchBuilder extends AbstractSearchBuilder<MarcusSearchBuild
             if (sortBuilder != null) {
                 searchRequest.addSort(sortBuilder);
             }
+            if(indexToBoost != null){
+                searchRequest.addIndexBoost(indexToBoost, 4.0f);
+            }
 
             //Append aggregations to the request builder
             if (Strings.hasText(aggregations)) {
@@ -279,7 +292,7 @@ public class MarcusSearchBuilder extends AbstractSearchBuilder<MarcusSearchBuild
             //Show builder for debugging purpose
             //logger.info(searchRequest.toString());
         } catch (SearchSourceBuilderException e) {
-            logger.error("Exception occurred when building search request: " + e.getDetailedMessage());
+            logger.error("Exception occurred when building search request: " + e.getMostSpecificCause());
         }
         return searchRequest;
     }
