@@ -54,7 +54,8 @@ public class MarcusSearchBuilder extends AbstractSearchBuilder<MarcusSearchBuild
                     "Marcus Selmer",
                     "Gaupås",
                     "nyborg",
-                    "flaktveit"
+                    "flaktveit",
+                    "Billedsamlingen"
             };
 
     /**
