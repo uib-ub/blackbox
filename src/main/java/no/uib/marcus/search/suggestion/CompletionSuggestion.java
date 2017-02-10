@@ -30,25 +30,27 @@ public class CompletionSuggestion {
      * @return a set of suggestion texts.
      **/
     public static Set<String> getSuggestions(String text, int size, @Nullable String... indices) {
-        //We want suggestion values to be sorted.
-        SortedSet<String> suggestValues = new TreeSet<>();
+        Set<String> suggestValues = new HashSet<>();
         try {
             SuggestResponse suggestResponse = getSuggestionResponse(text, size, indices);
-            Iterator<? extends Suggest.Suggestion.Entry.Option> iter = suggestResponse
+            Iterator<? extends Suggest.Suggestion.Entry.Option> iterator = suggestResponse
                     .getSuggest()
                     .getSuggestion("completion_suggestion")
                     .iterator()
                     .next()
                     .getOptions()
                     .iterator();
-            while (iter.hasNext()) {
-                Suggest.Suggestion.Entry.Option next = iter.next();
-                suggestValues.add(next.getText().string().trim());
+
+            //Add each option(value) to a set to ensure no repetition
+            while (iterator.hasNext()) {
+                Suggest.Suggestion.Entry.Option option = iterator.next();
+                suggestValues.add(option.getText().string().toLowerCase());
             }
         } catch (Exception e) {
             logger.error("Unable to perform suggestion for text: [" + text + "]") ;
         }
-        return suggestValues;
+        //We want suggestion values to be sorted, hence we put them in a tree set
+        return new TreeSet<>(suggestValues);
     }
 
     /**A method to get a list of suggestions.

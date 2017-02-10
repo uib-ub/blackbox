@@ -77,7 +77,7 @@ public class SkaSearchBuilder extends MarcusSearchBuilder {
                 AggregationUtils.addAggregations(searchRequest, getAggregations(), getSelectedFacets());
             }
             //Show builder for debugging purpose
-            logger.info(searchRequest.toString());
+            //logger.info(searchRequest.toString());
         } catch (SearchSourceBuilderException e) {
             logger.error("Exception occurred when building search request: " + e.getMostSpecificCause());
         }

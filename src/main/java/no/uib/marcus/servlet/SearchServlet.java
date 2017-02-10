@@ -79,8 +79,8 @@ public class SearchServlet extends HttpServlet {
             int resultSize = Strings.hasText(size)
                     ? Integer.parseInt(size)
                     : 10;
-            SortBuilder fieldSort = Strings.hasText(sortString)
-                    ? SortUtils.getFieldSort(sortString)
+            SortBuilder sort = Strings.hasText(sortString)
+                    ? SortUtils.getSort(sortString)
                     : null;
 
             //Build a filter map based on selected facets. In the result map
@@ -104,7 +104,7 @@ public class SearchServlet extends HttpServlet {
                     .setFrom(offset)
                     .setSize(resultSize)
                     .setSelectedFacets(selectedFacetMap)
-                    .setSortBuilder(fieldSort)
+                    .setSortBuilder(sort)
                     .setIndexToBoost(indexToBoost);
 
             //Build a bool filter

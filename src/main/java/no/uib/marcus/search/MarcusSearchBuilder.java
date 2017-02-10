@@ -280,6 +280,7 @@ public class MarcusSearchBuilder extends AbstractSearchBuilder<MarcusSearchBuild
             if (sortBuilder != null) {
                 searchRequest.addSort(sortBuilder);
             }
+
             if(indexToBoost != null){
                 searchRequest.addIndexBoost(indexToBoost, 4.0f);
             }
@@ -295,7 +296,7 @@ public class MarcusSearchBuilder extends AbstractSearchBuilder<MarcusSearchBuild
             searchRequest.setSize(getSize());
 
             //Show builder for debugging purpose
-            logger.info(searchRequest.toString());
+            //logger.info(searchRequest.toString());
         } catch (SearchSourceBuilderException e) {
             logger.error("Exception occurred when building search request: " + e.getMostSpecificCause());
         }
