@@ -50,12 +50,11 @@ public class MarcusSearchBuilder extends AbstractSearchBuilder<MarcusSearchBuild
     private final String[] randomList =
             {
                     "Knud Knudsen",
+                    "Widerøesamlingen",
                     "Sophus Tromholt",
                     "Marcus Selmer",
-                    "Gaupås",
-                    "nyborg",
-                    "flaktveit",
-                    "Billedsamlingen"
+                    "Billedsamlingen",
+                    "Nyborg"
             };
 
     /**
