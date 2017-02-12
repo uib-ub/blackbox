@@ -44,7 +44,7 @@ public class CompletionSuggestion {
             //Add each option(value) to a set to ensure no repetition
             while (iterator.hasNext()) {
                 Suggest.Suggestion.Entry.Option option = iterator.next();
-                suggestValues.add(option.getText().string());
+                suggestValues.add(option.getText().string().toLowerCase());
             }
         } catch (Exception e) {
             logger.error("Unable to perform suggestion for text: [" + text + "]") ;
