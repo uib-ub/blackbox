@@ -46,14 +46,15 @@ public class MarcusSearchBuilder extends AbstractSearchBuilder<MarcusSearchBuild
     private SortBuilder sortBuilder;
     private String indexToBoost;
 
-    //A list of places with colorful images.
+    //A list of images that will be
+    //randomly loaded at the front page.
     private final String[] randomList =
             {
                     "Knud Knudsen",
-                    "Widerøesamlingen",
+                    "Postkort",
                     "Sophus Tromholt",
                     "Marcus Selmer",
-                    "Billedsamlingen",
+                    "Widerøesamlingen",
                     "Nyborg"
             };
 
