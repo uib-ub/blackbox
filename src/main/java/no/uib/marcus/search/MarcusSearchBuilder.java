@@ -93,7 +93,8 @@ public class MarcusSearchBuilder extends AbstractSearchBuilder<MarcusSearchBuild
      * @return this object where aggregations have been set
      */
     public MarcusSearchBuilder setAggregations(String aggregations) {
-        if (aggregations != null && AggregationUtils.isValidJSONArray(aggregations)) {
+        if (aggregations != null) {
+            AggregationUtils.validateAggregations(aggregations);
             this.aggregations = aggregations;
         }
         return this;

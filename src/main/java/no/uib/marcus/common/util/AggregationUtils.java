@@ -32,6 +32,7 @@ public final class AggregationUtils {
     private static final Logger logger = Logger.getLogger(AggregationUtils.class);
     private static final char AGGS_KEY_VALUE_SEPARATOR = '#';
 
+    //Enforce non-instatiability
     private AggregationUtils() {
     }
 
@@ -43,13 +44,12 @@ public final class AggregationUtils {
      * @throws IllegalParameterException if string is not JSON array
      * @throws JsonParseException        is string is not valid JSON
      **/
-    public static boolean isValidJSONArray(String jsonString) {
+    public static void validateAggregations(String jsonString) {
         JsonElement element = new JsonParser().parse(jsonString);
         if (!element.isJsonArray()) {
             throw new IllegalParameterException(
                     "Aggregations must be valid JSON. Expected JSON Array of objects but found : [" + jsonString + "]");
         }
-        return true;
     }
 
     /**
