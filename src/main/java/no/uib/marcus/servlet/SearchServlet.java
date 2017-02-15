@@ -87,15 +87,7 @@ public class SearchServlet extends HttpServlet {
             //keys are "fields" and values are "terms"
             //e.g {"subject.exact" = ["Flyfoto" , "Birkeland"], "type" = ["Brev"]}
             Map<String, List<String>> selectedFacetMap = AggregationUtils.buildFilterMap(selectedFilters);
-
-            //Decide which service to use
-            if (Strings.hasText(service) && service.equals(Services.SKA.toString())) {
-                searchService = SearchBuilderFactory.skaSearch(client);
-            } else if (Strings.hasText(service) && service.equals(Services.WAB.toString())) {
-                searchService = SearchBuilderFactory.wabSearch(client);
-            } else {
-                searchService = SearchBuilderFactory.marcusSearch(client);
-            }
+            searchService =  getSearchBuilder(service, client);
             //Build search services
             searchService.setIndices(indices)
                     .setTypes(types)
@@ -135,6 +127,36 @@ public class SearchServlet extends HttpServlet {
             //Log search response
             logger.info(LogUtils.logSearchResponse(request, searchResponse));
         }
+    }
+
+
+    /**
+     * Decide which search service to use based on the service parameter
+     * @param service a service parameter
+     * @param client
+     * @return
+     */
+    private MarcusSearchBuilder getSearchBuilder(String service, Client client) {
+
+        if(!Strings.hasText(service)) {
+          return SearchBuilderFactory.marcusSearch(client);
+        }
+
+        Services s = Services.valueOf(service.toUpperCase());
+        MarcusSearchBuilder searchService;
+
+        System.out.println(service + " " + s);
+
+        switch (s){
+            case SKA : searchService = SearchBuilderFactory.skaSearch(client);
+                break;
+            case WAB : searchService = SearchBuilderFactory.wabSearch(client);
+                break;
+            case MARCUS : searchService = SearchBuilderFactory.marcusSearch(client);
+                break;
+            default: searchService = SearchBuilderFactory.marcusSearch(client);
+        }
+        return searchService;
     }
 
     /**
