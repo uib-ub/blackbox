@@ -1,6 +1,10 @@
 package no.uib.marcus.search;
 
+import no.uib.marcus.common.ServiceName;
+import org.apache.log4j.Logger;
 import org.elasticsearch.client.Client;
+import org.elasticsearch.common.Nullable;
+import org.elasticsearch.common.Strings;
 
 /**
  * Creation factory for search services.
@@ -46,5 +50,27 @@ public class SearchBuilderFactory {
     public static <T extends AbstractSearchBuilder> T dummySearch() {
         return null;
     }
+
+
+    /**
+     * Decide which search service to use based on the service parameter
+     * @param serviceString a service parameter. If it is null, it will fall to a default service.
+     * @param client
+     * @return
+     */
+    public static MarcusSearchBuilder getSearchBuilder(@Nullable String serviceString, Client client) {
+        ServiceName service = ServiceName.toEnum(serviceString);
+        switch (service){
+            case SKA :
+                return SearchBuilderFactory.skaSearch(client);
+            case WAB :
+                return SearchBuilderFactory.wabSearch(client);
+            case MARCUS :
+                return SearchBuilderFactory.marcusSearch(client);
+            default:
+                throw new AssertionError("Unknown service " + service);
+        }
+    }
+
 
 }

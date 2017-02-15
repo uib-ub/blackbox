@@ -32,15 +32,4 @@ public class Params {
         public static final String MADE_AFTER = "madeAfter";
     }
 
-    /**
-     * Service names
-     */
-    public static class ServiceName {
-        public static final String SKA = "ska";
-        public static final String WAB = "wab";
-        public static final String MARCUS_ADMIN = "marcus-admin";
-        public static final String MARCUS = "marcus";
-    }
-
-
 }
