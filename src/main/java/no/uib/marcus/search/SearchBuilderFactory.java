@@ -56,7 +56,7 @@ public class SearchBuilderFactory {
      * Decide which search service to use based on the service parameter
      * @param serviceString a service parameter. If it is null, it will fall to a default service.
      * @param client
-     * @return
+     * @return a corresponding search builder
      */
     public static MarcusSearchBuilder getSearchBuilder(@Nullable String serviceString, Client client) {
         ServiceName service = ServiceName.toEnum(serviceString);
@@ -68,7 +68,7 @@ public class SearchBuilderFactory {
             case MARCUS :
                 return SearchBuilderFactory.marcusSearch(client);
             default:
-                throw new AssertionError("Unknown service " + service);
+                throw new AssertionError("Unknown service for " + service);
         }
     }
 

@@ -1,5 +1,6 @@
 package no.uib.marcus.client;
 
+import com.google.gson.*;
 import org.apache.log4j.Logger;
 import org.elasticsearch.ElasticsearchException;
 import org.elasticsearch.action.admin.cluster.health.ClusterHealthResponse;
@@ -10,6 +11,7 @@ import org.elasticsearch.common.settings.Settings;
 import org.elasticsearch.common.transport.InetSocketTransportAddress;
 import org.elasticsearch.transport.ConnectTransportException;
 
+import java.io.IOException;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 
@@ -21,16 +23,21 @@ import java.net.UnknownHostException;
  * node. Note also that you must define the transport client port (9300-9399)
  * and not the REST port (9200-9299). Transport client does not use REST API.
  */
-public class ClientFactory {
+final public class ClientFactory {
 
-    private static final Logger logger = Logger.getLogger(ClientFactory.class);
     private static Client client;
+    private static final Logger logger = Logger.getLogger(ClientFactory.class);
+
+    //TODO: Read these settings from file
+    private static final String CLUSTER_NAME = "ubb-elasticsearch";
+    private static final String HOST = "kirishima.uib.no";
+    private static int TRANSPORT_PORT = 9300;
+
 
     /**
      * We want to prevent direct instantiation of this class, thus we create private constructor
      */
-    private ClientFactory() {
-    }
+    private ClientFactory() {}
 
     /**
      * Create a transport client
@@ -38,14 +45,14 @@ public class ClientFactory {
     private static Client createTransportClient() {
         try {
             Settings settings = ImmutableSettings.settingsBuilder()
-                    .put("cluster.name", "ubb-elasticsearch")
+                    .put("cluster.name", CLUSTER_NAME)
                     .put("node.name", "Blackbox")
                     //.put("client.transport.ping_timeout", "100s")
                     .build();
             client = new TransportClient(settings)
                     //You can add more than one addresses here, depending on the number of your servers.
                     //.addTransportAddress(new InetSocketTransportAddress(InetAddress.getLocalHost(), 9300));
-                    .addTransportAddress(new InetSocketTransportAddress(InetAddress.getByName("kirishima.uib.no"), 9300));
+                    .addTransportAddress(new InetSocketTransportAddress(InetAddress.getByName(HOST), TRANSPORT_PORT));
 
             ClusterHealthResponse hr = client.admin().cluster().prepareHealth().get();
             logger.info("Connected to Elasticsearch cluster: " + hr);
@@ -69,6 +76,7 @@ public class ClientFactory {
         }
         return client;
     }
+
 
     //Main method for easy debugging..
     public static void main(String[] args) {

@@ -1,0 +1,7 @@
+{
+    "cluster_name": "ubb-elasticsearch",
+    "node_name": "Blackbox",
+    "host": "kirishima.uib.no",
+    "transport_port": 9300
+}
+        

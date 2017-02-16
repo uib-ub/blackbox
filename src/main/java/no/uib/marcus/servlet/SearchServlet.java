@@ -2,7 +2,6 @@ package no.uib.marcus.servlet;
 
 import no.uib.marcus.client.ClientFactory;
 import no.uib.marcus.common.Params;
-import no.uib.marcus.common.ServiceName;
 import no.uib.marcus.common.util.*;
 import no.uib.marcus.search.MarcusSearchBuilder;
 import no.uib.marcus.search.SearchBuilderFactory;
@@ -82,13 +81,10 @@ public class SearchServlet extends HttpServlet {
             SortBuilder sort = Strings.hasText(sortString)
                     ? SortUtils.getSort(sortString)
                     : null;
-
-            //Build a filter map based on selected facets. In the result map
-            //keys are "fields" and values are "terms"
-            //e.g {"subject.exact" = ["Flyfoto" , "Birkeland"], "type" = ["Brev"]}
+            //Build a filter map based on selected facets.
             Map<String, List<String>> selectedFacetMap = AggregationUtils.buildFilterMap(selectedFilters);
             MarcusSearchBuilder searchService = SearchBuilderFactory.getSearchBuilder(service, client);
-            //Build search services
+            //Build search service
             searchService.setIndices(indices)
                     .setTypes(types)
                     .setQueryString(queryString)

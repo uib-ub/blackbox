@@ -37,11 +37,12 @@ public class Search {
     @GET
     @Consumes(MediaType.TEXT_PLAIN)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response getDocuments(@QueryParam("q") String queryString, 
+    public Response getDocuments(
+            @QueryParam("q") String queryString,
             @QueryParam("type") List<String> types,
             @QueryParam("index") List<String> indices,
             @QueryParam("aggs") String aggs,
-            @Context HttpServletRequest request){ 
+            @Context HttpServletRequest request){
         
         MarcusSearchBuilder searchBuilder = new MarcusSearchBuilder(ClientFactory.getTransportClient());
         searchBuilder.setIndices("ska2");
