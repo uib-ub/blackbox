@@ -28,8 +28,8 @@ public enum ServiceName {
      * Marcus Admin service name
      */
     MARCUS_ADMIN
-
     ;
+
     /**
      * Logger
      */

@@ -328,7 +328,7 @@ public class MarcusSearchBuilder extends AbstractSearchBuilder<MarcusSearchBuild
     }
 
     //Main method for easy debugging
-    public static void main(String[] args){
+    public static void main(String[] args) throws IOException {
         Client c = ClientFactory.getTransportClient();
         MarcusSearchBuilder service = SearchBuilderFactory.marcusSearch(c);
         service.setAggregations("koba"); //Invalid aggs, it should fail.

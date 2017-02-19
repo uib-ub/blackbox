@@ -1,6 +1,6 @@
 package no.uib.marcus.client;
 
-import com.google.gson.*;
+import no.uib.marcus.common.loader.JsonFileLoader;
 import org.apache.log4j.Logger;
 import org.elasticsearch.ElasticsearchException;
 import org.elasticsearch.action.admin.cluster.health.ClusterHealthResponse;
@@ -14,6 +14,7 @@ import org.elasticsearch.transport.ConnectTransportException;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.util.Map;
 
 /**
  * A singleton that connects to Elasticsearch cluster through Transport client
@@ -31,7 +32,7 @@ final public class ClientFactory {
     //TODO: Read these settings from file
     private static final String CLUSTER_NAME = "ubb-elasticsearch";
     private static final String HOST = "kirishima.uib.no";
-    private static int TRANSPORT_PORT = 9300;
+    private static final int TRANSPORT_PORT = 9300;
 
 
     /**
@@ -42,17 +43,26 @@ final public class ClientFactory {
     /**
      * Create a transport client
      **/
-    private static Client createTransportClient() {
+    private static Client createTransportClient() throws IOException {
+
+        //TODO: Provide this from JsonFileLoader?
+        JsonFileLoader loader = new JsonFileLoader();
+        String jsonString = loader.loadFromResourceFolder(JsonFileLoader.BLACKBOX_CONFIG_FILE_NAME);
+        logger.info("Loading blackbox file settings from: " + loader.getPathFromResource(JsonFileLoader.BLACKBOX_CONFIG_FILE_NAME));
+        Map<String, String> properties = new JsonFileLoader().toMap(jsonString);
+        logger.info("See here: " + properties.get("ubb_cluster.name"));
+
         try {
             Settings settings = ImmutableSettings.settingsBuilder()
-                    .put("cluster.name", CLUSTER_NAME)
+                    .put("cluster.name", properties.get("ubb_cluster.name"))
                     .put("node.name", "Blackbox")
                     //.put("client.transport.ping_timeout", "100s")
                     .build();
             client = new TransportClient(settings)
                     //You can add more than one addresses here, depending on the number of your servers.
                     //.addTransportAddress(new InetSocketTransportAddress(InetAddress.getLocalHost(), 9300));
-                    .addTransportAddress(new InetSocketTransportAddress(InetAddress.getByName(HOST), TRANSPORT_PORT));
+                    .addTransportAddress(new InetSocketTransportAddress(
+                            InetAddress.getByName(properties.get("ubb_cluster.host")), TRANSPORT_PORT));
 
             ClusterHealthResponse hr = client.admin().cluster().prepareHealth().get();
             logger.info("Connected to Elasticsearch cluster: " + hr);
@@ -70,7 +80,7 @@ final public class ClientFactory {
     /**
      * Syncronize the call so that different threads do not end up creating multiple instances
      */
-    public static synchronized Client getTransportClient() {
+    public static synchronized Client getTransportClient() throws IOException {
         if (client == null) {
             client = createTransportClient();
         }
@@ -79,7 +89,7 @@ final public class ClientFactory {
 
 
     //Main method for easy debugging..
-    public static void main(String[] args) {
+    public static void main(String[] args) throws IOException {
         getTransportClient();
     }
 

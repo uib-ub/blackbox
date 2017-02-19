@@ -1,20 +1,17 @@
 package no.uib.marcus.rest.action;
 
 
-import java.util.List;
-import javax.servlet.http.HttpServletRequest;
 import no.uib.marcus.client.ClientFactory;
 import no.uib.marcus.search.MarcusSearchBuilder;
 
-import javax.ws.rs.Consumes;
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
+import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import java.io.IOException;
+import java.util.List;
 
 /**
  * Implementing RESTful API.
@@ -42,7 +39,7 @@ public class Search {
             @QueryParam("type") List<String> types,
             @QueryParam("index") List<String> indices,
             @QueryParam("aggs") String aggs,
-            @Context HttpServletRequest request){
+            @Context HttpServletRequest request) throws IOException{
         
         MarcusSearchBuilder searchBuilder = new MarcusSearchBuilder(ClientFactory.getTransportClient());
         searchBuilder.setIndices("ska2");

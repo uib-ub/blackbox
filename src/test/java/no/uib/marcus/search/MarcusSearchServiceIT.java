@@ -39,7 +39,7 @@ public class MarcusSearchServiceIT extends TestCase {
 
     @Override
     @Before
-    protected void setUp(){
+    protected void setUp() throws IOException{
         try {
             //Establish a transport client
             client = ClientFactory.getTransportClient();

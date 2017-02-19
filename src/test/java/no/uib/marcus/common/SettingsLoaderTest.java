@@ -2,16 +2,11 @@ package no.uib.marcus.common;
 
 
 import com.carrotsearch.randomizedtesting.RandomizedTest;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonParser;
+import no.uib.marcus.common.loader.JsonFileLoader;
 import org.apache.log4j.Logger;
-import org.elasticsearch.common.settings.loader.JsonSettingsLoader;
 import org.junit.Test;
 
-import java.io.BufferedReader;
-import java.io.FileReader;
 import java.io.IOException;
-import java.util.HashMap;
 import java.util.Map;
 
 public class SettingsLoaderTest extends RandomizedTest {
@@ -31,28 +26,28 @@ public class SettingsLoaderTest extends RandomizedTest {
                 "  }\n" +
                 "}";
 
-        Map<String, String> settings = new HashMap<>();
-        settings.putAll(new JsonSettingsLoader().load(properties));
+        Map<String, String> settings = new JsonFileLoader().toMap(properties);
         logger.info("Testing if cluter properties file exist: " + !settings.isEmpty());
         assertTrue(!settings.isEmpty());
-        logger.info("Testing if cluster name exist : " + !settings.get("ubb_cluster.name").isEmpty());
         assertEquals("elasticsearch" , settings.get("ubb_cluster.name"));
         assertEquals("Blackbox" , settings.get("ubb_cluster.node_name"));
         assertEquals("uib.no/ub" , settings.get("ubb_cluster.host"));
     }
 
     /**
-     * Test using fixed values
+     * Testing loading JSON file from resource
      */
     @Test
     public void testLoadingJsonFileFromResource() throws IOException {
-        String path = getClass().getClassLoader()
-                .getResource("cluster-settings.json")
-                .getPath();
-        BufferedReader reader = new BufferedReader(new FileReader(path));
-        JsonElement json = new JsonParser().parse(reader);
-        assertNotNull(json);
-        assertTrue(!json.toString().isEmpty());
-        logger.info("Contents from JSON cluster settings file: " +  json.toString());
+        String fileName = "blackbox.json";
+        JsonFileLoader loader = new JsonFileLoader();
+        String jsonString = loader.loadFromResourceFolder(fileName);
+        logger.info("Testing blackbox file settings from: " + loader.getPathFromResource(fileName));
+        Map<String, String> settings = new JsonFileLoader().toMap(jsonString);
+        assertNotNull(jsonString);
+        assertNotNull(settings);
+        assertTrue(!jsonString.isEmpty());
+        logger.info("Testing if cluster name exist : " + !settings.get("ubb_cluster.name").isEmpty());
+        assertEquals("elasticsearch" , settings.get("ubb_cluster.name"));
     }
 }

@@ -2,7 +2,7 @@ package no.uib.marcus.common;
 
 /**
  * List of request parameters.
- * Servlets use these parameters to process the requests,
+ * Servlets use these parameters to process equests,
  */
 public class Params {
 
