@@ -1,0 +1,8 @@
+{
+  "ubbcluster": {
+    "name": "test-cluster",
+    "node_name": "Blackbox Test",
+    "host": "uib.no/ub",
+    "port": 9301
+  }
+}

@@ -25,7 +25,7 @@ import static org.elasticsearch.test.ElasticsearchTestCase.awaitBusy;
 
 /*
  * To run this test, you need to have Elasticsearch running 
- * with the same settings as Transport client settings.
+ * with the same settings as as Blackbox settings.
  * Make sure you have the same version and cluster name to that of the other nodes.
  */
 

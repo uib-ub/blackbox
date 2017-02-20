@@ -29,41 +29,29 @@ final public class ClientFactory {
     private static Client client;
     private static final Logger logger = Logger.getLogger(ClientFactory.class);
 
-    //TODO: Read these settings from file
-    private static final String CLUSTER_NAME = "ubb-elasticsearch";
-    private static final String HOST = "kirishima.uib.no";
-    private static final int TRANSPORT_PORT = 9300;
-
-
     /**
-     * We want to prevent direct instantiation of this class, thus we create private constructor
+     * Prevent direct instantiation of this class
      */
     private ClientFactory() {}
 
     /**
      * Create a transport client
      **/
-    private static Client createTransportClient() throws IOException {
-
-        //TODO: Provide this from JsonFileLoader?
-        JsonFileLoader loader = new JsonFileLoader();
-        String jsonString = loader.loadFromResourceFolder(JsonFileLoader.BLACKBOX_CONFIG_FILE_NAME);
-        logger.info("Loading blackbox file settings from: " + loader.getPathFromResource(JsonFileLoader.BLACKBOX_CONFIG_FILE_NAME));
-        Map<String, String> properties = new JsonFileLoader().toMap(jsonString);
-        logger.info("See here: " + properties.get("ubb_cluster.name"));
-
-        try {
+    private static Client createTransportClient(Map<String, String> properties){
+         try {
             Settings settings = ImmutableSettings.settingsBuilder()
-                    .put("cluster.name", properties.get("ubb_cluster.name"))
-                    .put("node.name", "Blackbox")
-                    //.put("client.transport.ping_timeout", "100s")
+                    .put("cluster.name", getValueAsString(properties, "ubbcluster.name"))
+                    .put("node.name", getValueAsString(properties, "ubbcluster.node_name"))
                     .build();
             client = new TransportClient(settings)
                     //You can add more than one addresses here, depending on the number of your servers.
-                    //.addTransportAddress(new InetSocketTransportAddress(InetAddress.getLocalHost(), 9300));
-                    .addTransportAddress(new InetSocketTransportAddress(
-                            InetAddress.getByName(properties.get("ubb_cluster.host")), TRANSPORT_PORT));
-
+                    //Use localhost in production
+                    .addTransportAddress(new InetSocketTransportAddress(InetAddress.getLocalHost(),
+                            getValueAsInt(properties, "ubbcluster.port")));
+                   /*.addTransportAddress(new InetSocketTransportAddress(
+                                    InetAddress.getByName(getValueAsString(properties , "ubbcluster.host")),
+                                    getValueAsInt(properties, "ubbcluster.port")));
+                    */
             ClusterHealthResponse hr = client.admin().cluster().prepareHealth().get();
             logger.info("Connected to Elasticsearch cluster: " + hr);
         } catch (UnknownHostException ue) {
@@ -82,7 +70,10 @@ final public class ClientFactory {
      */
     public static synchronized Client getTransportClient() throws IOException {
         if (client == null) {
-            client = createTransportClient();
+            JsonFileLoader loader = new JsonFileLoader();
+            Map<String, String> properties = loader.loadBlackboxConfigFromResource();
+            logger.info("Loaded Blackbox config from: " + loader.getPathFromResource(JsonFileLoader.BLACKBOX_CONFIG_FILE));
+            client = createTransportClient(properties);
         }
         return client;
     }
@@ -91,6 +82,31 @@ final public class ClientFactory {
     //Main method for easy debugging..
     public static void main(String[] args) throws IOException {
         getTransportClient();
+    }
+
+    /**
+     * A wrapper for getting map key and throw exception if value does not exist
+     *
+     * @param map a source map
+     * @param key a key which it's value need to be retrieved
+     * @return a value for the corresponding key, if exists
+     * <p>
+     * throws NullPointerException if key does not exist
+     */
+    private static String getValueAsString(Map<String, String> map, String key) {
+        if (map.get(key) == null) {
+            throw new NullPointerException("Value not found for key [" + key + "]. " +
+                    "Make sure both key and value exist " +
+                    "and are the same to those of your running Elasticsearch cluster");
+        }
+        return map.get(key);
+    }
+
+    /**
+     * See #getValueAsString
+     */
+    private static int getValueAsInt(Map<String, String> map, String key) {
+        return Integer.parseInt(getValueAsString(map, key));
     }
 
     /**

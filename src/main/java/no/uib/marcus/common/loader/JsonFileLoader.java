@@ -11,9 +11,14 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.Map;
 
+/**
+ * A class that provides utility methods for loading JSON config file.
+ * <p>
+ * author Hemed Ali
+ */
 public class JsonFileLoader extends JsonSettingsLoader {
+    public final static String BLACKBOX_CONFIG_FILE = "blackbox.json";
     private final Logger logger = Logger.getLogger(getClass().getName());
-    public final static String BLACKBOX_CONFIG_FILE_NAME = "blackbox.json";
 
     /**
      * Get the file path from the resource folder
@@ -26,8 +31,8 @@ public class JsonFileLoader extends JsonSettingsLoader {
         try {
             filePath = getClass().getClassLoader().getResource(fileName).getPath();
         } catch (NullPointerException ex) {
-            //Throw meaningful exception
-            throw new UnavailableResourceException("Unavailable file with name [" + fileName +"]");
+            //Throw meaningful exception instead
+            throw new UnavailableResourceException("Unavailable config file with name [" + fileName + "]");
         }
         return filePath;
     }
@@ -38,7 +43,7 @@ public class JsonFileLoader extends JsonSettingsLoader {
      * @param fileName
      * @return returns a string representation of file contents
      */
-    public String loadFromResourceFolder(String fileName) {
+    public String loadFromResource(String fileName) {
         return loadFromStream(getPathFromResource(fileName));
     }
 
@@ -70,6 +75,15 @@ public class JsonFileLoader extends JsonSettingsLoader {
      */
     public Map<String, String> toMap(String source) throws IOException {
         return super.load(source);
+    }
+
+    /**
+     * A wrapper for loading config file from resource
+     *
+     * @return a file converted to Java map
+     */
+    public Map<String, String> loadBlackboxConfigFromResource() throws IOException {
+        return toMap(loadFromResource(BLACKBOX_CONFIG_FILE));
     }
 
 }

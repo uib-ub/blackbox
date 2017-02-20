@@ -14,7 +14,7 @@ It is independent from the client implementations and hence can be queried separ
 Blackbox can be queried by specifying parameters in a respective endpoint.
 [Search endpoint](http://kirishima.uib.no/blackbox/search) can take parameters such as the followings:-
 
-* <code>index</code> : the index that the search should be executed. It can be more than one indices, e.g
+*<code>index</code> : the index that the search should be executed. It can be more than one indices, e.g
 <code>http://kirishima.uib.no/blackbox/search?index=ska2&index=admin-test</code>. If not specified, all indices in the cluster will be considered.
 * <code>type</code> : same as index, See Elasticsearch type.
 * <code>q</code> : a query string. For example, <code> http://kirishima.uib.no/blackbox/search?q=knud+knudsen</code> will perform a search to all indices in the cluster for the search string "knud knudsen".
