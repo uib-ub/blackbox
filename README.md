@@ -1,4 +1,4 @@
-# Blackbox - a bridge between clients and Elasticsearch cluster
+# Blackbox - a bridge between search clients and Elasticsearch cluster
 
 ![Alt text](src/main/webapp/images/class_diagram.png?raw=true "Class diagrams")
 
@@ -16,37 +16,41 @@ Blackbox can be queried by specifying parameters in a respective endpoint.
 
 * `index` : the index that the search should be executed. It can be more than one indices, e.g http://kirishima.uib.no/blackbox/search?index=ska2&index=admin-test. If not specified, all indices in the cluster will be considered.
 * `type` : same as index, See Elasticsearch type.
-* `q` : a query string. For example, ` http://kirishima.uib.no/blackbox/search?q=knud+knudsen` will perform a search to all indices in the cluster for the search string "knud knudsen".
+* `q` : a query string. For example, http://kirishima.uib.no/blackbox/search?q=knud+knudsen will perform a search to all indices in the cluster for the search string "knud knudsen".
 * `size` : the size of the returned results. Default is 10
 * `date_from / date_to `: search for created date in the form of `yyyy-MM-dd` or  `yyyy-MM` or  `yyyy`  
 * `filter` : a terms filter if you want to limit the search results e.g `filter=type.exact#Brev`, you will only search within type `Brev`.
-* `aggs`: you can specify aggregations as parameter. Aggregations must be a valid JSON arrays. For example ``` facets: [
-                                                                                                                                            {
-                                                                                                                                                "field": "type",
-                                                                                                                                                "size": 30,
-                                                                                                                                                "operator": "OR",
-                                                                                                                                                "order": "count_desc",
-                                                                                                                                                "min_doc_count": 0
-                                                                                                                                            },
-                                                                                                                                            {
-                                                                                                                                                "field": "hasZoom",
-                                                                                                                                                "size": 10,
-                                                                                                                                                "operator": "AND",
-                                                                                                                                                "order": "term_asc",
-                                                                                                                                                "min_doc_count": 0
-                                                                                                                                            }]
-                                                                                                                                            ``` 
+* `aggs`: you can specify aggregations as parameter. Aggregations must be a valid JSON arrays. For example 
+
+``` 
+facets: [
+{
+"field": "type",
+"size": 30,
+"operator": "OR",
+"order": "count_desc",
+"min_doc_count": 0
+},
+{
+"field": "hasZoom",
+"size": 10,
+"operator": "AND",
+"order": "term_asc",
+"min_doc_count": 0
+}]
                                                                                                                                             
-`pretty`: prettify results. It can hold explicit true values such as `true`, `1` or `on`. It is `false` by default.
-`sort`: you can sort by specifying the field that you want to sort and the sorting order separated by colon. For example, `available:asc` will sort the results in **asc**ending order of the filed `available`. You will have to make sure that the field exists and it is not analyzed.
-`service`: a service parameter tells Blackbox to construct a query based on a particular service, currently we have WAB, MARCUS and SKA services. Default is MARCUS service. We introduced  `service` because we would like to build query based on which data set we are querying. For instance, you would want to boost document of type "Postkort" in Marcus and of type "Skeivopedia" in Skeivtarkiv.  
-`index_boost`: sometimes you would want to boost documents that belong to a specific index if you are querying multiple indices at the same time. Here comes `index_boost` which takes index_name as it's value. 
+``` 
+                                                                                                                                            
+* `pretty`: prettify results. It can hold explicit true values such as `true`, `1` or `on`. It is `false` by default.
+* `sort`: you can sort by specifying the field that you want to sort and the sorting order separated by colon. For example, `available:asc` will sort the results in **asc**ending order of the filed `available`. You will have to make sure that the field exists and it is not analyzed.
+* `service`: a service parameter tells Blackbox to construct a query based on a particular service, currently we have WAB, MARCUS and SKA services. Default is MARCUS service. We introduced  `service` because we would like to build query based on which data set we are querying. For instance, you would want to boost document of type "Postkort" in Marcus and of type "Skeivopedia" in Skeivtarkiv.  
+* `index_boost`: sometimes you would want to boost documents that belong to a specific index if you are querying multiple indices at the same time. Here comes `index_boost` which takes index_name as it's value. 
 
 Another endpoint is [suggest endpoint](http://kirishima.uib.no/blackbox/suggest?=marcus) which is used for auto suggestion. The result is an array of the suggested values. For example `http://kirishima.uib.no/blackbox/suggest?q=marianne` gives a list of suggested values for string "marianne".
 
 
-We have also support for `"exclude" API `. This means if one wants to exclude a terms facet, one will have to write in form of
-`filter=-field#value`. Note the minus sign in front of field name. This query exclude documents of type `Fotografi` in Marcus : ` http://marcus.uib.no/search/?filter=-type.exact%23Fotografi`
+We have also support for *exclude API*. This means if one wants to exclude a terms facet, one will have to write in form of
+`filter=-field#value`. Note the minus sign in front of field name. This query exclude documents of type `Fotografi` in Marcus :  http://marcus.uib.no/search/?filter=-type.exact%23Fotografi
 
 
 ### Installation 
@@ -54,4 +58,4 @@ We have also support for `"exclude" API `. This means if one wants to exclude a 
 * Clone Blackbox from the master branch 
 * Add your cluster properties to `blackbox.json` in the resource folder. See `blackbox-test.json` for example usage.
 * Build a war file with Maven `mvn clean build`
-* Copy `war` file to Tomcat `wabapp` 
+* Copy `war` file to a Tomcat `wabapps` folder
