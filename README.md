@@ -14,13 +14,13 @@ It is independent from the client implementations and hence can be queried separ
 Blackbox can be queried by specifying parameters in a respective endpoint.
 [Search endpoint](http://kirishima.uib.no/blackbox/search) can take parameters such as the followings:-
 
-`index` : the index that the search should be executed. It can be more than one indices, e.g http://kirishima.uib.no/blackbox/search?index=ska2&index=admin-test. If not specified, all indices in the cluster will be considered.
-`type` : same as index, See Elasticsearch type.
-`q` : a query string. For example, ` http://kirishima.uib.no/blackbox/search?q=knud+knudsen` will perform a search to all indices in the cluster for the search string "knud knudsen".
-`size` : the size of the returned results. Default is 10
-`date_from / date_to `: search for created date in the form of `yyyy-MM-dd` or  `yyyy-MM` or  `yyyy`  
-`filter` : a terms filter if you want to limit the search results e.g `filter=type.exact#Brev`, you will only search within type `Brev`.
-`aggs`: you can specify aggregations as parameter. Aggregations must be a valid JSON arrays. For example ``` facets: [
+* `index` : the index that the search should be executed. It can be more than one indices, e.g http://kirishima.uib.no/blackbox/search?index=ska2&index=admin-test. If not specified, all indices in the cluster will be considered.
+* `type` : same as index, See Elasticsearch type.
+* `q` : a query string. For example, ` http://kirishima.uib.no/blackbox/search?q=knud+knudsen` will perform a search to all indices in the cluster for the search string "knud knudsen".
+* `size` : the size of the returned results. Default is 10
+* `date_from / date_to `: search for created date in the form of `yyyy-MM-dd` or  `yyyy-MM` or  `yyyy`  
+* `filter` : a terms filter if you want to limit the search results e.g `filter=type.exact#Brev`, you will only search within type `Brev`.
+* `aggs`: you can specify aggregations as parameter. Aggregations must be a valid JSON arrays. For example ``` facets: [
                                                                                                                                             {
                                                                                                                                                 "field": "type",
                                                                                                                                                 "size": 30,
