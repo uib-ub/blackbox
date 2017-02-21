@@ -2,16 +2,18 @@
 
 ![Alt text](src/main/webapp/images/class_diagram.png?raw=true "Class diagrams")
 
+##Preamble
+
 Blackbox is a server side application that acts as a bridge between Elasticsearch and client applications to simplify search experience that were before difficult to meet. It is developed to meet the University of Bergen Library requirements and adheres to OOP best practices and uses Elasticsearch core API to communicate with a cluster.
 
 Blackbox communicates with Elasticsearch cluster in round-robbin fashion through Transport client which acts as one of the Elasticsearch nodes in the cluster. 
 
-It runs as a [tomcat application](http://kirishima.uib.no/blackbox) and clients can communicate with it through HTTP.
+It runs as a [Web application](http://kirishima.uib.no/blackbox) whereby clients communicate with it through HTTP.
 
 It is independent from the client implementations and hence can be queried separately. 
 
-### Usage 
-Blackbox can be queried by specifying parameters in a respective endpoint.
+## Usage 
+Blackbox can be queried by specifying query parameters in a respective endpoint.
 [Search endpoint](http://kirishima.uib.no/blackbox/search) can take parameters such as the followings:-
 
 * `index` : the index that the search should be executed. It can be more than one indices, e.g http://kirishima.uib.no/blackbox/search?index=ska2&index=admin-test. If not specified, all indices in the cluster will be considered.
@@ -46,16 +48,17 @@ facets: [
 * `service`: a service parameter tells Blackbox to construct a query based on a particular service, currently we have WAB, MARCUS and SKA services. Default is MARCUS service. We introduced  `service` because we would like to build query based on which data set we are querying. For instance, you would want to boost document of type "Postkort" in Marcus and of type "Skeivopedia" in Skeivtarkiv.  
 * `index_boost`: sometimes you would want to boost documents that belong to a specific index if you are querying multiple indices at the same time. Here comes `index_boost` which takes index_name as it's value. 
 
-Another endpoint is [suggest endpoint](http://kirishima.uib.no/blackbox/suggest?=marcus) which is used for auto suggestion. The result is an array of the suggested values. For example `http://kirishima.uib.no/blackbox/suggest?q=marianne` gives a list of suggested values for string "marianne".
 
+Another endpoint is [suggest endpoint](http://kirishima.uib.no/blackbox/suggest?=marcus) which is used for auto suggestion. The result is an array of the suggested values. For example `http://kirishima.uib.no/blackbox/suggest?q=marianne` gives a list of suggested values for string "marianne".
+Suggest endpoint can take parameters such as `index` , `q` and `size`.
 
 We have also support for *exclude API*. This means if one wants to exclude a terms facet, one will have to write in form of
 `filter=-field#value`. Note the minus sign in front of field name. This query exclude documents of type `Fotografi` in Marcus :  http://marcus.uib.no/search/?filter=-type.exact%23Fotografi
 
 
-### Installation 
+## Installation 
 
 * Clone Blackbox from the master branch 
-* Add your cluster properties to `blackbox.json` in the resource folder. See `blackbox-test.json` for example usage.
+* Add your cluster properties to `blackbox.json` in the resource folder. See `blackbox-test.json` in the resource folder for example.
 * Build a war file with Maven `mvn clean build`
-* Copy `war` file to a Tomcat `wabapps` folder
+* Copy `war` file to a Tomcats `wabapps` folder

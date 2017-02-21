@@ -45,9 +45,9 @@ final public class ClientFactory {
                     .build();
             client = new TransportClient(settings)
                     //You can add more than one addresses here, depending on the number of your servers.
-                    //Use localhost in production
-                    .addTransportAddress(new InetSocketTransportAddress(InetAddress.getLocalHost(),
-                            getValueAsInt(properties, "ubbcluster.port")));
+                    .addTransportAddress(new InetSocketTransportAddress(
+                            //Use localhost in production
+                            InetAddress.getLocalHost(), getValueAsInt(properties, "ubbcluster.port")));
                    /*.addTransportAddress(new InetSocketTransportAddress(
                                     InetAddress.getByName(getValueAsString(properties , "ubbcluster.host")),
                                     getValueAsInt(properties, "ubbcluster.port")));
