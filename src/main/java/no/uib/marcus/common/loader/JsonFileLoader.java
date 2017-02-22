@@ -17,7 +17,7 @@ import java.util.Map;
  * author Hemed Ali
  */
 public class JsonFileLoader extends JsonSettingsLoader {
-    public final static String BLACKBOX_CONFIG_FILE = "blackbox.json";
+    public final static String CONFIG_TEMPLATE = "config-template.json";
     private final Logger logger = Logger.getLogger(getClass().getName());
 
     /**
@@ -83,7 +83,7 @@ public class JsonFileLoader extends JsonSettingsLoader {
      * @return a file converted to Java map
      */
     public Map<String, String> loadBlackboxConfigFromResource() throws IOException {
-        return toMap(loadFromResource(BLACKBOX_CONFIG_FILE));
+        return toMap(loadFromResource(CONFIG_TEMPLATE));
     }
 
 }

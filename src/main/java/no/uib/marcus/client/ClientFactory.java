@@ -40,18 +40,19 @@ final public class ClientFactory {
     private static Client createTransportClient(Map<String, String> properties){
          try {
             Settings settings = ImmutableSettings.settingsBuilder()
-                    .put("cluster.name", getValueAsString(properties, "ubbcluster.name"))
-                    .put("node.name", getValueAsString(properties, "ubbcluster.node_name"))
+                    .put("cluster.name", getValueAsString(properties, "cluster.name"))
+                    .put("node.name", getValueAsString(properties, "cluster.node_name"))
                     .build();
             client = new TransportClient(settings)
                     //You can add more than one addresses here, depending on the number of your servers.
-                    .addTransportAddress(new InetSocketTransportAddress(
+                    /*.addTransportAddress(new InetSocketTransportAddress(
                             //Use localhost in production
                             InetAddress.getLocalHost(), getValueAsInt(properties, "ubbcluster.port")));
-                   /*.addTransportAddress(new InetSocketTransportAddress(
-                                    InetAddress.getByName(getValueAsString(properties , "ubbcluster.host")),
-                                    getValueAsInt(properties, "ubbcluster.port")));
-                    */
+                     */
+                   .addTransportAddress(new InetSocketTransportAddress(
+                                    InetAddress.getByName(getValueAsString(properties , "cluster.host")),
+                                    getValueAsInt(properties, "cluster.port")));
+
             ClusterHealthResponse hr = client.admin().cluster().prepareHealth().get();
             logger.info("Connected to Elasticsearch cluster: " + hr);
         } catch (UnknownHostException ue) {
@@ -72,7 +73,7 @@ final public class ClientFactory {
         if (client == null) {
             JsonFileLoader loader = new JsonFileLoader();
             Map<String, String> properties = loader.loadBlackboxConfigFromResource();
-            logger.info("Loaded Blackbox config from: " + loader.getPathFromResource(JsonFileLoader.BLACKBOX_CONFIG_FILE));
+            logger.info("Loaded config template from: " + loader.getPathFromResource(JsonFileLoader.CONFIG_TEMPLATE));
             client = createTransportClient(properties);
         }
         return client;

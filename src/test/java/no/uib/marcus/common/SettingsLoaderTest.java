@@ -38,7 +38,7 @@ public class SettingsLoaderTest extends RandomizedTest {
      */
     @Test
     public void testLoadingJsonFileFromResource() throws IOException {
-        String fileName = "blackbox-test.json";
+        String fileName = "config-template-example.json";
         JsonFileLoader loader = new JsonFileLoader();
         String jsonString = loader.loadFromResource(fileName);
         logger.info("Testing blackbox config file from: " + loader.getPathFromResource(fileName));
@@ -46,8 +46,8 @@ public class SettingsLoaderTest extends RandomizedTest {
         assertNotNull(jsonString);
         assertNotNull(settings);
         assertTrue(!jsonString.isEmpty());
-        logger.info("Testing if cluster name exist : " + !settings.get("ubbcluster.name").isEmpty());
-        logger.info("Testing if host name exist : " + !settings.get("ubbcluster.host").isEmpty());
-        logger.info("Testing if port exist : " + !settings.get("ubbcluster.port").isEmpty());
+        logger.info("Testing if cluster name exist : " + !settings.get("cluster.name").isEmpty());
+        logger.info("Testing if host name exist : " + !settings.get("cluster.host").isEmpty());
+        logger.info("Testing if port exist : " + !settings.get("cluster.port").isEmpty());
     }
 }

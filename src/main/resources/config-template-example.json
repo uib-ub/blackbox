@@ -1,8 +1,9 @@
 {
-  "ubbcluster": {
+  "cluster": {
     "name": "test-cluster",
     "node_name": "Blackbox Test",
     "host": "uib.no/ub",
     "port": 9301
-  }
+  },
+  "_comment" : "application will look for these cluster settings when initializing"
 }
