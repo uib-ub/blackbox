@@ -2,7 +2,7 @@ package no.uib.marcus.common;
 
 /**
  * List of request parameters.
- * Servlets use these parameters to process the requests,
+ * Servlets use these parameters to process equests,
  */
 public class Params {
 
@@ -31,6 +31,5 @@ public class Params {
         public static final String MADE_BEFORE = "madeBefore";
         public static final String MADE_AFTER = "madeAfter";
     }
-
 
 }

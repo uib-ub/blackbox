@@ -2,7 +2,6 @@ package no.uib.marcus.servlet;
 
 import no.uib.marcus.client.ClientFactory;
 import no.uib.marcus.common.Params;
-import no.uib.marcus.common.Services;
 import no.uib.marcus.common.util.*;
 import no.uib.marcus.search.MarcusSearchBuilder;
 import no.uib.marcus.search.SearchBuilderFactory;
@@ -23,6 +22,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.List;
 import java.util.Map;
+
 
 /**
  * This servlet processes all HTTP requests coming from "/search" endpoint
@@ -70,7 +70,6 @@ public class SearchServlet extends HttpServlet {
         String indexToBoost = request.getParameter(Params.INDEX_BOOST);
 
         try (PrintWriter out = response.getWriter()) {
-            MarcusSearchBuilder searchService;
             Client client = ClientFactory.getTransportClient();
 
             int offset = Strings.hasText(from)
@@ -82,21 +81,10 @@ public class SearchServlet extends HttpServlet {
             SortBuilder sort = Strings.hasText(sortString)
                     ? SortUtils.getSort(sortString)
                     : null;
-
-            //Build a filter map based on selected facets. In the result map
-            //keys are "fields" and values are "terms"
-            //e.g {"subject.exact" = ["Flyfoto" , "Birkeland"], "type" = ["Brev"]}
+            //Build a filter map based on selected facets.
             Map<String, List<String>> selectedFacetMap = AggregationUtils.buildFilterMap(selectedFilters);
-
-            //Decide which service to use
-            if (Strings.hasText(service) && service.equals(Services.SKA.toString())) {
-                searchService = SearchBuilderFactory.skaSearch(client);
-            } else if (Strings.hasText(service) && service.equals(Services.WAB.toString())) {
-                searchService = SearchBuilderFactory.wabSearch(client);
-            } else {
-                searchService = SearchBuilderFactory.marcusSearch(client);
-            }
-            //Build search services
+            MarcusSearchBuilder searchService = SearchBuilderFactory.getSearchBuilder(service, client);
+            //Build search service
             searchService.setIndices(indices)
                     .setTypes(types)
                     .setQueryString(queryString)
@@ -136,6 +124,8 @@ public class SearchServlet extends HttpServlet {
             logger.info(LogUtils.logSearchResponse(request, searchResponse));
         }
     }
+
+
 
     /**
      * Handles the HTTP <code>POST</code> method.

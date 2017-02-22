@@ -33,17 +33,14 @@ public class CompletionSuggestion {
         Set<String> suggestValues = new HashSet<>();
         try {
             SuggestResponse suggestResponse = getSuggestionResponse(text, size, indices);
-            Iterator<? extends Suggest.Suggestion.Entry.Option> iterator = suggestResponse
+
+            //Add each option(value) to a set to ensure no repetition
+            for (Suggest.Suggestion.Entry.Option option : suggestResponse
                     .getSuggest()
                     .getSuggestion("completion_suggestion")
                     .iterator()
                     .next()
-                    .getOptions()
-                    .iterator();
-
-            //Add each option(value) to a set to ensure no repetition
-            while (iterator.hasNext()) {
-                Suggest.Suggestion.Entry.Option option = iterator.next();
+                    .getOptions()) {
                 suggestValues.add(option.getText().string().toLowerCase());
             }
         } catch (Exception e) {
