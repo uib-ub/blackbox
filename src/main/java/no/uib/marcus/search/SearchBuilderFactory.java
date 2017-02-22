@@ -1,10 +1,8 @@
 package no.uib.marcus.search;
 
 import no.uib.marcus.common.ServiceName;
-import org.apache.log4j.Logger;
 import org.elasticsearch.client.Client;
 import org.elasticsearch.common.Nullable;
-import org.elasticsearch.common.Strings;
 
 /**
  * Creation factory for search services.
@@ -67,10 +65,11 @@ public class SearchBuilderFactory {
                 return SearchBuilderFactory.wabSearch(client);
             case MARCUS :
                 return SearchBuilderFactory.marcusSearch(client);
+            case MARCUS_ADMIN:
+                return SearchBuilderFactory.marcusSearch(client);
             default:
                 throw new AssertionError("Unknown service for " + service);
         }
     }
-
 
 }
