@@ -21,6 +21,7 @@ Blackbox can be queried by specifying query parameters in a respective endpoint.
 * `aggs`: you can specify aggregations as parameter. Aggregations must be a valid JSON arrays. For example 
 
     ``` 
+    
     facets: [
     {
     "field": "type",
@@ -36,6 +37,7 @@ Blackbox can be queried by specifying query parameters in a respective endpoint.
     "order": "term_asc",
     "min_doc_count": 0
     }]
+    
                                                                                                                                        
     ``` 
                                                                                                                                             
