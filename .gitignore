@@ -7,4 +7,4 @@ build-idea/
 /out/
 *.iml
 #Blackbox config file. See config.template.example.json
-/src/main/resources/config-template.json
+/src/main/resources/config.template.json

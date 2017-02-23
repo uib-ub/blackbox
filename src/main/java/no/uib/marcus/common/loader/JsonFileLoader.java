@@ -17,7 +17,7 @@ import java.util.Map;
  * author Hemed Ali
  */
 public class JsonFileLoader extends JsonSettingsLoader {
-    public final static String CONFIG_TEMPLATE = "config-template.json";
+    public final static String CONFIG_TEMPLATE = "config.template.json";
     private final Logger logger = Logger.getLogger(getClass().getName());
 
     /**

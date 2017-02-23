@@ -20,8 +20,7 @@ Blackbox can be queried by specifying query parameters in a respective endpoint.
 * `filter` : a terms filter if you want to limit the search results e.g `filter=type.exact#Brev`, you will only search within type `Brev`.
 * `aggs`: you can specify aggregations as parameter. Aggregations must be a valid JSON arrays. For example 
 
-   ``` 
-    
+    ``` 
     facets: [
     {
     "field": "type",
@@ -37,8 +36,7 @@ Blackbox can be queried by specifying query parameters in a respective endpoint.
     "order": "term_asc",
     "min_doc_count": 0
     }]
-    
-                                                                                                                                            
+                                                                                                                                       
     ``` 
                                                                                                                                             
 * `pretty`: prettify results. It can hold explicit true values such as `true`, `1` or `on`. It is `false` by default.
@@ -57,6 +55,6 @@ We have also support for *exclude API*. This means if one wants to exclude a ter
 ## Installation 
 
 * Clone Blackbox from the master branch 
-* Add your cluster properties to `config-template.json` in the resource folder. Blackbox will look for these settings when initializing. See `config-template-test.json` in the resource folder for example settings.
+* Add your cluster properties to `config.template.json` in the resource folder. Blackbox will look for these settings when initializing. See `config.template.test.json` in the resource folder for example settings.
 * Build a war file with Maven `mvn clean build`
 * Copy `war` file to a Tomcats `wabapps` folder
