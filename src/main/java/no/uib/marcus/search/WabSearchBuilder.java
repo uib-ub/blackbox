@@ -38,6 +38,7 @@ public class WabSearchBuilder extends MarcusSearchBuilder {
                 query = QueryBuilders.simpleQueryStringQuery(getQueryString())
                         .field("label")//whitespace analyzed
                         .field("publishedIn")//whitespace analyzed
+                        .field("publishedInPart")//not_analyzed
                         //.field("hasPart")
                         //.field("refersTo")
                         .field("_all")
