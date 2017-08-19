@@ -8,6 +8,14 @@ import java.util.Map;
  */
 public class Settings {
     public static final String MINUS = "-";
+
+    //Any of this format is OK
+    public static final String DEFAULT_DATE_FORMAT = "yyyy-mm-dd||yyyy-mm||yyyy";
+
+    //Prevent this class from being initialized
+    private Settings(){}
+
+
     /**
      * If input map contains an array of only one element, then convert the
      * the array to string making it a proper JSON string.

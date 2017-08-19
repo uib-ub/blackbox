@@ -15,6 +15,6 @@ public class TestFilterUtils extends RandomizedTest {
         assertTrue("From == To (valid range)" , FilterUtils.isValidRange("2010", "2010-01-01"));
         assertFalse("From > To (not valid range)" , FilterUtils.isValidRange("2010-01-01", "2001-01-01"));
         assertTrue("From > To but different format (valid range)" , FilterUtils.isValidRange("2010-01", "2017-01-01"));
-
+        assertFalse("From is null (not valid range)" , FilterUtils.isValidRange(null, "2001-01-01"));
     }
 }
