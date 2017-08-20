@@ -9,6 +9,6 @@ build-idea/
 #Blackbox config file. See config.template.example.json
 /src/main/resources/config.template.json
  *.DS_Store
- blackbox.log
+blackbox.log
 
 

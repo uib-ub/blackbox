@@ -1,7 +1,6 @@
 package no.uib.marcus.common.util;
 
 import no.uib.marcus.common.Params;
-import no.uib.marcus.common.Settings;
 import org.apache.log4j.Logger;
 import org.elasticsearch.common.Nullable;
 import org.elasticsearch.common.Strings;
@@ -105,6 +104,16 @@ public final class FilterUtils {
                          made_after|---------------------------------------------------|made_before
                      */
 
+
+                     //Experimental and needs a discussion?
+                     //if(Strings.hasText(fromDate) && !Strings.hasText(toDate)){
+                     //    boolFilter.must(FilterBuilders.rangeFilter(Params.DateField.MADE_AFTER).gte(fromDate));
+                     //}
+               /*
+                TODO: Create an issue to solve date errors in the data. some of them they dont have madeAfter/madeBefore fields,
+                and others madeAfter > madeBefore, which is not correct.
+               */
+
             if (isValidRange(fromDate, toDate)) {
                 boolFilter.should(FilterBuilders.boolFilter()
                         .must(FilterBuilders.rangeFilter(Params.DateField.MADE_AFTER).lte(fromDate))
@@ -120,13 +129,15 @@ public final class FilterUtils {
      *
      * @param fromDate from date
      * @param toDate to date
+     *
+     * @pre-condition: both parameter must have values
      * @return {@code true } if toDate is greater or equal to fromDate, otherwise {@code false}
      */
     public static boolean isValidRange(String fromDate, String toDate) {
         if(Strings.hasText(fromDate) && Strings.hasText(toDate)) {
-            LocalDate from = Joda.forPattern(Settings.DEFAULT_DATE_FORMAT).parser().parseLocalDate(fromDate);
-            LocalDate to = Joda.forPattern(Settings.DEFAULT_DATE_FORMAT).parser().parseLocalDate(toDate);
-            if(from.isBefore(to) || from.equals(to)){
+            LocalDate from = Joda.forPattern(BlackboxUtils.DEFAULT_DATE_FORMAT).parser().parseLocalDate(fromDate);
+            LocalDate to = Joda.forPattern(BlackboxUtils.DEFAULT_DATE_FORMAT).parser().parseLocalDate(toDate);
+            if(from.isBefore(to) || from.isEqual(to)){
                 return true;
             }
         }
@@ -168,9 +179,9 @@ public final class FilterUtils {
         //Build a filter map based on selected facets. In the result map
         //keys are "fields" and values are "terms"
         //e.g {"subject.exact" = ["Flyfoto" , "Birkeland"], "type" = ["Brev"]}
-        Map<String, List<String>> selectedFacetMap = AggregationUtils.buildFilterMap(selectedFilters);
+        Map<String, List<String>> selectedFacets = AggregationUtils.buildFilterMap(selectedFilters);
 
-        return buildBoolFilter(selectedFacetMap, aggregations, fromDate, toDate);
+        return buildBoolFilter(selectedFacets, aggregations, fromDate, toDate);
     }
 
 
@@ -201,7 +212,7 @@ public final class FilterUtils {
                         if (AggregationUtils.contains(aggs, entry.getKey(), "operator", "AND")) {
                             for (Object value : entry.getValue()) {
                                 //Building "AND" filter with "term" filter.
-                                if (entry.getKey().startsWith(Settings.MINUS)) {
+                                if (entry.getKey().startsWith(BlackboxUtils.MINUS)) {
                                     //Exclude any filter that begins with minus sign ("-") by using MUST NOT filter;
                                     filter.mustNot(FilterBuilders.termFilter(entry.getKey().substring(1), value));
                                 } else {
@@ -210,7 +221,7 @@ public final class FilterUtils {
                             }
                         }
                         //Exclude any filter that begins with minus sign ("-") by using MUST NOT filter;
-                        else if (entry.getKey().startsWith(Settings.MINUS)) {
+                        else if (entry.getKey().startsWith(BlackboxUtils.MINUS)) {
                             filter.mustNot(FilterBuilders.termsFilter(entry.getKey().substring(1), entry.getValue()));
                         }
                         //Building "OR" filter using "terms" filter (default).

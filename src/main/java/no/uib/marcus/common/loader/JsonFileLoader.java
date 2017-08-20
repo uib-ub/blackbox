@@ -31,8 +31,9 @@ public class JsonFileLoader extends JsonSettingsLoader {
         try {
             filePath = getClass().getClassLoader().getResource(fileName).getPath();
         } catch (NullPointerException ex) {
-            //Throw meaningful exception instead
-            throw new UnavailableResourceException("Unavailable config file with name [" + fileName + "]");
+            //throw meaningful exception instead
+            throw new UnavailableResourceException("Unavailable config file with name [" + fileName + "] " +
+                    "in src/main/resources");
         }
         return filePath;
     }

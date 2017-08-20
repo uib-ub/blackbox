@@ -26,7 +26,7 @@ public class SettingsLoaderTest extends RandomizedTest {
                 "}";
 
         Map<String, String> settings = new JsonFileLoader().toMap(properties);
-        logger.info("Testing if cluster properties file exist: " + !settings.isEmpty());
+        //logger.info("Testing if cluster properties file exist: " + !settings.isEmpty());
         assertTrue(!settings.isEmpty());
         assertEquals("elasticsearch", settings.get("ubbcluster.name"));
         assertEquals("Blackbox", settings.get("ubbcluster.node_name"));
@@ -38,16 +38,17 @@ public class SettingsLoaderTest extends RandomizedTest {
      */
     @Test
     public void testLoadingJsonFileFromResource() throws IOException {
-        String fileName = "config.template.example.json";
+        String fileName = JsonFileLoader.CONFIG_TEMPLATE;
         JsonFileLoader loader = new JsonFileLoader();
         String jsonString = loader.loadFromResource(fileName);
-        logger.info("Testing blackbox config file from: " + loader.getPathFromResource(fileName));
+
+        logger.info("Validating config file from: " + loader.getPathFromResource(fileName));
         Map<String, String> settings = loader.toMap(jsonString);
         assertNotNull(jsonString);
         assertNotNull(settings);
         assertTrue(!jsonString.isEmpty());
-        logger.info("Testing if cluster name exist : " + !settings.get("cluster.name").isEmpty());
-        logger.info("Testing if host name exist : " + !settings.get("cluster.host").isEmpty());
-        logger.info("Testing if port exist : " + !settings.get("cluster.port").isEmpty());
+        logger.info("Does cluster name exist? : " + !settings.get("cluster.name").isEmpty());
+        logger.info("Does host name exist? : " + !settings.get("cluster.host").isEmpty());
+        logger.info("Does port exist? : " + !settings.get("cluster.port").isEmpty());
     }
 }

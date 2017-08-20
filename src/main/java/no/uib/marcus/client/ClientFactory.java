@@ -1,5 +1,6 @@
 package no.uib.marcus.client;
 
+import no.uib.marcus.common.util.BlackboxUtils;
 import no.uib.marcus.common.loader.JsonFileLoader;
 import org.apache.log4j.Logger;
 import org.elasticsearch.ElasticsearchException;
@@ -15,6 +16,7 @@ import java.io.IOException;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.Map;
+
 
 /**
  * A singleton that connects to Elasticsearch cluster through Transport client
@@ -40,8 +42,8 @@ final public class ClientFactory {
     private static Client createTransportClient(Map<String, String> properties){
          try {
             Settings settings = ImmutableSettings.settingsBuilder()
-                    .put("cluster.name", getValueAsString(properties, "cluster.name"))
-                    .put("node.name", getValueAsString(properties, "cluster.node_name"))
+                    .put("cluster.name", BlackboxUtils.getValueAsString(properties, "cluster.name"))
+                    .put("node.name", BlackboxUtils.getValueAsString(properties, "cluster.node_name"))
                     .build();
             client = new TransportClient(settings)
                     //You can add more than one addresses here, depending on the number of your servers.
@@ -50,8 +52,8 @@ final public class ClientFactory {
                             InetAddress.getLocalHost(), getValueAsInt(properties, "ubbcluster.port")));
                      */
                    .addTransportAddress(new InetSocketTransportAddress(
-                                    InetAddress.getByName(getValueAsString(properties , "cluster.host")),
-                                    getValueAsInt(properties, "cluster.port")));
+                                    InetAddress.getByName(BlackboxUtils.getValueAsString(properties , "cluster.host")),
+                                    BlackboxUtils.getValueAsInt(properties, "cluster.port")));
 
             ClusterHealthResponse hr = client.admin().cluster().prepareHealth().get();
             logger.info("Connected to Elasticsearch cluster: " + hr);
@@ -80,36 +82,6 @@ final public class ClientFactory {
     }
 
 
-    //Main method for easy debugging..
-    public static void main(String[] args) throws IOException {
-        getTransportClient();
-    }
-
-    /**
-     * A wrapper for getting map key and throw exception if value does not exist
-     *
-     * @param map a source map
-     * @param key a key which it's value need to be retrieved
-     * @return a value for the corresponding key, if exists
-     * <p>
-     * throws NullPointerException if key does not exist
-     */
-    private static String getValueAsString(Map<String, String> map, String key) {
-        if (map.get(key) == null) {
-            throw new NullPointerException("Value not found for key [" + key + "]. " +
-                    "Make sure both key and value exist " +
-                    "and are the same to those of your running Elasticsearch cluster");
-        }
-        return map.get(key);
-    }
-
-    /**
-     * See #getValueAsString
-     */
-    private static int getValueAsInt(Map<String, String> map, String key) {
-        return Integer.parseInt(getValueAsString(map, key));
-    }
-
     /**
      * Don't allow cloning for this object
      **/
@@ -117,5 +89,11 @@ final public class ClientFactory {
     protected Object clone() throws CloneNotSupportedException {
         throw new CloneNotSupportedException("Cloning for this object is not supported");
     }
+
+    //Main method for easy debugging..
+    public static void main(String[] args) throws IOException {
+        getTransportClient();
+    }
+
 
 }

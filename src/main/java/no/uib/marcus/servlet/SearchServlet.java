@@ -72,6 +72,7 @@ public class SearchServlet extends HttpServlet {
         try (PrintWriter out = response.getWriter()) {
             Client client = ClientFactory.getTransportClient();
 
+            //Assign default values, if needs be
             int offset = Strings.hasText(from)
                     ? Integer.parseInt(from)
                     : 0;
@@ -81,10 +82,12 @@ public class SearchServlet extends HttpServlet {
             SortBuilder sort = Strings.hasText(sortString)
                     ? SortUtils.getSort(sortString)
                     : null;
+
             //Build a filter map based on selected facets.
             Map<String, List<String>> selectedFacetMap = AggregationUtils.buildFilterMap(selectedFilters);
-            MarcusSearchBuilder searchService = SearchBuilderFactory.getSearchBuilder(service, client);
+
             //Build search service
+            MarcusSearchBuilder searchService = SearchBuilderFactory.getSearchBuilder(service, client);
             searchService.setIndices(indices)
                     .setTypes(types)
                     .setQueryString(queryString)
@@ -121,7 +124,7 @@ public class SearchServlet extends HttpServlet {
             out.write(searchResponseString);
 
             //Log search response
-            logger.info(LogUtils.logSearchResponse(request, searchResponse));
+            logger.info(LogUtils.createLogMessage(request, searchResponse));
         }
     }
 
