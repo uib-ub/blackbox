@@ -4,8 +4,6 @@ import no.uib.marcus.common.Params;
 import no.uib.marcus.search.range.DateRange;
 import org.apache.log4j.Logger;
 import org.elasticsearch.common.Nullable;
-import org.elasticsearch.common.Strings;
-import org.elasticsearch.common.joda.Joda;
 import org.elasticsearch.common.joda.time.LocalDate;
 import org.elasticsearch.index.query.BoolFilterBuilder;
 import org.elasticsearch.index.query.FilterBuilders;
@@ -50,11 +48,9 @@ public final class FilterUtils {
      to script injection in which we don't want to do it.
      Therefore, if it happens, we are living the blame to the data, and we are assuming the condition always holds.
 
-     * @param boolFilter  a filter in which date ranges will be appended to.
-     * @param fromDate from_date as a string in the form of YYYY or YYYY-MM or YYYY-MM-DD
-     * @param toDate to_date as a string in the form of YYYY or YYYY-MM or YYYY-MM-DD
+     * @param dateRange date range object that will be appended to range filters.
      *
-     * @return a bool_filter with date ranges
+     * @return a bool_filter with date ranges appended
      */
 
     public static BoolFilterBuilder appendDateRangeFilter(BoolFilterBuilder boolFilter, DateRange dateRange) {
@@ -62,120 +58,83 @@ public final class FilterUtils {
             throw new NullPointerException("Cannot append date ranges to a null bool_filter");
         }
 
-        if (Objects.nonNull(dateRange.getFrom()) || Objects.nonNull(dateRange.getTo())) {
+        if (Objects.nonNull(dateRange)) {
+            //Get lower boundary for this range
             LocalDate fromDate = dateRange.getFrom();
+
+            //Get upper boundary for this range
             LocalDate toDate = dateRange.getTo();
-        //if (Strings.hasText(fromDate) || Strings.hasText(toDate)) {
-            boolFilter
-                    //Range within "available" field
-                    //.should(FilterBuilders.rangeFilter(Params.DateField.AVAILABLE).gte(fromDate).lte(toDate))
 
-                    //Range within "created" field
-                    .should(FilterBuilders.rangeFilter(Params.DateField.CREATED).gte(fromDate).lte(toDate))
+            if (Objects.nonNull(fromDate) || Objects.nonNull(toDate)) {
 
-                    /*
-                      Here, the condition in which madeAfter >= from_date and madeAfter <= to_date is taken care and
-                      we don't care about madeBefore. But our assumptions is always madeBefore >= madeAfter
-                      See drawing below:-
-
-                         from_date-----------------to_date
-                         from_date---------------------------------------------------------------------to_date
-                                       from_date---------------------------------to_date
-                                       from_date-----to_date
-                                       madeAfter================================madeBefore
-                     */
-                     .should(FilterBuilders.boolFilter()
-                            .must(FilterBuilders.rangeFilter(Params.DateField.MADE_AFTER).gte(fromDate).lte(toDate)))
-                            //.must(FilterBuilders.rangeFilter(Params.DateField.MADE_AFTER).lte(toDate)))
-
-                   /*
-                     Here the condition in which madeBefore >= from_date and madeBefore <= to_date, we don't care
-                     about madeAfter.
-                                                                      from_date-----------------to_date
-                     from_date------------------------------------------------------------------------to_date
-                                                                from_date|------|to_date
-                                       madeAfter================================|madeBefore
-                    */
-                    .should(FilterBuilders.boolFilter()
-                            .must(FilterBuilders.rangeFilter(Params.DateField.MADE_BEFORE).gte(fromDate).lte(toDate)));
-                            //.must(FilterBuilders.rangeFilter(Params.DateField.MADE_BEFORE).lte(toDate)))
-
-                     /*
-                      This is a case that fromDate and toDate are within madeAfter and madeBefore range.
-                      Pre condition:  both fromDate and toDate must have values AND fromDate <= toDate
-
-                          from_date|---------------------------------------------------|to_date
-                                      from_date|-----------------------|to_date
-                         made_after|---------------------------------------------------|made_before
-                     */
+                //Range within "created" field
+                boolFilter.should(FilterBuilders.rangeFilter(Params.DateField.CREATED).gte(fromDate).lte(toDate));
 
 
-                     //Experimental and needs a discussion?
-                     //if(Strings.hasText(fromDate) && !Strings.hasText(toDate)){
-                     //    boolFilter.must(FilterBuilders.rangeFilter(Params.DateField.MADE_AFTER).gte(fromDate));
-                     //}
+                /*
+                  Here, the condition in which madeAfter >= from_date and madeAfter <= to_date is taken care and
+                  we don't care about madeBefore. But our assumptions is always madeBefore >= madeAfter
+                  See drawing below:-
+
+                     from_date-----------------to_date
+                     from_date---------------------------------------------------------------------to_date
+                                   from_date---------------------------------to_date
+                                   from_date-----to_date
+                                   madeAfter================================madeBefore
+                */
+                    boolFilter.should(FilterBuilders.boolFilter()
+                            .must(FilterBuilders.rangeFilter(Params.DateField.MADE_AFTER).gte(fromDate).lte(toDate)));
+                    //.must(FilterBuilders.rangeFilter(Params.DateField.MADE_AFTER).lte(toDate)))
+
+
                /*
-                TODO: Create an issue to solve date errors in the data. some of them they dont have madeAfter/madeBefore fields,
-                and others madeAfter > madeBefore, which is not correct.
-               */
+                 Here the condition in which madeBefore >= from_date and madeBefore <= to_date, we don't care
+                 about madeAfter.
+                                                                  from_date-----------------to_date
+                 from_date------------------------------------------------------------------------to_date
+                                                            from_date|------|to_date
+                                   madeAfter================================|madeBefore
+                */
+                    boolFilter.should(FilterBuilders.boolFilter()
+                            .must(FilterBuilders.rangeFilter(Params.DateField.MADE_BEFORE).gte(fromDate).lte(toDate)));
+                    //.must(FilterBuilders.rangeFilter(Params.DateField.MADE_BEFORE).lte(toDate)))
 
-               if(dateRange.hasPositiveRange()){
-                   boolFilter.should(FilterBuilders.boolFilter()
-                           .must(FilterBuilders.rangeFilter(Params.DateField.MADE_AFTER).lte(fromDate))
-                           .must(FilterBuilders.rangeFilter(Params.DateField.MADE_BEFORE).gte(toDate)));
 
-               }
+                 /*
+                  This is a case that fromDate and toDate are within madeAfter and madeBefore range.
+                  Pre condition:  both fromDate and toDate must have values AND fromDate <= toDate
 
-            /**if (isValidRange(fromDate, toDate)) {
-                boolFilter.should(FilterBuilders.boolFilter()
-                        .must(FilterBuilders.rangeFilter(Params.DateField.MADE_AFTER).lte(fromDate))
-                        .must(FilterBuilders.rangeFilter(Params.DateField.MADE_BEFORE).gte(toDate)));
-            }**/
+                      from_date|---------------------------------------------------|to_date
+                                  from_date|-----------------------|to_date
+                     made_after|---------------------------------------------------|made_before
+                 */
+                    if (dateRange.isPositive()) {
+                        boolFilter.should(FilterBuilders.boolFilter()
+                                .must(FilterBuilders.rangeFilter(Params.DateField.MADE_AFTER).lte(fromDate))
+                                .must(FilterBuilders.rangeFilter(Params.DateField.MADE_BEFORE).gte(toDate)));
+
+                    }
+            }
         }
         return boolFilter;
     }
 
 
     /**
-     *  Validate date range
-     *
-     * @param fromDate from date
-     * @param toDate to date
-     *
-     * @pre-condition: both parameter must have values
-     * @return {@code true } if toDate is greater or equal to fromDate, otherwise {@code false}
-     */
-    public static boolean isValidRange(String fromDate, String toDate) {
-        if(Strings.hasText(fromDate) && Strings.hasText(toDate)) {
-            LocalDate from = Joda.forPattern(BlackboxUtils.DEFAULT_DATE_FORMAT).parser().parseLocalDate(fromDate);
-            LocalDate to = Joda.forPattern(BlackboxUtils.DEFAULT_DATE_FORMAT).parser().parseLocalDate(toDate);
-            if(from.isBefore(to) || from.isEqual(to)){
-                return true;
-            }
-        }
-        return false;
-    }
-
-
-    /**
      * A wrapper for building OR filter
      * @param filterMap a map of selected facets with keys as fields and values as terms.
-     * @see FilterUtils#buildBoolFilter(Map, String, String, String)
+     * @see FilterUtils#
      **/
     public static Map<String, BoolFilterBuilder> buildBoolFilter(@NotNull Map<String, List<String>> filterMap) {
-       return  buildBoolFilter(filterMap, null, null, null);
+        return buildBoolFilter(filterMap, null, null);
     }
 
 
     /**
      * A wrapper for building filter without dates
      ***/
-    public static Map<String, BoolFilterBuilder> buildBoolFilter(
-            @NotNull Map<String,
-            List<String>> filterMap,
-            String aggs) {
-
-        return  buildBoolFilter(filterMap, aggs, null, null);
+    public static Map<String, BoolFilterBuilder> buildBoolFilter(@NotNull Map<String, List<String>> filterMap, String aggs) {
+        return buildBoolFilter(filterMap, aggs, null);
     }
 
     /**
@@ -193,7 +152,7 @@ public final class FilterUtils {
         //e.g {"subject.exact" = ["Flyfoto" , "Birkeland"], "type" = ["Brev"]}
         Map<String, List<String>> selectedFacets = AggregationUtils.buildFilterMap(selectedFilters);
 
-        return buildBoolFilter(selectedFacets, aggregations, fromDate, toDate);
+        return buildBoolFilter(selectedFacets, aggregations, new DateRange(fromDate, toDate));
     }
 
 
@@ -204,15 +163,13 @@ public final class FilterUtils {
          *
          *  @param filterMap a map of selected facets with keys as fields and values as terms.
          *  @param aggs aggregations
-         *  @param fromDate start date
-         *  @param toDate   end date
+         *  @param dateRange a date range to be applied to a range filter
          *
          *  @return  a map which contains AND and OR bool filters based on the aggregations
          */
     public static Map<String, BoolFilterBuilder> buildBoolFilter(@NotNull Map<String, List<String>> filterMap,
                                                                  @Nullable String aggs,
-                                                                 @Nullable String fromDate,
-                                                                 @Nullable String toDate) {
+                                                                 DateRange dateRange) {
         Map<String, BoolFilterBuilder> boolFilterMap = new HashMap<>();
         BoolFilterBuilder filter = FilterBuilders.boolFilter();
         BoolFilterBuilder postFilter = FilterBuilders.boolFilter();
@@ -249,7 +206,9 @@ public final class FilterUtils {
         }
 
          //Append date range filter
-         appendDateRangeFilter(filter, new DateRange(fromDate, toDate));
+        if (dateRange != null) {
+            appendDateRangeFilter(filter, dateRange);
+        }
 
          boolFilterMap.put(Params.TOP_FILTER, filter);
          boolFilterMap.put(Params.POST_FILTER, postFilter);

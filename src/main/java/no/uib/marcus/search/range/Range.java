@@ -3,7 +3,7 @@ package no.uib.marcus.search.range;
 
 /**
  * Interface for manipulating Ranges
- * @param <T> range a specified Type T
+ * @param <T> range of a specified Type
  *
  *           @author Hemed Al Ruwehy
  *           21-08-2017
@@ -36,7 +36,7 @@ public interface  Range <T> {
 
 
     /**
-     * Parse a string representation of the range value
+     * Parse a string representation to a range type T value
      */
     T parse(String s);
 

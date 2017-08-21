@@ -1,16 +1,18 @@
 package no.uib.marcus;
 
-import com.carrotsearch.randomizedtesting.RandomizedTest;
 import no.uib.marcus.search.range.DateRange;
 import org.junit.Test;
 
-public class DateRangeTest extends RandomizedTest {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
+public class DateRangeTest {
 
     @Test
     public void testHasPositiveValue(){
         DateRange range = new DateRange("2013", "2015");
-        assertTrue("Range is positive", range.hasPositiveRange());
-        assertTrue("Range is positive", new DateRange("2017", "2017").hasPositiveRange());
+        assertTrue("Range is positive", range.isPositive());
+        assertTrue("Range is positive", new DateRange("2017", "2017").isPositive());
         assertEquals("2013-01-01", range.getFrom().toString());
 
     }
@@ -19,7 +21,7 @@ public class DateRangeTest extends RandomizedTest {
     @Test
     public void testHasNegativeValue(){
         DateRange range = new DateRange("2017-01-01", "2015");
-        assertTrue("Range is negative", range.hasNegativeRange());
+        assertTrue("Range is negative", range.isNegative());
         assertEquals("2017-01-01", range.getFrom().toString());
 
     }

@@ -8,6 +8,13 @@ import org.elasticsearch.common.joda.time.LocalDate;
 import javax.validation.constraints.NotNull;
 import java.util.Objects;
 
+/**
+ * DateRange class that manipulates date ranges
+ *
+ * @author Hemed Al Ruwehy
+ * 20-08-2017
+ * University of Bergen Library
+ */
 
 public class DateRange implements Range<LocalDate> {
 
@@ -22,9 +29,9 @@ public class DateRange implements Range<LocalDate> {
     @Nullable
     private LocalDate toDate;
 
+    //Specified date format
     @NotNull
     private String dateFormat;
-
 
     public DateRange(String format) {
         this.dateFormat = Objects.requireNonNull(format, "Date format cannot be null");
@@ -32,7 +39,6 @@ public class DateRange implements Range<LocalDate> {
 
     public DateRange(LocalDate from, LocalDate to, String format) {
         this.dateFormat = Objects.requireNonNull(format, "Date format cannot be null");
-        ;
         this.fromDate = from;
         this.toDate = to;
     }
@@ -47,8 +53,7 @@ public class DateRange implements Range<LocalDate> {
         this.toDate =  parse(to);
     }
 
-
-  @Override
+    @Override
     public void setFrom(LocalDate from) {
         this.fromDate = from;
     }
@@ -70,7 +75,10 @@ public class DateRange implements Range<LocalDate> {
 
     }
 
-
+    /**
+     * Get a date format or default format if not specified.
+     * The default format is "yyyy-MM-dd||yyyy-MM||yyyy"
+     */
     public String getDateFormat() {
         if (Objects.nonNull(dateFormat)) {
             return dateFormat;
@@ -79,7 +87,7 @@ public class DateRange implements Range<LocalDate> {
     }
 
     /**
-     * Apply a date format
+     * Apply a date format to this range
      *
      * @param dateFormat a non-null date format string
      */
@@ -88,25 +96,24 @@ public class DateRange implements Range<LocalDate> {
     }
 
     /**
-     * Parse a string to a local date or null if that string is empty.
-     * {@code Null} indicates unbounded/infinite value
+     * Parse a string to a local date
      *
-     * @param input date string to pass
-     * @return a LocalDate
+     * @param input date string to parse
+     * @return a LocalDate or null if the input string is empty. {@code Null} indicates unbounded value
      */
     @Override
     public LocalDate parse(String input) {
-        if (!Strings.hasText(input)) {
-            return null;
+        if (Strings.hasText(input)) {
+            return Joda.forPattern(getDateFormat()).parser().parseLocalDate(input);
         }
-        return Joda.forPattern(getDateFormat()).parser().parseLocalDate(input);
+        return null;
     }
 
     /**
-     * Check for positive range, a positive range is such that fromDate <= toDate
-     * all of them are non-null
+     * Check whether a range is positive, a positive range is the one such that
+     * fromDate <= toDate for non-null boundaries.
      */
-    public boolean hasPositiveRange() {
+    public boolean isPositive() {
         if (Objects.nonNull(fromDate) && Objects.nonNull(toDate)) {
             if (fromDate.isBefore(toDate) || fromDate.isEqual(toDate)) {
                 return true;
@@ -117,13 +124,11 @@ public class DateRange implements Range<LocalDate> {
 
 
     /**
-     * Check for negative range, a negative range is such that fromDate > toDate
-     * all of them are non-null
+     * Check for negative range, a negative range is such that fromDate > toDate for non-null boundaries.
      */
-    public boolean hasNegativeRange() {
+    public boolean isNegative() {
         if (Objects.nonNull(fromDate) && Objects.nonNull(toDate)) {
             if (fromDate.isAfter(toDate)) {
-
                 return true;
             }
         }
@@ -146,9 +151,9 @@ public class DateRange implements Range<LocalDate> {
     public int hashCode() {
         int result = fromDate != null ? fromDate.hashCode() : 0;
         result = 31 * result + (toDate != null ? toDate.hashCode() : 0);
+        result = 31 * result + dateFormat.hashCode();
         return result;
     }
-
 
     @Override
     public String toString() {
@@ -160,16 +165,11 @@ public class DateRange implements Range<LocalDate> {
         return sb.toString();
     }
 
+    public static void main(String[] args){
+        DateRange d = null;
 
-
-    //For debugging purpose
-    public static void main(String[] args) {
-        DateRange dr = new DateRange("yyyy-MM");
-
-        //dr.setFrom(dr.parse("2013-12-30"));
-        dr.setTo(dr.parse("2013-12"));
-
-        System.out.println(dr);
+        System.out.println(d.getFrom());
+        System.out.println(d.getTo());
     }
 
 }
