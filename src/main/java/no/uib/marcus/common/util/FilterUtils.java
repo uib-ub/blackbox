@@ -1,6 +1,7 @@
 package no.uib.marcus.common.util;
 
 import no.uib.marcus.common.Params;
+import no.uib.marcus.search.range.DateRange;
 import org.apache.log4j.Logger;
 import org.elasticsearch.common.Nullable;
 import org.elasticsearch.common.Strings;
@@ -14,6 +15,7 @@ import javax.validation.constraints.NotNull;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 /**
  * Utility class for building Elasticsearch filters
@@ -55,12 +57,15 @@ public final class FilterUtils {
      * @return a bool_filter with date ranges
      */
 
-    public static BoolFilterBuilder appendDateRangeFilter(BoolFilterBuilder boolFilter, String fromDate, String toDate) {
+    public static BoolFilterBuilder appendDateRangeFilter(BoolFilterBuilder boolFilter, DateRange dateRange) {
         if(boolFilter == null){
             throw new NullPointerException("Cannot append date ranges to a null bool_filter");
         }
 
-        if (Strings.hasText(fromDate) || Strings.hasText(toDate)) {
+        if (Objects.nonNull(dateRange.getFrom()) || Objects.nonNull(dateRange.getTo())) {
+            LocalDate fromDate = dateRange.getFrom();
+            LocalDate toDate = dateRange.getTo();
+        //if (Strings.hasText(fromDate) || Strings.hasText(toDate)) {
             boolFilter
                     //Range within "available" field
                     //.should(FilterBuilders.rangeFilter(Params.DateField.AVAILABLE).gte(fromDate).lte(toDate))
@@ -114,11 +119,18 @@ public final class FilterUtils {
                 and others madeAfter > madeBefore, which is not correct.
                */
 
-            if (isValidRange(fromDate, toDate)) {
+               if(dateRange.hasPositiveRange()){
+                   boolFilter.should(FilterBuilders.boolFilter()
+                           .must(FilterBuilders.rangeFilter(Params.DateField.MADE_AFTER).lte(fromDate))
+                           .must(FilterBuilders.rangeFilter(Params.DateField.MADE_BEFORE).gte(toDate)));
+
+               }
+
+            /**if (isValidRange(fromDate, toDate)) {
                 boolFilter.should(FilterBuilders.boolFilter()
                         .must(FilterBuilders.rangeFilter(Params.DateField.MADE_AFTER).lte(fromDate))
                         .must(FilterBuilders.rangeFilter(Params.DateField.MADE_BEFORE).gte(toDate)));
-            }
+            }**/
         }
         return boolFilter;
     }
@@ -237,7 +249,7 @@ public final class FilterUtils {
         }
 
          //Append date range filter
-         appendDateRangeFilter(filter, fromDate, toDate);
+         appendDateRangeFilter(filter, new DateRange(fromDate, toDate));
 
          boolFilterMap.put(Params.TOP_FILTER, filter);
          boolFilterMap.put(Params.POST_FILTER, postFilter);

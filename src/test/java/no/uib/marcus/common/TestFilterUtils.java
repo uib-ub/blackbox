@@ -6,7 +6,7 @@ import org.junit.Test;
 
 import java.text.ParseException;
 
-public class TestFilterUtils extends RandomizedTest {
+public class  TestFilterUtils extends RandomizedTest {
 
     @Test
     public void testIsValidRange() throws ParseException {
