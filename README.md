@@ -21,6 +21,7 @@ Blackbox can be queried by specifying query parameters in a respective endpoint.
 * `aggs`: you can specify aggregations as parameter. Aggregations must be a valid JSON arrays. For example 
 
 ``` 
+
     facets: [
     {
     "field": "type",
@@ -37,7 +38,8 @@ Blackbox can be queried by specifying query parameters in a respective endpoint.
     "min_doc_count": 0
     }]
     
- ``` 
+    
+   ``` 
                                                                                                                                             
 * `pretty`: prettify results. It can hold explicit true values such as `true`, `1` or `on`. It is `false` by default.
 * `sort`: you can sort by specifying the field that you want to sort and the sorting order separated by colon. For example, `available:asc` will sort the results in **asc**ending order of the filed `available`. You will have to make sure that the field exists and it is not analyzed.
