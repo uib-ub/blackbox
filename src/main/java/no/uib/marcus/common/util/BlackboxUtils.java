@@ -1,13 +1,21 @@
-package no.uib.marcus.common;
+package no.uib.marcus.common.util;
 
 import java.util.Map;
 
 /**
- * @author Hemed
+ * A utility class for different convenience methods
+ *
+ * @author Hemed Al Ruwehy
  * Date: 15/11/2016.
  */
-public class Settings {
+public class BlackboxUtils {
     public static final String MINUS = "-";
+
+
+    //Prevent this class from being initialized
+    private BlackboxUtils(){}
+
+
     /**
      * If input map contains an array of only one element, then convert the
      * the array to string making it a proper JSON string.
@@ -57,5 +65,30 @@ public class Settings {
             }
             return true;
         }
+    }
+
+    /**
+     * A wrapper for getting map key and throw exception if value does not exist
+     *
+     * @param map a source map
+     * @param key a key which it's value need to be retrieved
+     * @return a value for the corresponding key, if exists
+     * <p>
+     * throws NullPointerException if key does not exist
+     */
+    public static String getValueAsString(Map<String, String> map, String key) {
+        if (map.get(key) == null) {
+            throw new NullPointerException("Value not found for key [" + key + "]. " +
+                    "Make sure both key and value exist " +
+                    "and are the same to those of your running Elasticsearch cluster");
+        }
+        return map.get(key);
+    }
+
+    /**
+     * See #getValueAsString
+     */
+    public static int getValueAsInt(Map<String, String> map, String key) {
+        return Integer.parseInt(getValueAsString(map, key));
     }
 }

@@ -3,13 +3,10 @@ package no.uib.marcus.common;
 import com.carrotsearch.randomizedtesting.RandomizedTest;
 import com.carrotsearch.randomizedtesting.annotations.Repeat;
 import com.carrotsearch.randomizedtesting.annotations.Seed;
-import com.google.gson.JsonParseException;
 import no.uib.marcus.common.util.AggregationUtils;
 import no.uib.marcus.common.util.FilterUtils;
-import no.uib.marcus.search.IllegalParameterException;
-import no.uib.marcus.search.MarcusDiscoveryBuilder;
+import no.uib.marcus.range.DateRange;
 import org.apache.log4j.Logger;
-import org.elasticsearch.common.netty.channel.ExceptionEvent;
 import org.elasticsearch.index.query.BoolFilterBuilder;
 import org.elasticsearch.index.query.FilterBuilders;
 import org.junit.Test;
@@ -110,9 +107,9 @@ public class AggregationUtilsTest extends RandomizedTest {
         public void testBoolFilterOnDates(){
             BoolFilterBuilder boolFilter = FilterBuilders.boolFilter();
             //Filter will not contain any clause because dates are empty
-            assertFalse(FilterUtils.appendDateRangeFilter(boolFilter, "","").hasClauses());
+            assertFalse(FilterUtils.appendDateRangeFilter(boolFilter, new DateRange("","")).hasClauses());
             //Filter shall contain must or should clauses
-            assertTrue(FilterUtils.appendDateRangeFilter(boolFilter, "1999", "2000").hasClauses());
+            assertTrue(FilterUtils.appendDateRangeFilter(boolFilter, new DateRange("1999", "2000")).hasClauses());
         }
 
 

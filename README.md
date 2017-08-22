@@ -56,6 +56,7 @@ We have also support for *exclude API*. This means if one wants to exclude a ter
 ## Installation 
 
 * Clone Blackbox from the master branch 
-* Create a file with name `config.template.json` in the resource folder. Blackbox will look for these settings when initializing. See `config.template.test.json` in the resource folder for example settings.
+* Create a file with name `config.template.json` in the resource folder (`/src/main/resources/`). Blackbox will look for these settings when initializing. 
+ Copy the settings from `config.template.test.json` in the resource folder to this file. You may also rename `config.template.test.json` to `config.template.json` if you are feeling lazy.
 * Build a war file with Maven `mvn clean build`
 * Copy `war` file to a Tomcats `wabapps` folder

@@ -1,8 +1,8 @@
 {
   "cluster": {
-    "name": "test-cluster",
-    "node_name": "Blackbox Test",
-    "host": "uib.no/ub",
+    "name": "elasticsearch",
+    "node_name": "Blackbox",
+    "host": "marcus.uib.no",
     "port": 9301
   },
   "_comment" : "application will look for these cluster settings when initializing"
