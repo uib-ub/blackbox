@@ -38,7 +38,9 @@ public class SettingsLoaderTest extends RandomizedTest {
      */
     @Test
     public void testLoadingJsonFileFromResource() throws IOException {
-        String fileName = JsonFileLoader.CONFIG_TEMPLATE;
+        //Since the config file is not exposed to version-control,
+        //We use this for testing..
+        String fileName = "config.template.example.json";
         JsonFileLoader loader = new JsonFileLoader();
         String jsonString = loader.loadFromResource(fileName);
 

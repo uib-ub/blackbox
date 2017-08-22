@@ -1,4 +1,4 @@
-package no.uib.marcus.search.range;
+package no.uib.marcus.range;
 
 
 /**
@@ -36,7 +36,7 @@ public interface  Range <T> {
 
 
     /**
-     * Parse a string representation to a range type T value
+     * Parse a string representation to a range value of type T
      */
     T parse(String s);
 

@@ -11,8 +11,6 @@ import java.util.Map;
 public class BlackboxUtils {
     public static final String MINUS = "-";
 
-    //Any of this format is OK
-    public static final String DEFAULT_DATE_FORMAT = "yyyy-mm-dd||yyyy-mm||yyyy";
 
     //Prevent this class from being initialized
     private BlackboxUtils(){}

@@ -1,6 +1,6 @@
 package no.uib.marcus;
 
-import no.uib.marcus.search.range.DateRange;
+import no.uib.marcus.range.DateRange;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -23,6 +23,14 @@ public class DateRangeTest {
         DateRange range = new DateRange("2017-01-01", "2015");
         assertTrue("Range is negative", range.isNegative());
         assertEquals("2017-01-01", range.getFrom().toString());
+
+    }
+
+    @Test
+    public void testIfReturnsNullForEmptyBounds(){
+        DateRange range = new DateRange("", " ");
+        assertEquals(null, range.getFrom());
+        assertEquals(null, range.getTo());
 
     }
 

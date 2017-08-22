@@ -1,7 +1,7 @@
 package no.uib.marcus.common;
 
 import com.carrotsearch.randomizedtesting.RandomizedTest;
-import no.uib.marcus.search.range.DateRange;
+import no.uib.marcus.range.DateRange;
 import org.junit.Test;
 
 import java.text.ParseException;

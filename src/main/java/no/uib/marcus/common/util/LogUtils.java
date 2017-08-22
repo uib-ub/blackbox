@@ -30,6 +30,7 @@ public final class LogUtils {
         Map<String, Object> parameterMapCopy = new HashMap<>(request.getParameterMap());
         //Remove aggregations from the logs
         parameterMapCopy.remove(Params.AGGREGATIONS);
+        //Build log message
         XContentBuilder builder = XContentFactory.jsonBuilder()
                 .startObject()
                 //.field("host", request.getRemoteAddr().equals("0:0:0:0:0:0:0:1") ?

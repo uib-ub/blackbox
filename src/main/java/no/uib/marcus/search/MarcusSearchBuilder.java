@@ -298,7 +298,7 @@ public class MarcusSearchBuilder extends AbstractSearchBuilder<MarcusSearchBuild
             searchRequest.setSize(getSize());
 
             //Show builder for debugging purpose
-            logger.info(searchRequest.toString());
+            //logger.info(searchRequest.toString());
         } catch (SearchSourceBuilderException e) {
             logger.error("Exception occurred when building search request: " + e.getMostSpecificCause());
         }

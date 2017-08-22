@@ -1,7 +1,7 @@
 package no.uib.marcus.common.util;
 
 import no.uib.marcus.common.Params;
-import no.uib.marcus.search.range.DateRange;
+import no.uib.marcus.range.DateRange;
 import org.apache.log4j.Logger;
 import org.elasticsearch.common.Nullable;
 import org.elasticsearch.common.joda.time.LocalDate;
@@ -102,7 +102,8 @@ public final class FilterUtils {
 
                  /*
                   This is a case that fromDate and toDate are within madeAfter and madeBefore range.
-                  Pre condition:  both fromDate and toDate must have values AND fromDate <= toDate
+                  Pre condition:  both fromDate and toDate must have values AND fromDate <= toDate.
+                  In other words, we must have positive range for this condition to satisfy.
 
                       from_date|---------------------------------------------------|to_date
                                   from_date|-----------------------|to_date
@@ -205,7 +206,7 @@ public final class FilterUtils {
             logger.error("Exception occurred when constructing bool_filter [ " + ex + " ]");
         }
 
-         //Append date range filter
+         //Append date range filter, if exists
         if (dateRange != null) {
             appendDateRangeFilter(filter, dateRange);
         }

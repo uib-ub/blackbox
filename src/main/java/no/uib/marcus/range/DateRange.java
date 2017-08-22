@@ -1,4 +1,4 @@
-package no.uib.marcus.search.range;
+package no.uib.marcus.range;
 
 import org.elasticsearch.common.Nullable;
 import org.elasticsearch.common.Strings;
@@ -9,7 +9,7 @@ import javax.validation.constraints.NotNull;
 import java.util.Objects;
 
 /**
- * DateRange class that manipulates date ranges
+ * DateRange class that manipulates ranges for Local Dates.
  *
  * @author Hemed Al Ruwehy
  * 20-08-2017
@@ -18,7 +18,7 @@ import java.util.Objects;
 
 public class DateRange implements Range<LocalDate> {
 
-    //Default date format, any one of these are OK
+    //Default date format, any one of these is OK
     public static String DEFAULT_DATE_FORMAT = "yyyy-MM-dd||yyyy-MM||yyyy";
 
     //Null indicates unbounded/infinite value
@@ -163,13 +163,6 @@ public class DateRange implements Range<LocalDate> {
         sb.append(", dateFormat='").append(dateFormat).append('\'');
         sb.append('}');
         return sb.toString();
-    }
-
-    public static void main(String[] args){
-        DateRange d = null;
-
-        System.out.println(d.getFrom());
-        System.out.println(d.getTo());
     }
 
 }
