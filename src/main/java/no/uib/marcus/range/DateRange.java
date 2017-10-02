@@ -38,7 +38,7 @@ public class DateRange implements Range<LocalDate> {
     }
 
     public DateRange(LocalDate from, LocalDate to, String format) {
-        this.dateFormat = Objects.requireNonNull(format, "Date format cannot be null");
+        this(format);
         this.fromDate = from;
         this.toDate = to;
     }
@@ -48,7 +48,7 @@ public class DateRange implements Range<LocalDate> {
     }
 
     public DateRange(String from, String to, String format) {
-        this.dateFormat = Objects.requireNonNull(format, "Date format cannot be null");
+        this(format);
         this.fromDate = parse(from);
         this.toDate =  parse(to);
     }
