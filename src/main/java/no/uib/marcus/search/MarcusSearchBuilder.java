@@ -46,8 +46,7 @@ public class MarcusSearchBuilder extends AbstractSearchBuilder<MarcusSearchBuild
     private SortBuilder sortBuilder;
     private String indexToBoost;
 
-    //A list of images that will be
-    //randomly loaded at the front page.
+    //A list of images that will be randomly loaded at the front page.
     private final String[] randomList =
             {
                     "Knud Knudsen",
@@ -57,6 +56,15 @@ public class MarcusSearchBuilder extends AbstractSearchBuilder<MarcusSearchBuild
                     "Widerøesamlingen",
                     "Nyborg"
             };
+
+
+    //Type to be boosted if nothing is specified
+    static class BoostType {
+            final static String FOTOGRAFI = "fotografi";
+            final static String BILDE = "bilde";
+
+    }
+
 
     /**
      * Build Marcus search service
@@ -257,11 +265,14 @@ public class MarcusSearchBuilder extends AbstractSearchBuilder<MarcusSearchBuild
                                 ScoreFunctionBuilders.weightFactorFunction(2)
                         );
             }
+
             //Boost documents of type "Fotografi" for every query performed.
-            query = functionScoreQueryBuilder.add(
-                    FilterBuilders.termFilter("type", "fotografi"),
-                    ScoreFunctionBuilders.weightFactorFunction(3)
-            );
+            query = functionScoreQueryBuilder
+                    .add(FilterBuilders.termFilter("type", BoostType.FOTOGRAFI),
+                            ScoreFunctionBuilders.weightFactorFunction(3))
+                    .add(FilterBuilders.termFilter("type", BoostType.BILDE),
+                            ScoreFunctionBuilders.weightFactorFunction(3)
+                    );
 
             //Set filtered query, whether with or without filter
             if (filter != null) {
