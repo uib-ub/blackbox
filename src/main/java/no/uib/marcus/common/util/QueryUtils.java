@@ -1,6 +1,7 @@
 package no.uib.marcus.common.util;
 
 import org.elasticsearch.action.search.SearchResponse;
+import org.elasticsearch.common.Strings;
 import org.elasticsearch.common.xcontent.ToXContent;
 import org.elasticsearch.common.xcontent.XContentBuilder;
 import org.elasticsearch.common.xcontent.XContentFactory;
@@ -24,13 +25,12 @@ public final class QueryUtils {
      * @return a builder for simple query string
      */
     public static SimpleQueryStringBuilder buildSimpleQueryString(String queryString) {
-        SimpleQueryStringBuilder builder = QueryBuilders.simpleQueryStringQuery(queryString)
+        return QueryBuilders.simpleQueryStringQuery(queryString)
                 .analyzer("default")//The custom "default" analyzer is defined in the "_settings".
                 .field("identifier")//Not analyzed field
                 .field("label", 3)//Not analyzed field.
                 .field("_all")
                 .defaultOperator(SimpleQueryStringBuilder.Operator.AND);
-        return builder;
     }
 
     /**
@@ -40,14 +40,34 @@ public final class QueryUtils {
      * @return a builder for query string
      */
     public static QueryStringQueryBuilder buildQueryString(String queryString) {
-        QueryStringQueryBuilder builder = QueryBuilders.queryStringQuery(queryString)
+        return QueryBuilders
+                .queryStringQuery(queryString)
                 .analyzer("default")//The custom "default" analyzer is defined in the "_settings".
                 .field("identifier")//Not analyzed field
                 .field("label", 3)//Not analyzed field.
                 .field("_all")
                 .defaultOperator(QueryStringQueryBuilder.Operator.AND);
-        return builder;
     }
+
+
+    /**
+     * A method to add a leading wildcard for a single word (with no whitespace)
+     *
+     * @param queryString a string to add such wildcard
+     * @return the given string with a wildcard appended to the end
+     */
+    public static String addLeadingWildcardIfNoWhitespace(String queryString) {
+        if(queryString != null
+                && !queryString.isEmpty()
+                && queryString.indexOf('*') == -1
+                && queryString.indexOf('"') == -1
+                && !Strings.containsWhitespace(queryString)){
+
+            return queryString + '*';
+        }
+        return queryString;
+    }
+
     /**
      * Convert a search response to a JSON string.
      *

@@ -54,7 +54,8 @@ public class MarcusSearchBuilder extends AbstractSearchBuilder<MarcusSearchBuild
                     "Sophus Tromholt",
                     "Marcus Selmer",
                     "Widerøesamlingen",
-                    "Nyborg"
+                    "Nyborg",
+                    "Flaktveit"
             };
 
 
@@ -229,6 +230,11 @@ public class MarcusSearchBuilder extends AbstractSearchBuilder<MarcusSearchBuild
     }
 
 
+    @Override
+    public String getQueryString() {
+        return QueryUtils.addLeadingWildcardIfNoWhitespace(super.getQueryString());
+    }
+
     /**
      * Construct search request based on the service settings.
      **/
@@ -251,9 +257,8 @@ public class MarcusSearchBuilder extends AbstractSearchBuilder<MarcusSearchBuild
             //Set query
             if (Strings.hasText(getQueryString())) {
                 //Use query_string query with AND operator
-                functionScoreQueryBuilder = QueryBuilders.functionScoreQuery(
-                        QueryUtils.buildQueryString(getQueryString())
-                );
+                functionScoreQueryBuilder = QueryBuilders
+                        .functionScoreQuery(QueryUtils.buildQueryString(getQueryString()));
             } else {
                 //Boost documents inside the "random list" of places because these places have colorful images
                 //and hence they beautify the front page.

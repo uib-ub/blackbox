@@ -23,6 +23,12 @@ public class SkaSearchBuilder extends MarcusSearchBuilder {
         super(client);
     }
 
+
+    @Override
+    public String getQueryString() {
+        return QueryUtils.addLeadingWildcardIfNoWhitespace(super.getQueryString());
+    }
+
     /**
      * Construct a specific search request for SkA dataset
      **/
