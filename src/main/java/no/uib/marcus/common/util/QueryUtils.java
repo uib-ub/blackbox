@@ -10,6 +10,7 @@ import org.elasticsearch.index.query.QueryStringQueryBuilder;
 import org.elasticsearch.index.query.SimpleQueryStringBuilder;
 
 import java.io.IOException;
+import java.util.Objects;
 
 /**
  * @author Hemed Ali
@@ -17,6 +18,12 @@ import java.io.IOException;
 public final class QueryUtils {
 
     private QueryUtils(){}
+
+    //Elasticsearch reserved characters (without minus sign)
+    private static final char[] reservedChars = {
+            '*', '"', '\\', '/', '=', '&', '|', '>', '<', '!', '(', ')',
+            '{', '}', '[', ']', '^', '~', '?', ':', '/', '/', '!', '[', ']', '{', '}'
+    };
 
     /**
      * Build a simple query string
@@ -51,22 +58,41 @@ public final class QueryUtils {
 
 
     /**
-     * A method to add a leading wildcard for a single word (with no whitespace)
+     * Adds a leading wildcard to a single word, if it does not contain reserved characters
      *
      * @param queryString a string to add such wildcard
      * @return the given string with a wildcard appended to the end
      */
-    public static String addLeadingWildcardIfNoWhitespace(String queryString) {
+    public static String addLeadingWildcard(String queryString) {
         if(queryString != null
                 && !queryString.isEmpty()
-                && queryString.indexOf('*') == -1
-                && queryString.indexOf('"') == -1
-                && !Strings.containsWhitespace(queryString)){
+                && Character.isLetter(queryString.charAt(0))
+                && !Strings.containsWhitespace(queryString)
+                && !containsReservedChars(queryString)){
 
             return queryString + '*';
         }
         return queryString;
     }
+
+    /**
+     * Checks if a given string contains Elasticsearch reserved characters
+     *
+     * @param s  a given string
+     * @return <tt>true</tt> if a given string contains a reserved character, otherwise <tt>false</tt>
+     */
+    public static boolean containsReservedChars(String s) {
+        if(Objects.isNull(s)) {
+            return false;
+        }
+        for (char character : reservedChars) {
+            if(s.indexOf(character) > -1) {
+                return true;
+            }
+        }
+        return false;
+    }
+
 
     /**
      * Convert a search response to a JSON string.

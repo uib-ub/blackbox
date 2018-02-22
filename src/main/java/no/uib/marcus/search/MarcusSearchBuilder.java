@@ -232,7 +232,7 @@ public class MarcusSearchBuilder extends AbstractSearchBuilder<MarcusSearchBuild
 
     @Override
     public String getQueryString() {
-        return QueryUtils.addLeadingWildcardIfNoWhitespace(super.getQueryString());
+        return QueryUtils.addLeadingWildcard(super.getQueryString());
     }
 
     /**
