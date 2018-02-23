@@ -19,7 +19,7 @@ import java.util.Objects;
 public class DateRange implements Range<LocalDate> {
 
     //Default date format, any one of these is OK
-    public static String DEFAULT_DATE_FORMAT = "yyyy-MM-dd||yyyy-MM||yyyy";
+    public static final String DEFAULT_DATE_FORMAT = "yyyy-MM-dd||yyyy-MM||yyyy";
 
     //Null indicates unbounded/infinite value
     @Nullable

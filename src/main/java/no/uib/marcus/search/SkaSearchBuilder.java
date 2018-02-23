@@ -26,7 +26,7 @@ public class SkaSearchBuilder extends MarcusSearchBuilder {
 
     @Override
     public String getQueryString() {
-        return QueryUtils.addLeadingWildcard(super.getQueryString());
+        return QueryUtils.addLeadingWildcardIfSingleWord(super.getQueryString());
     }
 
     /**

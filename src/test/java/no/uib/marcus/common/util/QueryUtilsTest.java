@@ -9,21 +9,50 @@ public class QueryUtilsTest {
 
     @Test
     public void addLeadingWildcard() {
-        assertEquals("", QueryUtils.addLeadingWildcard(""));
-        assertEquals(null, QueryUtils.addLeadingWildcard(null));
-        assertEquals("ali*", QueryUtils.addLeadingWildcard("ali"));
-        assertEquals("ali AND juma", QueryUtils.addLeadingWildcard("ali AND juma"));
-        assertEquals("ali -juma", QueryUtils.addLeadingWildcard("ali -juma"));
-        assertEquals("makame*", QueryUtils.addLeadingWildcard("makame"));
-        assertEquals("makame**", QueryUtils.addLeadingWildcard("makame**"));
-        assertEquals("makame*", QueryUtils.addLeadingWildcard("makame*"));
-        assertEquals("makame *", QueryUtils.addLeadingWildcard("makame *"));
-        assertEquals("*makame*", QueryUtils.addLeadingWildcard("*makame*"));
-        assertEquals("*makame^", QueryUtils.addLeadingWildcard("*makame^"));
-        assertEquals("\"ali\"", QueryUtils.addLeadingWildcard("\"ali\""));
-        assertEquals("\"ali*", QueryUtils.addLeadingWildcard("\"ali*"));
-        assertEquals("0234", QueryUtils.addLeadingWildcard("0234"));
-        assertEquals("l0234l*", QueryUtils.addLeadingWildcard("l0234l"));
+        assertEquals("", QueryUtils.addLeadingWildcardIfSingleWord(""));
+        assertEquals(null, QueryUtils.addLeadingWildcardIfSingleWord(null));
+        assertEquals("-kk", QueryUtils.addLeadingWildcardIfSingleWord("-kk"));
+        assertEquals("ali*", QueryUtils.addLeadingWildcardIfSingleWord("ali"));
+        assertEquals("ali AND juma", QueryUtils.addLeadingWildcardIfSingleWord("ali AND juma"));
+        assertEquals("ali -juma", QueryUtils.addLeadingWildcardIfSingleWord("ali -juma"));
+        assertEquals("makame*", QueryUtils.addLeadingWildcardIfSingleWord("makame"));
+        assertEquals("makame**", QueryUtils.addLeadingWildcardIfSingleWord("makame**"));
+        assertEquals("makame*", QueryUtils.addLeadingWildcardIfSingleWord("makame*"));
+        assertEquals("makame *", QueryUtils.addLeadingWildcardIfSingleWord("makame *"));
+        assertEquals("*makame*", QueryUtils.addLeadingWildcardIfSingleWord("*makame*"));
+        assertEquals("*makame^", QueryUtils.addLeadingWildcardIfSingleWord("*makame^"));
+        assertEquals("\"ali\"", QueryUtils.addLeadingWildcardIfSingleWord("\"ali\""));
+        assertEquals("\"ali*", QueryUtils.addLeadingWildcardIfSingleWord("\"ali*"));
+        assertEquals("0234", QueryUtils.addLeadingWildcardIfSingleWord("0234"));
+        assertEquals("l0234l*", QueryUtils.addLeadingWildcardIfSingleWord("l0234l"));
+        assertEquals("ubb-ms*", QueryUtils.addLeadingWildcardIfSingleWord("ubb-ms"));
+        assertEquals("bros-0123-*", QueryUtils.addLeadingWildcardIfSingleWord("bros-0123-"));
+        //It is not a single word
+        assertEquals("ubb bros-0123", QueryUtils.addLeadingWildcardIfSingleWord("ubb bros-0123"));
+
+    }
+
+
+    @Test
+    public void appendWildcardToSignature() {
+        assertEquals("", QueryUtils.appendWildcardToSignature(""));
+        assertEquals(null, QueryUtils.appendWildcardToSignature(null));
+        assertEquals("ubb", QueryUtils.appendWildcardToSignature("ubb"));
+        assertEquals("svardal", QueryUtils.appendWildcardToSignature("svardal"));
+        assertEquals("ubb-*", QueryUtils.appendWildcardToSignature("ubb-"));
+        assertEquals("-kk", QueryUtils.appendWildcardToSignature("-kk"));
+        assertEquals("ali", QueryUtils.appendWildcardToSignature("ali"));
+        assertEquals("*bros-0123-*", QueryUtils.appendWildcardToSignature("bros-0123-"));
+        assertEquals("ali AND juma", QueryUtils.appendWildcardToSignature("ali AND juma"));
+        assertEquals("ali -juma", QueryUtils.appendWildcardToSignature("ali -juma"));
+        assertEquals("\"ali\"", QueryUtils.appendWildcardToSignature("\"ali\""));
+        assertEquals("0234", QueryUtils.appendWildcardToSignature("0234"));
+        assertEquals("l0234l", QueryUtils.appendWildcardToSignature("l0234l"));
+        assertEquals("ubb-ms*", QueryUtils.appendWildcardToSignature("ubb-ms"));
+        assertEquals("*bros-0123-*", QueryUtils.appendWildcardToSignature("bros-0123-"));
+        //It is not a single word
+        assertEquals("ubb bros-0123", QueryUtils.appendWildcardToSignature("ubb bros-0123"));
+
     }
 
     @Test
@@ -33,6 +62,16 @@ public class QueryUtilsTest {
         assertFalse(QueryUtils.containsReservedChars("mama"));
         assertTrue(QueryUtils.containsReservedChars("s!"));
         assertTrue(QueryUtils.containsReservedChars("ali\""));
-        assertFalse(QueryUtils.containsReservedChars("ubb-ms-02"));    //We permit minus ("-")
+        assertFalse(QueryUtils.containsReservedChars("ubb-ms-02")); //"-" is OK due
+        assertFalse(QueryUtils.containsReservedChars("ms-02"));
     }
+
+
+    @Test
+    public void containsChar() {
+        assertTrue(QueryUtils.containsChar("ubb-ms-01", '-'));
+        assertTrue(QueryUtils.containsChar("u-", '-'));
+    }
+
+
 }
