@@ -2,30 +2,30 @@ package no.uib.marcus.common.util;
 
 import org.junit.Test;
 
-import static no.uib.marcus.common.util.SignatureUtils.appendWildcard;
+import static no.uib.marcus.common.util.SignatureUtils.appendWildcardIfValidSignature;
 import static org.junit.Assert.*;
 
 public class SignatureUtilsTest {
 
     @Test
-    public void testAppendWildcard() {
-        assertEquals("", appendWildcard(""));
-        assertEquals(null, appendWildcard(null));
-        assertEquals("ubb", appendWildcard("ubb"));
-        assertEquals("svardal", appendWildcard("svardal"));
-        assertEquals("ubb-*", appendWildcard("ubb-"));
-        assertEquals("-kk", appendWildcard("-kk"));
-        assertEquals("ali", appendWildcard("ali"));
-        assertEquals("*bros-0123-*", appendWildcard("bros-0123-"));
-        assertEquals("ali AND juma", appendWildcard("ali AND juma"));
-        assertEquals("ali -juma", appendWildcard("ali -juma"));
-        assertEquals("\"ali\"", appendWildcard("\"ali\""));
-        assertEquals("0234", appendWildcard("0234"));
-        assertEquals("l0234l", appendWildcard("l0234l"));
-        assertEquals("ubb-ms*", appendWildcard("ubb-ms"));
-        assertEquals("*bros-0123-*", appendWildcard("bros-0123-"));
+    public void appendWildcard() {
+        assertEquals("", appendWildcardIfValidSignature(""));
+        assertEquals(null, appendWildcardIfValidSignature(null));
+        assertEquals("ubb", appendWildcardIfValidSignature("ubb"));
+        assertEquals("svardal", appendWildcardIfValidSignature("svardal"));
+        assertEquals("ubb-*", appendWildcardIfValidSignature("ubb-"));
+        assertEquals("-kk", appendWildcardIfValidSignature("-kk"));
+        assertEquals("ali", appendWildcardIfValidSignature("ali"));
+        assertEquals("*bros-0123-*", appendWildcardIfValidSignature("bros-0123-"));
+        assertEquals("ali AND juma", appendWildcardIfValidSignature("ali AND juma"));
+        assertEquals("ali -juma", appendWildcardIfValidSignature("ali -juma"));
+        assertEquals("\"ali\"", appendWildcardIfValidSignature("\"ali\""));
+        assertEquals("0234", appendWildcardIfValidSignature("0234"));
+        assertEquals("l0234l", appendWildcardIfValidSignature("l0234l"));
+        assertEquals("ubb-ms*", appendWildcardIfValidSignature("ubb-ms"));
+        assertEquals("*bros-0123-*", appendWildcardIfValidSignature("bros-0123-"));
         //It is not a single word
-        assertEquals("ubb bros-0123", appendWildcard("ubb bros-0123"));
+        assertEquals("ubb bros-0123", appendWildcardIfValidSignature("ubb bros-0123"));
 
     }
 

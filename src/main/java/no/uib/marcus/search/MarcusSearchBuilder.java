@@ -225,8 +225,7 @@ public class MarcusSearchBuilder extends AbstractSearchBuilder<MarcusSearchBuild
 
     @Override
     public String getQueryString() {
-        //Append wildcard the it is a signature
-        return SignatureUtils.appendWildcard(super.getQueryString());
+        return SignatureUtils.appendWildcardIfValidSignature(super.getQueryString());
     }
 
     /**

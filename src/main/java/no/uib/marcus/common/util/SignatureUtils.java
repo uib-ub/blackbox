@@ -27,7 +27,7 @@ public class SignatureUtils {
      * @param signature a signature string to append such wildcard to
      * @return the given string with a wildcard appended to the end
      */
-    public static String appendWildcard(String signature) {
+    public static String appendWildcardIfValidSignature(String signature) {
         if (!isNullOrEmpty(signature)
                 && Character.isLetter(signature.charAt(0))
                 && !Strings.containsWhitespace(signature)
