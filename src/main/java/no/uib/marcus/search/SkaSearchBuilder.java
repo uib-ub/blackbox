@@ -13,20 +13,15 @@ import org.elasticsearch.index.query.functionscore.ScoreFunctionBuilders;
 import org.elasticsearch.search.builder.SearchSourceBuilderException;
 
 /**
- * Bulding a search service for Skeivt archive dataset
- * @author  Hemed Al Ruwehy
+ * Building a search service for Skeivt archive dataset
+ *
+ * @author Hemed Al Ruwehy
  */
 public class SkaSearchBuilder extends MarcusSearchBuilder {
     private final Logger logger = Logger.getLogger(getClass().getName());
 
-    SkaSearchBuilder(Client client){
+    SkaSearchBuilder(Client client) {
         super(client);
-    }
-
-
-    @Override
-    public String getQueryString() {
-        return QueryUtils.addLeadingWildcardIfSingleWord(super.getQueryString());
     }
 
     /**
@@ -37,12 +32,14 @@ public class SkaSearchBuilder extends MarcusSearchBuilder {
         QueryBuilder query;
         SearchRequestBuilder searchRequest = getClient().prepareSearch();
         try {
+
             //Set indices
-            if (getIndices() != null && getIndices().length > 0) {
+            if (isNeitherNullNorEmpty(getIndices())) {
                 searchRequest.setIndices(getIndices());
             }
+
             //Set types
-            if (getTypes() != null && getTypes().length > 0) {
+            if (isNeitherNullNorEmpty(getTypes())) {
                 searchRequest.setTypes(getTypes());
             }
             //Set query
@@ -57,12 +54,12 @@ public class SkaSearchBuilder extends MarcusSearchBuilder {
             //Set query whether with or without filter
             if (getFilter() != null) {
                 searchRequest.setQuery(QueryBuilders.filteredQuery(query, getFilter()));
-            }  else {
+            } else {
                 searchRequest.setQuery(query);
             }
 
             //Set post filter
-            if(getPostFilter() != null){
+            if (getPostFilter() != null) {
                 searchRequest.setPostFilter(getPostFilter());
             }
 
@@ -75,7 +72,7 @@ public class SkaSearchBuilder extends MarcusSearchBuilder {
                 searchRequest.addSort(getSortBuilder());
             }
             //Boost specific index
-            if(getIndexToBoost() != null){
+            if (getIndexToBoost() != null) {
                 searchRequest.addIndexBoost(getIndexToBoost(), 5.0f);
             }
             //Append aggregations to the request builder

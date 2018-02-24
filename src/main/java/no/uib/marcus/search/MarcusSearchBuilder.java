@@ -3,6 +3,7 @@ package no.uib.marcus.search;
 import no.uib.marcus.client.ClientFactory;
 import no.uib.marcus.common.util.AggregationUtils;
 import no.uib.marcus.common.util.QueryUtils;
+import no.uib.marcus.common.util.SignatureUtils;
 import org.apache.log4j.Logger;
 import org.elasticsearch.ElasticsearchException;
 import org.elasticsearch.action.search.SearchPhaseExecutionException;
@@ -39,41 +40,34 @@ import java.util.Random;
 public class MarcusSearchBuilder extends AbstractSearchBuilder<MarcusSearchBuilder> {
 
     private final Logger logger = Logger.getLogger(getClass().getName());
-    private FilterBuilder filter;
-    private FilterBuilder postFilter;
+    private FilterBuilder filter, postFilter;
     private Map<String, List<String>> selectedFacets;
     private String aggregations;
     private SortBuilder sortBuilder;
     private String indexToBoost;
 
-    //A list of images that will be randomly loaded at the front page.
+    //A list of images that will be randomly
+    // loaded at the front page on page load, if nothing is specified
     private final String[] randomList =
             {
                     "Knud Knudsen",
                     "Postkort",
-                    "Sophus Tromholt",
                     "Marcus Selmer",
+                    "Nordnes",
                     "Widerøesamlingen",
-                    "Nyborg",
-                    "Flaktveit"
+                    "Sophus Tromholt",
+                    "Nyborg"
             };
-
-
-    //Type to be boosted if nothing is specified
-    static class BoostType {
-            final static String FOTOGRAFI = "fotografi";
-            final static String BILDE = "bilde";
-
-    }
-
 
     /**
      * Build Marcus search service
+     *
      * @param client Elasticsearch client to communicate with a cluster.
      */
     public MarcusSearchBuilder(@NotNull Client client) {
         super(client);
     }
+
 
     /**
      * Experimental search response
@@ -94,6 +88,12 @@ public class MarcusSearchBuilder extends AbstractSearchBuilder<MarcusSearchBuild
         return optionalResponse;
     }
 
+    /**
+     * Get aggregations or <tt>null</tt> if not set
+     **/
+    public String getAggregations() {
+        return aggregations;
+    }
 
     /**
      * Set aggregations to be applied
@@ -110,10 +110,10 @@ public class MarcusSearchBuilder extends AbstractSearchBuilder<MarcusSearchBuild
     }
 
     /**
-     * Get aggregations or <tt>null</tt> if not set
-     **/
-    public String getAggregations() {
-        return aggregations;
+     * Get sort builder or <tt>null</tt> if not set
+     */
+    public SortBuilder getSortBuilder() {
+        return sortBuilder;
     }
 
     /**
@@ -129,9 +129,9 @@ public class MarcusSearchBuilder extends AbstractSearchBuilder<MarcusSearchBuild
 
     /**
      * Get sort builder or <tt>null</tt> if not set
-     */
-    public SortBuilder getSortBuilder() {
-        return sortBuilder;
+     **/
+    public FilterBuilder getFilter() {
+        return filter;
     }
 
     /**
@@ -146,12 +146,11 @@ public class MarcusSearchBuilder extends AbstractSearchBuilder<MarcusSearchBuild
     }
 
     /**
-     * Get sort builder or <tt>null</tt> if not set
-     **/
-    public FilterBuilder getFilter() {
-        return filter;
+     * Get post filter or <tt>null</tt> if not set
+     */
+    public FilterBuilder getPostFilter() {
+        return postFilter;
     }
-
 
     /**
      * Set a post_filter that would affect only search results but NOT aggregations.
@@ -165,11 +164,28 @@ public class MarcusSearchBuilder extends AbstractSearchBuilder<MarcusSearchBuild
         return this;
     }
 
+    public String getIndexToBoost() {
+        return indexToBoost;
+    }
+
     /**
-     * Get post filter or <tt>null</tt> if not set
+     * Set index that need to be boosted
+     *
+     * @param indexToBoost
+     * @return
      */
-    public FilterBuilder getPostFilter() {
-        return postFilter;
+    public MarcusSearchBuilder setIndexToBoost(String indexToBoost) {
+        this.indexToBoost = indexToBoost;
+        return this;
+    }
+
+    /**
+     * Get selected filters or <tt>null</tt> if not set
+     *
+     * @return a map containing selected filters
+     */
+    public Map<String, List<String>> getSelectedFacets() {
+        return selectedFacets;
     }
 
     /**
@@ -186,28 +202,6 @@ public class MarcusSearchBuilder extends AbstractSearchBuilder<MarcusSearchBuild
     }
 
     /**
-     * Set index that need to be boosted
-     * @param indexToBoost
-     * @return
-     */
-    public MarcusSearchBuilder setIndexToBoost(String indexToBoost) {
-        this.indexToBoost = indexToBoost;
-        return this;
-    }
-
-    public String getIndexToBoost(){
-        return indexToBoost;
-    }
-
-    /**
-     * Get selected filters or <tt>null</tt> if not set
-     * @return a map containing selected filters
-     */
-    public Map<String, List<String>> getSelectedFacets() {
-        return selectedFacets;
-    }
-
-    /**
      * Get all documents based on the service settings.
      *
      * @return a SearchResponse, can be <code>null</code>, which means search was not successfully executed.
@@ -220,8 +214,7 @@ public class MarcusSearchBuilder extends AbstractSearchBuilder<MarcusSearchBuild
             response = constructSearchRequest().execute().actionGet();
             //Show response for debugging purpose
             //logger.info(response.toString());
-        }
-           catch (SearchPhaseExecutionException e) {
+        } catch (SearchPhaseExecutionException e) {
             //I've not found a direct way to validate a query string. Therefore, the idea here is to catch any
             //exception that is related to search execution.
             logger.error("Could not execute search: " + e.getDetailedMessage());
@@ -232,7 +225,8 @@ public class MarcusSearchBuilder extends AbstractSearchBuilder<MarcusSearchBuild
 
     @Override
     public String getQueryString() {
-        return QueryUtils.appendWildcardToSignature(super.getQueryString());
+        //Append wildcard the it is a signature
+        return SignatureUtils.appendWildcard(super.getQueryString());
     }
 
     /**
@@ -245,12 +239,14 @@ public class MarcusSearchBuilder extends AbstractSearchBuilder<MarcusSearchBuild
         SearchRequestBuilder searchRequest = getClient().prepareSearch();
 
         try {
+
             //Set indices
-            if (getIndices() != null && getIndices().length > 0) {
+            if (isNeitherNullNorEmpty(getIndices())) {
                 searchRequest.setIndices(getIndices());
             }
+
             //Set types
-            if (getTypes() != null && getTypes().length > 0) {
+            if (isNeitherNullNorEmpty(getTypes())) {
                 searchRequest.setTypes(getTypes());
             }
 
@@ -299,7 +295,7 @@ public class MarcusSearchBuilder extends AbstractSearchBuilder<MarcusSearchBuild
                 searchRequest.addSort(sortBuilder);
             }
 
-            if(indexToBoost != null){
+            if (indexToBoost != null) {
                 searchRequest.addIndexBoost(indexToBoost, 4.0f);
             }
 
@@ -341,6 +337,13 @@ public class MarcusSearchBuilder extends AbstractSearchBuilder<MarcusSearchBuild
         } catch (IOException e) {
             return "{ \"error\" : \"" + e.getMessage() + "\"}";
         }
+    }
+
+    //Type to be boosted if nothing is specified
+    static class BoostType {
+        final static String FOTOGRAFI = "fotografi";
+        final static String BILDE = "bilde";
+
     }
 
     //Main method for easy debugging
