@@ -2,6 +2,8 @@ package no.uib.marcus.common.util;
 
 import org.elasticsearch.common.Strings;
 
+import java.util.Locale;
+
 import static no.uib.marcus.common.util.BlackboxUtils.containsChar;
 import static no.uib.marcus.common.util.BlackboxUtils.isNullOrEmpty;
 import static no.uib.marcus.common.util.QueryUtils.containsReservedChars;
@@ -16,13 +18,12 @@ public class SignatureUtils {
     //List of signature prefixes for University of Bergen Library
     private static final String[] UBB_SIGNATURE_PREFIXES = {"ubb", "ubm"};
 
-
-    private SignatureUtils(){
+    //Ensure non-instantiability
+    private SignatureUtils() {
     }
 
     /**
-     * Appends wildcard if a given input is UBB signature, but only if
-     * it does not contain reserved characters
+     * Appends wildcard if a given input is UBB signature, if it does not contain reserved characters
      *
      * @param signature a signature string to append such wildcard to
      * @return the given string with a wildcard appended to the end
@@ -50,12 +51,11 @@ public class SignatureUtils {
 
 
     /**
-     * Checks if it is UBB signature
+     * Checks if it is valid UBB signature
      */
     public static boolean isValidSignature(String signature) {
         return beginsWithSignaturePrefix(signature) && containsChar(signature, SPECIAL_SIGNATURE_CHAR);
     }
-
 
     /**
      * Checks if a given query is likely a signature, that means it begins with signature prefix
@@ -65,7 +65,7 @@ public class SignatureUtils {
             return false;
         }
         for (String prefix : UBB_SIGNATURE_PREFIXES) {
-            if (query.toLowerCase().startsWith(prefix)) {
+            if (query.toLowerCase(Locale.ROOT).startsWith(prefix)) {
                 return true;
             }
         }

@@ -33,7 +33,7 @@ public class DiscoveryServlet extends HttpServlet {
     /**
      * Process a request
      **/
-    protected void processRequest(HttpServletRequest request, HttpServletResponse response)
+    private void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         request.setCharacterEncoding("UTF-8");
         response.setContentType("application/json;charset=UTF-8");

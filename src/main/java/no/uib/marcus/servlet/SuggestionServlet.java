@@ -5,7 +5,6 @@ import no.uib.marcus.common.Params;
 import no.uib.marcus.search.suggestion.CompletionSuggestion;
 import org.elasticsearch.common.Strings;
 
-import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -24,9 +23,8 @@ public class SuggestionServlet extends HttpServlet {
 
     private static final long serialVersionUID = 2L;
 
-    protected void processRequest(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException
-    {
+    private void processRequest(HttpServletRequest request, HttpServletResponse response)
+            throws IOException {
         request.setCharacterEncoding("UTF-8");
         response.setContentType("application/json;charset=UTF-8");
 
@@ -39,22 +37,21 @@ public class SuggestionServlet extends HttpServlet {
             int suggestSize = Strings.hasText(size)
                     ? Integer.parseInt(size)
                     : 5;
-            Gson gson = new Gson();
-
-            jsonString = gson.toJson(CompletionSuggestion.getSuggestions(suggestText, suggestSize, indices));
+            jsonString = new Gson()
+                    .toJson(CompletionSuggestion.getSuggestions(suggestText, suggestSize, indices));
             out.write(jsonString);
         }
     }
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
+            throws IOException {
         processRequest(request, response);
     }
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
+            throws IOException {
         processRequest(request, response);
     }
 

@@ -48,8 +48,7 @@ public class MarcusSearchBuilder extends AbstractSearchBuilder<MarcusSearchBuild
 
     //A list of images that will be randomly
     // loaded at the front page on page load, if nothing is specified
-    private final String[] randomList =
-            {
+    private final String[] randomPictures = {
                     "Knud Knudsen",
                     "Postkort",
                     "Marcus Selmer",
@@ -238,7 +237,6 @@ public class MarcusSearchBuilder extends AbstractSearchBuilder<MarcusSearchBuild
         SearchRequestBuilder searchRequest = getClient().prepareSearch();
 
         try {
-
             //Set indices
             if (isNeitherNullNorEmpty(getIndices())) {
                 searchRequest.setIndices(getIndices());
@@ -253,17 +251,15 @@ public class MarcusSearchBuilder extends AbstractSearchBuilder<MarcusSearchBuild
             if (Strings.hasText(getQueryString())) {
                 //Use query_string query with AND operator
                 functionScoreQueryBuilder = QueryBuilders
-                        .functionScoreQuery(QueryUtils.buildQueryString(getQueryString()));
+                        .functionScoreQuery(QueryUtils.buildMarcusQueryString(getQueryString()));
             } else {
-                //Boost documents inside the "random list" of places because these places have colorful images
-                //and hence they beautify the front page.
+                //Boost documents inside the "random list" of places because they beautify the front page.
                 //This is just for coolness and it has no effect if the query yields no results
-                String randomQueryString = randomList[new Random().nextInt(randomList.length)];
+                String randomQueryString = randomPictures[new Random().nextInt(randomPictures.length)];
                 functionScoreQueryBuilder = QueryBuilders.functionScoreQuery(QueryBuilders.matchAllQuery())
                         .add(FilterBuilders.queryFilter(
                                 QueryBuilders.simpleQueryStringQuery(randomQueryString)),
-                                ScoreFunctionBuilders.weightFactorFunction(2)
-                        );
+                                ScoreFunctionBuilders.weightFactorFunction(2));
             }
 
             //Boost documents of type "Fotografi" for every query performed.

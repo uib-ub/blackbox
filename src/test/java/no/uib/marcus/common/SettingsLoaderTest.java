@@ -2,6 +2,7 @@ package no.uib.marcus.common;
 
 import com.carrotsearch.randomizedtesting.RandomizedTest;
 import no.uib.marcus.common.loader.JsonFileLoader;
+import no.uib.marcus.common.loader.UnavailableResourceException;
 import org.apache.log4j.Logger;
 import org.junit.Test;
 
@@ -33,6 +34,15 @@ public class SettingsLoaderTest extends RandomizedTest {
         assertEquals("uib.no/ub", settings.get("ubbcluster.host"));
     }
 
+
+    /**
+     * Testing loading non-existing file from resource
+     */
+    @Test(expected = UnavailableResourceException.class)
+    public void testFileUnavailableFileFromResource() {
+        new JsonFileLoader().loadFromResource("hakuna-matata.json");
+    }
+
     /**
      * Testing loading JSON file from resource
      */
@@ -42,15 +52,24 @@ public class SettingsLoaderTest extends RandomizedTest {
         //We use this for testing..
         String fileName = "config.template.example.json";
         JsonFileLoader loader = new JsonFileLoader();
-        String jsonString = loader.loadFromResource(fileName);
+        String jsonString;
+        try {
+            jsonString = loader.loadFromResource(fileName);
+        } catch (UnavailableResourceException ex) {
+            //Load from resource
+            fileName = "config.template.json";
+            jsonString = loader.loadFromResource(fileName);
+        }
 
         logger.info("Validating config file from: " + loader.getPathFromResource(fileName));
         Map<String, String> settings = loader.toMap(jsonString);
         assertNotNull(jsonString);
         assertNotNull(settings);
         assertTrue(!jsonString.isEmpty());
-        logger.info("Does cluster name exist? : " + !settings.get("cluster.name").isEmpty());
-        logger.info("Does host name exist? : " + !settings.get("cluster.host").isEmpty());
-        logger.info("Does port exist? : " + !settings.get("cluster.port").isEmpty());
+        assertTrue("Does cluster name exist? : ", !settings.get("cluster.name").isEmpty());
+        assertTrue("Does host name exist? : ", !settings.get("cluster.host").isEmpty());
+        assertTrue("Does port exist? : ", !settings.get("cluster.port").isEmpty());
     }
+
+
 }

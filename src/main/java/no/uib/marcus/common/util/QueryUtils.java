@@ -35,7 +35,7 @@ public final class QueryUtils {
      * @param queryString a query string
      * @return a builder for simple query string
      */
-    public static SimpleQueryStringBuilder buildSimpleQueryString(String queryString) {
+    public static SimpleQueryStringBuilder buildMarcusSimpleQueryString(String queryString) {
         return QueryBuilders.simpleQueryStringQuery(queryString)
                 .analyzer("default")//The custom "default" analyzer is defined in the "_settings".
                 .field("identifier")//Not analyzed field
@@ -50,7 +50,7 @@ public final class QueryUtils {
      * @param queryString a query string
      * @return a builder for query string
      */
-    public static QueryStringQueryBuilder buildQueryString(String queryString) {
+    public static QueryStringQueryBuilder buildMarcusQueryString(String queryString) {
         return QueryBuilders.queryStringQuery(queryString)
                 .analyzer("default")//The custom "default" analyzer is defined in the "_settings".
                 .field("identifier")//Not analyzed field
@@ -61,7 +61,7 @@ public final class QueryUtils {
 
 
     /**
-     * Adds a leading wildcard to a single term query, if it does not contain reserved characters
+     * Adds a trailing wildcard to a single term query, if it does not contain reserved characters
      *
      * @param queryString a string to add such wildcard
      * @return the given string with a wildcard appended to the end

@@ -44,7 +44,7 @@ public class SkaSearchBuilder extends MarcusSearchBuilder {
             }
             //Set query
             if (Strings.hasText(getQueryString())) {
-                query = QueryUtils.buildQueryString(getQueryString());
+                query = QueryUtils.buildMarcusQueryString(getQueryString());
             } else {
                 //Boost documents of type "skeivopedia" if nothing specified
                 query = QueryBuilders.functionScoreQuery(QueryBuilders.matchAllQuery()).add(

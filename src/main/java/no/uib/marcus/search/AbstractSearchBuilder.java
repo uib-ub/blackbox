@@ -175,7 +175,8 @@ public abstract class AbstractSearchBuilder<T extends AbstractSearchBuilder<T>> 
     /**
      * Get all documents based on the service settings.
      *
-     * @return a SearchResponse, can be <code>null</code>, which means search was not successfully executed.
+     * @return a SearchResponse, can be <code>null</code>,
+     * which means search was not successfully executed.
      */
     @Override
     public abstract SearchResponse executeSearch();
@@ -189,9 +190,9 @@ public abstract class AbstractSearchBuilder<T extends AbstractSearchBuilder<T>> 
 
 
     /**
-     * Ensure this array of string is neither null nor empty
+     * Ensure this string or array of string is neither null nor empty
      */
-    public static boolean isNeitherNullNorEmpty(String[] s) {
+    public static boolean isNeitherNullNorEmpty(String... s) {
         return s != null && s.length > 0;
     }
 
