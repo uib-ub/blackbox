@@ -46,10 +46,10 @@ public class SkaSearchBuilder extends MarcusSearchBuilder {
             if (Strings.hasText(getQueryString())) {
                 query = QueryUtils.buildMarcusQueryString(getQueryString());
             } else {
-                //Boost documents of type "skeivopedia" if nothing specified
-                query = QueryBuilders.functionScoreQuery(QueryBuilders.matchAllQuery()).add(
-                        FilterBuilders.termFilter("type", "skeivopedia"),
-                        ScoreFunctionBuilders.weightFactorFunction(2));
+                //Boost documents of type "Manuskript" if nothing specified
+                query = QueryBuilders.functionScoreQuery(QueryBuilders.matchAllQuery())
+                        .add(FilterBuilders.termFilter("type", "Manuskript"),
+                                ScoreFunctionBuilders.weightFactorFunction(2));
             }
             //Set query whether with or without filter
             if (getFilter() != null) {
