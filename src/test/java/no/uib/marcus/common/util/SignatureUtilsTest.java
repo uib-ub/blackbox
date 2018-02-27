@@ -31,10 +31,11 @@ public class SignatureUtilsTest {
 
     @Test
     public void isValidSignature() {
-        assertFalse(SignatureUtils.isValidSignature(null));
-        assertFalse(SignatureUtils.isValidSignature(""));
-        assertFalse(SignatureUtils.isValidSignature("ubb"));
-        assertTrue(SignatureUtils.isValidSignature("ubb-ms-01"));
+        assertFalse(SignatureUtils.isSignature(null));
+        assertFalse(SignatureUtils.isSignature(""));
+        assertFalse(SignatureUtils.isSignature("ubb"));
+        assertTrue(SignatureUtils.isSignature("ubb-ms-01"));
+        assertTrue(SignatureUtils.isSignature(" ubb-ms-01")); //with trim
     }
 
 
