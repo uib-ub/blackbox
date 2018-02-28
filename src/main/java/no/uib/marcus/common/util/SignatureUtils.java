@@ -5,7 +5,7 @@ import org.elasticsearch.common.Strings;
 import java.util.Locale;
 
 import static no.uib.marcus.common.util.BlackboxUtils.containsChar;
-import static no.uib.marcus.common.util.BlackboxUtils.isNeitherNullNOrEmpty;
+import static no.uib.marcus.common.util.BlackboxUtils.isNeitherNullNorEmpty;
 import static no.uib.marcus.common.util.BlackboxUtils.isNullOrEmpty;
 import static no.uib.marcus.common.util.QueryUtils.containsReservedChars;
 
@@ -24,13 +24,13 @@ public class SignatureUtils {
     }
 
     /**
-     * Appends wildcard if a given input is UBB value, if it does not contain reserved characters
+     * Appends wildcard if a given input is a valid signature, if it does not contain reserved characters
      *
-     * @param value a value string to append such wildcard to
+     * @param value a value string to append such wildcard if it is thought to be a signature
      * @return the given string with a wildcard appended to the end
      */
     public static String appendWildcardIfValidSignature(String value) {
-        if (isNeitherNullNOrEmpty(value)
+        if (isNeitherNullNorEmpty(value)
                 && Character.isLetter(value.charAt(0))
                 && !Strings.containsWhitespace(value)
                 && !containsReservedChars(value)) {

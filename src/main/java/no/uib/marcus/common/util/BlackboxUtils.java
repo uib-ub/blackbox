@@ -109,7 +109,7 @@ public class BlackboxUtils {
      * @param s  a string to check
      * @return true if this string is not null or not empty, otherwise false
      */
-    public static boolean isNeitherNullNOrEmpty(CharSequence s) {
+    public static boolean isNeitherNullNorEmpty(CharSequence s) {
         return s != null && s.length() > 0;
     }
 
@@ -117,7 +117,7 @@ public class BlackboxUtils {
      * Checks if a given string does not start with a given character
      */
     public static boolean containsChar(String s, char character) {
-        return !isNullOrEmpty(s) && s.indexOf(character) > -1;
+        return isNeitherNullNorEmpty(s) && s.indexOf(character) > -1;
     }
 
 }
