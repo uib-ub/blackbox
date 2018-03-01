@@ -22,6 +22,7 @@ import java.io.PrintWriter;
 public class SuggestionServlet extends HttpServlet {
 
     private static final long serialVersionUID = 2L;
+    private static final int DEFAULT_SIZE = 5;
 
     private void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws IOException {
@@ -34,9 +35,7 @@ public class SuggestionServlet extends HttpServlet {
         String jsonString;
 
         try (PrintWriter out = response.getWriter()) {
-            int suggestSize = Strings.hasText(size)
-                    ? Integer.parseInt(size)
-                    : 5;
+            int suggestSize = Strings.hasText(size) ? Integer.parseInt(size) : DEFAULT_SIZE;
             jsonString = new Gson()
                     .toJson(CompletionSuggestion.getSuggestions(suggestText, suggestSize, indices));
             out.write(jsonString);

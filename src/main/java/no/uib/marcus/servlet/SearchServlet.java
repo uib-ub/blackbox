@@ -30,13 +30,13 @@ import java.util.Map;
  * <p/>
  *
  * @author Hemed Al Ruwehy
- *         2016-01-24, University of Bergen Library.
+ * 2016-01-24, University of Bergen Library.
  */
 @WebServlet(
         name = "SearchServlet",
         urlPatterns = {"/search"},
-        description = "Servlet for handling search requests"
-)
+        description = "Servlet for handling search requests")
+
 public class SearchServlet extends HttpServlet {
     private static final Logger logger = Logger.getLogger(SearchServlet.class);
     private static final long serialVersionUID = 1L;
@@ -48,7 +48,8 @@ public class SearchServlet extends HttpServlet {
      * @param response HTTP servlet response
      * @throws ServletException if a servlet-specific error occurs
      * @throws IOException      if an I/O error occurs
-     * @returns a JSON string of search hits.
+     *
+     * writes a JSON string of search hits.
      **/
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
@@ -73,27 +74,21 @@ public class SearchServlet extends HttpServlet {
             Client client = ClientFactory.getTransportClient();
 
             //Assign default values, if needs be
-            int offset = Strings.hasText(from)
-                    ? Integer.parseInt(from)
-                    : 0;
-            int resultSize = Strings.hasText(size)
-                    ? Integer.parseInt(size)
-                    : 10;
-            SortBuilder sort = Strings.hasText(sortString)
-                    ? SortUtils.getSort(sortString)
-                    : null;
+            int _from = Strings.hasText(from) ? Integer.parseInt(from) : Params.DEFAULT_FROM;
+            int _size = Strings.hasText(size) ? Integer.parseInt(size) : Params.DEFAULT_SIZE;
+            SortBuilder sort = Strings.hasText(sortString) ? SortUtils.getSort(sortString) : null;
 
             //Build a filter map based on selected facets.
             Map<String, List<String>> selectedFacetMap = AggregationUtils.buildFilterMap(selectedFilters);
 
             //Build search service
-            MarcusSearchBuilder searchService = SearchBuilderFactory.getSearchBuilder(service, client);
-            searchService.setIndices(indices)
+            MarcusSearchBuilder searchService = SearchBuilderFactory.getSearchBuilder(service, client)
+                    .setIndices(indices)
                     .setTypes(types)
                     .setQueryString(queryString)
                     .setAggregations(aggs)
-                    .setFrom(offset)
-                    .setSize(resultSize)
+                    .setFrom(_from)
+                    .setSize(_size)
                     .setSelectedFacets(selectedFacetMap)
                     .setSortBuilder(sort)
                     .setIndexToBoost(indexToBoost);
@@ -127,7 +122,6 @@ public class SearchServlet extends HttpServlet {
             logger.info(LogUtils.createLogMessage(request, searchResponse));
         }
     }
-
 
 
     /**
