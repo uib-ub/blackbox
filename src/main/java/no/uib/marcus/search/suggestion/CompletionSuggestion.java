@@ -44,7 +44,7 @@ public class CompletionSuggestion {
                 suggestValues.add(option.getText().string().toLowerCase());
             }
         } catch (Exception e) {
-            logger.error("Unable to perform suggestion for text: [" + text + "]") ;
+            logger.error("Unable to perform suggestion for text: [" + text + "]. Message: " + e.getLocalizedMessage()) ;
         }
         //We want suggestion values to be sorted, hence we put them in a tree set
         return new TreeSet<>(suggestValues);
