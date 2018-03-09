@@ -1,4 +1,4 @@
-package no.uib.marcus.common;
+package no.uib.marcus.common.util;
 
 import com.carrotsearch.randomizedtesting.RandomizedTest;
 import no.uib.marcus.range.DateRange;

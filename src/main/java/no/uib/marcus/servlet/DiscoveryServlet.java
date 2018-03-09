@@ -32,8 +32,8 @@ public class DiscoveryServlet extends HttpServlet {
 
     /**
      * Process a request
-     **/
-    protected void processRequest(HttpServletRequest request, HttpServletResponse response)
+     */
+    private void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         request.setCharacterEncoding("UTF-8");
         response.setContentType("application/json;charset=UTF-8");
@@ -43,8 +43,8 @@ public class DiscoveryServlet extends HttpServlet {
         String from = request.getParameter(Params.FROM);
         String size = request.getParameter(Params.SIZE);
 
-        int _from = Strings.hasText(from) ? Integer.parseInt(from) : 0;
-        int _size = Strings.hasText(size) ? Integer.parseInt(size) : 10;
+        int _from = Strings.hasText(from) ? Integer.parseInt(from) : Params.DEFAULT_FROM;
+        int _size = Strings.hasText(size) ? Integer.parseInt(size) : Params.DEFAULT_SIZE;
         Client client = ClientFactory.getTransportClient();
 
         //Build a discovery service

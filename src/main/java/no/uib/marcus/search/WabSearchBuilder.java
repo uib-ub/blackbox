@@ -25,11 +25,11 @@ public class WabSearchBuilder extends MarcusSearchBuilder {
         try {
 
             //Set indices
-            if (getIndices() != null && getIndices().length > 0) {
+            if (isNeitherNullNorEmpty(getIndices())) {
                 searchRequest.setIndices(getIndices());
             }
             //Set types
-            if (getTypes() != null && getTypes().length > 0) {
+            if (isNeitherNullNorEmpty(getTypes())) {
                 searchRequest.setTypes(getTypes());
             }
 

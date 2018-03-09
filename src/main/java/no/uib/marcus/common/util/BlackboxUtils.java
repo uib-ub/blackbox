@@ -54,7 +54,7 @@ public class BlackboxUtils {
      * @param cs character sequence
      **/
     public static boolean isNumeric(CharSequence cs) {
-        if (cs == null || cs.length() == 0) {
+        if (isNullOrEmpty(cs)) {
             return false;
         } else {
             int sz = cs.length();
@@ -91,4 +91,33 @@ public class BlackboxUtils {
     public static int getValueAsInt(Map<String, String> map, String key) {
         return Integer.parseInt(getValueAsString(map, key));
     }
+
+
+    /**
+     * Checks if a given string is either null or empty
+     *
+     * @param s  a string to check
+     * @return true if this string is null or empty, otherwise false
+     */
+    public static boolean isNullOrEmpty(CharSequence s) {
+        return s == null || s.length() == 0;
+    }
+
+    /**
+     * Checks if a given string is neither null nor empty
+     *
+     * @param s  a string to check
+     * @return true if this string is not null or not empty, otherwise false
+     */
+    public static boolean isNeitherNullNorEmpty(CharSequence s) {
+        return s != null && s.length() > 0;
+    }
+
+    /**
+     * Checks if a given string does not start with a given character
+     */
+    public static boolean containsChar(String s, char character) {
+        return isNeitherNullNorEmpty(s) && s.indexOf(character) > -1;
+    }
+
 }

@@ -45,8 +45,8 @@ public class SearchBuilderFactory {
      * Create a dummy service. It may use different client and different settings.
      * (Not yet implemented)
      **/
-    public static <T extends AbstractSearchBuilder> T dummySearch() {
-        return null;
+    public static <T extends MarcusSearchBuilder> T get(Client client) {
+        return (T)new MarcusSearchBuilder(client);
     }
 
 

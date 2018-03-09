@@ -10,6 +10,8 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
+import static no.uib.marcus.common.util.BlackboxUtils.jsonify;
+
 /**
  * @author Hemed
  */
@@ -35,7 +37,7 @@ public final class LogUtils {
                 .startObject()
                 //.field("host", request.getRemoteAddr().equals("0:0:0:0:0:0:0:1") ?
                 // InetAddress.getLocalHost() : request.getRemoteAddr())
-                .field("params", BlackboxUtils.jsonify(parameterMapCopy))
+                .field("params", jsonify(parameterMapCopy))
                 .field("hits", searchResponse.getHits().getTotalHits())
                 .field("took", searchResponse.getTook())
                 .endObject();
