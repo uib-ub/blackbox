@@ -29,7 +29,7 @@ import java.util.Random;
  * @since 0.1
  * 2016-01-24, University of Bergen Library.
  */
-public class MarcusSearchBuilder extends AbstractSearchBuilder<MarcusSearchBuilder> {
+public class MarcusSearchBuilder extends SearchBuilder<MarcusSearchBuilder> {
 
     private final Logger logger = Logger.getLogger(getClass().getName());
 
@@ -54,6 +54,7 @@ public class MarcusSearchBuilder extends AbstractSearchBuilder<MarcusSearchBuild
         super(client);
     }
 
+
     /**
      * Appends wildcard to the query string if it is a valid UBB signature
      */
@@ -62,21 +63,9 @@ public class MarcusSearchBuilder extends AbstractSearchBuilder<MarcusSearchBuild
         return SignatureUtils.appendWildcardIfValidSignature(super.getQueryString());
     }
 
-    //Main method for easy debugging
-    public static void main(String[] args) throws IOException {
-        Client c = ClientFactory.getTransportClient();
-        System.out.println("Cluster: " + c.admin().cluster());
-        AbstractSearchBuilder service = SearchBuilderFactory.marcusSearch(c);
-        //service.setAggregations("koba"); //Invalid aggs, it should fail.
-        //service.setQueryString("~ana");
-        System.out.println(service);
-        //System.out.println(QueryUtils.toJsonString(service.executeSearch(), true));
-    }
-
-
     /**
      * Construct search request based on the service settings.
-     **/
+     */
     @Override
     public SearchRequestBuilder constructSearchRequest() {
         QueryBuilder query;
@@ -143,9 +132,7 @@ public class MarcusSearchBuilder extends AbstractSearchBuilder<MarcusSearchBuild
 
             //Append aggregations to the request builder
             if (Strings.hasText(getAggregations())) {
-                AggregationUtils.addAggregations(
-                        searchRequest, getAggregations(), getSelectedFacets()
-                );
+                AggregationUtils.addAggregations(searchRequest, getAggregations(), getSelectedFacets());
             }
             //Set from and size
             searchRequest.setFrom(getFrom());
@@ -182,7 +169,16 @@ public class MarcusSearchBuilder extends AbstractSearchBuilder<MarcusSearchBuild
     static class BoostType {
         final static String FOTOGRAFI = "fotografi";
         final static String BILDE = "bilde";
+    }
 
+    //Main method for easy debugging
+    public static void main(String[] args) throws IOException {
+        Client c = ClientFactory.getTransportClient();
+        SearchBuilder service = SearchBuilderFactory.marcusSearch(c);
+        //service.setAggregations("koba"); //Invalid aggs, it should fail.
+        //service.setQueryString("~ana");
+        System.out.println(service);
+        System.out.println(QueryUtils.toJsonString(service.executeSearch(), true));
     }
 }
 

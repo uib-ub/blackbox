@@ -3,7 +3,7 @@ package no.uib.marcus.servlet;
 import no.uib.marcus.client.ClientFactory;
 import no.uib.marcus.common.Params;
 import no.uib.marcus.common.util.*;
-import no.uib.marcus.search.MarcusSearchBuilder;
+import no.uib.marcus.search.SearchBuilder;
 import no.uib.marcus.search.SearchBuilderFactory;
 import org.apache.log4j.Logger;
 import org.elasticsearch.action.search.SearchResponse;
@@ -22,6 +22,8 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.List;
 import java.util.Map;
+
+
 
 
 /**
@@ -82,7 +84,7 @@ public class SearchServlet extends HttpServlet {
             Map<String, List<String>> selectedFacetMap = AggregationUtils.buildFilterMap(selectedFilters);
 
             //Build search service
-            MarcusSearchBuilder searchService = SearchBuilderFactory.getSearchBuilder(service, client)
+            SearchBuilder builder = SearchBuilderFactory.get(service, client)
                     .setIndices(indices)
                     .setTypes(types)
                     .setQueryString(queryString)
@@ -98,17 +100,17 @@ public class SearchServlet extends HttpServlet {
 
             //Set top level filter if any
             if (boolFilterMap.get(Params.TOP_FILTER).hasClauses()) {
-                searchService.setFilter(boolFilterMap.get(Params.TOP_FILTER));
+                builder.setFilter(boolFilterMap.get(Params.TOP_FILTER));
             }
 
             //Set post_filter, so that aggregations should not be affected by the query.
             //post_filter only affects search results but NOT aggregations
             if (boolFilterMap.get(Params.POST_FILTER).hasClauses()) {
-                searchService.setPostFilter(boolFilterMap.get(Params.POST_FILTER));
+                builder.setPostFilter(boolFilterMap.get(Params.POST_FILTER));
             }
 
             //Send search request to Elasticsearch and execute
-            SearchResponse searchResponse = searchService.executeSearch();
+            SearchResponse searchResponse = builder.executeSearch();
 
             //Decide whether to get a pretty JSON output or not
             String searchResponseString = Booleans.isExplicitTrue(isPretty)

@@ -9,7 +9,8 @@ import javax.validation.constraints.NotNull;
 
 /**
  * @author Hemed Ali Al Ruwehy
- * A contract for creating search services.
+ *
+ * A basic contract for creating search services. See {@link SearchBuilder}
  */
 public interface SearchService<S extends SearchService> {
     /**

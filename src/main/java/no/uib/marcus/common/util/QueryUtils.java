@@ -108,8 +108,7 @@ public final class QueryUtils {
     public static String toJsonString(final SearchResponse response, final boolean isPretty) {
         try {
             if (response == null) {
-                return "{ \"error\" : \"" + "Could not execute search. "
-                        + "Your query is malformed" + "\"}";
+                return "{ \"error\" : \"" + "Could not execute search. See internal server logs" + "\"}";
             }
             XContentBuilder builder = XContentFactory.jsonBuilder();
             if (isPretty) {

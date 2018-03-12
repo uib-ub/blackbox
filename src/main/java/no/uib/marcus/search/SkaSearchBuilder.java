@@ -48,7 +48,7 @@ public class SkaSearchBuilder extends MarcusSearchBuilder {
             } else {
                 //Boost documents of type "Manuskript" if nothing specified
                 query = QueryBuilders.functionScoreQuery(QueryBuilders.matchAllQuery())
-                        .add(FilterBuilders.termFilter("type", "Manuskript"),
+                        .add(FilterBuilders.termFilter("type", BoostType.INTERVJU),
                                 ScoreFunctionBuilders.weightFactorFunction(2));
             }
             //Set query whether with or without filter
@@ -85,6 +85,11 @@ public class SkaSearchBuilder extends MarcusSearchBuilder {
             logger.error("Exception occurred when building search request: " + e.getMostSpecificCause());
         }
         return searchRequest;
+    }
+
+    //Type to be boosted if nothing is specified
+    static class BoostType {
+        final static String INTERVJU = "intervju";
     }
 
 }

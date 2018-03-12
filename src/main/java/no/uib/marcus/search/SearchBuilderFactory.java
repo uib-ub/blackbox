@@ -8,11 +8,12 @@ import org.elasticsearch.common.Nullable;
  * Creation factory for search services.
  */
 public class SearchBuilderFactory {
-    private SearchBuilderFactory() {}
+    private SearchBuilderFactory() {
+    }
 
     /**
      * Create a new search service for Marcus data set
-     **/
+     */
     public static MarcusSearchBuilder marcusSearch(Client client) {
         return new MarcusSearchBuilder(client);
     }
@@ -20,7 +21,7 @@ public class SearchBuilderFactory {
 
     /**
      * Create a Skeivtarkiv(SkA) search builder
-     **/
+     */
     public static SkaSearchBuilder skaSearch(Client client) {
         return new SkaSearchBuilder(client);
     }
@@ -41,29 +42,30 @@ public class SearchBuilderFactory {
         return new MarcusDiscoveryBuilder(client);
     }
 
+
     /**
-     * Create a dummy service. It may use different client and different settings.
-     * (Not yet implemented)
-     **/
-    public static <T extends MarcusSearchBuilder> T get(Client client) {
-        return (T)new MarcusSearchBuilder(client);
+     * Gets search builder using default settings
+     */
+    public static SearchBuilder get(Client client) {
+        return get(null, client);
     }
 
 
     /**
-     * Decide which search service to use based on the service parameter
+     * Decides which search builder to return based on the service parameter
+     *
      * @param serviceString a service parameter. If it is null, it will fall to a default service.
-     * @param client
+     * @param client        a search client to be used
      * @return a corresponding search builder
      */
-    public static MarcusSearchBuilder getSearchBuilder(@Nullable String serviceString, Client client) {
+    public static SearchBuilder get(@Nullable String serviceString, Client client) {
         ServiceName service = ServiceName.toEnum(serviceString);
-        switch (service){
-            case SKA :
+        switch (service) {
+            case SKA:
                 return SearchBuilderFactory.skaSearch(client);
-            case WAB :
+            case WAB:
                 return SearchBuilderFactory.wabSearch(client);
-            case MARCUS :
+            case MARCUS:
                 return SearchBuilderFactory.marcusSearch(client);
             case MARCUS_ADMIN:
                 return SearchBuilderFactory.marcusSearch(client);

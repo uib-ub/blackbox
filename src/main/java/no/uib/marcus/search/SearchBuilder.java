@@ -2,7 +2,7 @@ package no.uib.marcus.search;
 
 import no.uib.marcus.common.util.AggregationUtils;
 import org.apache.log4j.Logger;
-import org.elasticsearch.ElasticsearchException;
+import org.elasticsearch.action.search.SearchPhaseExecutionException;
 import org.elasticsearch.action.search.SearchRequestBuilder;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.client.Client;
@@ -19,7 +19,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Abstract builder for search services. The idea here is that, all search service builders
+ * Abstract builder for search services. The idea here is that, all search builders
  * should inherit this class.
  *
  * @author Hemed Ali Al Ruwehy
@@ -27,7 +27,7 @@ import java.util.Map;
  * University of Bergen Library.
  * 2016-04-15
  */
-public abstract class AbstractSearchBuilder<T extends AbstractSearchBuilder<T>> implements SearchService<T> {
+public abstract class SearchBuilder<T extends SearchBuilder<T>> implements SearchService<T> {
     private final Logger logger = Logger.getLogger(getClass().getName());
     private Client client;
     @Nullable
@@ -36,21 +36,20 @@ public abstract class AbstractSearchBuilder<T extends AbstractSearchBuilder<T>> 
     private String[] types;
     @Nullable
     private String queryString;
-    private int from = 0;
-    private int size = 10;
     private FilterBuilder filter, postFilter;
     private Map<String, List<String>> selectedFacets;
     private String aggregations;
     private SortBuilder sortBuilder;
     private String indexToBoost;
-
+    private int from = 0;
+    private int size = 10;
 
     /**
      * Constructor
      *
      * @param client a non-null Elasticsearch client to communicate with a cluster.
      */
-    public AbstractSearchBuilder(@NotNull Client client) {
+    public SearchBuilder(@NotNull Client client) {
         if (client == null) {
             throw new IllegalParameterException("Unable to initialize service. Client cannot be null");
         }
@@ -329,13 +328,14 @@ public abstract class AbstractSearchBuilder<T extends AbstractSearchBuilder<T>> 
             response = constructSearchRequest().execute().actionGet();
             //Show response for debugging purpose
             //logger.info(response.toString());
-        } catch (ElasticsearchException e) {
+        } catch (SearchPhaseExecutionException e) {
             //I've not found a direct way to validate a query string. Therefore, the idea here is to catch any
             //exception that is related to search execution.
             logger.error("Could not execute search: " + e.getDetailedMessage());
         }
         return response;
     }
+
 
     /**
      * Print out properties of this instance as a JSON string

@@ -1,9 +1,8 @@
 package no.uib.marcus.client;
 
-import no.uib.marcus.common.util.BlackboxUtils;
 import no.uib.marcus.common.loader.JsonFileLoader;
+import no.uib.marcus.common.util.BlackboxUtils;
 import org.apache.log4j.Logger;
-import org.elasticsearch.ElasticsearchException;
 import org.elasticsearch.action.admin.cluster.health.ClusterHealthResponse;
 import org.elasticsearch.client.Client;
 import org.elasticsearch.client.transport.TransportClient;
@@ -28,19 +27,20 @@ import java.util.Map;
  */
 final public class ClientFactory {
 
-    private static Client client;
     private static final Logger logger = Logger.getLogger(ClientFactory.class);
+    private static Client client;
 
     /**
      * Prevent direct instantiation of this class
      */
-    private ClientFactory() {}
+    private ClientFactory() {
+    }
 
     /**
      * Create a transport client
-     **/
-    private static Client createTransportClient(Map<String, String> properties){
-         try {
+     */
+    private static Client createTransportClient(Map<String, String> properties) {
+        try {
             Settings settings = ImmutableSettings.settingsBuilder()
                     .put("cluster.name", BlackboxUtils.getValueAsString(properties, "cluster.name"))
                     .put("node.name", BlackboxUtils.getValueAsString(properties, "cluster.node_name"))
@@ -51,19 +51,16 @@ final public class ClientFactory {
                             //Use localhost in production
                             InetAddress.getLocalHost(), getValueAsInt(properties, "ubbcluster.port")));
                      */
-                   .addTransportAddress(new InetSocketTransportAddress(
-                                    InetAddress.getByName(BlackboxUtils.getValueAsString(properties , "cluster.host")),
-                                    BlackboxUtils.getValueAsInt(properties, "cluster.port")));
-
+                    .addTransportAddress(new InetSocketTransportAddress(
+                            InetAddress.getByName(BlackboxUtils.getValueAsString(properties, "cluster.host")),
+                            BlackboxUtils.getValueAsInt(properties, "cluster.port")));
             ClusterHealthResponse hr = client.admin().cluster().prepareHealth().get();
             logger.info("Connected to Elasticsearch cluster: " + hr);
         } catch (UnknownHostException ue) {
             logger.error("Unknown host: " + ue.getMessage());
-        } catch (ElasticsearchException e) {
-            if (e instanceof ConnectTransportException) {
-                logger.warn("Unable to connect to Elasticsearch. Is it running? ");
-            }
-            logger.error(e.getDetailedMessage());
+        } catch (ConnectTransportException e) {
+            logger.warn("Unable to connect to Elasticsearch cluster. Is Elasticsearch running? "
+                    + e.getDetailedMessage());
         }
         return client;
     }
@@ -81,18 +78,17 @@ final public class ClientFactory {
         return client;
     }
 
-
-    /**
-     * Don't allow cloning for this object
-     **/
-    @Override
-    protected Object clone() throws CloneNotSupportedException {
-        throw new CloneNotSupportedException("Cloning for this object is not supported");
-    }
-
     //Main method for easy debugging..
     public static void main(String[] args) throws IOException {
         getTransportClient();
+    }
+
+    /**
+     * Don't allow cloning for this object
+     */
+    @Override
+    protected Object clone() throws CloneNotSupportedException {
+        throw new CloneNotSupportedException("Cloning for this object is not supported");
     }
 
 

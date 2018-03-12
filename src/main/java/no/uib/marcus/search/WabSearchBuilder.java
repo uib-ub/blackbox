@@ -11,7 +11,7 @@ import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.index.query.SimpleQueryStringBuilder;
 import org.elasticsearch.search.builder.SearchSourceBuilderException;
 
-public class WabSearchBuilder extends AbstractSearchBuilder<WabSearchBuilder> {
+public class WabSearchBuilder extends SearchBuilder<WabSearchBuilder> {
     private final Logger logger = Logger.getLogger(getClass().getName());
 
     WabSearchBuilder(Client client) {
@@ -23,7 +23,6 @@ public class WabSearchBuilder extends AbstractSearchBuilder<WabSearchBuilder> {
         QueryBuilder query;
         SearchRequestBuilder searchRequest = getClient().prepareSearch();
         try {
-
             //Set indices
             if (isNeitherNullNorEmpty(getIndices())) {
                 searchRequest.setIndices(getIndices());

@@ -38,8 +38,8 @@ public final class LogUtils {
                 //.field("host", request.getRemoteAddr().equals("0:0:0:0:0:0:0:1") ?
                 // InetAddress.getLocalHost() : request.getRemoteAddr())
                 .field("params", jsonify(parameterMapCopy))
-                .field("hits", searchResponse.getHits().getTotalHits())
-                .field("took", searchResponse.getTook())
+                .field("hits", searchResponse == null ? -1 : searchResponse.getHits().getTotalHits())
+                .field("took", searchResponse == null ? -1 : searchResponse.getTook())
                 .endObject();
         return  builder.string();
     }
