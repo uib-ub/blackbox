@@ -2,6 +2,7 @@ package no.uib.marcus.search;
 
 
 import no.uib.marcus.common.util.AggregationUtils;
+import no.uib.marcus.common.util.SignatureUtils;
 import org.apache.log4j.Logger;
 import org.elasticsearch.action.search.SearchRequestBuilder;
 import org.elasticsearch.client.Client;
@@ -11,6 +12,9 @@ import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.index.query.SimpleQueryStringBuilder;
 import org.elasticsearch.search.builder.SearchSourceBuilderException;
 
+/**
+ * A search builder for WAB
+ */
 public class WabSearchBuilder extends SearchBuilder<WabSearchBuilder> {
     private final Logger logger = Logger.getLogger(getClass().getName());
 
@@ -18,6 +22,17 @@ public class WabSearchBuilder extends SearchBuilder<WabSearchBuilder> {
         super(client);
     }
 
+    /**
+     * Appends leading wildcard if query string is WAB signature
+     */
+    @Override
+    public String getQueryString() {
+        return SignatureUtils.appendLeadingWildcardIfWABSignature(super.getQueryString());
+    }
+
+    /**
+     * Builds query for WAB
+     */
     @Override
     public SearchRequestBuilder constructSearchRequest() {
         QueryBuilder query;

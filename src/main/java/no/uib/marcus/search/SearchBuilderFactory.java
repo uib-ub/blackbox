@@ -5,7 +5,7 @@ import org.elasticsearch.client.Client;
 import org.elasticsearch.common.Nullable;
 
 /**
- * Creation factory for search services.
+ * Creation factory for search builders.
  */
 public class SearchBuilderFactory {
     private SearchBuilderFactory() {
@@ -44,7 +44,7 @@ public class SearchBuilderFactory {
 
 
     /**
-     * Gets search builder using default settings
+     * Gets default search builder
      */
     public static SearchBuilder get(Client client) {
         return get(null, client);
@@ -52,7 +52,7 @@ public class SearchBuilderFactory {
 
 
     /**
-     * Decides which search builder to return based on the service parameter
+     * Gets corresponding search builder based on the service parameter
      *
      * @param serviceString a service parameter. If it is null, it will fall to a default service.
      * @param client        a search client to be used
@@ -70,7 +70,7 @@ public class SearchBuilderFactory {
             case MARCUS_ADMIN:
                 return SearchBuilderFactory.marcusSearch(client);
             default:
-                throw new AssertionError("Unknown service for " + service);
+                throw new IllegalParameterException("Unknown service parameter [" + service + "]");
         }
     }
 

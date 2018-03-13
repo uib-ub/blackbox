@@ -13,7 +13,7 @@ import org.elasticsearch.index.query.functionscore.ScoreFunctionBuilders;
 import org.elasticsearch.search.builder.SearchSourceBuilderException;
 
 /**
- * Building a search service for Skeivt archive dataset
+ * Building a search service for Skeivtarkiv
  *
  * @author Hemed Al Ruwehy
  */

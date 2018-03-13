@@ -20,7 +20,7 @@ import java.util.Map;
 
 /**
  * Abstract builder for search services. The idea here is that, all search builders
- * should inherit this class.
+ * should inherit from this class.
  *
  * @author Hemed Ali Al Ruwehy
  * <p>
@@ -204,7 +204,7 @@ public abstract class SearchBuilder<T extends SearchBuilder<T>> implements Searc
     @SuppressWarnings("unchecked")
     public T setClient(@NotNull Client client) {
         if (client == null) {
-            throw new IllegalParameterException("[Unable to initialize service. Client cannot be null]");
+            throw new IllegalParameterException("Unable to initialize service. Client cannot be null");
         }
         this.client = client;
         return (T) this;

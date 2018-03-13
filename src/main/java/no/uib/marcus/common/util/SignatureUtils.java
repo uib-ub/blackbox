@@ -17,7 +17,7 @@ public class SignatureUtils {
     //List of signature prefixes for the University of Bergen Library (UBB)
     private static final String[] UBB_SIGNATURE_PREFIXES = {"ubb", "ubm", "sab"};
 
-    //List of signature prefixes for Wittgensteins Archives (WAB)
+    //List of signature prefixes for Wittgensteins Archives at UiB (WAB)
     private static final String[] WAB_SIGNATURE_PREFIXES = {"ms-", "ts-"};
 
     //Ensure non-instantiability
@@ -31,14 +31,12 @@ public class SignatureUtils {
      * @return the given string with a wildcard appended to the end
      */
     public static String appendLeadingWildcardIfWABSignature(String value) {
-        if (isNeitherNullNorEmpty(value)
-                && Character.isLetter(value.charAt(0))
-                && !Strings.containsWhitespace(value)
-                && value.indexOf(WILDCARD) == -1) {
-
-            //E.g "ms-101" should be transformed to "ms-101*"
-            if (isWABSignature(value)) {
-                return value + WILDCARD;
+        if (isNeitherNullNorEmpty(value)) {
+            value = value.trim();
+            if (!Strings.containsWhitespace(value) && value.indexOf(WILDCARD) == -1) {
+                if (isWABSignature(value)) {
+                    return value + WILDCARD; //"ms-101" should be transformed to "ms-101*"
+                }
             }
         }
         return value;
@@ -52,22 +50,21 @@ public class SignatureUtils {
      * @return the given string with a wildcard appended to the end
      */
     public static String appendWildcardIfUBBSignature(String value) {
-        if (isNeitherNullNorEmpty(value)
-                && Character.isLetter(value.charAt(0))
-                && !Strings.containsWhitespace(value)
-                && !containsReservedChars(value)) {
+        if (isNeitherNullNorEmpty(value)) {
+            value = value.trim();
+            if (Character.isLetter(value.charAt(0))
+                    && !Strings.containsWhitespace(value)
+                    && !containsReservedChars(value)) {
 
-            //E.g "ubb-ms-01" should be transformed to "ubb-ms-01*"
-            // but not ubb+ms
-            if (isUBBSignature(value)) {
-                return value + WILDCARD;
+                //"ubb-ms-01" should be transformed to "ubb-ms-01*" but not ubb+ms
+                if (isUBBSignature(value)) {
+                    return value + WILDCARD;
+                }
+                //"bros-2000" should be transformed to "*bros-2000*" but not "-bros-2000"
+                if (containsChar(value, SPECIAL_SIGNATURE_CHAR)) {
+                    return WILDCARD + value + WILDCARD;
+                }
             }
-            //E.g, "bros-2000" should be transformed to "*bros-2000*"
-            //but not "-bros-2000" (which has different meaning)
-            if (containsChar(value, SPECIAL_SIGNATURE_CHAR)) {
-                return WILDCARD + value + WILDCARD;
-            }
-
         }
         return value;
     }

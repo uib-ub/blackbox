@@ -23,7 +23,7 @@ public class SignatureUtilsTest {
         assertEquals("\"ali\"", appendWildcardIfUBBSignature("\"ali\""));
         assertEquals("0234", appendWildcardIfUBBSignature("0234"));
         assertEquals("l0234l", appendWildcardIfUBBSignature("l0234l"));
-        //assertEquals("ubb-ms*", appendWildcardIfUBBSignature(" ubb-ms"));
+        assertEquals("ubb-ms*", appendWildcardIfUBBSignature(" ubb-ms"));
         assertEquals("*bros-0123-*", appendWildcardIfUBBSignature("bros-0123-"));
         //It is not a single word
         assertEquals("ubb bros-0123", appendWildcardIfUBBSignature("ubb bros-0123"));
@@ -46,7 +46,7 @@ public class SignatureUtilsTest {
         assertFalse(SignatureUtils.isWABSignature(""));
         assertFalse(SignatureUtils.isWABSignature("ubb"));
         assertFalse(SignatureUtils.isWABSignature("ubb-ms-01"));
-   //     assertFalse(SignatureUtils.isWABSignature(" ms-01*")); //with trim
+        assertTrue(SignatureUtils.isWABSignature(" ms-01*")); //with trim
         assertTrue(SignatureUtils.isWABSignature(" ms-01")); //with trim
     }
 
@@ -57,9 +57,12 @@ public class SignatureUtilsTest {
         assertEquals(null, appendLeadingWildcardIfWABSignature(null));
         assertEquals("ubb", appendLeadingWildcardIfWABSignature("ubb"));
         assertEquals("ms-0123-*", appendLeadingWildcardIfWABSignature("ms-0123-"));
-       // assertEquals("ms-101,11*", appendLeadingWildcardIfWABSignature(" ms-101,11"));
+        assertEquals("ms-101,11*", appendLeadingWildcardIfWABSignature(" ms-101,11"));
+        assertEquals("ts-101,11*", appendLeadingWildcardIfWABSignature(" ts-101,11*"));
+        assertEquals("*ts-101", appendLeadingWildcardIfWABSignature("*ts-101"));
         //It is not a single word
         assertEquals("ts bros-0123", appendLeadingWildcardIfWABSignature("ts bros-0123"));
+        assertEquals("-ms", appendWildcardIfUBBSignature("-ms"));
 
 
     }
