@@ -2,40 +2,66 @@ package no.uib.marcus.common.util;
 
 import org.junit.Test;
 
-import static no.uib.marcus.common.util.SignatureUtils.appendWildcardIfValidSignature;
+import static no.uib.marcus.common.util.SignatureUtils.appendLeadingWildcardIfWABSignature;
+import static no.uib.marcus.common.util.SignatureUtils.appendWildcardIfUBBSignature;
 import static org.junit.Assert.*;
 
 public class SignatureUtilsTest {
 
     @Test
-    public void appendWildcard() {
-        assertEquals("", appendWildcardIfValidSignature(""));
-        assertEquals(null, appendWildcardIfValidSignature(null));
-        assertEquals("ubb", appendWildcardIfValidSignature("ubb"));
-        assertEquals("svardal", appendWildcardIfValidSignature("svardal"));
-        assertEquals("ubb-*", appendWildcardIfValidSignature("ubb-"));
-        assertEquals("-kk", appendWildcardIfValidSignature("-kk"));
-        assertEquals("ali", appendWildcardIfValidSignature("ali"));
-        assertEquals("*bros-0123-*", appendWildcardIfValidSignature("bros-0123-"));
-        assertEquals("ali AND juma", appendWildcardIfValidSignature("ali AND juma"));
-        assertEquals("ali -juma", appendWildcardIfValidSignature("ali -juma"));
-        assertEquals("\"ali\"", appendWildcardIfValidSignature("\"ali\""));
-        assertEquals("0234", appendWildcardIfValidSignature("0234"));
-        assertEquals("l0234l", appendWildcardIfValidSignature("l0234l"));
-        assertEquals("ubb-ms*", appendWildcardIfValidSignature("ubb-ms"));
-        assertEquals("*bros-0123-*", appendWildcardIfValidSignature("bros-0123-"));
+    public void appendWildcardForUBBSignature() {
+        assertEquals("", appendWildcardIfUBBSignature(""));
+        assertEquals(null, appendWildcardIfUBBSignature(null));
+        assertEquals("ubb", appendWildcardIfUBBSignature("ubb"));
+        assertEquals("svardal", appendWildcardIfUBBSignature("svardal"));
+        assertEquals("ubb-*", appendWildcardIfUBBSignature("ubb-"));
+        assertEquals("-kk", appendWildcardIfUBBSignature("-kk"));
+        assertEquals("ali", appendWildcardIfUBBSignature("ali"));
+        assertEquals("*bros-0123-*", appendWildcardIfUBBSignature("bros-0123-"));
+        assertEquals("ali AND juma", appendWildcardIfUBBSignature("ali AND juma"));
+        assertEquals("ali -juma", appendWildcardIfUBBSignature("ali -juma"));
+        assertEquals("\"ali\"", appendWildcardIfUBBSignature("\"ali\""));
+        assertEquals("0234", appendWildcardIfUBBSignature("0234"));
+        assertEquals("l0234l", appendWildcardIfUBBSignature("l0234l"));
+        //assertEquals("ubb-ms*", appendWildcardIfUBBSignature(" ubb-ms"));
+        assertEquals("*bros-0123-*", appendWildcardIfUBBSignature("bros-0123-"));
         //It is not a single word
-        assertEquals("ubb bros-0123", appendWildcardIfValidSignature("ubb bros-0123"));
+        assertEquals("ubb bros-0123", appendWildcardIfUBBSignature("ubb bros-0123"));
 
     }
 
     @Test
-    public void isValidSignature() {
-        assertFalse(SignatureUtils.isSignature(null));
-        assertFalse(SignatureUtils.isSignature(""));
-        assertFalse(SignatureUtils.isSignature("ubb"));
-        assertTrue(SignatureUtils.isSignature("ubb-ms-01"));
-        assertTrue(SignatureUtils.isSignature(" ubb-ms-01")); //with trim
+    public void isValidUBBSignature() {
+        assertFalse(SignatureUtils.isUBBSignature(null));
+        assertFalse(SignatureUtils.isUBBSignature(""));
+        assertFalse(SignatureUtils.isUBBSignature("ubb"));
+        assertTrue(SignatureUtils.isUBBSignature("ubb-ms-01"));
+        assertTrue(SignatureUtils.isUBBSignature(" ubb-ms-01")); //with trim
+    }
+
+
+    @Test
+    public void isValidWABSignature() {
+        assertFalse(SignatureUtils.isWABSignature(null));
+        assertFalse(SignatureUtils.isWABSignature(""));
+        assertFalse(SignatureUtils.isWABSignature("ubb"));
+        assertFalse(SignatureUtils.isWABSignature("ubb-ms-01"));
+   //     assertFalse(SignatureUtils.isWABSignature(" ms-01*")); //with trim
+        assertTrue(SignatureUtils.isWABSignature(" ms-01")); //with trim
+    }
+
+
+    @Test
+    public void appendLeadingWildcarForAllWABSignatures() {
+        assertEquals("", appendLeadingWildcardIfWABSignature(""));
+        assertEquals(null, appendLeadingWildcardIfWABSignature(null));
+        assertEquals("ubb", appendLeadingWildcardIfWABSignature("ubb"));
+        assertEquals("ms-0123-*", appendLeadingWildcardIfWABSignature("ms-0123-"));
+       // assertEquals("ms-101,11*", appendLeadingWildcardIfWABSignature(" ms-101,11"));
+        //It is not a single word
+        assertEquals("ts bros-0123", appendLeadingWildcardIfWABSignature("ts bros-0123"));
+
+
     }
 
 

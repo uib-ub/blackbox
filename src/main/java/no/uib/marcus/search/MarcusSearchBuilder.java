@@ -60,7 +60,7 @@ public class MarcusSearchBuilder extends SearchBuilder<MarcusSearchBuilder> {
      */
     @Override
     public String getQueryString() {
-        return SignatureUtils.appendWildcardIfValidSignature(super.getQueryString());
+        return SignatureUtils.appendWildcardIfUBBSignature(super.getQueryString());
     }
 
     /**
