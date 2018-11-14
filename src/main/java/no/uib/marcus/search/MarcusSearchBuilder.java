@@ -175,6 +175,8 @@ public class MarcusSearchBuilder extends SearchBuilder<MarcusSearchBuilder> {
     public static void main(String[] args) throws IOException {
         Client c = ClientFactory.getTransportClient();
         SearchBuilder service = SearchBuilderFactory.marcusSearch(c);
+        service.setTypes("ali", "qli");
+        service.setTypes("juma");
         //service.setAggregations("koba"); //Invalid aggs, it should fail.
         //service.setQueryString("~ana");
         System.out.println(service);

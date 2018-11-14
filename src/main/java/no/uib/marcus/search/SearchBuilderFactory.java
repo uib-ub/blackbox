@@ -2,6 +2,7 @@ package no.uib.marcus.search;
 
 import no.uib.marcus.common.ServiceName;
 import org.elasticsearch.client.Client;
+import org.elasticsearch.common.Names;
 import org.elasticsearch.common.Nullable;
 
 /**
@@ -31,6 +32,13 @@ public class SearchBuilderFactory {
      **/
     public static WabSearchBuilder wabSearch(Client client) {
         return new WabSearchBuilder(client);
+    }
+
+    /**
+     * Create a Skeivtarkiv(SkA) search builder
+     */
+    public static NaturenSearchBuilder naturenSearch(Client client) {
+        return new NaturenSearchBuilder(client);
     }
 
     /**
@@ -69,6 +77,8 @@ public class SearchBuilderFactory {
                 return SearchBuilderFactory.marcusSearch(client);
             case MARCUS_ADMIN:
                 return SearchBuilderFactory.marcusSearch(client);
+            case NATUREN:
+                return SearchBuilderFactory.naturenSearch(client);
             default:
                 throw new IllegalParameterException("Unknown service parameter [" + service + "]");
         }

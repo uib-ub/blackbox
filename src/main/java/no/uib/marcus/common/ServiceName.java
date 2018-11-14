@@ -27,7 +27,12 @@ public enum ServiceName {
     /**
      * Marcus Admin service name
      */
-    MARCUS_ADMIN
+    MARCUS_ADMIN,
+
+    /**
+     * Naturen service name
+     */
+    NATUREN
     ;
 
     /**
