@@ -327,8 +327,8 @@ public abstract class SearchBuilder<T extends SearchBuilder<T>> implements Searc
         try {
             response = constructSearchRequest().execute().actionGet();
             //Show response for debugging purpose
-            logger.info(response.toString());
-            System.out.println(response.toString());
+            //logger.info(response.toString());
+            //System.out.println(response.toString());
         } catch (SearchPhaseExecutionException e) {
             //I've not found a direct way to validate a query string. Therefore, the idea here is to catch any
             //exception that is related to search execution.

@@ -54,7 +54,6 @@ public class MarcusSearchBuilder extends SearchBuilder<MarcusSearchBuilder> {
         super(client);
     }
 
-
     /**
      * Appends wildcard to the query string if it is a valid UBB signature
      */
@@ -175,8 +174,8 @@ public class MarcusSearchBuilder extends SearchBuilder<MarcusSearchBuilder> {
     public static void main(String[] args) throws IOException {
         Client c = ClientFactory.getTransportClient();
         SearchBuilder service = SearchBuilderFactory.marcusSearch(c);
-        service.setTypes("ali", "qli");
         service.setTypes("juma");
+        service.setTypes("ali", "qli");
         //service.setAggregations("koba"); //Invalid aggs, it should fail.
         //service.setQueryString("~ana");
         System.out.println(service);
