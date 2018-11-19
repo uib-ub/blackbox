@@ -34,7 +34,8 @@ public class NaturenSearchBuilder extends MarcusSearchBuilder {
                 query = QueryUtils.buildMarcusQueryString(getQueryString());
             } else {
                 query = QueryBuilders.functionScoreQuery(QueryBuilders.matchAllQuery())
-                        .add(FilterBuilders.rangeFilter(Params.DateField.AVAILABLE).from(LocalDate.now().minusDays(5)), weightFactorFunction(3))
+                        .add(FilterBuilders.rangeFilter(Params.DateField.AVAILABLE)
+                                .from(LocalDate.now().minusWeeks(1)), weightFactorFunction(3))
                         .add(FilterBuilders.existsFilter("hasThumbnail"), weightFactorFunction(2));
 
                 // Restrict search only on type issues
@@ -44,7 +45,6 @@ public class NaturenSearchBuilder extends MarcusSearchBuilder {
                     searchRequest.setTypes(BoostType.ISSUE);
                 }
             }
-
             //Set filtered query, whether with or without filter
             if (getFilter() != null) {
                 //Note: Filtered query is deprecated from ES v2.0
@@ -54,13 +54,12 @@ public class NaturenSearchBuilder extends MarcusSearchBuilder {
             } else {
                 searchRequest.setQuery(query);
             }
-
             //Set highlighting option
             searchRequest.addHighlightedField("textContent")
                     // .setHighlighterNoMatchSize(0) // if no match, return these characters, 0 means return all
-                    // .setHighlighterFragmentSize(500)
+                    // .setHighlighterFragmentSize(500) //default 100
                     // .setHighlighterNumOfFragments(0) //fragments to return. 0 means return everything
-                    .setHighlighterPreTags("<em class='highlight'>")
+                    .setHighlighterPreTags("<em class='txt-highlight'>")
                     .setHighlighterPostTags("</em>");
 
             //Show builder for debugging purpose

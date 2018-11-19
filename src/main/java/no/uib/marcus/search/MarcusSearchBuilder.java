@@ -1,6 +1,7 @@
 package no.uib.marcus.search;
 
 import no.uib.marcus.client.ClientFactory;
+import no.uib.marcus.common.Params;
 import no.uib.marcus.common.util.AggregationUtils;
 import no.uib.marcus.common.util.QueryUtils;
 import no.uib.marcus.common.util.SignatureUtils;
@@ -19,8 +20,10 @@ import org.elasticsearch.search.builder.SearchSourceBuilderException;
 
 import javax.validation.constraints.NotNull;
 import java.io.IOException;
+import java.time.LocalDate;
 import java.util.Optional;
 import java.util.Random;
+import static org.elasticsearch.index.query.functionscore.ScoreFunctionBuilders.weightFactorFunction;
 
 /**
  * Builder for Marcus search service
@@ -92,18 +95,15 @@ public class MarcusSearchBuilder extends SearchBuilder<MarcusSearchBuilder> {
                 //This is just for coolness and it has no effect if the query yields no results
                 String randomQueryString = randomPictures[new Random().nextInt(randomPictures.length)];
                 functionScoreQueryBuilder = QueryBuilders.functionScoreQuery(QueryBuilders.matchAllQuery())
-                        .add(FilterBuilders.queryFilter(
-                                QueryBuilders.simpleQueryStringQuery(randomQueryString)),
-                                ScoreFunctionBuilders.weightFactorFunction(2));
+                        .add(FilterBuilders.queryFilter(QueryBuilders.simpleQueryStringQuery(randomQueryString)),
+                                weightFactorFunction(2));
             }
 
             //Boost documents of type "Fotografi" for every query performed.
             query = functionScoreQueryBuilder
-                    .add(FilterBuilders.termFilter("type", BoostType.FOTOGRAFI),
-                            ScoreFunctionBuilders.weightFactorFunction(3))
-                    .add(FilterBuilders.termFilter("type", BoostType.BILDE),
-                            ScoreFunctionBuilders.weightFactorFunction(3)
-                    );
+                    .add(FilterBuilders.termFilter("type", BoostType.FOTOGRAFI), weightFactorFunction(3))
+                    .add(FilterBuilders.termFilter("type", BoostType.BILDE), weightFactorFunction(3));
+
 
             //Set filtered query, whether with or without filter
             if (getFilter() != null) {
