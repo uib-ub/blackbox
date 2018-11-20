@@ -35,7 +35,7 @@ public class NaturenSearchBuilder extends MarcusSearchBuilder {
             } else {
                 query = QueryBuilders.functionScoreQuery(QueryBuilders.matchAllQuery())
                         .add(FilterBuilders.rangeFilter(Params.DateField.AVAILABLE)
-                                .from(LocalDate.now().minusWeeks(1)), weightFactorFunction(3))
+                                .from(LocalDate.now().minusDays(1)), weightFactorFunction(3))
                         .add(FilterBuilders.existsFilter("hasThumbnail"), weightFactorFunction(2));
 
                 // Restrict search only on type issues
@@ -64,7 +64,7 @@ public class NaturenSearchBuilder extends MarcusSearchBuilder {
 
             //Show builder for debugging purpose
             //logger.info(searchRequest.toString());
-            System.out.println(searchRequest.toString());
+            //System.out.println(searchRequest.toString());
         } catch (SearchSourceBuilderException e) {
             logger.error("Exception occurred when building search request: " + e.getMostSpecificCause());
         }
