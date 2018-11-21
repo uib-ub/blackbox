@@ -35,7 +35,7 @@ public class NaturenSearchBuilder extends MarcusSearchBuilder {
             } else {
                 query = QueryBuilders.functionScoreQuery(QueryBuilders.matchAllQuery())
                         .add(FilterBuilders.rangeFilter(Params.DateField.AVAILABLE)
-                                .from(LocalDate.now().minusDays(1)), weightFactorFunction(3))
+                                .from(LocalDate.now().minusDays(1)), weightFactorFunction(2))
                         .add(FilterBuilders.existsFilter("hasThumbnail"), weightFactorFunction(2));
 
                 // Restrict search only on type issues
