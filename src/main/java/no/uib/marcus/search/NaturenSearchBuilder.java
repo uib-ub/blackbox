@@ -15,6 +15,10 @@ import java.time.LocalDate;
 
 import static org.elasticsearch.index.query.functionscore.ScoreFunctionBuilders.weightFactorFunction;
 
+/***
+ * A search builder for naturen
+ * @author Hemed Al Ruwehy
+ */
 public class NaturenSearchBuilder extends MarcusSearchBuilder {
 
     private final Logger logger = Logger.getLogger(getClass().getName());
