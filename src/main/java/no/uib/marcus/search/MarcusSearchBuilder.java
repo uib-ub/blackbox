@@ -139,6 +139,7 @@ public class MarcusSearchBuilder extends SearchBuilder<MarcusSearchBuilder> {
 
             //Show builder for debugging purpose
             //logger.info(searchRequest.toString());
+            System.out.println(searchRequest.toString());
         } catch (SearchSourceBuilderException e) {
             logger.error("Exception occurred when building search request: " + e.getMostSpecificCause());
         }
@@ -173,12 +174,17 @@ public class MarcusSearchBuilder extends SearchBuilder<MarcusSearchBuilder> {
     //Main method for easy debugging
     public static void main(String[] args) throws IOException {
         Client c = ClientFactory.getTransportClient();
+        String [] selectedFilters = { "hasGenreForm.exact#Bok" };
+        String aggs = "[{\"field\":\"type.exact\",\"size\":10,\"operator\":\"OR\",\"order\":\"count_desc\",\"min_doc_count\":1},{\"label\":\"genreform\",\"field\":\"hasGenreForm.exact\",\"size\":10,\"operator\":\"OR\",\"order\":\"count_desc\",\"min_doc_count\":1},{\"field\":\"hasZoom\",\"size\":2,\"operator\":\"AND\",\"order\":\"term_asc\",\"min_doc_count\":0},{\"field\":\"isDigitized\",\"size\":2,\"operator\":\"AND\",\"order\":\"count_desc\",\"min_doc_count\":0},{\"field\":\"subject.exact\",\"size\":10,\"operator\":\"AND\",\"min_doc_count\":1},{\"field\":\"isPartOf.exact\",\"size\":10,\"operator\":\"OR\",\"order\":\"count_desc\",\"min_doc_count\":1},{\"field\":\"producedIn.exact\",\"size\":10,\"operator\":\"AND\",\"order\":\"count_desc\",\"min_doc_count\":1},{\"field\":\"maker.exact\",\"size\":10,\"operator\":\"AND\",\"order\":\"count_desc\",\"min_doc_count\":1}]";
         SearchBuilder service = SearchBuilderFactory.marcusSearch(c);
-        service.setTypes("juma");
-        service.setTypes("ali", "qli");
+        service.setIndices("marcus-admin");
+        service.setTypes("document");
+        service.setSize(2);
+        service.setSelectedFacets(AggregationUtils.buildFilterMap(selectedFilters));
+        service.setAggregations(aggs);
         //service.setAggregations("koba"); //Invalid aggs, it should fail.
         //service.setQueryString("~ana");
-        System.out.println(service);
+        //System.out.println(service);
         System.out.println(QueryUtils.toJsonString(service.executeSearch(), true));
     }
 }

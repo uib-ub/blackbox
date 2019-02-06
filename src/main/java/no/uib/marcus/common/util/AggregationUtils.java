@@ -11,6 +11,7 @@ import org.elasticsearch.action.search.SearchRequestBuilder;
 import org.elasticsearch.common.Nullable;
 import org.elasticsearch.common.Strings;
 import org.elasticsearch.index.query.BoolFilterBuilder;
+import org.elasticsearch.index.query.FilterBuilders;
 import org.elasticsearch.search.aggregations.AggregationBuilder;
 import org.elasticsearch.search.aggregations.AggregationBuilders;
 import org.elasticsearch.search.aggregations.bucket.histogram.DateHistogram;
@@ -26,11 +27,12 @@ import java.util.*;
  * Utility class for constructing aggregations.
  *
  * @author Hemed Ali Al Ruwehy
- *         University of Bergen
+ * University of Bergen
  */
 public final class AggregationUtils {
     private static final Logger logger = Logger.getLogger(AggregationUtils.class);
     private static final char AGGS_KEY_VALUE_SEPARATOR = '#';
+    private static final String AGGS_FILTER_KEY = "aggs_filter";
 
     //Enforce non-instatiability
     private AggregationUtils() {
@@ -108,7 +110,7 @@ public final class AggregationUtils {
                     //Get the index for the last occurrence of a separator
                     int lastIndex = entry.lastIndexOf(AGGS_KEY_VALUE_SEPARATOR);
                     String key = entry.substring(0, lastIndex).trim();
-                    String value = entry.substring(lastIndex + 1, entry.length()).trim();
+                    String value = entry.substring(lastIndex + 1).trim();
                     if (!filters.containsKey(key)) {
                         List<String> valuesList = new ArrayList<>();
                         valuesList.add(value);
@@ -152,43 +154,29 @@ public final class AggregationUtils {
 
         JsonElement jsonElement = new JsonParser().parse(aggregations);
         for (JsonElement facets : jsonElement.getAsJsonArray()) {
-            JsonObject currentFacet = facets.getAsJsonObject();
-            if (currentFacet.has("field")) {
+            JsonObject facet = facets.getAsJsonObject();
+            if (facet.has("field")) {
                 //Add DateHistogram aggregations
-                if (currentFacet.has("type") && currentFacet.get("type").getAsString().equals("date_histogram")) {
-                    searchRequest.addAggregation(
-                            AggregationUtils.getDateHistogramAggregation(currentFacet));
+                if (facet.has("type") && facet.get("type").getAsString().equals("date_histogram")) {
+                    searchRequest.addAggregation(AggregationUtils.getDateHistogramAggregation(facet));
                 } else {
-                    AggregationBuilder termsAggs = AggregationUtils.getTermsAggregation(currentFacet);
-
-                    if (selectedFacets != null && !selectedFacets.isEmpty()) {
+                    AggregationBuilder termsAggs = getTermsAggregation(facet);
+                    if (selectedFacets != null && selectedFacets.size() > 0) {
                         //Get current field
-                        String facetField = currentFacet.get("field").getAsString();
-
+                        String facetField = facet.get("field").getAsString();
                         // Logic: Whenever a user selects value from an "OR" aggregations,
-                        // you add a corresponding filter to all aggregations as sub aggregations (here aggs_filter)
-                        // EXCEPT for the aggregation in which the selection was done in.
+                        // you add a corresponding filter (here aggs_filter) to all aggregations as sub aggregations
+                        // EXCEPT for the aggregation in which the selection was performed in.
                         if (selectedFacets.containsKey(facetField)) {
                             //Make a copy of the map.
                             Map<String, List<String>> selectedFacetCopy = new HashMap<>(selectedFacets);
                             //Remove the facet that aggregation was performed in from the map
                             selectedFacetCopy.remove(facetField);
                             //Build bool_filter for the copy of the selected facets.
-                            //Since we did not pass aggregations as argument in buildBolFilter() method,
-                            //we are sure it is an POST_FILTER (terms bool_filter)
-                            BoolFilterBuilder boolFilterCopy = FilterUtils.buildBoolFilter(selectedFacetCopy).get(Params.POST_FILTER);
-                            if (boolFilterCopy.hasClauses()) {
-                                termsAggs.subAggregation(
-                                        AggregationBuilders.filter("aggs_filter").filter(boolFilterCopy));
-                            }
+                            //We build sub aggregation filter only for "OR" facets
+                            termsAggs = addSubAggregationFilter(aggregations, facet, termsAggs, selectedFacetCopy);
                         } else {
-                            //Build a top level filter
-                            BoolFilterBuilder boolFilter = FilterUtils.buildBoolFilter(selectedFacets).get(Params.POST_FILTER);
-                            if (boolFilter.hasClauses()) {
-                                termsAggs.subAggregation(
-                                        AggregationBuilders.filter("aggs_filter").filter(boolFilter)
-                                );
-                            }
+                            termsAggs = addSubAggregationFilter(aggregations, facet, termsAggs, selectedFacets);
                         }
                     }
                     searchRequest.addAggregation(termsAggs);
@@ -197,6 +185,19 @@ public final class AggregationUtils {
             }
         }
         return searchRequest;
+    }
+
+    /**
+     * Adds sub aggregation filter with the name "aggs_filter". Sub aggregations filter is added only to "OR" facets
+     */
+    private static AggregationBuilder addSubAggregationFilter(String aggs, JsonObject currentFacet,
+                                                              AggregationBuilder termsAggs, Map<String, List<String>> selectedFacets) {
+        BoolFilterBuilder aggsFilter = FilterUtils.buildBoolFilter(selectedFacets, aggs).get(Params.POST_FILTER);
+        if (aggsFilter.hasClauses()) {
+            termsAggs = getTermsAggregation(currentFacet, true);
+            termsAggs.subAggregation(AggregationBuilders.filter(AGGS_FILTER_KEY).filter(aggsFilter));
+        }
+        return termsAggs;
     }
 
 
@@ -240,16 +241,14 @@ public final class AggregationUtils {
     }
 
     /**
-     * A method to build terms aggregations
+     * A method to build terms aggregations and sort options
      *
      * @param facet a JSON object
      * @return a term builder
      */
-    public static TermsBuilder getTermsAggregation(JsonObject facet) {
+    public static TermsBuilder getTermsAggregation(JsonObject facet, boolean sortBySubAggregation) {
         String field = facet.get("field").getAsString();
-        TermsBuilder termsBuilder = AggregationBuilders
-                .terms(field)
-                .field(field);
+        TermsBuilder termsBuilder = AggregationBuilders.terms(field).field(field);
         //Set size
         if (facet.has("size")) {
             int size = facet.get("size").getAsInt();
@@ -257,15 +256,23 @@ public final class AggregationUtils {
         }
         //Set order
         if (facet.has("order")) {
-            Terms.Order order = Terms.Order.count(false);//default to count descending
+            Terms.Order order = Terms.Order.count(false);//default order (count descending)
+            Terms.Order aggsFilterOrder = Terms.Order.aggregation(AGGS_FILTER_KEY, false);
             if (facet.get("order").getAsString().equalsIgnoreCase("count_asc")) {
                 order = Terms.Order.count(true);
+                aggsFilterOrder = Terms.Order.aggregation(AGGS_FILTER_KEY, true);
             } else if (facet.get("order").getAsString().equalsIgnoreCase("term_asc")) {
                 order = Terms.Order.term(true);
+                aggsFilterOrder = order; // for term_asc, we only sort as normal
             } else if (facet.get("order").getAsString().equalsIgnoreCase("term_desc")) {
                 order = Terms.Order.term(false);
+                aggsFilterOrder = order;
             }
-            termsBuilder.order(order);
+            if (sortBySubAggregation) {//Sort using sub aggregation
+                termsBuilder.order(aggsFilterOrder);
+            } else { //sort normally using top aggregation
+                termsBuilder.order(order);
+            }
         }
         //Set number of minimum documents that should be returned
         if (facet.has("min_doc_count")) {
@@ -273,6 +280,16 @@ public final class AggregationUtils {
             termsBuilder.minDocCount(minDocCount);
         }
         return termsBuilder;
+    }
+
+    /**
+     * A method to build terms aggregations and sort options on the parent aggregations
+     *
+     * @param facet a JSON object
+     * @return a term builder
+     */
+    public static TermsBuilder getTermsAggregation(JsonObject facet) {
+        return getTermsAggregation(facet, false);
     }
 
 }

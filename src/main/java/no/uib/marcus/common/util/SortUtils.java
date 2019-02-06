@@ -21,7 +21,8 @@ public final class SortUtils {
     private static final String SORT_ORDER = "sort_order";
 
     //Enforce non-instantiability
-    private SortUtils() {}
+    private SortUtils() {
+    }
 
 
     /**
@@ -57,7 +58,7 @@ public final class SortUtils {
                         + "but found: " + sortString);
             }
             String field = sortString.substring(0, lastIndex).trim();
-            String order = sortString.substring(lastIndex + 1, sortString.length()).trim();
+            String order = sortString.substring(lastIndex + 1).trim();
             //Insert values to the map
             fieldSortMap.put(SORT_FIELD, field);
             fieldSortMap.put(SORT_ORDER, order);
@@ -87,9 +88,7 @@ public final class SortUtils {
                 sortOrder = SortOrder.DESC;
             }
             //Build sort
-            sortBuilder = SortBuilders
-                    .fieldSort(field)
-                    .missing("_last");
+            sortBuilder = SortBuilders.fieldSort(field).missing("_last");
 
             if (sortBuilder != null) {
                 sortBuilder.order(sortOrder);

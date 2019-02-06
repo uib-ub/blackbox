@@ -333,6 +333,7 @@ public abstract class SearchBuilder<T extends SearchBuilder<T>> implements Searc
             //I've not found a direct way to validate a query string. Therefore, the idea here is to catch any
             //exception that is related to search execution.
             //logger.error("Could not execute search: " + e.getDetailedMessage());
+            throw e;
         }
         return response;
     }
