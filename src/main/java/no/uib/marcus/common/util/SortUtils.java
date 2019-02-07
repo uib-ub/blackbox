@@ -3,12 +3,14 @@ package no.uib.marcus.common.util;
 import no.uib.marcus.search.IllegalParameterException;
 import org.apache.log4j.Logger;
 import org.elasticsearch.ElasticsearchException;
+import org.elasticsearch.common.Strings;
 import org.elasticsearch.search.sort.SortBuilder;
 import org.elasticsearch.search.sort.SortBuilders;
 import org.elasticsearch.search.sort.SortOrder;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 /**
  * @author Hemed Ali
@@ -26,17 +28,20 @@ public final class SortUtils {
 
 
     /**
-     * A wrapper method for building sort
+     * A wrapper method for building score or field sort options
      *
-     * @param sortString
-     * @return either a score sort or field sort
+     * @param sortString a sort string
+     * @return either a score sort, field sort or null if the sort string is empty
      */
     public static SortBuilder getSort(String sortString) {
-        if (sortString.equals("_score")) {
-            return getScoreSort();
-        } else {
-            return getFieldSort(sortString);
+        if(Strings.hasText(sortString)) {
+            if (sortString.equals("_score")) {
+                return getScoreSort();
+            } else {
+                return getFieldSort(sortString);
+            }
         }
+        return null;
     }
 
     /**

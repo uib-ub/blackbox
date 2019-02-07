@@ -115,9 +115,7 @@ public class DateRange implements Range<LocalDate> {
      */
     public boolean isPositive() {
         if (Objects.nonNull(fromDate) && Objects.nonNull(toDate)) {
-            if (fromDate.isBefore(toDate) || fromDate.isEqual(toDate)) {
-                return true;
-            }
+            return fromDate.isBefore(toDate) || fromDate.isEqual(toDate);
         }
         return false;
     }
@@ -128,9 +126,7 @@ public class DateRange implements Range<LocalDate> {
      */
     public boolean isNegative() {
         if (Objects.nonNull(fromDate) && Objects.nonNull(toDate)) {
-            if (fromDate.isAfter(toDate)) {
-                return true;
-            }
+            return fromDate.isAfter(toDate);
         }
         return false;
     }
@@ -143,8 +139,8 @@ public class DateRange implements Range<LocalDate> {
 
         DateRange dateRange = (DateRange) o;
 
-        if (fromDate != null ? !fromDate.equals(dateRange.fromDate) : dateRange.fromDate != null) return false;
-        return toDate != null ? toDate.equals(dateRange.toDate) : dateRange.toDate == null;
+        if (!Objects.equals(fromDate, dateRange.fromDate)) return false;
+        return Objects.equals(toDate, dateRange.toDate);
     }
 
     @Override

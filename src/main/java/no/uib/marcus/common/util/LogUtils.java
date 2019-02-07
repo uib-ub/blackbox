@@ -37,6 +37,7 @@ public final class LogUtils {
                 .startObject()
                 //.field("host", request.getRemoteAddr().equals("0:0:0:0:0:0:0:1") ?
                 // InetAddress.getLocalHost() : request.getRemoteAddr())
+                .field("status", searchResponse == null? 404 : searchResponse.status().getStatus())
                 .field("params", jsonify(parameterMapCopy))
                 .field("hits", searchResponse == null ? -1 : searchResponse.getHits().getTotalHits())
                 .field("took", searchResponse == null ? -1 : searchResponse.getTook())

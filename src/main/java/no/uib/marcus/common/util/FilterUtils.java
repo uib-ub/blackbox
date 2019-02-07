@@ -24,13 +24,111 @@ import java.util.Objects;
 
 public final class FilterUtils {
     private static final Logger logger = Logger.getLogger(FilterUtils.class);
+    private static final String TOP_FILTER = "top_filter";
+    private static final String POST_FILTER = "post_filter";
 
     //Prevent this class from being initialized
     private FilterUtils() {
     }
 
     /**
-     * Append date range filter to a bool_filter based on the University Library's logic for a date range.
+     * A wrapper for building filter without dates
+     ***/
+    public static Map<String, BoolFilterBuilder> buildBoolFilter(@NotNull Map<String, List<String>> filterMap, String aggs) {
+        return buildBoolFilter(filterMap, aggs, null);
+    }
+
+    /**
+     * A wrapper method for building BoolFilter based on the aggregation settings.
+     */
+    public static Map<String, BoolFilterBuilder> buildBoolFilter(HttpServletRequest request) {
+        //Get corresponding request parameters
+        String fromDate = request.getParameter(Params.FROM_DATE);
+        String toDate = request.getParameter(Params.TO_DATE);
+        String[] selectedFilters = request.getParameterValues(Params.SELECTED_FILTERS);
+        String aggregations = request.getParameter(Params.AGGREGATIONS);
+
+
+        Map<String, List<String>> selectedFacets = AggregationUtils.buildFilterMap(selectedFilters);
+
+        return buildBoolFilter(selectedFacets, aggregations, new DateRange(fromDate, toDate));
+    }
+
+
+    /**
+     * Gets top filter from the given filter map or empty filter if it does not exist
+     */
+    public static BoolFilterBuilder getTopFilter(@NotNull Map<String, List<String>> selectedFacets, String aggs, DateRange dateRange) {
+        Map<String, BoolFilterBuilder> filter = FilterUtils.buildBoolFilter(selectedFacets, aggs, dateRange);
+        return filter.getOrDefault(TOP_FILTER, FilterBuilders.boolFilter());
+    }
+
+    /**
+     * Gets post filter from the given filter map or empty filter if it does not exist
+     */
+    public static BoolFilterBuilder getPostFilter(@NotNull Map<String, List<String>> selectedFacets, String aggs) {
+        Map<String, BoolFilterBuilder> filter = FilterUtils.buildBoolFilter(selectedFacets, aggs);
+        return filter.getOrDefault(POST_FILTER, FilterBuilders.boolFilter());
+    }
+
+    /**
+     * A method for building BoolFilter based on the aggregation settings.
+     *
+     * @param filterMap a map of selected facets with keys as fields and values as terms.
+     * @param aggregations      aggregations
+     * @param dateRange a date range to be applied to a range filter
+     * @return a map which contains AND and OR bool filters based on the aggregations, with the keys
+     * "top_filter" and "post_filter" respectively
+     */
+    private static Map<String, BoolFilterBuilder> buildBoolFilter(
+            @NotNull Map<String, List<String>> filterMap,
+            @Nullable String aggregations,
+            DateRange dateRange
+    ) {
+        Map<String, BoolFilterBuilder> boolFilterMap = new HashMap<>();
+        BoolFilterBuilder topFilter = FilterBuilders.boolFilter();
+        BoolFilterBuilder postFilter = FilterBuilders.boolFilter();
+
+        try {
+            //Building a filter based on the user selected facets. Starting with AND filter
+            for (Map.Entry<String, List<String>> entry : filterMap.entrySet()) {
+                if (entry.getValue() != null && entry.getValue().size() > 0) {
+                    if (hasOROperator(aggregations, entry.getKey())) {
+                        //Building "OR" filter that will be used as post_filter.
+                        //post_filter only affects search results but NOT aggregations.
+                        postFilter.must(FilterBuilders.termsFilter(entry.getKey(), entry.getValue()));
+                    } else if (entry.getKey().startsWith(BlackboxUtils.MINUS)) {
+                        //Exclude any filter that begins with minus sign
+                        topFilter.mustNot(FilterBuilders.termsFilter(entry.getKey().substring(1), entry.getValue()));
+                    } else { //default is "AND" filter that will be used as top_filter
+                        for (Object value : entry.getValue()) {
+                            if (entry.getKey().startsWith(BlackboxUtils.MINUS)) {
+                                //Exclude any filter that begins with minus sign
+                                topFilter.mustNot(FilterBuilders.termFilter(entry.getKey().substring(1), value));
+                            } else {//Building "AND" filter
+                                topFilter.must(FilterBuilders.termFilter(entry.getKey(), value));
+                            }
+                        }
+                    }
+                }
+            }
+        } catch (Exception ex) {
+            logger.error("Exception occurred when constructing bool_filter [ " + ex + " ]");
+            throw ex;
+        }
+
+        if (Objects.nonNull(dateRange)) { //append date range filter on top_filter
+            addDateRangeFilter(topFilter, dateRange);
+        }
+        boolFilterMap.put(TOP_FILTER, topFilter);
+        boolFilterMap.put(POST_FILTER, postFilter);
+
+        return boolFilterMap;
+    }
+
+
+    /**
+     * Appends date range filter to a bool_filter based on the University Library's logic for a date range.
      * <p>
      * Logic: Given a date range, fromDate to toDate, find any resource in which this range or it's subset
      * lies within it.
@@ -54,7 +152,7 @@ public final class FilterUtils {
      * @return a bool_filter with date ranges appended
      */
 
-    public static BoolFilterBuilder appendDateRangeFilter(BoolFilterBuilder boolFilter, DateRange dateRange) {
+    public static BoolFilterBuilder addDateRangeFilter(BoolFilterBuilder boolFilter, DateRange dateRange) {
         if (boolFilter == null) {
             throw new NullPointerException("Cannot append date ranges to a null bool_filter");
         }
@@ -121,82 +219,10 @@ public final class FilterUtils {
         return boolFilter;
     }
 
-
     /**
-     * A wrapper for building filter without dates
-     ***/
-    public static Map<String, BoolFilterBuilder> buildBoolFilter(@NotNull Map<String, List<String>> filterMap, String aggs) {
-        return buildBoolFilter(filterMap, aggs, null);
-    }
-
-    /**
-     * A wrapper method for building BoolFilter based on the aggregation settings.
+     * Checks if an aggregation key has OR operator
      */
-    public static Map<String, BoolFilterBuilder> buildBoolFilter(HttpServletRequest request) {
-        //Get corresponding request parameters
-        String fromDate = request.getParameter(Params.FROM_DATE);
-        String toDate = request.getParameter(Params.TO_DATE);
-        String[] selectedFilters = request.getParameterValues(Params.SELECTED_FILTERS);
-        String aggregations = request.getParameter(Params.AGGREGATIONS);
-
-        //Build a filter map based on selected facets. In the result map
-        //keys are "fields" and values are "terms"
-        //e.g {"subject.exact" = ["Flyfoto" , "Birkeland"], "type" = ["Brev"]}
-        Map<String, List<String>> selectedFacets = AggregationUtils.buildFilterMap(selectedFilters);
-
-        return buildBoolFilter(selectedFacets, aggregations, new DateRange(fromDate, toDate));
-    }
-
-
-    /**
-     * A method for building BoolFilter based on the aggregation settings.
-     *
-     * @param filterMap a map of selected facets with keys as fields and values as terms.
-     * @param aggs      aggregations
-     * @param dateRange a date range to be applied to a range filter
-     * @return a map which contains AND and OR bool filters based on the aggregations
-     */
-    public static Map<String, BoolFilterBuilder> buildBoolFilter(@NotNull Map<String, List<String>> filterMap,
-                                                                 @Nullable String aggs,
-                                                                 DateRange dateRange) {
-        Map<String, BoolFilterBuilder> boolFilterMap = new HashMap<>();
-        BoolFilterBuilder topFilter = FilterBuilders.boolFilter();
-        BoolFilterBuilder postFilter = FilterBuilders.boolFilter();
-
-        try {
-            //Building a filter based on the user selected facets. Starting with AND filter
-            for (Map.Entry<String, List<String>> entry : filterMap.entrySet()) {
-                if (entry.getValue() != null && entry.getValue().size() > 0) {
-                    if (AggregationUtils.contains(aggs, entry.getKey(), "operator", "OR")) {
-                        //Building "OR" filter that will be used as post_filter.
-                        //post_filter only affects search results but NOT aggregations.
-                        postFilter.must(FilterBuilders.termsFilter(entry.getKey(), entry.getValue()));
-                    } else if (entry.getKey().startsWith(BlackboxUtils.MINUS)) {
-                        //Exclude any filter that begins with minus sign
-                        topFilter.mustNot(FilterBuilders.termsFilter(entry.getKey().substring(1), entry.getValue()));
-                    } else { //default is "AND" filter that will be used as top_filter
-                        for (Object value : entry.getValue()) {
-                            if (entry.getKey().startsWith(BlackboxUtils.MINUS)) {
-                                //Exclude any filter that begins with minus sign
-                                topFilter.mustNot(FilterBuilders.termFilter(entry.getKey().substring(1), value));
-                            } else {//Building "AND" filter
-                                topFilter.must(FilterBuilders.termFilter(entry.getKey(), value));
-                            }
-                        }
-                    }
-                }
-            }
-        } catch (Exception ex) {
-            logger.error("Exception occurred when constructing bool_filter [ " + ex + " ]");
-            throw ex;
-        }
-
-        if (dateRange != null) { //append date range filter on top_filter
-            appendDateRangeFilter(topFilter, dateRange);
-        }
-        boolFilterMap.put(Params.TOP_FILTER, topFilter);
-        boolFilterMap.put(Params.POST_FILTER, postFilter);
-
-        return boolFilterMap;
+    private static boolean hasOROperator(String aggregations, String key) {
+        return AggregationUtils.contains(aggregations, key, "operator", "OR");
     }
 }

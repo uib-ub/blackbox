@@ -1,7 +1,5 @@
 package no.uib.marcus.search;
 
-import no.uib.marcus.client.ClientFactory;
-import no.uib.marcus.common.Params;
 import no.uib.marcus.common.util.AggregationUtils;
 import no.uib.marcus.common.util.QueryUtils;
 import no.uib.marcus.common.util.SignatureUtils;
@@ -15,14 +13,12 @@ import org.elasticsearch.index.query.FilterBuilders;
 import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.index.query.functionscore.FunctionScoreQueryBuilder;
-import org.elasticsearch.index.query.functionscore.ScoreFunctionBuilders;
 import org.elasticsearch.search.builder.SearchSourceBuilderException;
 
 import javax.validation.constraints.NotNull;
-import java.io.IOException;
-import java.time.LocalDate;
 import java.util.Optional;
 import java.util.Random;
+
 import static org.elasticsearch.index.query.functionscore.ScoreFunctionBuilders.weightFactorFunction;
 
 /**
@@ -85,6 +81,10 @@ public class MarcusSearchBuilder extends SearchBuilder<MarcusSearchBuilder> {
                 searchRequest.setTypes(getTypes());
             }
 
+            //Set from and size
+            searchRequest.setFrom(getFrom());
+            searchRequest.setSize(getSize());
+
             //Set query
             if (Strings.hasText(getQueryString())) {
                 //Use query_string query with AND operator
@@ -98,14 +98,12 @@ public class MarcusSearchBuilder extends SearchBuilder<MarcusSearchBuilder> {
                         .add(FilterBuilders.queryFilter(QueryBuilders.simpleQueryStringQuery(randomQueryString)),
                                 weightFactorFunction(2));
             }
-
             //Boost documents of type "Fotografi" for every query performed.
             query = functionScoreQueryBuilder
                     .add(FilterBuilders.termFilter("type", BoostType.FOTOGRAFI), weightFactorFunction(3))
                     .add(FilterBuilders.termFilter("type", BoostType.BILDE), weightFactorFunction(3));
 
-
-            //Set filtered query, whether with or without filter
+            //Set filtered query with top_filter
             if (getFilter() != null) {
                 //Note: Filtered query is deprecated from ES v2.0
                 //in favour of a new filter clause on the bool query
@@ -114,32 +112,26 @@ public class MarcusSearchBuilder extends SearchBuilder<MarcusSearchBuilder> {
             } else {
                 searchRequest.setQuery(query);
             }
-
-            //Set post filter
+            //Set post filter if available
             if (getPostFilter() != null) {
                 searchRequest.setPostFilter(getPostFilter());
             }
-
-            //Set sortBuilder
-            if (getSortBuilder() != null) {
-                searchRequest.addSort(getSortBuilder());
-            }
-
+            //Set index to boost
             if (getIndexToBoost() != null) {
                 searchRequest.addIndexBoost(getIndexToBoost(), 4.0f);
             }
-
+            //Set options
+            if (getSortBuilder() != null) {
+                searchRequest.addSort(getSortBuilder());
+            }
             //Append aggregations to the request builder
             if (Strings.hasText(getAggregations())) {
                 AggregationUtils.addAggregations(searchRequest, getAggregations(), getSelectedFacets());
             }
-            //Set from and size
-            searchRequest.setFrom(getFrom());
-            searchRequest.setSize(getSize());
 
             //Show builder for debugging purpose
             //logger.info(searchRequest.toString());
-            System.out.println(searchRequest.toString());
+            //System.out.println(searchRequest.toString());
         } catch (SearchSourceBuilderException e) {
             logger.error("Exception occurred when building search request: " + e.getMostSpecificCause());
         }
@@ -169,23 +161,6 @@ public class MarcusSearchBuilder extends SearchBuilder<MarcusSearchBuilder> {
     static class BoostType {
         final static String FOTOGRAFI = "fotografi";
         final static String BILDE = "bilde";
-    }
-
-    //Main method for easy debugging
-    public static void main(String[] args) throws IOException {
-        Client c = ClientFactory.getTransportClient();
-        String [] selectedFilters = { "hasGenreForm.exact#Bok" };
-        String aggs = "[{\"field\":\"type.exact\",\"size\":10,\"operator\":\"OR\",\"order\":\"count_desc\",\"min_doc_count\":1},{\"label\":\"genreform\",\"field\":\"hasGenreForm.exact\",\"size\":10,\"operator\":\"OR\",\"order\":\"count_desc\",\"min_doc_count\":1},{\"field\":\"hasZoom\",\"size\":2,\"operator\":\"AND\",\"order\":\"term_asc\",\"min_doc_count\":0},{\"field\":\"isDigitized\",\"size\":2,\"operator\":\"AND\",\"order\":\"count_desc\",\"min_doc_count\":0},{\"field\":\"subject.exact\",\"size\":10,\"operator\":\"AND\",\"min_doc_count\":1},{\"field\":\"isPartOf.exact\",\"size\":10,\"operator\":\"OR\",\"order\":\"count_desc\",\"min_doc_count\":1},{\"field\":\"producedIn.exact\",\"size\":10,\"operator\":\"AND\",\"order\":\"count_desc\",\"min_doc_count\":1},{\"field\":\"maker.exact\",\"size\":10,\"operator\":\"AND\",\"order\":\"count_desc\",\"min_doc_count\":1}]";
-        SearchBuilder service = SearchBuilderFactory.marcusSearch(c);
-        service.setIndices("marcus-admin");
-        service.setTypes("document");
-        service.setSize(2);
-        service.setSelectedFacets(AggregationUtils.buildFilterMap(selectedFilters));
-        service.setAggregations(aggs);
-        //service.setAggregations("koba"); //Invalid aggs, it should fail.
-        //service.setQueryString("~ana");
-        //System.out.println(service);
-        System.out.println(QueryUtils.toJsonString(service.executeSearch(), true));
     }
 }
 

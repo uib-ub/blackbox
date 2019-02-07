@@ -3,8 +3,6 @@ package no.uib.marcus.common.util;
 import com.carrotsearch.randomizedtesting.RandomizedTest;
 import com.carrotsearch.randomizedtesting.annotations.Repeat;
 import com.carrotsearch.randomizedtesting.annotations.Seed;
-import no.uib.marcus.common.util.AggregationUtils;
-import no.uib.marcus.common.util.FilterUtils;
 import no.uib.marcus.range.DateRange;
 import org.apache.log4j.Logger;
 import org.elasticsearch.index.query.BoolFilterBuilder;
@@ -107,9 +105,9 @@ public class AggregationUtilsTest extends RandomizedTest {
         public void testBoolFilterOnDates(){
             BoolFilterBuilder boolFilter = FilterBuilders.boolFilter();
             //Filter will not contain any clause because dates are empty
-            assertFalse(FilterUtils.appendDateRangeFilter(boolFilter, new DateRange("","")).hasClauses());
+            assertFalse(FilterUtils.addDateRangeFilter(boolFilter, new DateRange("","")).hasClauses());
             //Filter shall contain must or should clauses
-            assertTrue(FilterUtils.appendDateRangeFilter(boolFilter, new DateRange("1999", "2000")).hasClauses());
+            assertTrue(FilterUtils.addDateRangeFilter(boolFilter, new DateRange("1999", "2000")).hasClauses());
         }
 
 

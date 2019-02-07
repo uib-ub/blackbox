@@ -51,9 +51,6 @@ public class NaturenSearchBuilder extends MarcusSearchBuilder {
             }
             //Set filtered query, whether with or without filter
             if (getFilter() != null) {
-                //Note: Filtered query is deprecated from ES v2.0
-                //in favour of a new filter clause on the bool query
-                //Read https://www.elastic.co/blog/better-query-execution-coming-elasticsearch-2-0
                 searchRequest.setQuery(QueryBuilders.filteredQuery(query, getFilter()));
             } else {
                 searchRequest.setQuery(query);

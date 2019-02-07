@@ -4,7 +4,6 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
 import com.google.gson.JsonParser;
-import no.uib.marcus.common.Params;
 import no.uib.marcus.search.IllegalParameterException;
 import org.apache.log4j.Logger;
 import org.elasticsearch.action.search.SearchRequestBuilder;
@@ -21,7 +20,10 @@ import org.elasticsearch.search.aggregations.bucket.terms.Terms;
 import org.elasticsearch.search.aggregations.bucket.terms.TermsBuilder;
 
 import javax.validation.constraints.NotNull;
-import java.util.*;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Utility class for constructing aggregations.
@@ -148,8 +150,7 @@ public final class AggregationUtils {
     public static SearchRequestBuilder addAggregations(SearchRequestBuilder searchRequest,
                                                        String aggregations,
                                                        Map<String, List<String>> selectedFacets)
-            throws JsonParseException, IllegalStateException
-    {
+            throws JsonParseException, IllegalStateException {
         JsonElement jsonElement = new JsonParser().parse(aggregations);
         for (JsonElement facets : jsonElement.getAsJsonArray()) {
             JsonObject facet = facets.getAsJsonObject();
@@ -191,9 +192,8 @@ public final class AggregationUtils {
             String aggs,
             JsonObject currentFacet,
             AggregationBuilder termsAggs,
-            Map<String, List<String>> selectedFacets)
-    {
-        BoolFilterBuilder aggsFilter = FilterUtils.buildBoolFilter(selectedFacets, aggs).get(Params.POST_FILTER);
+            Map<String, List<String>> selectedFacets) {
+        BoolFilterBuilder aggsFilter = FilterUtils.getPostFilter(selectedFacets, aggs);
         if (aggsFilter.hasClauses()) {
             termsAggs = constructTermsAggregation(currentFacet, true);
             termsAggs.subAggregation(AggregationBuilders.filter(AGGS_FILTER_KEY).filter(aggsFilter));
@@ -244,7 +244,7 @@ public final class AggregationUtils {
     /**
      * Builds terms aggregations and their corresponding sort options
      *
-     * @param facet a JSON object
+     * @param facet                a JSON object
      * @param sortBySubAggregation a flag whether to sort by sub aggregation filter
      * @return a term builder
      */
@@ -275,9 +275,8 @@ public final class AggregationUtils {
             } else { //sort normally using top aggregation
                 termsBuilder.order(order);
             }
-        }
-        else {//if order is not specified, use sub aggregation sort, otherwise let Elasticsearch decides
-            if(sortBySubAggregation){
+        } else {//if order is not specified
+            if (sortBySubAggregation) { //use sub aggregation order, otherwise let Elasticsearch decides
                 termsBuilder.order(subAggregationOrder);
             }
         }

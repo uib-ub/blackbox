@@ -3,6 +3,7 @@ package no.uib.marcus.servlet;
 import no.uib.marcus.client.ClientFactory;
 import no.uib.marcus.common.Params;
 import no.uib.marcus.common.util.*;
+import no.uib.marcus.range.DateRange;
 import no.uib.marcus.search.SearchBuilder;
 import no.uib.marcus.search.SearchBuilderFactory;
 import org.apache.log4j.Logger;
@@ -22,8 +23,6 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.List;
 import java.util.Map;
-
-
 
 
 /**
@@ -50,8 +49,8 @@ public class SearchServlet extends HttpServlet {
      * @param response HTTP servlet response
      * @throws ServletException if a servlet-specific error occurs
      * @throws IOException      if an I/O error occurs
-     *
-     * writes a JSON string of search hits.
+     *                          <p>
+     *                          writes a JSON string of search hits.
      **/
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
@@ -66,6 +65,8 @@ public class SearchServlet extends HttpServlet {
         String[] types = request.getParameterValues(Params.INDEX_TYPES);
         String from = request.getParameter(Params.FROM);
         String size = request.getParameter(Params.SIZE);
+        String fromDate = request.getParameter(Params.FROM_DATE);
+        String toDate = request.getParameter(Params.TO_DATE);
         String sortString = request.getParameter(Params.SORT);
         String isPretty = request.getParameter(Params.PRETTY_PRINT);
         String[] selectedFilters = request.getParameterValues(Params.SELECTED_FILTERS);
@@ -78,10 +79,11 @@ public class SearchServlet extends HttpServlet {
             //Assign default values, if needs be
             int _from = Strings.hasText(from) ? Integer.parseInt(from) : Params.DEFAULT_FROM;
             int _size = Strings.hasText(size) ? Integer.parseInt(size) : Params.DEFAULT_SIZE;
-            SortBuilder sort = Strings.hasText(sortString) ? SortUtils.getSort(sortString) : null;
 
-            //Build a filter map based on selected facets.
-            Map<String, List<String>> selectedFacetMap = AggregationUtils.buildFilterMap(selectedFilters);
+            // Build a filter map based on selected filters. In the result map, keys are "fields"
+            // and values are "terms"
+            // e.g {"subject.exact" = ["Flyfoto" , "Birkeland"], "type" = ["Brev"]}
+            Map<String, List<String>> selectedFacets = AggregationUtils.buildFilterMap(selectedFilters);
 
             //Build search service
             SearchBuilder builder = SearchBuilderFactory.get(service, client)
@@ -91,24 +93,20 @@ public class SearchServlet extends HttpServlet {
                     .setAggregations(aggs)
                     .setFrom(_from)
                     .setSize(_size)
-                    .setSelectedFacets(selectedFacetMap)
-                    .setSortBuilder(sort)
+                    .setSelectedFacets(selectedFacets)
+                    .setSortBuilder(SortUtils.getSort(sortString))
                     .setIndexToBoost(indexToBoost);
 
-            //Build a bool filter
-            Map<String, BoolFilterBuilder> boolFilterMap = FilterUtils.buildBoolFilter(request);
-
-            //Set top level filter if any
-            if (boolFilterMap.get(Params.TOP_FILTER).hasClauses()) {
-                builder.setFilter(boolFilterMap.get(Params.TOP_FILTER));
+            //Add top level filter, for "AND" aggregations
+            BoolFilterBuilder topFilter = FilterUtils.getTopFilter(selectedFacets, aggs, new DateRange(fromDate, toDate));
+            if (topFilter.hasClauses()) {
+                builder.setFilter(topFilter);
             }
-
-            //Set post_filter, so that aggregations should not be affected by the query.
-            //post_filter only affects search results but NOT aggregations
-            if (boolFilterMap.get(Params.POST_FILTER).hasClauses()) {
-                builder.setPostFilter(boolFilterMap.get(Params.POST_FILTER));
+            //Add post filter for "OR" aggregations if any
+            BoolFilterBuilder postFilter = FilterUtils.getPostFilter(selectedFacets, aggs);
+            if (postFilter.hasClauses()) {
+                builder.setPostFilter(postFilter);
             }
-
             //Send search request to Elasticsearch and execute
             SearchResponse searchResponse = builder.executeSearch();
 
