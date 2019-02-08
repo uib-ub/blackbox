@@ -33,7 +33,6 @@ import java.util.Map;
  */
 public final class AggregationUtils {
     private static final Logger logger = Logger.getLogger(AggregationUtils.class);
-    private static final char AGGS_KEY_VALUE_SEPARATOR = '#';
     private static final String AGGS_FILTER_KEY = "aggs_filter";
 
     //Enforce non-instatiability
@@ -90,40 +89,6 @@ public final class AggregationUtils {
             return false;
         }
         return false;
-    }
-
-    /**
-     * A method to build a map based on the selected filters. If no filter is
-     * selected, return an empty map.
-     *
-     * @param selectedFilters a string of selected filters in the form of "field#value"
-     * @return a filter map in the form of
-     * e.g {"subject.exact" = ["Flyfoto" , "Birkeland"], "type.exact" = ["Brev"]}
-     */
-    @NotNull
-    public static Map<String, List<String>> buildFilterMap(@Nullable String[] selectedFilters) {
-        Map<String, List<String>> filters = new HashMap<>();
-        try {
-            if (selectedFilters == null || selectedFilters.length == 0) {
-                return Collections.emptyMap();
-            }
-            for (String entry : selectedFilters) {
-                if (entry.lastIndexOf(AGGS_KEY_VALUE_SEPARATOR) != -1) {
-                    //Get the index for the last occurrence of a separator
-                    int lastIndex = entry.lastIndexOf(AGGS_KEY_VALUE_SEPARATOR);
-                    String key = entry.substring(0, lastIndex).trim();
-                    String value = entry.substring(lastIndex + 1).trim();
-                    if (!filters.containsKey(key)) {
-                        filters.put(key, Lists.newArrayList(value));
-                    } else {
-                        filters.get(key).add(value);
-                    }
-                }
-            }
-        } catch (Exception ex) {
-            logger.error("Exception occurred while constructing a map from selected filters: " + ex.getMessage());
-        }
-        return filters;
     }
 
 
@@ -188,11 +153,10 @@ public final class AggregationUtils {
     /**
      * Adds sub aggregation filter with the name "aggs_filter". Sub aggregations are added only to "OR" facets
      */
-    private static AggregationBuilder addSubAggregationFilter(
-            String aggs,
-            JsonObject currentFacet,
-            AggregationBuilder termsAggs,
-            Map<String, List<String>> selectedFacets) {
+    private static AggregationBuilder addSubAggregationFilter(String aggs, JsonObject currentFacet,
+                                                              AggregationBuilder termsAggs,
+                                                              Map<String, List<String>> selectedFacets)
+    {
         BoolFilterBuilder aggsFilter = FilterUtils.getPostFilter(selectedFacets, aggs);
         if (aggsFilter.hasClauses()) {
             termsAggs = constructTermsAggregation(currentFacet, true);

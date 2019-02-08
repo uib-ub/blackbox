@@ -12,7 +12,6 @@ import org.elasticsearch.client.Client;
 import org.elasticsearch.common.Booleans;
 import org.elasticsearch.common.Strings;
 import org.elasticsearch.index.query.BoolFilterBuilder;
-import org.elasticsearch.search.sort.SortBuilder;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -80,10 +79,10 @@ public class SearchServlet extends HttpServlet {
             int _from = Strings.hasText(from) ? Integer.parseInt(from) : Params.DEFAULT_FROM;
             int _size = Strings.hasText(size) ? Integer.parseInt(size) : Params.DEFAULT_SIZE;
 
-            // Build a filter map based on selected filters. In the result map, keys are "fields"
+            // Build a facet map based on selected filters. In the result map, keys are "fields"
             // and values are "terms"
             // e.g {"subject.exact" = ["Flyfoto" , "Birkeland"], "type" = ["Brev"]}
-            Map<String, List<String>> selectedFacets = AggregationUtils.buildFilterMap(selectedFilters);
+            Map<String, List<String>> selectedFacets = FilterUtils.buildFilterMap(selectedFilters);
 
             //Build search service
             SearchBuilder builder = SearchBuilderFactory.get(service, client)

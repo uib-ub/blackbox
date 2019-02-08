@@ -4,16 +4,13 @@ import no.uib.marcus.common.Params;
 import no.uib.marcus.range.DateRange;
 import org.apache.log4j.Logger;
 import org.elasticsearch.common.Nullable;
+import org.elasticsearch.common.collect.Lists;
 import org.elasticsearch.common.joda.time.LocalDate;
 import org.elasticsearch.index.query.BoolFilterBuilder;
 import org.elasticsearch.index.query.FilterBuilders;
 
-import javax.servlet.http.HttpServletRequest;
 import javax.validation.constraints.NotNull;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 
 /**
  * Utility class for building Elasticsearch filters
@@ -26,6 +23,7 @@ public final class FilterUtils {
     private static final Logger logger = Logger.getLogger(FilterUtils.class);
     private static final String TOP_FILTER = "top_filter";
     private static final String POST_FILTER = "post_filter";
+    private static final char FILTER_KEY_VALUE_SEPARATOR = '#';
 
     //Prevent this class from being initialized
     private FilterUtils() {
@@ -37,23 +35,6 @@ public final class FilterUtils {
     public static Map<String, BoolFilterBuilder> buildBoolFilter(@NotNull Map<String, List<String>> filterMap, String aggs) {
         return buildBoolFilter(filterMap, aggs, null);
     }
-
-    /**
-     * A wrapper method for building BoolFilter based on the aggregation settings.
-     */
-    public static Map<String, BoolFilterBuilder> buildBoolFilter(HttpServletRequest request) {
-        //Get corresponding request parameters
-        String fromDate = request.getParameter(Params.FROM_DATE);
-        String toDate = request.getParameter(Params.TO_DATE);
-        String[] selectedFilters = request.getParameterValues(Params.SELECTED_FILTERS);
-        String aggregations = request.getParameter(Params.AGGREGATIONS);
-
-
-        Map<String, List<String>> selectedFacets = AggregationUtils.buildFilterMap(selectedFilters);
-
-        return buildBoolFilter(selectedFacets, aggregations, new DateRange(fromDate, toDate));
-    }
-
 
     /**
      * Gets top filter from the given filter map or empty filter if it does not exist
@@ -74,9 +55,9 @@ public final class FilterUtils {
     /**
      * A method for building BoolFilter based on the aggregation settings.
      *
-     * @param filterMap a map of selected facets with keys as fields and values as terms.
-     * @param aggregations      aggregations
-     * @param dateRange a date range to be applied to a range filter
+     * @param filterMap    a map of selected facets with keys as fields and values as terms.
+     * @param aggregations aggregations
+     * @param dateRange    a date range to be applied to a range filter
      * @return a map which contains AND and OR bool filters based on the aggregations, with the keys
      * "top_filter" and "post_filter" respectively
      */
@@ -146,7 +127,7 @@ public final class FilterUtils {
      * unexpected result if that is not the case. Checking the integrity of these fields maybe be done using
      * Elasticsearch Script Filters but it is a heavy process and we would have to expose Elasticsearch cluster
      * to script injection in which we don't want to do it.
-     * Therefore, if it happens, we are living the blame to the data, and we are assuming the condition always holds.
+     * Therefore, if it happens, we are leaving the blame to the data, and we are assuming the condition always holds.
      *
      * @param dateRange date range object that will be appended to range filters.
      * @return a bool_filter with date ranges appended
@@ -224,5 +205,39 @@ public final class FilterUtils {
      */
     private static boolean hasOROperator(String aggregations, String key) {
         return AggregationUtils.contains(aggregations, key, "operator", "OR");
+    }
+
+    /**
+     * A method to build a map based on the selected filters. If no filter is
+     * selected, return an empty map.
+     *
+     * @param selectedFilters a string of selected filters in the form of "field#value"
+     * @return a filter map in the form of
+     * e.g {"subject.exact" = ["Flyfoto" , "Birkeland"], "type.exact" = ["Brev"]}
+     */
+    @NotNull
+    public static Map<String, List<String>> buildFilterMap(@Nullable String[] selectedFilters) {
+        Map<String, List<String>> filters = new HashMap<>();
+        try {
+            if (selectedFilters == null || selectedFilters.length == 0) {
+                return Collections.emptyMap();
+            }
+            for (String entry : selectedFilters) {
+                if (entry.lastIndexOf(FILTER_KEY_VALUE_SEPARATOR) != -1) {
+                    //Get the index for the last occurrence of a separator
+                    int lastIndex = entry.lastIndexOf(FILTER_KEY_VALUE_SEPARATOR);
+                    String key = entry.substring(0, lastIndex).trim();
+                    String value = entry.substring(lastIndex + 1).trim();
+                    if (!filters.containsKey(key)) {
+                        filters.put(key, Lists.newArrayList(value));
+                    } else {
+                        filters.get(key).add(value);
+                    }
+                }
+            }
+        } catch (Exception ex) {
+            logger.error("Exception occurred while constructing a map from selected filters: " + ex.getMessage());
+        }
+        return filters;
     }
 }

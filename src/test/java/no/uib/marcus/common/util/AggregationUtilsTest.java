@@ -71,7 +71,7 @@ public class AggregationUtilsTest extends RandomizedTest {
                 expectedMap.put("hemed", Arrays.asList("ali"));
                 expectedMap.put("status", Arrays.asList("sent", "draft"));
 
-                assertEquals(AggregationUtils.buildFilterMap(selectedFilter), expectedMap);
+                assertEquals(FilterUtils.buildFilterMap(selectedFilter), expectedMap);
         }
 
         /**
@@ -84,11 +84,11 @@ public class AggregationUtilsTest extends RandomizedTest {
                 String[] selectedFilter2 = {"type#Fotografi"};
 
                 //Test for empty map
-                assertEquals(Collections.emptyMap(), AggregationUtils.buildFilterMap(selectedFilter));
-                assertEquals(Collections.emptyMap(), AggregationUtils.buildFilterMap(new String[0]));
-                assertEquals(Collections.emptyMap(), AggregationUtils.buildFilterMap(null));
+                assertEquals(Collections.emptyMap(), FilterUtils.buildFilterMap(selectedFilter));
+                assertEquals(Collections.emptyMap(), FilterUtils.buildFilterMap(new String[0]));
+                assertEquals(Collections.emptyMap(), FilterUtils.buildFilterMap(null));
                 //Test if a filter map contains a key
-                assertTrue(AggregationUtils.buildFilterMap(selectedFilter2).containsKey("type"));
+                assertTrue(FilterUtils.buildFilterMap(selectedFilter2).containsKey("type"));
         }
 
         @Test
@@ -97,7 +97,7 @@ public class AggregationUtilsTest extends RandomizedTest {
                 String[] selectedFilter = {"http://marcus.uib.no#photography", "status_sent", "status_draft"};
                 Map<String, List<String>> expectedMap = new HashMap<>();
                 expectedMap.put("http://marcus.uib.no", Arrays.asList("photography"));
-                assertEquals(AggregationUtils.buildFilterMap(selectedFilter), expectedMap);
+                assertEquals(FilterUtils.buildFilterMap(selectedFilter), expectedMap);
 
         }
 
@@ -116,6 +116,6 @@ public class AggregationUtilsTest extends RandomizedTest {
                 String[] input = {"status#sent", "status#draft", "status#makame", "status#bee"};
                 Map<String, List<String>> expectedMap = new HashMap<>();
                 expectedMap.put("status", Arrays.asList("sent", "draft", "makame", "bee"));
-                assertEquals(AggregationUtils.buildFilterMap(input), expectedMap);
+                assertEquals(FilterUtils.buildFilterMap(input), expectedMap);
         }
 }

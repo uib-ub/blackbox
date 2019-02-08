@@ -1,7 +1,7 @@
 package no.uib.marcus.search;
 
 import no.uib.marcus.client.ClientFactory;
-import no.uib.marcus.common.util.AggregationUtils;
+import no.uib.marcus.common.util.FilterUtils;
 import no.uib.marcus.common.util.QueryUtils;
 import org.elasticsearch.client.Client;
 
@@ -16,7 +16,7 @@ public class BuilderRunner {
         Client c = ClientFactory.getTransportClient();
         String[] selectedFilters = { "hasGenreForm.exact#Bok" };
         SearchBuilder service = SearchBuilderFactory.marcusSearch(c);
-        service.setSelectedFacets(AggregationUtils.buildFilterMap(selectedFilters));
+        service.setSelectedFacets(FilterUtils.buildFilterMap(selectedFilters));
         service.setIndices("marcus-admin");
         service.setTypes("document");
         service.setSize(2);
