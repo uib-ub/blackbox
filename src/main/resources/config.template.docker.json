@@ -1,0 +1,9 @@
+{
+  "cluster": {
+    "name": "ubb-elasticsearch-docker",
+    "node_name": "Blackbox",
+    "host": "es",
+    "port": 9300
+  },
+  "_comment" : "application will look for these cluster settings when initializing"
+}
