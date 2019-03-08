@@ -147,6 +147,8 @@ public final class FilterUtils {
 
             if (Objects.nonNull(fromDate) || Objects.nonNull(toDate)) {
 
+                System.out.println("From: " + fromDate + " To date: " + toDate);
+
                 //Range within "created" field
                 boolFilter.should(FilterBuilders.rangeFilter(Params.DateField.CREATED).gte(fromDate).lte(toDate));
 

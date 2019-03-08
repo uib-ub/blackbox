@@ -97,7 +97,7 @@ public class SearchServlet extends HttpServlet {
                     .setIndexToBoost(indexToBoost);
 
             //Add top level filter, for "AND" aggregations
-            BoolFilterBuilder topFilter = FilterUtils.getTopFilter(selectedFacets, aggs, new DateRange(fromDate, toDate));
+            BoolFilterBuilder topFilter = FilterUtils.getTopFilter(selectedFacets, aggs, DateRange.of(fromDate, toDate));
             if (topFilter.hasClauses()) {
                 builder.setFilter(topFilter);
             }

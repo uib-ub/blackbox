@@ -47,6 +47,10 @@ public class DateRange implements Range<LocalDate> {
         this(from, to, DEFAULT_DATE_FORMAT);
     }
 
+    public static DateRange of(@Nullable String from, @Nullable String to) {
+        return new DateRange(from, to);
+    }
+
     public DateRange(String from, String to, String format) {
         this(format);
         this.fromDate = parse(from);
@@ -65,7 +69,7 @@ public class DateRange implements Range<LocalDate> {
 
     @Override
     public LocalDate getTo() {
-        return toDate;
+        return modifyToDate(toDate);
     }
 
 
@@ -108,6 +112,21 @@ public class DateRange implements Range<LocalDate> {
         }
         return null;
     }
+
+
+    /**
+     * If day and year is not specified, Joda parser assumes that it is January 01. This makes sense for "form_date"
+     * but not for "to_date". Therefore, this method tries to change it to December 31st
+     */
+    private LocalDate modifyToDate(LocalDate date) {
+        if (date != null) {
+            if(date.getMonthOfYear() == 1 && date.getDayOfMonth() == 1) {
+                return new LocalDate(date.getYear(), 12, 31);
+            }
+        }
+        return date;
+    }
+
 
     /**
      * Check whether a range is positive, a positive range is the one such that

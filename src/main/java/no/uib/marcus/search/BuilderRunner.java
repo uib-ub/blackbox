@@ -3,6 +3,7 @@ package no.uib.marcus.search;
 import no.uib.marcus.client.ClientFactory;
 import no.uib.marcus.common.util.FilterUtils;
 import no.uib.marcus.common.util.QueryUtils;
+import no.uib.marcus.range.DateRange;
 import org.elasticsearch.client.Client;
 
 import java.io.IOException;
@@ -71,7 +72,12 @@ public class BuilderRunner {
                 "\"order\": \"count_desc\"," +
                 "\"min_doc_count\": 1" +
                 "}]";
-        service.setAggregations(aggs);
+        //service.setAggregations(aggs);
+        service.setPostFilter(
+                FilterUtils.getTopFilter(FilterUtils.buildFilterMap(selectedFilters),
+                aggs,
+                new DateRange("04.01.1910", "1930", "yyyy||dd.MM.yyyy"))
+        );
         System.out.println(QueryUtils.toJsonString(service.executeSearch(), true));
     }
 }
