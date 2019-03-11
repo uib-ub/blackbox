@@ -15,13 +15,12 @@ public class BuilderRunner {
 
     public static void main(String[] args) throws IOException {
         Client c = ClientFactory.getTransportClient();
-        String[] selectedFilters = { "hasGenreForm.exact#Bok" };
+        String[] selectedFilters = {"hasGenreForm.exact#Bok"};
         SearchBuilder service = SearchBuilderFactory.marcusSearch(c);
         service.setSelectedFacets(FilterUtils.buildFilterMap(selectedFilters));
         service.setIndices("marcus-admin");
         service.setTypes("document");
         service.setSize(2);
-
         String aggs = "[{" +
                 "\"field\": \"type.exact\"," +
                 "\"size\": 10," +
@@ -75,9 +74,10 @@ public class BuilderRunner {
         //service.setAggregations(aggs);
         service.setPostFilter(
                 FilterUtils.getTopFilter(FilterUtils.buildFilterMap(selectedFilters),
-                aggs,
-                new DateRange("04.01.1910", "1930", "yyyy||dd.MM.yyyy"))
+                        aggs,
+                        new DateRange("1999-07-02", "600"))
         );
         System.out.println(QueryUtils.toJsonString(service.executeSearch(), true));
+        //System.out.println("Is valid year?: " + DateRange.isXSDgYear("1920"));
     }
 }
