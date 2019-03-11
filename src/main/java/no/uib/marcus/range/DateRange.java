@@ -1,11 +1,16 @@
 package no.uib.marcus.range;
 
+import org.apache.log4j.Logger;
 import org.elasticsearch.common.Nullable;
 import org.elasticsearch.common.Strings;
 import org.elasticsearch.common.joda.Joda;
 import org.elasticsearch.common.joda.time.LocalDate;
 
 import javax.validation.constraints.NotNull;
+import javax.xml.datatype.DatatypeConfigurationException;
+import javax.xml.datatype.DatatypeConstants;
+import javax.xml.datatype.DatatypeFactory;
+import javax.xml.datatype.XMLGregorianCalendar;
 import java.util.Objects;
 
 /**
@@ -17,9 +22,9 @@ import java.util.Objects;
  */
 
 public class DateRange implements Range<LocalDate> {
-
     //Default date format, any one of these is OK
     public static final String DEFAULT_DATE_FORMAT = "yyyy-MM-dd||yyyy-MM||yyyy";
+    private static final Logger logger = Logger.getLogger(DateRange.class);
 
     //Null indicates unbounded/infinite value
     @Nullable
@@ -37,29 +42,18 @@ public class DateRange implements Range<LocalDate> {
         this.dateFormat = Objects.requireNonNull(format, "Date format cannot be null");
     }
 
-    public DateRange(LocalDate from, LocalDate to, String format) {
-        this(format);
-        this.fromDate = from;
-        this.toDate = to;
-    }
-
     public DateRange(@Nullable String from, @Nullable String to) {
         this(from, to, DEFAULT_DATE_FORMAT);
     }
 
-    public static DateRange of(@Nullable String from, @Nullable String to) {
-        return new DateRange(from, to);
-    }
-
     public DateRange(String from, String to, String format) {
         this(format);
-        this.fromDate = parse(from);
-        this.toDate =  parse(to);
+        this.fromDate = parseFromDate(from);
+        this.toDate = parseToDate(to);
     }
 
-    @Override
-    public void setFrom(LocalDate from) {
-        this.fromDate = from;
+    public static DateRange of(@Nullable String from, @Nullable String to) {
+        return new DateRange(from, to);
     }
 
     @Override
@@ -68,15 +62,39 @@ public class DateRange implements Range<LocalDate> {
     }
 
     @Override
-    public LocalDate getTo() {
-        return modifyToDate(toDate);
+    public void setFrom(LocalDate from) {
+        this.fromDate = from;
     }
 
+    @Override
+    public LocalDate getTo() {
+        return toDate;
+    }
 
     @Override
     public void setTo(LocalDate to) {
         this.toDate = to;
 
+    }
+
+    /**
+     * When only year is specified as "to_date", Joda Time parser assumes that it is 1st of January. This makes
+     * sense for "from_date" but not for "to_date". Therefore, this method tries to modify day and month of "to_date"
+     * to 31st of December.
+     */
+    public LocalDate parseToDate(String toDateString) {
+        LocalDate toDate = parse(toDateString);
+        if (toDate != null && isXSDgYear(toDateString)) {// when only year is specified
+            return new LocalDate(toDate.getYear(), 12, 31);
+        }
+        return toDate;
+    }
+
+    /**
+     * Joda Time parses from_date correctly
+     */
+    public LocalDate parseFromDate(String fromDateString) {
+        return parse(fromDateString);
     }
 
     /**
@@ -111,20 +129,6 @@ public class DateRange implements Range<LocalDate> {
             return Joda.forPattern(getDateFormat()).parser().parseLocalDate(input);
         }
         return null;
-    }
-
-
-    /**
-     * If day and year is not specified, Joda parser assumes that it is January 01. This makes sense for "form_date"
-     * but not for "to_date". Therefore, this method tries to change it to December 31st
-     */
-    private LocalDate modifyToDate(LocalDate date) {
-        if (date != null) {
-            if(date.getMonthOfYear() == 1 && date.getDayOfMonth() == 1) {
-                return new LocalDate(date.getYear(), 12, 31);
-            }
-        }
-        return date;
     }
 
 
@@ -178,6 +182,46 @@ public class DateRange implements Range<LocalDate> {
         sb.append(", dateFormat='").append(dateFormat).append('\'');
         sb.append('}');
         return sb.toString();
+    }
+
+    /**
+     * Checks if a provided string is valid xsd:gYear
+     *
+     * @param yearString a gYear string to parse
+     * @return {@code empty string} true if it is valid gYear, otherwise false
+     */
+    public static boolean isXSDgYear(String yearString) {
+        try {
+            int inputYear = Integer.parseInt(yearString);
+            /*
+             * Input year should be at most 4 digits number. I had to make sure about this because if input year
+             * is greater than 4 digits, it will be truncated by toXMLFormat() method anyway.
+             **/
+            if (inputYear > 0 && String.valueOf(inputYear).length() > 4) {
+                return true;
+            }
+            //Negative gYear with at most 4 digits is allowed. e.g -0160 for 160BC
+            if (inputYear < 0 && String.valueOf(inputYear).length() > 5) {
+                return true;
+            }
+
+            XMLGregorianCalendar gCalendar = DatatypeFactory
+                    .newInstance()
+                    .newXMLGregorianCalendarDate(
+                            inputYear,
+                            DatatypeConstants.FIELD_UNDEFINED,
+                            DatatypeConstants.FIELD_UNDEFINED,
+                            DatatypeConstants.FIELD_UNDEFINED
+                    );
+            gCalendar.toXMLFormat();
+        } catch (NumberFormatException nfe) {
+            logger.warn("gYear must be a number: " + nfe.getLocalizedMessage());
+            return false;
+        } catch (DatatypeConfigurationException | IllegalArgumentException ex) {
+            logger.warn(ex.getLocalizedMessage());
+            return false;
+        }
+        return true;
     }
 
 }
