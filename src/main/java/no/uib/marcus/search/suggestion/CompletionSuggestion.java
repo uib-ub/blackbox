@@ -41,7 +41,9 @@ public class CompletionSuggestion {
                     .iterator()
                     .next()
                     .getOptions()) {
-                suggestValues.add(option.getText().string().toLowerCase());
+                // Lowecasing is done via ubb-rdf-river
+                // suggestValues.add(option.getText().string().toLowerCase());
+                suggestValues.add(option.getText().string());
             }
         } catch (Exception e) {
             logger.error("Unable to perform suggestion for text: [" + text + "]. Message: " + e.getLocalizedMessage()) ;
