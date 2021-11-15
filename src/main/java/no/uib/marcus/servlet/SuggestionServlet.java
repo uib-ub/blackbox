@@ -13,6 +13,8 @@ import java.io.IOException;
 import java.io.PrintWriter;
 
 /**
+ * This servlet processes all HTTP requests coming from "/suggest" endpoint
+ *
  * @author Hemed Ali
  */
 @WebServlet(
