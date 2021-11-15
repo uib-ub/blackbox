@@ -1,16 +1,129 @@
-# Blackbox - a bridge between search clients and Elasticsearch cluster
+# Blackbox - query builder for Elasticsearch
 
-![Alt text](src/main/webapp/images/class_diagram.png?raw=true "Class diagrams")
+<!-- ![Alt text](src/main/webapp/images/class_diagram.png?raw=true "Class diagrams") -->
 
-##Preamble
+## What is Blackbox?
 
-Blackbox is a server side application that acts as a bridge between Elasticsearch and client applications to simplify search experience that were before difficult to meet. It is developed to meet the University of Bergen Library requirements and adheres to OOP best practices and uses Elasticsearch core API to communicate with a cluster.
+Blackbox is an Elasticsearch Query Builder which takes client requests, send them to Elasticsearch, and get the results back. It is a server side application that acts as a bridge between Elasticsearch and client applications to simplify search 
+experience. 
 
-Blackbox communicates with Elasticsearch cluster in round-robbin fashion through Transport client which acts as one of the Elasticsearch nodes in the cluster. It runs as a [Web application](http://kirishima.uib.no/blackbox) whereby clients communicate with it through HTTP and it is independent from the client implementation and hence can be queried separately. 
+Blackbox (version 0.70) uses Elasticsearch core API to communicate with Elasticsearch cluster in round-robbin 
+fashion through built-in Elasticseach Transport client which acts as one of the Elasticsearch nodes in the cluster. 
+It runs as a [Web application](http://jambo.uib.no/blackbox) whereby clients communicate with it through HTTP.
+
+## Why Blackbox?
+
+The main reason is to simplify queries for search clients. This means search clients send simple queries to Blackbox,
+and Blackbox transforms those queries into complex queries which Elasticsearch understands, and then send them to Elasticsearch.
+
+### Example 
+
+Marcus search client sends this query to Blackbox: https://marcus.uib.no/search/?q=nordnes&from_date=1800&filter=type.exact%23Fotografi . 
+Blackbox takes the query, pre process it and transform it to complex Query DSL before sending it to Elasticsearch. 
+See below on how the above query gets converted to. 
+
+``` 
+{
+   "from":0,
+   "size":10,
+   "query":{
+      "filtered":{
+         "query":{
+            "function_score":{
+               "query":{
+                  "query_string":{
+                     "query":"nordnes",
+                     "fields":[
+                        "identifier",
+                        "label^3.0",
+                        "_all"
+                     ],
+                     "default_operator":"and",
+                     "analyzer":"default"
+                  }
+               },
+               "functions":[
+                  {
+                     "filter":{
+                        "term":{
+                           "type":"fotografi"
+                        }
+                     },
+                     "weight":3.0
+                  },
+                  {
+                     "filter":{
+                        "term":{
+                           "type":"bilde"
+                        }
+                     },
+                     "weight":3.0
+                  }
+               ]
+            }
+         },
+         "filter":{
+            "bool":{
+               "must":{
+                  "term":{
+                     "type.exact":"Fotografi"
+                  }
+               },
+               "should":[
+                  {
+                     "range":{
+                        "created":{
+                           "from":"1800-01-01",
+                           "to":null,
+                           "include_lower":true,
+                           "include_upper":true
+                        }
+                     }
+                  },
+                  {
+                     "bool":{
+                        "must":{
+                           "range":{
+                              "madeAfter":{
+                                 "from":"1800-01-01",
+                                 "to":null,
+                                 "include_lower":true,
+                                 "include_upper":true
+                              }
+                           }
+                        }
+                     }
+                  },
+                  {
+                     "bool":{
+                        "must":{
+                           "range":{
+                              "madeBefore":{
+                                 "from":"1800-01-01",
+                                 "to":null,
+                                 "include_lower":true,
+                                 "include_upper":true
+                              }
+                           }
+                        }
+                     }
+                  }
+               ]
+            }
+         }
+      }
+   }
+}   
+``` 
+
+Nevertheless, letting search clients access Elasticsearch cluster directly may pose some security threats, 
+and thus we decided that the search traffic should pass only through Blackbox which then supports only GET requests. 
+
+
 
 ## Usage 
 Blackbox can be queried by specifying query parameters in a respective endpoint.
-[Search endpoint](http://kirishima.uib.no/blackbox/search) can take parameters such as the followings:-
+[Search endpoint](http://jambo.uib.no/blackbox/search) can take parameters such as the followings:-
 
 * `index` : the index that the search should be executed. It can be more than one indices, e.g http://kirishima.uib.no/blackbox/search?index=ska2&index=admin-test. If not specified, all indices in the cluster will be considered.
 * `type` : same as index, See Elasticsearch type.
@@ -21,23 +134,22 @@ Blackbox can be queried by specifying query parameters in a respective endpoint.
 * `aggs`: you can specify aggregations as parameter. Aggregations must be a valid JSON arrays. For example 
 
 ``` 
-
-    facets: [
-    {
-    "field": "type",
-    "size": 30,
-    "operator": "OR",
-    "order": "count_desc",
-    "min_doc_count": 0
-    },
-    {
-    "field": "hasZoom",
-    "size": 10,
-    "operator": "AND",
-    "order": "term_asc",
-    "min_doc_count": 0
-    }]
-    
+ facets :[
+   {
+      "field":"type",
+      "size":30,
+      "operator":"OR",
+      "order":"count_desc",
+      "min_doc_count":0
+   },
+   {
+      "field":"hasZoom",
+      "size":10,
+      "operator":"AND",
+      "order":"term_asc",
+      "min_doc_count":0
+   }
+]
     
    ``` 
                                                                                                                                             
