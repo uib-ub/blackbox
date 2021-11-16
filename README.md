@@ -1,6 +1,6 @@
 # Blackbox - query builder for Elasticsearch
 
-<!-- ![Alt text](src/main/webapp/images/class_diagram.png?raw=true "Class diagrams") -->
+![Alt text](src/main/webapp/images/blackbox.png?raw=true "Class diagrams")
 
 ## What is Blackbox?
 
@@ -121,13 +121,18 @@ and thus we decided that the search traffic should pass only through Blackbox wh
 
 
 
-## Usage 
-Blackbox can be queried by specifying query parameters in a respective endpoint.
-[Search endpoint](http://jambo.uib.no/blackbox/search) can take parameters such as the followings:-
+## Usage and query parameters
+Currently Blackbox supports 3 endpoints Search, Suggest and Discover.
 
-* `index` : the index that the search should be executed. It can be more than one indices, e.g http://kirishima.uib.no/blackbox/search?index=ska2&index=admin-test. If not specified, all indices in the cluster will be considered.
+- Search - for search and supports full range of query parameters  e.g https://jambo.uib.no/blackbox/search?q=marcus
+- Suggest - for auto suggestions e.g https://jambo.uib.no/blackbox/suggest?q=marcus
+- Discover - for experimental endpoint just for discovering data  e.g https://jambo.uib.no/blackbox/discover?q=marcus
+
+ [Search endpoint](http://jambo.uib.no/blackbox/search) can take full range of parameters, such as the followings:-
+
+* `index` : the index that the search should be executed. It can be more than one indices, e.g http://jambo.uib.no/blackbox/search?index=ska2&index=admin-test. If not specified, all indices in the cluster will be considered.
 * `type` : same as index, See Elasticsearch type.
-* `q` : a query string. For example, http://kirishima.uib.no/blackbox/search?q=knud+knudsen will perform a search to all indices in the cluster for the search string "knud knudsen".
+* `q` : a query string. For example, http://jambo.uib.no/blackbox/search?q=knud+knudsen will perform a search to all indices in the cluster for the search string "knud knudsen".
 * `size` : the size of the returned results. Default is 10
 * `date_from / date_to `: search for created date in the form of `yyyy-MM-dd` or  `yyyy-MM` or  `yyyy`  
 * `filter` : a terms filter if you want to limit the search results e.g `filter=type.exact#Brev`, you will only search within type `Brev`.
@@ -159,18 +164,19 @@ Blackbox can be queried by specifying query parameters in a respective endpoint.
 * `index_boost`: sometimes you would want to boost documents that belong to a specific index if you are querying multiple indices at the same time. Here comes `index_boost` which takes index_name as it's value. 
 
 
-Another endpoint is [suggest endpoint](http://kirishima.uib.no/blackbox/suggest?=marcus) which is used for auto suggestion. The result is an array of the suggested values. For example `http://kirishima.uib.no/blackbox/suggest?q=marianne` gives a list of suggested values for string "marianne".
+Another endpoint is [suggest endpoint](http://jambo.uib.no/blackbox/suggest?=marcus) which is used for auto suggestion. The result is an array of the suggested values. For example `http://jambo.uib.no/blackbox/suggest?q=marianne` gives a list of suggested values for string "marianne".
 Suggest endpoint can take parameters such as `index` , `q` and `size`.
 
 We have also support for *exclude API*. This means if one wants to exclude a terms facet, one will have to write in form of
 `filter=-field#value`. Note the minus sign in front of field name. This query exclude documents of type `Fotografi` in Marcus :  http://marcus.uib.no/search/?filter=-type.exact%23Fotografi
 
 
-## Installation 
+## Installation instructions
 
-* Clone Blackbox from the master branch 
-* Create a file with name `config.template.json` in the resource folder (`/src/main/resources/`). Copy the settings from `config.template.example.json` in the resource folder to this file. You may also rename `config.template.test.json` to `config.template.json` if you are feeling lazy.
-Blackbox will look for these settings when initializing. 
-* Build a war file with Maven `mvn clean build`
-* Copy `war` file to a Tomcats `wabapps` folder
-* Your application is ready accept requests
+* Install tomcat
+* Install maven
+* Clone Blackbox from the master branch
+* Copy the template file `config.template.example.json` from `/src/main/resources/` and give it a name `config.template.json`.  In the file `config.template.json`, you need to change `cluster.name` and `cluster.host` to the same names as your Elasticsearch cluster settings. 
+* Go to the root directory of Blackbox and build a war file with Maven `mvn clean build`
+* Copy `war` file (which should be in `target` folder) to a Tomcats `wabapps` folder and simply call it `blackbox.war`. 
+* You should then be able to access the blackbox by server URL e.g `localhost/blackbox/`
