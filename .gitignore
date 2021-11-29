@@ -11,4 +11,5 @@ build-idea/
  *.DS_Store
 src/.DS_Store
 blackbox.log
+.DS_Store
 
