@@ -19,15 +19,14 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Abstract builder for search services. The idea here is that, all search builders
- * should inherit from this class.
+ * Abstract search builder where specific search builders inherit from.
  *
- * @author Hemed Ali Al Ruwehy
+ * @author Hemed Al Ruwehy
  * <p>
  * University of Bergen Library.
  * 2016-04-15
  */
-public abstract class SearchBuilder<T extends SearchBuilder<T>> implements SearchService<T> {
+public abstract class AbstractSearchBuilder implements SearchService<AbstractSearchBuilder> {
     private final Logger logger = Logger.getLogger(getClass().getName());
     private Client client;
     @Nullable
@@ -49,7 +48,7 @@ public abstract class SearchBuilder<T extends SearchBuilder<T>> implements Searc
      *
      * @param client a non-null Elasticsearch client to communicate with a cluster.
      */
-    public SearchBuilder(@NotNull Client client) {
+    public AbstractSearchBuilder(@NotNull Client client) {
         if (client == null) {
             throw new IllegalParameterException("Unable to initialize service. Client cannot be null");
         }
@@ -83,12 +82,12 @@ public abstract class SearchBuilder<T extends SearchBuilder<T>> implements Searc
      * @return this object where aggregations have been set
      */
     @SuppressWarnings("unchecked")
-    public T setAggregations(String aggregations) {
+    public AbstractSearchBuilder setAggregations(String aggregations) {
         if (aggregations != null) {
             AggregationUtils.validateAggregations(aggregations);
             this.aggregations = aggregations;
         }
-        return (T) this;
+        return this;
     }
 
     /**
@@ -105,9 +104,9 @@ public abstract class SearchBuilder<T extends SearchBuilder<T>> implements Searc
      * @return this object where sort has been set
      */
     @SuppressWarnings("unchecked")
-    public T setSortBuilder(SortBuilder sortBuilder) {
+    public AbstractSearchBuilder setSortBuilder(SortBuilder sortBuilder) {
         this.sortBuilder = sortBuilder;
-        return (T) this;
+        return this;
     }
 
     /**
@@ -124,9 +123,9 @@ public abstract class SearchBuilder<T extends SearchBuilder<T>> implements Searc
      * @return this object where filter has been set
      */
     @SuppressWarnings("unchecked")
-    public T setFilter(FilterBuilder filter) {
+    public AbstractSearchBuilder setFilter(FilterBuilder filter) {
         this.filter = filter;
-        return (T) this;
+        return this;
     }
 
     /**
@@ -144,9 +143,9 @@ public abstract class SearchBuilder<T extends SearchBuilder<T>> implements Searc
      * @return this object where post_filter has been set
      */
     @SuppressWarnings("unchecked")
-    public T setPostFilter(FilterBuilder filter) {
+    public AbstractSearchBuilder setPostFilter(FilterBuilder filter) {
         this.postFilter = filter;
-        return (T) this;
+        return this;
     }
 
     public String getIndexToBoost() {
@@ -160,9 +159,9 @@ public abstract class SearchBuilder<T extends SearchBuilder<T>> implements Searc
      * @return this builder where index to boost has been set
      */
     @SuppressWarnings("unchecked")
-    public T setIndexToBoost(String indexToBoost) {
+    public AbstractSearchBuilder setIndexToBoost(String indexToBoost) {
         this.indexToBoost = indexToBoost;
-        return (T) this;
+        return this;
     }
 
     /**
@@ -181,11 +180,11 @@ public abstract class SearchBuilder<T extends SearchBuilder<T>> implements Searc
      * @return this object where a date range filter has been set
      */
     @SuppressWarnings("unchecked")
-    public T setSelectedFacets(Map<String, List<String>> selectedFacets) {
+    public AbstractSearchBuilder setSelectedFacets(Map<String, List<String>> selectedFacets) {
         if (selectedFacets != null && !selectedFacets.isEmpty()) {
             this.selectedFacets = selectedFacets;
         }
-        return (T) this;
+        return this;
     }
 
     /**
@@ -202,12 +201,12 @@ public abstract class SearchBuilder<T extends SearchBuilder<T>> implements Searc
      * @return this object where client has been set
      */
     @SuppressWarnings("unchecked")
-    public T setClient(@NotNull Client client) {
+    public AbstractSearchBuilder setClient(@NotNull Client client) {
         if (client == null) {
             throw new IllegalParameterException("Unable to initialize service. Client cannot be null");
         }
         this.client = client;
-        return (T) this;
+        return this;
     }
 
     /**
@@ -224,9 +223,9 @@ public abstract class SearchBuilder<T extends SearchBuilder<T>> implements Searc
      * @return this object where indices have been set
      */
     @SuppressWarnings("unchecked")
-    public T setIndices(String... indices) {
+    public AbstractSearchBuilder setIndices(String... indices) {
         this.indices = indices;
-        return (T) this;
+        return this;
     }
 
     /**
@@ -243,9 +242,9 @@ public abstract class SearchBuilder<T extends SearchBuilder<T>> implements Searc
      * @return this object where index types are set
      */
     @SuppressWarnings("unchecked")
-    public T setTypes(String... types) {
+    public AbstractSearchBuilder setTypes(String... types) {
         this.types = types;
-        return (T) this;
+        return this;
     }
 
     /**
@@ -262,11 +261,11 @@ public abstract class SearchBuilder<T extends SearchBuilder<T>> implements Searc
      * @return this object where from is set
      */
     @SuppressWarnings("unchecked")
-    public T setFrom(int from) {
+    public AbstractSearchBuilder setFrom(int from) {
         if (from >= 0) {
             this.from = from;
         }
-        return (T) this;
+        return this;
     }
 
     /**
@@ -283,11 +282,11 @@ public abstract class SearchBuilder<T extends SearchBuilder<T>> implements Searc
      * @return this object where size has been set
      */
     @SuppressWarnings("unchecked")
-    public T setSize(int size) {
+    public AbstractSearchBuilder setSize(int size) {
         if (size >= 0) {
             this.size = size;
         }
-        return (T) this;
+        return this;
     }
 
     /**
@@ -304,9 +303,9 @@ public abstract class SearchBuilder<T extends SearchBuilder<T>> implements Searc
      * @return this object where query string has been set.
      */
     @SuppressWarnings("unchecked")
-    public T setQueryString(@Nullable String queryString) {
+    public AbstractSearchBuilder setQueryString(@Nullable String queryString) {
         this.queryString = queryString;
-        return (T) this;
+        return this;
     }
 
     /**

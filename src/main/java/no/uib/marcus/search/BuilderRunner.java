@@ -16,7 +16,7 @@ public class BuilderRunner {
     public static void main(String[] args) throws IOException {
         Client c = ClientFactory.getTransportClient();
         String[] selectedFilters = {"hasGenreForm.exact#Bok"};
-        SearchBuilder service = SearchBuilderFactory.marcusSearch(c);
+        AbstractSearchBuilder service = SearchBuilderFactory.marcusSearch(c);
         service.setSelectedFacets(FilterUtils.buildFilterMap(selectedFilters));
         service.setIndices("marcus-admin");
         service.setTypes("document");

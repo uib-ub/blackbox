@@ -24,7 +24,7 @@ import static org.elasticsearch.test.ElasticsearchTestCase.awaitBusy;
  */
 
 /*
- * To run this test, you need to have Elasticsearch running 
+ * To run this test, you need to have Elasticsearch running
  * with the same settings as as Blackbox settings.
  * Make sure you have the same version and cluster name to that of the other nodes.
  */
@@ -34,7 +34,7 @@ import static org.elasticsearch.test.ElasticsearchTestCase.awaitBusy;
 public class MarcusSearchServiceIT extends TestCase {
 
     private static final Logger logger = Logger.getLogger(MarcusSearchServiceIT.class);
-    private String indexName = "test";
+    private final String indexName = "test";
     private Client client;
 
     @Override
@@ -93,7 +93,7 @@ public class MarcusSearchServiceIT extends TestCase {
         logger.info("************Testing executeSearch()*****************");
         logger.info("Indexing documents to index: " + indexName);
 
-        final MarcusSearchBuilder searchService = SearchBuilderFactory.marcusSearch(client)
+        final MarcusSearchBuilder searchService = (MarcusSearchBuilder) SearchBuilderFactory.marcusSearch(client)
                 .setIndices(indexName);
 
         //Index 1 document
@@ -132,7 +132,7 @@ public class MarcusSearchServiceIT extends TestCase {
         logger.info("************Testing executeSearch()*****************");
         logger.info("Indexing documents to index: " + indexName);
 
-        final MarcusSearchBuilder searchService = SearchBuilderFactory.marcusSearch(client)
+        final MarcusSearchBuilder searchService = (MarcusSearchBuilder) SearchBuilderFactory.marcusSearch(client)
                 .setIndices(indexName);
 
         //Index 1 document

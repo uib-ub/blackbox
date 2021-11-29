@@ -3,7 +3,7 @@ package no.uib.marcus.servlet;
 import no.uib.marcus.client.ClientFactory;
 import no.uib.marcus.common.Params;
 import no.uib.marcus.common.util.QueryUtils;
-import no.uib.marcus.search.MarcusDiscoveryBuilder;
+import no.uib.marcus.search.AbstractSearchBuilder;
 import no.uib.marcus.search.SearchBuilderFactory;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.client.Client;
@@ -48,7 +48,7 @@ public class DiscoveryServlet extends HttpServlet {
         Client client = ClientFactory.getTransportClient();
 
         //Build a discovery service
-        MarcusDiscoveryBuilder service = SearchBuilderFactory.marcusDiscovery(client)
+        AbstractSearchBuilder service = SearchBuilderFactory.marcusDiscovery(client)
                 .setIndices(indices)
                 .setTypes(types)
                 .setFrom(_from)

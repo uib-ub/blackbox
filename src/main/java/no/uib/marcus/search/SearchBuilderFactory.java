@@ -2,7 +2,6 @@ package no.uib.marcus.search;
 
 import no.uib.marcus.common.ServiceName;
 import org.elasticsearch.client.Client;
-import org.elasticsearch.common.Names;
 import org.elasticsearch.common.Nullable;
 
 /**
@@ -54,7 +53,7 @@ public class SearchBuilderFactory {
     /**
      * Gets default search builder
      */
-    public static SearchBuilder get(Client client) {
+    public static AbstractSearchBuilder get(Client client) {
         return get(null, client);
     }
 
@@ -66,7 +65,7 @@ public class SearchBuilderFactory {
      * @param client        a search client to be used
      * @return a corresponding search builder
      */
-    public static SearchBuilder get(@Nullable String serviceString, Client client) {
+    public static AbstractSearchBuilder get(@Nullable String serviceString, Client client) {
         ServiceName service = ServiceName.toEnum(serviceString);
         switch (service) {
             case SKA:
@@ -74,7 +73,6 @@ public class SearchBuilderFactory {
             case WAB:
                 return SearchBuilderFactory.wabSearch(client);
             case MARCUS:
-                return SearchBuilderFactory.marcusSearch(client);
             case MARCUS_ADMIN:
                 return SearchBuilderFactory.marcusSearch(client);
             case NATUREN:

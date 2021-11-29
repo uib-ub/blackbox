@@ -4,7 +4,7 @@ import no.uib.marcus.client.ClientFactory;
 import no.uib.marcus.common.Params;
 import no.uib.marcus.common.util.*;
 import no.uib.marcus.range.DateRange;
-import no.uib.marcus.search.SearchBuilder;
+import no.uib.marcus.search.AbstractSearchBuilder;
 import no.uib.marcus.search.SearchBuilderFactory;
 import org.apache.log4j.Logger;
 import org.elasticsearch.action.search.SearchResponse;
@@ -85,7 +85,7 @@ public class SearchServlet extends HttpServlet {
             Map<String, List<String>> selectedFacets = FilterUtils.buildFilterMap(selectedFilters);
 
             //Build search service
-            SearchBuilder builder = SearchBuilderFactory.get(service, client)
+            AbstractSearchBuilder builder = SearchBuilderFactory.get(service, client)
                     .setIndices(indices)
                     .setTypes(types)
                     .setQueryString(queryString)
@@ -119,6 +119,7 @@ public class SearchServlet extends HttpServlet {
 
             //Log search response
             logger.info(LogUtils.createLogMessage(request, searchResponse));
+            // System.out.println("Builder class: " + builder.getClass().getName() + " \nBuilder toString: " + builder  );
         }
     }
 

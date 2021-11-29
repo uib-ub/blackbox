@@ -8,11 +8,11 @@ import org.elasticsearch.common.Nullable;
 import javax.validation.constraints.NotNull;
 
 /**
- * @author Hemed Ali Al Ruwehy
+ * A basic contract for creating search services. See also {@link AbstractSearchBuilder}
  *
- * A basic contract for creating search services. See also {@link SearchBuilder}
+ * @author Hemed Ali Al Ruwehy
  */
-public interface SearchService<S extends SearchService> {
+public interface SearchService<S extends SearchService<S>> {
     /**
      * Set Elasticsearch client to the service
      * @param client Elasticsearch client to communicate with a cluster. Cannot be <code>null</code>
@@ -54,10 +54,15 @@ public interface SearchService<S extends SearchService> {
      *
      * @return a search response.
      */
-    SearchResponse executeSearch();
 
     /**
      * Construct search request based on the service settings
-     **/
+     */
     SearchRequestBuilder constructSearchRequest();
+
+    /**
+     * Get documents based on the service settings.
+     */
+    SearchResponse executeSearch();
+
 }
