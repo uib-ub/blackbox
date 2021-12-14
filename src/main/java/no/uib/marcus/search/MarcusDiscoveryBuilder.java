@@ -13,7 +13,7 @@ import org.elasticsearch.search.builder.SearchSourceBuilderException;
  *
  * @author Hemed Ali
  */
-public class MarcusDiscoveryBuilder extends AbstractSearchBuilder {
+public class MarcusDiscoveryBuilder extends AbstractSearchBuilder<MarcusDiscoveryBuilder> {
     private static final Logger logger = Logger.getLogger(MarcusDiscoveryBuilder.class);
 
     MarcusDiscoveryBuilder(Client client) {

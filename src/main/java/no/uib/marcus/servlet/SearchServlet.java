@@ -101,7 +101,9 @@ public class SearchServlet extends HttpServlet {
                     .setIndexToBoost(indexToBoost);
 
             //Add top level filter, for "AND" aggregations
-            BoolFilterBuilder topFilter = FilterUtils.getTopFilter(selectedFacets, aggs, DateRange.of(fromDate, toDate));
+            BoolFilterBuilder topFilter = FilterUtils.getTopFilter(
+                    selectedFacets, aggs, DateRange.of(fromDate, toDate)
+            );
             if (topFilter.hasClauses()) {
                 builder.setFilter(topFilter);
             }
@@ -124,7 +126,7 @@ public class SearchServlet extends HttpServlet {
             // Log search response
             logger.info(LogUtils.createLogMessage(request, searchResponse));
             // System.out.println("Builder class: " + builder.getClass().getName() + " " +
-            //                "\nBuilder toString: " + builder  );
+            //                 "\nBuilder toString: " + builder  );
         }
     }
 
@@ -140,6 +142,10 @@ public class SearchServlet extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+
+        request.setCharacterEncoding("UTF-8");
+        response.setContentType("application/json;charset=UTF-8");
+
         try (PrintWriter out = response.getWriter()) {
             out.write(XContentFactory.jsonBuilder()
                     .startObject()
