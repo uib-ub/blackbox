@@ -5,9 +5,13 @@ import org.elasticsearch.client.Client;
 import org.elasticsearch.common.Nullable;
 
 /**
- * Creation factory for search builders.
+ * A set of static factory methods for creation of {@link SearchBuilder}s.
  */
 public class SearchBuilderFactory {
+
+    /**
+     * Prevents instantiation
+     */
     private SearchBuilderFactory() {
     }
 
@@ -51,21 +55,15 @@ public class SearchBuilderFactory {
 
 
     /**
-     * Gets default search builder
-     */
-    public static AbstractSearchBuilder get(Client client) {
-        return get(null, client);
-    }
-
-
-    /**
      * Gets corresponding search builder based on the service parameter
      *
      * @param serviceString a service parameter. If it is null, it will fall to a default service.
      * @param client        a search client to be used
      * @return a corresponding search builder
      */
-    public static AbstractSearchBuilder get(@Nullable String serviceString, Client client) {
+    public static SearchBuilder<? extends AbstractSearchBuilder<?>> getSearchBuilder(
+            @Nullable String serviceString,
+            Client client) {
         ServiceName service = ServiceName.toEnum(serviceString);
         switch (service) {
             case SKA:

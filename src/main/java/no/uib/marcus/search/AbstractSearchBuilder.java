@@ -19,14 +19,16 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Abstract search builder where specific search builders inherit from.
+ * This class provides a skeletal implementation of {@link SearchBuilder} interface to minimize
+ * the effort required to implement the interface. The idea here is that, all custom search builders
+ * should inherit this class.
  *
- * @author Hemed Al Ruwehy
+ * @author Hemed Ali Al Ruwehy
  * <p>
  * University of Bergen Library.
  * 2016-04-15
  */
-public abstract class AbstractSearchBuilder implements SearchService<AbstractSearchBuilder> {
+public abstract class AbstractSearchBuilder<T extends AbstractSearchBuilder<T>> implements SearchBuilder<T> {
     private final Logger logger = Logger.getLogger(getClass().getName());
     private Client client;
     @Nullable
@@ -44,11 +46,11 @@ public abstract class AbstractSearchBuilder implements SearchService<AbstractSea
     private int size = 10;
 
     /**
-     * Constructor
+     * Sole constructor. (For invocation by subclass constructors, typically implicit.)
      *
      * @param client a non-null Elasticsearch client to communicate with a cluster.
      */
-    public AbstractSearchBuilder(@NotNull Client client) {
+    protected AbstractSearchBuilder(@NotNull Client client) {
         if (client == null) {
             throw new IllegalParameterException("Unable to initialize service. Client cannot be null");
         }
@@ -82,12 +84,12 @@ public abstract class AbstractSearchBuilder implements SearchService<AbstractSea
      * @return this object where aggregations have been set
      */
     @SuppressWarnings("unchecked")
-    public AbstractSearchBuilder setAggregations(String aggregations) {
+    public T setAggregations(String aggregations) {
         if (aggregations != null) {
             AggregationUtils.validateAggregations(aggregations);
             this.aggregations = aggregations;
         }
-        return this;
+        return (T) this;
     }
 
     /**
@@ -104,9 +106,9 @@ public abstract class AbstractSearchBuilder implements SearchService<AbstractSea
      * @return this object where sort has been set
      */
     @SuppressWarnings("unchecked")
-    public AbstractSearchBuilder setSortBuilder(SortBuilder sortBuilder) {
+    public T setSortBuilder(SortBuilder sortBuilder) {
         this.sortBuilder = sortBuilder;
-        return this;
+        return (T) this;
     }
 
     /**
@@ -123,9 +125,9 @@ public abstract class AbstractSearchBuilder implements SearchService<AbstractSea
      * @return this object where filter has been set
      */
     @SuppressWarnings("unchecked")
-    public AbstractSearchBuilder setFilter(FilterBuilder filter) {
+    public T setFilter(FilterBuilder filter) {
         this.filter = filter;
-        return this;
+        return (T) this;
     }
 
     /**
@@ -143,9 +145,11 @@ public abstract class AbstractSearchBuilder implements SearchService<AbstractSea
      * @return this object where post_filter has been set
      */
     @SuppressWarnings("unchecked")
-    public AbstractSearchBuilder setPostFilter(FilterBuilder filter) {
-        this.postFilter = filter;
-        return this;
+    public T setPostFilter(FilterBuilder filter) {
+        if(filter != null) {
+            this.postFilter = filter;
+        }
+        return (T) this;
     }
 
     public String getIndexToBoost() {
@@ -159,9 +163,11 @@ public abstract class AbstractSearchBuilder implements SearchService<AbstractSea
      * @return this builder where index to boost has been set
      */
     @SuppressWarnings("unchecked")
-    public AbstractSearchBuilder setIndexToBoost(String indexToBoost) {
-        this.indexToBoost = indexToBoost;
-        return this;
+    public T setIndexToBoost(String indexToBoost) {
+        if(Strings.hasText(indexToBoost)) {
+            this.indexToBoost = indexToBoost;
+        }
+        return (T) this;
     }
 
     /**
@@ -180,11 +186,11 @@ public abstract class AbstractSearchBuilder implements SearchService<AbstractSea
      * @return this object where a date range filter has been set
      */
     @SuppressWarnings("unchecked")
-    public AbstractSearchBuilder setSelectedFacets(Map<String, List<String>> selectedFacets) {
+    public T setSelectedFacets(Map<String, List<String>> selectedFacets) {
         if (selectedFacets != null && !selectedFacets.isEmpty()) {
             this.selectedFacets = selectedFacets;
         }
-        return this;
+        return (T) this;
     }
 
     /**
@@ -201,12 +207,12 @@ public abstract class AbstractSearchBuilder implements SearchService<AbstractSea
      * @return this object where client has been set
      */
     @SuppressWarnings("unchecked")
-    public AbstractSearchBuilder setClient(@NotNull Client client) {
+    public T setClient(@NotNull Client client) {
         if (client == null) {
             throw new IllegalParameterException("Unable to initialize service. Client cannot be null");
         }
         this.client = client;
-        return this;
+        return (T) this;
     }
 
     /**
@@ -223,9 +229,9 @@ public abstract class AbstractSearchBuilder implements SearchService<AbstractSea
      * @return this object where indices have been set
      */
     @SuppressWarnings("unchecked")
-    public AbstractSearchBuilder setIndices(String... indices) {
+    public T setIndices(String... indices) {
         this.indices = indices;
-        return this;
+        return (T) this;
     }
 
     /**
@@ -242,9 +248,9 @@ public abstract class AbstractSearchBuilder implements SearchService<AbstractSea
      * @return this object where index types are set
      */
     @SuppressWarnings("unchecked")
-    public AbstractSearchBuilder setTypes(String... types) {
+    public T setTypes(String... types) {
         this.types = types;
-        return this;
+        return (T) this;
     }
 
     /**
@@ -261,11 +267,11 @@ public abstract class AbstractSearchBuilder implements SearchService<AbstractSea
      * @return this object where from is set
      */
     @SuppressWarnings("unchecked")
-    public AbstractSearchBuilder setFrom(int from) {
+    public T setFrom(int from) {
         if (from >= 0) {
             this.from = from;
         }
-        return this;
+        return (T) this;
     }
 
     /**
@@ -282,11 +288,11 @@ public abstract class AbstractSearchBuilder implements SearchService<AbstractSea
      * @return this object where size has been set
      */
     @SuppressWarnings("unchecked")
-    public AbstractSearchBuilder setSize(int size) {
+    public T setSize(int size) {
         if (size >= 0) {
             this.size = size;
         }
-        return this;
+        return (T) this;
     }
 
     /**
@@ -303,9 +309,9 @@ public abstract class AbstractSearchBuilder implements SearchService<AbstractSea
      * @return this object where query string has been set.
      */
     @SuppressWarnings("unchecked")
-    public AbstractSearchBuilder setQueryString(@Nullable String queryString) {
+    public T setQueryString(@Nullable String queryString) {
         this.queryString = queryString;
-        return this;
+        return (T) this;
     }
 
     /**

@@ -13,9 +13,9 @@ import org.elasticsearch.index.query.SimpleQueryStringBuilder;
 import org.elasticsearch.search.builder.SearchSourceBuilderException;
 
 /**
- * A search builder for WAB
+ * A custom search builder for WAB
  */
-public class WabSearchBuilder extends AbstractSearchBuilder {
+public class WabSearchBuilder extends AbstractSearchBuilder<WabSearchBuilder> {
     private final Logger logger = Logger.getLogger(getClass().getName());
 
     WabSearchBuilder(Client client) {
