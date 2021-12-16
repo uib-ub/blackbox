@@ -6,8 +6,8 @@
 
 Blackbox is an Elasticsearch query builder which takes client requests, process them and then send them to Elasticsearch. It is a server side application that acts as a bridge between Elasticsearch and client applications to simplify search experience. 
 
-Blackbox uses Elasticsearch core API to communicate with Elasticsearch cluster in round-robbin 
-fashion through built-in Elasticseach Transport client (transport client is deprecated in favor of HTTP client). Blackbox acts as one of the Elasticsearch nodes in the cluster. It runs as a [Web application](http://jambo.uib.no/blackbox) whereby clients communicate with it through HTTP.
+Blackbox uses Elasticsearch core Java API to communicate with Elasticsearch cluster in round-robbin 
+fashion through built-in Elasticseach `TransportClient` (from Elasticsearch 7.0.0, the `TransportClient` is deprecated in favour of the Java High Level REST Client and will be removed in Elasticsearch 8.0.). Blackbox acts as one of the Elasticsearch nodes in the cluster. It runs as a [Web application](http://jambo.uib.no/blackbox) whereby clients communicate with it through HTTP.
 
 ## Why Blackbox?
 
