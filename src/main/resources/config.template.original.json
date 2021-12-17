@@ -1,8 +1,8 @@
 {
   "cluster": {
-    "name": "ubb-elasticsearch",
+    "name": "ubb-elasticsearch-jambo",
     "node_name": "Blackbox",
-    "host": "kirishima.uib.no",
+    "host": "jambo.uib.no",
     "port": 9300
   },
   "_comment" : "application will look for these cluster settings when initializing"
