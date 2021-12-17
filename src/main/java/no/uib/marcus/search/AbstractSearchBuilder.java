@@ -20,7 +20,7 @@ import java.util.Map;
 
 /**
  * This class provides a skeletal implementation of {@link SearchBuilder} interface to minimize
- * the effort required to implement the interface when building your own search build. The idea here is that,
+ * the effort required to implement the interface when building your own search builder. The idea here is that,
  * all custom search builders should inherit from this class.
  *
  * @author Hemed Ali Al Ruwehy
