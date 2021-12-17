@@ -4,7 +4,9 @@ import com.google.gson.Gson;
 import no.uib.marcus.common.Params;
 import no.uib.marcus.search.suggestion.CompletionSuggestion;
 import org.elasticsearch.common.Strings;
+import org.elasticsearch.common.xcontent.XContentFactory;
 
+import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -50,10 +52,30 @@ public class SuggestionServlet extends HttpServlet {
         processRequest(request, response);
     }
 
+    /**
+     * Handles the HTTP <code>POST</code> method.
+     *
+     * @param request  servlet request
+     * @param response servlet response
+     * @throws ServletException if a servlet-specific error occurs
+     * @throws IOException      if an I/O error occurs
+     */
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
-            throws IOException {
-        processRequest(request, response);
+            throws ServletException, IOException {
+
+        request.setCharacterEncoding("UTF-8");
+        response.setContentType("application/json;charset=UTF-8");
+
+        try (PrintWriter out = response.getWriter()) {
+            out.write(XContentFactory.jsonBuilder()
+                    .startObject()
+                    .field("code", 405)
+                    .field("message", "Method Not Allowed")
+                    .endObject()
+                    .string()
+            );
+        }
     }
 
     @Override

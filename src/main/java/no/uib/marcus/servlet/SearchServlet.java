@@ -2,7 +2,10 @@ package no.uib.marcus.servlet;
 
 import no.uib.marcus.client.ClientFactory;
 import no.uib.marcus.common.Params;
-import no.uib.marcus.common.util.*;
+import no.uib.marcus.common.util.FilterUtils;
+import no.uib.marcus.common.util.LogUtils;
+import no.uib.marcus.common.util.QueryUtils;
+import no.uib.marcus.common.util.SortUtils;
 import no.uib.marcus.range.DateRange;
 import no.uib.marcus.search.SearchBuilder;
 import no.uib.marcus.search.SearchBuilderFactory;
@@ -11,6 +14,7 @@ import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.client.Client;
 import org.elasticsearch.common.Booleans;
 import org.elasticsearch.common.Strings;
+import org.elasticsearch.common.xcontent.XContentFactory;
 import org.elasticsearch.index.query.BoolFilterBuilder;
 
 import javax.servlet.ServletException;
@@ -79,13 +83,13 @@ public class SearchServlet extends HttpServlet {
             int _from = Strings.hasText(from) ? Integer.parseInt(from) : Params.DEFAULT_FROM;
             int _size = Strings.hasText(size) ? Integer.parseInt(size) : Params.DEFAULT_SIZE;
 
-            // Build a facet map based on selected filters. In the result map, keys are "fields"
-            // and values are "terms"
+            // Build a facet map based on selected filters.
             // e.g {"subject.exact" = ["Flyfoto" , "Birkeland"], "type" = ["Brev"]}
             Map<String, List<String>> selectedFacets = FilterUtils.buildFilterMap(selectedFilters);
 
-            //Build search service
-            SearchBuilder builder = SearchBuilderFactory.get(service, client)
+            //Get and build corresponding search builder based on the "service" parameter
+            SearchBuilder<? extends SearchBuilder<?>> builder = SearchBuilderFactory
+                    .getSearchBuilder(service, client)
                     .setIndices(indices)
                     .setTypes(types)
                     .setQueryString(queryString)
@@ -97,7 +101,9 @@ public class SearchServlet extends HttpServlet {
                     .setIndexToBoost(indexToBoost);
 
             //Add top level filter, for "AND" aggregations
-            BoolFilterBuilder topFilter = FilterUtils.getTopFilter(selectedFacets, aggs, DateRange.of(fromDate, toDate));
+            BoolFilterBuilder topFilter = FilterUtils.getTopFilter(
+                    selectedFacets, aggs, DateRange.of(fromDate, toDate)
+            );
             if (topFilter.hasClauses()) {
                 builder.setFilter(topFilter);
             }
@@ -117,8 +123,10 @@ public class SearchServlet extends HttpServlet {
             //Write response to the client
             out.write(searchResponseString);
 
-            //Log search response
+            // Log search response
             logger.info(LogUtils.createLogMessage(request, searchResponse));
+            // System.out.println("Builder class: " + builder.getClass().getName() + " " +
+            //                 "\nBuilder toString: " + builder  );
         }
     }
 
@@ -134,7 +142,19 @@ public class SearchServlet extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        doGet(request, response);
+
+        request.setCharacterEncoding("UTF-8");
+        response.setContentType("application/json;charset=UTF-8");
+
+        try (PrintWriter out = response.getWriter()) {
+            out.write(XContentFactory.jsonBuilder()
+                    .startObject()
+                    .field("code", 405)
+                    .field("message", "Method Not Allowed")
+                    .endObject()
+                    .string()
+             );
+        }
     }
 
     @Override

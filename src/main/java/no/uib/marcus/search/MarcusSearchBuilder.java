@@ -24,11 +24,11 @@ import static org.elasticsearch.index.query.functionscore.ScoreFunctionBuilders.
 /**
  * Builder for Marcus search service
  *
- * @author Hemed A. Al Ruwehy
+ * @author Hemed Al Ruwehy
  * @since 0.1
  * 2016-01-24, University of Bergen Library.
  */
-public class MarcusSearchBuilder extends SearchBuilder<MarcusSearchBuilder> {
+public class MarcusSearchBuilder extends AbstractSearchBuilder<MarcusSearchBuilder> {
 
     private final Logger logger = Logger.getLogger(getClass().getName());
 

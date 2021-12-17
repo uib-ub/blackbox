@@ -8,6 +8,7 @@ import no.uib.marcus.search.SearchBuilderFactory;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.client.Client;
 import org.elasticsearch.common.Strings;
+import org.elasticsearch.common.xcontent.XContentFactory;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -85,8 +86,20 @@ public class DiscoveryServlet extends HttpServlet {
      */
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
-        processRequest(request, response);
+            throws IOException {
+
+        request.setCharacterEncoding("UTF-8");
+        response.setContentType("application/json;charset=UTF-8");
+
+        try (PrintWriter out = response.getWriter()) {
+            out.write(XContentFactory.jsonBuilder()
+                    .startObject()
+                    .field("code", 405)
+                    .field("message", "Method Not Allowed")
+                    .endObject()
+                    .string()
+            );
+        }
     }
 
     /**

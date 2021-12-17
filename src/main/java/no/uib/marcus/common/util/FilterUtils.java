@@ -164,8 +164,6 @@ public final class FilterUtils {
                 */
                 boolFilter.should(FilterBuilders.boolFilter()
                         .must(FilterBuilders.rangeFilter(Params.DateField.MADE_AFTER).gte(fromDate).lte(toDate)));
-                //.must(FilterBuilders.rangeFilter(Params.DateField.MADE_AFTER).lte(toDate)))
-
 
                /*
                  Here the condition in which madeBefore >= from_date and madeBefore <= to_date, we don't care
@@ -177,12 +175,10 @@ public final class FilterUtils {
                 */
                 boolFilter.should(FilterBuilders.boolFilter()
                         .must(FilterBuilders.rangeFilter(Params.DateField.MADE_BEFORE).gte(fromDate).lte(toDate)));
-                //.must(FilterBuilders.rangeFilter(Params.DateField.MADE_BEFORE).lte(toDate)))
-
 
                  /*
                   This is a case that fromDate and toDate are within madeAfter and madeBefore range.
-                  Pre condition:  both fromDate and toDate must have values AND fromDate <= toDate.
+                  Precondition:  both fromDate and toDate must have values AND fromDate <= toDate.
                   In other words, we must have positive range for this condition to satisfy.
 
                       from_date|---------------------------------------------------|to_date
