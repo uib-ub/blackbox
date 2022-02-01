@@ -9,6 +9,15 @@ Blackbox is an Elasticsearch query builder which takes client requests, process 
 Blackbox uses Elasticsearch core Java API to communicate with Elasticsearch cluster in round-robbin 
 fashion through built-in Elasticseach `TransportClient` (from Elasticsearch 7.0.0, the `TransportClient` is deprecated in favour of the Java High Level REST Client and will be removed in Elasticsearch 8.0.). Blackbox acts as one of the Elasticsearch nodes in the cluster. It runs as a [Web application](http://jambo.uib.no/blackbox) whereby clients communicate with it through HTTP.
 
+## Blackbox at the University of Bergen Library
+
+Elasticsearch set up at the University of Bergen Library contains three main components, Elasticsearch, [RDF River](https://github.com/ubbdst/elasticsearch-rdf-river)  and Blackbox.
+RDF River is an Elasticsearch plugin which injects RDF data from SPARQL endpoint or TDB into Elasticsearch. For more information, see [Elasticsearch indexing scripts](https://git.app.uib.no/uib-ub/elasticsearch-scripts)
+
+The diagram below shows the interaction between Elasticsearch, RDF River and Blackbox.
+
+![Alt text](src/main/webapp/images/elasticsearch-setup-ub.png?raw=true "Elasticsearch")
+
 ## Why Blackbox?
 
 The main reason is to simplify queries for search clients. This means search clients send simple queries to Blackbox,
@@ -115,17 +124,7 @@ See below on how the above query gets converted to.
 ``` 
 
 Nevertheless, letting search clients access Elasticsearch cluster directly may pose some security threats, 
-and thus we decided that the search traffic should pass only through Blackbox which then supports only GET requests. 
-
-## Blackbox at the University of Bergen Library
-
-Elasticsearch set up at the University of Bergen Library contains three main components, Elasticsearch, [RDF River](https://github.com/ubbdst/elasticsearch-rdf-river)  and Blackbox.
-RDF River is an Elasticsearch plugin which injects RDF data from SPARQL endpoint or TDB into Elasticsearch. For more information, see [Elasticsearch indexing scripts](https://git.app.uib.no/uib-ub/elasticsearch-scripts)
-
-The diagram below shows the interaction between Elasticsearch, RDF River and Blackbox.
-
-![Alt text](../elasticsearch-scripts/common/img/elasticsearch-setup-ub.png?raw=true "Class diagrams")
-
+and thus we decided that the search traffic should pass only through Blackbox which then supports only GET requests.
 
 ## Usage and query parameters
 Currently Blackbox supports 3 endpoints Search, Suggest and Discover.
