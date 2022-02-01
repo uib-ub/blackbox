@@ -117,6 +117,14 @@ See below on how the above query gets converted to.
 Nevertheless, letting search clients access Elasticsearch cluster directly may pose some security threats, 
 and thus we decided that the search traffic should pass only through Blackbox which then supports only GET requests. 
 
+## Blackbox at the University of Bergen Library
+
+Elasticsearch set up at the University of Bergen Library contains three main components, Elasticsearch, [RDF River](https://github.com/ubbdst/elasticsearch-rdf-river)  and Blackbox.
+RDF River is an Elasticsearch plugin which injects RDF data from SPARQL endpoint or TDB into Elasticsearch. For more information, see [Elasticsearch indexing scripts](https://git.app.uib.no/uib-ub/elasticsearch-scripts)
+
+The diagram below shows the interaction between Elasticsearch, RDF River and Blackbox.
+
+![Alt text](../elasticsearch-scripts/common/img/elasticsearch-setup-ub.png?raw=true "Class diagrams")
 
 
 ## Usage and query parameters
