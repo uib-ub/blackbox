@@ -3,6 +3,8 @@ package no.uib.marcus;
 import no.uib.marcus.range.DateRange;
 import org.junit.Test;
 
+import java.time.LocalDate;
+
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
@@ -11,6 +13,7 @@ public class DateRangeTest {
     @Test
     public void testHasPositiveValue(){
         DateRange range = new DateRange("2013", "2015");
+        LocalDate ld =  range.getFrom();
         assertTrue("Range is positive", range.isPositive());
         assertTrue("Range is positive", new DateRange("2017", "2017").isPositive());
         assertEquals("2013-01-01", range.getFrom().toString());

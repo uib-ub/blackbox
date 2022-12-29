@@ -1,17 +1,16 @@
 package no.uib.marcus.range;
 
-import org.apache.log4j.Logger;
 import org.elasticsearch.common.Nullable;
 import org.elasticsearch.common.Strings;
-import org.elasticsearch.common.joda.Joda;
-import org.elasticsearch.common.joda.time.LocalDate;
 
 import javax.validation.constraints.NotNull;
 import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.datatype.DatatypeConstants;
 import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.XMLGregorianCalendar;
+import java.time.LocalDate;
 import java.util.Objects;
+import java.util.logging.Logger;
 
 /**
  * DateRange class that manipulates ranges for Local Dates.
@@ -24,7 +23,7 @@ import java.util.Objects;
 public class DateRange implements Range<LocalDate> {
     //Default date format, any one of these is OK
     public static final String DEFAULT_DATE_FORMAT = "yyyy-MM-dd||yyyy-MM||yyyy";
-    private static final Logger logger = Logger.getLogger(DateRange.class);
+    private static final Logger logger = Logger.getLogger(String.valueOf(DateRange.class));
 
     //Null indicates unbounded/infinite value
     @Nullable
