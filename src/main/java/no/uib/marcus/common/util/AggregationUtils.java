@@ -18,6 +18,7 @@ import org.elasticsearch.search.aggregations.bucket.histogram.DateHistogramAggre
 import org.elasticsearch.search.aggregations.bucket.histogram.DateHistogramInterval;
 import org.elasticsearch.search.aggregations.bucket.histogram.Histogram;
 import org.elasticsearch.search.aggregations.bucket.terms.Terms;
+import org.elasticsearch.search.aggregations.bucket.terms.TermsAggregationBuilder;
 
 import java.util.HashMap;
 import java.util.List;
@@ -161,7 +162,7 @@ public final class AggregationUtils {
         BoolFilterBuilder aggsFilter = FilterUtils.getPostFilter(selectedFacets, aggs);
         if (aggsFilter.hasClauses()) {
             termsAggs = constructTermsAggregation(currentFacet, true);
-            termsAggs.subAggregation(AggregationBuilders.filter(AGGS_FILTER_KEY).filter(aggsFilter));
+            termsAggs.subAggregation(AggregationBuilders.filter(AGGS_FILTER_KEY, aggsFilter).filter(aggsFilter));
         }
         return termsAggs;
     }
@@ -215,26 +216,26 @@ public final class AggregationUtils {
      */
     public static AggregationBuilder constructTermsAggregation(JsonObject facet, boolean sortBySubAggregation) {
         String field = facet.get("field").getAsString();
-        Object filterList;
-        QueryBuilders.termsQuery("keyword", toLowerCase(filterList));
-        AggregationBuilder termsBuilder = AggregationBuilders.terms(field).field(field);
+      //  Object filterList;
+       // QueryBuilders.termsQuery("keyword", toLowerCase(filterList));
+        TermsAggregationBuilder termsBuilder = AggregationBuilders.terms(field).field(field);
         //Set size
         if (facet.has("size")) {
             int size = facet.get("size").getAsInt();
             termsBuilder.size(size);
         }
         //Set order
-        Order subAggregationOrder = Terms.x|(aggregation(AGGS_FILTER_KEY, false);
+        BucketOrder subAggregationOrder =  BucketOrder.aggregation(AGGS_FILTER_KEY, false);
         if (facet.has("order")) {
-            Terms.Order order = Terms.Order.count(false);//default order (count descending)
+            BucketOrder order = BucketOrder.count(false);//default order (count descending)
             if (facet.get("order").getAsString().equalsIgnoreCase("count_asc")) {
-                order = Terms.Order.count(true);
-                subAggregationOrder = Terms.Order.aggregation(AGGS_FILTER_KEY, true);
+                order = BucketOrder.count(true);
+                subAggregationOrder = BucketOrder.aggregation(AGGS_FILTER_KEY, true);
             } else if (facet.get("order").getAsString().equalsIgnoreCase("term_asc")) {
-                order = Terms.Order.term(true);
+                order = BucketOrder.key(true);
                 subAggregationOrder = order; // for term_asc, sort by parent aggregation
             } else if (facet.get("order").getAsString().equalsIgnoreCase("term_desc")) {
-                order = Terms.Order.term(false);
+                order = BucketOrder.key(false);
                 subAggregationOrder = order; // for term_desc, sort by parent aggregation
             }
             if (sortBySubAggregation) {//Sort using sub aggregation

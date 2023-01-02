@@ -2,8 +2,9 @@ package no.uib.marcus.common.util;
 
 import no.uib.marcus.common.Params;
 import org.elasticsearch.action.search.SearchResponse;
-import org.elasticsearch.common.xcontent.XContentBuilder;
-import org.elasticsearch.common.xcontent.XContentFactory;
+import org.elasticsearch.search.SearchHits;
+import org.elasticsearch.xcontent.XContentBuilder;
+import org.elasticsearch.xcontent.XContentFactory;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
@@ -32,6 +33,7 @@ public final class LogUtils {
         Map<String, Object> parameterMapCopy = new HashMap<>(request.getParameterMap());
         //Remove aggregations from the logs
         parameterMapCopy.remove(Params.AGGREGATIONS);
+
         //Build log message
         XContentBuilder builder = XContentFactory.jsonBuilder()
                 .startObject()
@@ -39,10 +41,9 @@ public final class LogUtils {
                 // InetAddress.getLocalHost() : request.getRemoteAddr())
                 .field("status", searchResponse == null? 404 : searchResponse.status().getStatus())
                 .field("params", jsonify(parameterMapCopy))
-                .field("hits", searchResponse == null ? -1 : searchResponse.getHits().getTotalHits())
                 .field("took", searchResponse == null ? -1 : searchResponse.getTook())
                 .endObject();
-        return  builder.string();
+        return  builder.toString();
     }
 
 }

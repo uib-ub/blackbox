@@ -31,14 +31,7 @@
     </developers>
      <!--Dependencies for Blackbox -->
     <dependencies>
-        <dependency>
-            <!--Testing framework for Lucene-->
-            <groupId>org.apache.lucene</groupId>
-            <artifactId>lucene-test-framework</artifactId>
-            <version>4.10.4</version>
-            <scope>test</scope>
-        </dependency>   
-        <dependency>
+         <dependency>
             <groupId>javax</groupId>
             <artifactId>javaee-web-api</artifactId>
             <version>8.0.1</version>
@@ -79,7 +72,14 @@
             <artifactId>elasticsearch-rest-high-level-client</artifactId>
             <version>7.17.8</version>
         </dependency>
+
         <dependency>
+        <groupId>org.elasticsearch</groupId>
+        <artifactId>elasticsearch</artifactId>
+        <version>${elasticsearch.version}</version>
+    </dependency>
+
+    <dependency>
             <groupId>com.google.code.gson</groupId>
             <artifactId>gson</artifactId>
             <version>2.9.1</version>
