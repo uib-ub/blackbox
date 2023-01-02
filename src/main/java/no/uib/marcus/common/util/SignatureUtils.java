@@ -33,7 +33,7 @@ public class SignatureUtils {
     public static String appendLeadingWildcardIfWABSignature(String value) {
         if (isNeitherNullNorEmpty(value)) {
             value = value.trim();
-            if (!Strings.containsWhitespace(value) && value.indexOf(WILDCARD) == -1) {
+            if (!value.matches("\\s") && value.indexOf(WILDCARD) == -1) {
                 if (isWABSignature(value)) {
                     return value + WILDCARD; //"ms-101" should be transformed to "ms-101*"
                 }
@@ -53,7 +53,7 @@ public class SignatureUtils {
         if (isNeitherNullNorEmpty(value)) {
             value = value.trim();
             if (Character.isLetter(value.charAt(0))
-                    && !Strings.containsWhitespace(value)
+                    && !value.matches("\\s")
                     && !containsReservedChars(value)) {
 
                 //"ubb-ms-01" should be transformed to "ubb-ms-01*" but not ubb+ms
