@@ -121,7 +121,7 @@ public final class AggregationUtils {
             if (facet.has("field")) {
                 //Add DateHistogram aggregations
                 if (facet.has("type") && facet.get("type").getAsString().equals("date_histogram")) {
-                    DateHistogramAggregationBuilder DHAB = searchRequest.addAggregation(AggregationUtils.getDateHistogramAggregation()tDateHistogramAggregation(facet));
+                    searchRequest.addAggregation(AggregationUtils.getDateHistogramAggregation(facet));
                 } else {
                     AggregationBuilder termsAggs = constructTermsAggregation(facet);
                     if (selectedFacets != null && selectedFacets.size() > 0) {
@@ -213,7 +213,7 @@ public final class AggregationUtils {
      * @param sortBySubAggregation a flag whether to sort by sub aggregation filter
      * @return a term builder
      */
-    public static TermsBuilder constructTermsAggregation(JsonObject facet, boolean sortBySubAggregation) {
+    public static AggregationBuilder constructTermsAggregation(JsonObject facet, boolean sortBySubAggregation) {
         String field = facet.get("field").getAsString();
         Object filterList;
         QueryBuilders.termsQuery("keyword", toLowerCase(filterList));
@@ -261,7 +261,7 @@ public final class AggregationUtils {
      * @param facet a JSON object
      * @return a term builder
      */
-    public static TermsBuilder constructTermsAggregation(JsonObject facet) {
+    public static AggregationBuilder constructTermsAggregation(JsonObject facet) {
         return constructTermsAggregation(facet, false);
     }
 
