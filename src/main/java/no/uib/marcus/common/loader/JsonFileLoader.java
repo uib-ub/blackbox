@@ -2,8 +2,11 @@ package no.uib.marcus.common.loader;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
+import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.elasticsearch.common.settings.loader.JsonSettingsLoader;
+import  org.elasticsearch.xcontent.json.JsonXContent;
+
+import org.elasticsearch.common.settings.JsonSettingsLoader;
 
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
@@ -17,8 +20,12 @@ import java.util.Map;
  * author Hemed Ali
  */
 public class JsonFileLoader extends JsonSettingsLoader {
+
+    /* https://www.javadoc.io/doc/org.elasticsearch/elasticsearch/latest/org.elasticsearch.server/org/elasticsearch/common/settings/Settings.Builder.html
+    * Use builder
+    *  */
     public final static String CONFIG_TEMPLATE = "config.template.json";
-    private final Logger logger = Logger.getLogger(getClass().getName());
+    private final Logger logger = LogManager.getLogger(getClass().getName());
 
     /**
      * Get the file path from the resource folder
