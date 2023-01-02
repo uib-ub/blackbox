@@ -9,6 +9,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.elasticsearch.action.search.SearchRequestBuilder;
 import org.elasticsearch.index.query.BoolQueryBuilder;
+import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.common.Strings;
 import org.elasticsearch.search.aggregations.AggregationBuilder;
@@ -159,10 +160,10 @@ public final class AggregationUtils {
     {
         BoolQueryBuilder query = QueryBuilders.boolQuery();
         query.filter();
-        BoolFilterBuilder aggsFilter = FilterUtils.getPostFilter(selectedFacets, aggs);
+        BoolQueryBuilder aggsFilter = FilterUtils.getPostFilter(selectedFacets, aggs);
         if (aggsFilter.hasClauses()) {
             termsAggs = constructTermsAggregation(currentFacet, true);
-            termsAggs.subAggregation(AggregationBuilders.filter(AGGS_FILTER_KEY, aggsFilter).filter(aggsFilter));
+            termsAggs.subAggregation(AggregationBuilders.filter(AGGS_FILTER_KEY, aggsFilter));
         }
         return termsAggs;
     }

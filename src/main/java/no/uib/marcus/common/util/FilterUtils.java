@@ -4,11 +4,13 @@ import no.uib.marcus.common.Params;
 import no.uib.marcus.range.DateRange;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.elasticsearch.common.Nullable;
-import org.elasticsearch.common.collect.Lists;
-import org.elasticsearch.common.joda.time.LocalDate;
-import org.elasticsearch.index.query.BoolFilterBuilder;
-import org.elasticsearch.index.query.FilterBuilders;
+import java.time.LocalDate;
+
+import org.elasticsearch.core.Nullable;
+import org.elasticsearch.index.query.BoolQueryBuilder;
+import org.elasticsearch.index.query.QueryBuilders;
+
+import com.google.common.collect.Lists;
 
 import javax.validation.constraints.NotNull;
 import java.util.*;
@@ -33,24 +35,24 @@ public final class FilterUtils {
     /**
      * A wrapper for building filter without dates
      ***/
-    public static Map<String, BoolFilterBuilder> buildBoolFilter(@NotNull Map<String, List<String>> filterMap, String aggs) {
+    public static Map<String, BoolQueryBuilder> buildBoolFilter(@NotNull Map<String, List<String>> filterMap, String aggs) {
         return buildBoolFilter(filterMap, aggs, null);
     }
 
     /**
      * Gets top filter from the given filter map or empty filter if it does not exist
      */
-    public static BoolFilterBuilder getTopFilter(@NotNull Map<String, List<String>> selectedFacets, String aggs, DateRange dateRange) {
-        Map<String, BoolFilterBuilder> filter = FilterUtils.buildBoolFilter(selectedFacets, aggs, dateRange);
-        return filter.getOrDefault(TOP_FILTER, FilterBuilders.boolFilter());
+    public static BoolQueryBuilder getTopFilter(@NotNull Map<String, List<String>> selectedFacets, String aggs, DateRange dateRange) {
+        Map<String, BoolQueryBuilder> filter = FilterUtils.buildBoolFilter(selectedFacets, aggs, dateRange);
+        return filter.getOrDefault(TOP_FILTER, QueryBuilders.boolQuery());
     }
 
     /**
      * Gets post filter from the given filter map or empty filter if it does not exist
      */
-    public static BoolFilterBuilder getPostFilter(@NotNull Map<String, List<String>> selectedFacets, String aggs) {
-        Map<String, BoolFilterBuilder> filter = FilterUtils.buildBoolFilter(selectedFacets, aggs);
-        return filter.getOrDefault(POST_FILTER, FilterBuilders.boolFilter());
+    public static BoolQueryBuilder getPostFilter(@NotNull Map<String, List<String>> selectedFacets, String aggs) {
+        Map<String, BoolQueryBuilder> filter = FilterUtils.buildBoolFilter(selectedFacets, aggs);
+        return filter.getOrDefault(POST_FILTER, QueryBuilders.boolQuery());
     }
 
     /**
@@ -62,14 +64,14 @@ public final class FilterUtils {
      * @return a map which contains AND and OR bool filters based on the aggregations, with the keys
      * "top_filter" and "post_filter" respectively
      */
-    private static Map<String, BoolFilterBuilder> buildBoolFilter(
+    private static Map<String, BoolQueryBuilder> buildBoolFilter(
             @NotNull Map<String, List<String>> filterMap,
             @Nullable String aggregations,
             DateRange dateRange
     ) {
-        Map<String, BoolFilterBuilder> boolFilterMap = new HashMap<>();
-        BoolFilterBuilder topFilter = FilterBuilders.boolFilter();
-        BoolFilterBuilder postFilter = FilterBuilders.boolFilter();
+        Map<String, BoolQueryBuilder> boolFilterMap = new HashMap<>();
+        BoolQueryBuilder topFilter = QueryBuilders.boolQuery();
+        BoolQueryBuilder postFilter = QueryBuilders.boolQuery();
 
         try {
             //Building a filter based on the user selected facets. Starting with AND filter
@@ -78,17 +80,17 @@ public final class FilterUtils {
                     if (hasOROperator(aggregations, entry.getKey())) {
                         //Building "OR" filter that will be used as post_filter.
                         //post_filter only affects search results but NOT aggregations.
-                        postFilter.must(FilterBuilders.termsFilter(entry.getKey(), entry.getValue()));
+                        postFilter.must(QueryBuilders.termQuery(entry.getKey(), entry.getValue()));
                     } else if (entry.getKey().startsWith(BlackboxUtils.MINUS)) {
                         //Exclude any filter that begins with minus sign
-                        topFilter.mustNot(FilterBuilders.termsFilter(entry.getKey().substring(1), entry.getValue()));
+                        topFilter.mustNot(QueryBuilders.termsQuery(entry.getKey().substring(1), entry.getValue()));
                     } else { //default is "AND" filter that will be used as top_filter
                         for (Object value : entry.getValue()) {
                             if (entry.getKey().startsWith(BlackboxUtils.MINUS)) {
                                 //Exclude any filter that begins with minus sign
-                                topFilter.mustNot(FilterBuilders.termFilter(entry.getKey().substring(1), value));
+                                topFilter.mustNot(QueryBuilders.termQuery(entry.getKey().substring(1), value));
                             } else {//Building "AND" filter
-                                topFilter.must(FilterBuilders.termFilter(entry.getKey(), value));
+                                topFilter.must(QueryBuilders.termQuery(entry.getKey(), value));
                             }
                         }
                     }
@@ -134,7 +136,7 @@ public final class FilterUtils {
      * @return a bool_filter with date ranges appended
      */
 
-    public static BoolFilterBuilder addDateRangeFilter(BoolFilterBuilder boolFilter, DateRange dateRange) {
+    public static BoolQueryBuilder addDateRangeFilter(BoolQueryBuilder boolFilter, DateRange dateRange) {
         if (boolFilter == null) {
             throw new NullPointerException("Cannot append date ranges to a null bool_filter");
         }
@@ -149,7 +151,7 @@ public final class FilterUtils {
             if (Objects.nonNull(fromDate) || Objects.nonNull(toDate)) {
 
                 //Range within "created" field
-                boolFilter.should(FilterBuilders.rangeFilter(Params.DateField.CREATED).gte(fromDate).lte(toDate));
+                boolFilter.should(QueryBuilders.rangeQuery(Params.DateField.CREATED).gte(fromDate).lte(toDate));
 
 
                 /*
@@ -163,8 +165,8 @@ public final class FilterUtils {
                                    from_date-----to_date
                                    madeAfter================================madeBefore
                 */
-                boolFilter.should(FilterBuilders.boolFilter()
-                        .must(FilterBuilders.rangeFilter(Params.DateField.MADE_AFTER).gte(fromDate).lte(toDate)));
+                boolFilter.should(QueryBuilders.boolQuery()
+                        .must(QueryBuilders.rangeQuery(Params.DateField.MADE_AFTER).gte(fromDate).lte(toDate)));
 
                /*
                  Here the condition in which madeBefore >= from_date and madeBefore <= to_date, we don't care
@@ -174,8 +176,8 @@ public final class FilterUtils {
                                                             from_date|------|to_date
                                    madeAfter================================|madeBefore
                 */
-                boolFilter.should(FilterBuilders.boolFilter()
-                        .must(FilterBuilders.rangeFilter(Params.DateField.MADE_BEFORE).gte(fromDate).lte(toDate)));
+                boolFilter.should(QueryBuilders.boolQuery()
+                        .must(QueryBuilders.rangeQuery(Params.DateField.MADE_BEFORE).gte(fromDate).lte(toDate)));
 
                  /*
                   This is a case that fromDate and toDate are within madeAfter and madeBefore range.
@@ -187,9 +189,9 @@ public final class FilterUtils {
                      made_after|---------------------------------------------------|made_before
                  */
                 if (dateRange.isPositive()) {
-                    boolFilter.should(FilterBuilders.boolFilter()
-                            .must(FilterBuilders.rangeFilter(Params.DateField.MADE_AFTER).lte(fromDate))
-                            .must(FilterBuilders.rangeFilter(Params.DateField.MADE_BEFORE).gte(toDate)));
+                    boolFilter.should(QueryBuilders.boolQuery()
+                            .must(QueryBuilders.rangeQuery(Params.DateField.MADE_AFTER).lte(fromDate))
+                            .must(QueryBuilders.rangeQuery(Params.DateField.MADE_BEFORE).gte(toDate)));
 
                 }
             }
