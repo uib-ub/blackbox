@@ -1,5 +1,6 @@
 package no.uib.marcus.common;
 
+import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.elasticsearch.common.Strings;
 
@@ -38,7 +39,7 @@ public enum ServiceName {
     /**
      * Logger
      */
-    private static final Logger logger = Logger.getLogger(ServiceName.class);
+    private static final Logger logger = LogManager.getLogger(ServiceName.class);
 
     /**
      * Get corresponding enum from it's string representation

@@ -2,9 +2,11 @@ package no.uib.marcus.common.util;
 
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.common.Strings;
-import org.elasticsearch.common.xcontent.ToXContent;
-import org.elasticsearch.common.xcontent.XContentBuilder;
-import org.elasticsearch.common.xcontent.XContentFactory;
+import org.elasticsearch.xcontent.ToXContent;
+import org.elasticsearch.xcontent.XContentBuilder;
+import org.elasticsearch.xcontent.XContentFactory;
+
+import org.elasticsearch.index.query.Operator;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.index.query.QueryStringQueryBuilder;
 import org.elasticsearch.index.query.SimpleQueryStringBuilder;
@@ -41,7 +43,7 @@ public final class QueryUtils {
                 .field("identifier")//Not analyzed field
                 .field("label", 3)//Not analyzed field.
                 .field("_all")
-                .defaultOperator(SimpleQueryStringBuilder.Operator.AND);
+                .defaultOperator(Operator.AND);
     }
 
     /**
@@ -51,12 +53,13 @@ public final class QueryUtils {
      * @return a builder for query string
      */
     public static QueryStringQueryBuilder buildMarcusQueryString(String queryString) {
+
         return QueryBuilders.queryStringQuery(queryString)
                 .analyzer("default")//The custom "default" analyzer is defined in the "_settings".
                 .field("identifier")//Not analyzed field
                 .field("label", 3)//Not analyzed field.
                 .field("_all")
-                .defaultOperator(QueryStringQueryBuilder.Operator.AND);
+                .defaultOperator(Operator.AND);
     }
 
 
@@ -69,7 +72,7 @@ public final class QueryUtils {
     public static String appendTrailingWildcardIfSingleTerm(String queryString) {
         if (!isNullOrEmpty(queryString)
                 && Character.isLetter(queryString.charAt(0))
-                && !Strings.containsWhitespace(queryString)
+                && !queryString.matches("\\s")
                 && !containsReservedChars(queryString)) {
 
             return queryString + WILDCARD;
@@ -117,7 +120,7 @@ public final class QueryUtils {
             builder.startObject();
             response.toXContent(builder, ToXContent.EMPTY_PARAMS);
             builder.endObject();
-            return builder.string();
+            return builder.toString();
         } catch (IOException e) {
             return "{ \"error\" : \"" + e.getMessage() + "\"}";
         }
