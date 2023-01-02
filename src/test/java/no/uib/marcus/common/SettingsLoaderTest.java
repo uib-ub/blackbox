@@ -3,7 +3,7 @@ package no.uib.marcus.common;
 import com.carrotsearch.randomizedtesting.RandomizedTest;
 import no.uib.marcus.common.loader.JsonFileLoader;
 import no.uib.marcus.common.loader.UnavailableResourceException;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 import org.junit.Test;
 
 import java.io.IOException;

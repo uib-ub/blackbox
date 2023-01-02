@@ -2,7 +2,7 @@ package no.uib.marcus.common.loader;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 import org.elasticsearch.common.settings.loader.JsonSettingsLoader;
 
 import java.io.BufferedReader;

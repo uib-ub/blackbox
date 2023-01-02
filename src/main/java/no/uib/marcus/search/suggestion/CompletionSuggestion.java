@@ -2,7 +2,7 @@ package no.uib.marcus.search.suggestion;
 
 import com.google.gson.Gson;
 import no.uib.marcus.client.ClientFactory;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 import org.elasticsearch.action.suggest.SuggestRequestBuilder;
 import org.elasticsearch.action.suggest.SuggestResponse;
 import org.elasticsearch.common.Nullable;

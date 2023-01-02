@@ -2,7 +2,7 @@ package no.uib.marcus.search;
 
 import junit.framework.TestCase;
 import no.uib.marcus.client.ClientFactory;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.client.Client;
 import org.elasticsearch.common.base.Predicate;

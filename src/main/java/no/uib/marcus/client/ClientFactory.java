@@ -3,13 +3,11 @@ package no.uib.marcus.client;
 import no.uib.marcus.common.loader.JsonFileLoader;
 import no.uib.marcus.common.util.BlackboxUtils;
 import org.apache.http.HttpHost;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 import org.elasticsearch.action.admin.cluster.health.ClusterHealthRequest;
 import org.elasticsearch.action.admin.cluster.health.ClusterHealthResponse;
-import org.elasticsearch.client.Client;
-import org.elasticsearch.client.ClusterAdminClient;
-import org.elasticsearch.client.RestClient;
-import org.elasticsearch.client.RestHighLevelClient;
+import org.elasticsearch.client.*;
 import org.elasticsearch.client.transport.TransportClient;
 import org.elasticsearch.common.settings.Settings;
 import org.elasticsearch.common.transport.TransportAddress;
@@ -31,7 +29,7 @@ import java.util.Map;
  */
 final public class ClientFactory {
 
-    private static final Logger logger = Logger.getLogger(ClientFactory.class);
+    private static final Logger logger =  LogManager.getLogger(ClientFactory.class);
     private static Client client;
 
     /**
@@ -53,14 +51,16 @@ final public class ClientFactory {
                     RestClient.builder(
                             new HttpHost(InetAddress.getByName(BlackboxUtils.getValueAsString(properties, "cluster.host")),  BlackboxUtils.getValueAsInt(properties, "cluster.port"), "https")
                          ));
-
-            ClusterHealthResponse hr = client.cluster().health(new ClusterHealthRequest());
+            ClusterHealthRequest ch = new ClusterHealthRequest();
+            ClusterHealthResponse hr = client.cluster().health(ch, RequestOptions.DEFAULT);
             logger.info("Connected to Elasticsearch cluster: " + hr);
         } catch (UnknownHostException ue) {
             logger.error("Unknown host: " + ue.getMessage());
         } catch (ConnectTransportException e) {
             logger.warn("Unable to connect to Elasticsearch cluster. Is Elasticsearch running? "
                     + e.getDetailedMessage());
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
         return client;
     }

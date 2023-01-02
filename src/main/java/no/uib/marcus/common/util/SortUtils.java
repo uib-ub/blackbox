@@ -1,7 +1,8 @@
 package no.uib.marcus.common.util;
 
 import no.uib.marcus.search.IllegalParameterException;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.elasticsearch.ElasticsearchException;
 import org.elasticsearch.common.Strings;
 import org.elasticsearch.search.sort.SortBuilder;
@@ -17,7 +18,7 @@ import java.util.Optional;
  * University of Bergen Library
  */
 public final class SortUtils {
-    private static final Logger logger = Logger.getLogger(SortUtils.class);
+    private static final Logger logger = LogManager.getLogger(SortUtils.class);
     private static final char FIELD_SORT_TYPE_SEPARATOR = ':';
     private static final String SORT_FIELD = "sort_field";
     private static final String SORT_ORDER = "sort_order";
@@ -112,10 +113,9 @@ public final class SortUtils {
         try {
             //Build score sorting
             sortBuilder = SortBuilders.scoreSort()
-                    .order(SortOrder.DESC)
-                    .missing("_last");
+                    .order(SortOrder.DESC) ;
         } catch (ElasticsearchException e) {
-            logger.error("Score sorting cannot be constructed. " + e.getMostSpecificCause());
+            logger.error("Score sorting cannot be constructed. " + e.getDetailedMessage());
         }
         return sortBuilder;
     }

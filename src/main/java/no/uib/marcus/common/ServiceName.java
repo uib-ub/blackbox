@@ -1,6 +1,6 @@
 package no.uib.marcus.common;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 import org.elasticsearch.common.Strings;
 
 import java.util.Arrays;

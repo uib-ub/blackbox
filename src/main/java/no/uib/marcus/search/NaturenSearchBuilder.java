@@ -2,7 +2,7 @@ package no.uib.marcus.search;
 
 import no.uib.marcus.common.Params;
 import no.uib.marcus.common.util.QueryUtils;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 import org.elasticsearch.action.search.SearchRequestBuilder;
 import org.elasticsearch.client.Client;
 import org.elasticsearch.common.Strings;
