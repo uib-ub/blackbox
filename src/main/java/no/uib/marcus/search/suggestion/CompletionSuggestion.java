@@ -37,6 +37,11 @@ public class CompletionSuggestion {
     public static Set<String> getSuggestions(String text, int size, @Nullable String... indices) {
         Set<String> suggestValues = new HashSet<>();
         try {
+
+            CompletionSuggestion suggestion = CompletionSuggestionBuilder.Reader.;
+
+            Suggest suggestResponse = SearchReponse.getSuggest();
+
             SearchResponse suggestRespone
             SuggestBuilders.
             SuggestResponse suggestResponse = getSuggestionResponse(text, size, indices);
