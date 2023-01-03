@@ -4,6 +4,7 @@ import com.google.gson.Gson;
 import no.uib.marcus.common.Params;
 import no.uib.marcus.search.suggestion.CompletionSuggestion;
 import org.elasticsearch.common.Strings;
+import org.elasticsearch.xcontent.XContentBuilder;
 import org.elasticsearch.xcontent.XContentFactory;
 
 import javax.servlet.ServletException;
@@ -67,8 +68,9 @@ public class SuggestionServlet extends HttpServlet {
         request.setCharacterEncoding("UTF-8");
         response.setContentType("application/json;charset=UTF-8");
 
-        try (PrintWriter out = response.getWriter()) {
-            out.write(XContentFactory.jsonBuilder()
+        try (PrintWriter out = response.getWriter();
+             XContentBuilder xContentBuilder = XContentFactory.jsonBuilder()) {
+            out.write(xContentBuilder
                     .startObject()
                     .field("code", 405)
                     .field("message", "Method Not Allowed")
