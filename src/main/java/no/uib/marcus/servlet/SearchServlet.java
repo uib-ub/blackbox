@@ -12,10 +12,11 @@ import no.uib.marcus.search.SearchBuilderFactory;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.elasticsearch.action.search.SearchResponse;
-import org.elasticsearch.client.Client;
+import org.elasticsearch.client.internal.Client;
 import org.elasticsearch.core.Booleans;
 import org.elasticsearch.common.Strings;
 import org.elasticsearch.index.query.BoolQueryBuilder;
+import org.elasticsearch.xcontent.XContentBuilder;
 import org.elasticsearch.xcontent.XContentFactory;
 import org.elasticsearch.index.query.QueryBuilder;
 
@@ -148,8 +149,9 @@ public class SearchServlet extends HttpServlet {
         request.setCharacterEncoding("UTF-8");
         response.setContentType("application/json;charset=UTF-8");
 
-        try (PrintWriter out = response.getWriter()) {
-            out.write(XContentFactory.jsonBuilder()
+        try (PrintWriter out = response.getWriter();
+             XContentBuilder xContentBuilder = XContentFactory.jsonBuilder()) {
+            out.write(xContentBuilder
                     .startObject()
                     .field("code", 405)
                     .field("message", "Method Not Allowed")
