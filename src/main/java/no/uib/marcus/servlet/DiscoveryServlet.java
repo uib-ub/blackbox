@@ -6,21 +6,22 @@ import no.uib.marcus.common.util.QueryUtils;
 import no.uib.marcus.search.MarcusDiscoveryBuilder;
 import no.uib.marcus.search.SearchBuilderFactory;
 import org.elasticsearch.action.search.SearchResponse;
-import org.elasticsearch.client.Client;
+import org.elasticsearch.client.internal.Client;
 import org.elasticsearch.common.Strings;
+import org.elasticsearch.xcontent.XContentBuilder;
 import org.elasticsearch.xcontent.XContentFactory;
 
-import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.io.Serial;
 
 /**
  * Discovery service which is available at "/discover" endpoint only allow
- * to explore Marcus data in a simplest fashion.
+ * to explore Marcus data in the simplest fashion.
  * It does not provide advance functionality such as free text search, aggregations or sorting.
  * For complex operations, please go to "/search" endpoint.
  */
@@ -29,13 +30,13 @@ import java.io.PrintWriter;
         urlPatterns = {"/discover"}
 )
 public class DiscoveryServlet extends HttpServlet {
-    private static final long serialVersionUID = 3L;
+    @Serial  private static final long serialVersionUID = 3L;
 
     /**
      * Process a request
      */
     private void processRequest(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
+            throws  IOException {
         request.setCharacterEncoding("UTF-8");
         response.setContentType("application/json;charset=UTF-8");
         String from = request.getParameter(Params.FROM);
@@ -67,12 +68,11 @@ public class DiscoveryServlet extends HttpServlet {
      *
      * @param request  servlet request
      * @param response servlet response
-     * @throws ServletException if a servlet-specific error occurs
      * @throws IOException      if an I/O error occurs
      */
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
+            throws IOException {
         processRequest(request, response);
     }
 
@@ -81,7 +81,6 @@ public class DiscoveryServlet extends HttpServlet {
      *
      * @param request  servlet request
      * @param response servlet response
-     * @throws ServletException if a servlet-specific error occurs
      * @throws IOException      if an I/O error occurs
      */
     @Override
@@ -91,8 +90,9 @@ public class DiscoveryServlet extends HttpServlet {
         request.setCharacterEncoding("UTF-8");
         response.setContentType("application/json;charset=UTF-8");
 
-        try (PrintWriter out = response.getWriter()) {
-            out.write(XContentFactory.jsonBuilder()
+        try (PrintWriter out = response.getWriter();
+             XContentBuilder xcontentBuilder =  XContentFactory.jsonBuilder()) {
+            out.write(xcontentBuilder
                     .startObject()
                     .field("code", 405)
                     .field("message", "Method Not Allowed")

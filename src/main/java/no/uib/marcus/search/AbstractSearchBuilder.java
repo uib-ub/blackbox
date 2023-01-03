@@ -7,7 +7,7 @@ import org.elasticsearch.action.search.SearchPhaseExecutionException;
 import org.elasticsearch.action.search.SearchRequestBuilder;
 import org.elasticsearch.action.search.SearchResponse;
 
-import org.elasticsearch.client.Client;
+import org.elasticsearch.client.internal.Client;
 import org.elasticsearch.core.Nullable;
 
 
@@ -211,7 +211,7 @@ public abstract class AbstractSearchBuilder<T extends AbstractSearchBuilder<T>> 
      * @return this object where client has been set
      */
     @SuppressWarnings("unchecked")
-    public T setClient(@NotNull Client client) {
+    public final T setClient(@NotNull Client client) {
         if (client == null) {
             throw new IllegalParameterException("Unable to initialize service. Client cannot be null");
         }
@@ -240,6 +240,7 @@ public abstract class AbstractSearchBuilder<T extends AbstractSearchBuilder<T>> 
 
     /**
      * Get index types for this service
+     * Types are removed in elasticsearch 8
      */
     public String[] getTypes() {
         return types;

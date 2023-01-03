@@ -70,7 +70,7 @@ public class JsonFileLoader extends JsonSettingsLoader {
             throw new UnavailableResourceException("Unavailable file for blackbox settings. " +
                     "Make sure this path exist: " + filePath);
         }
-        JsonElement json = new JsonParser().parse(reader);
+        JsonElement json =  JsonParser.parseReader(reader);
         return json.toString();
     }
 

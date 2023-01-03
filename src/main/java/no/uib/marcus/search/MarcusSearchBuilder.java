@@ -8,9 +8,9 @@ import org.apache.logging.log4j.Logger;
 import org.elasticsearch.ElasticsearchException;
 import org.elasticsearch.action.search.SearchRequestBuilder;
 import org.elasticsearch.action.search.SearchResponse;
-import org.elasticsearch.client.Client;
+import org.elasticsearch.client.internal.Client;
 import org.elasticsearch.common.Strings;
-import org.elasticsearch.index.query.FilterBuilders;
+import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.index.query.functionscore.FunctionScoreQueryBuilder;
@@ -77,10 +77,10 @@ public class MarcusSearchBuilder extends AbstractSearchBuilder<MarcusSearchBuild
                 searchRequest.setIndices(getIndices());
             }
 
-            //Set types
-            if (isNeitherNullNorEmpty(getTypes())) {
-                searchRequest.setTypes(getTypes());
-            }
+            //Set types (Types removed in ES8)
+            //if (isNeitherNullNorEmpty(getTypes())) {
+            //    searchRequest.setTypes(getTypes());
+            //}
 
             //Set from and size
             searchRequest.setFrom(getFrom());
@@ -95,8 +95,8 @@ public class MarcusSearchBuilder extends AbstractSearchBuilder<MarcusSearchBuild
                 //Boost documents inside the "random list" of places because they beautify the front page.
                 //This is just for coolness and it has no effect if the query yields no results
                 String randomQueryString = randomPictures[new Random().nextInt(randomPictures.length)];
-                functionScoreQueryBuilder = QueryBuilders.functionScoreQuery(QueryBuilders.matchAllQuery())
-                        .add(FilterBuilders.queryFilter(QueryBuilders.simpleQueryStringQuery(randomQueryString)),
+                functionScoreQueryBuilder = QueryBuilders.boolQuery().filter(QueryBuilders.matchAllQuery()).must()
+                        .add(QueryBuilders.(QueryBuilders.simpleQueryStringQuery(randomQueryString)),
                                 weightFactorFunction(2));
             }
             //Boost documents of type "Fotografi" for every query performed.

@@ -5,10 +5,7 @@ import no.uib.marcus.client.ClientFactory;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.elasticsearch.action.search.SearchRequestBuilder;
-import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.search.suggest.SuggestBuilder;
-import org.elasticsearch.search.suggest.SuggestBuilders;
-
 import org.elasticsearch.search.suggest.SuggestionBuilder;
 
 import org.elasticsearch.core.Nullable;
@@ -38,14 +35,8 @@ public class CompletionSuggestion {
         Set<String> suggestValues = new HashSet<>();
         try {
 
-            CompletionSuggestion suggestion = CompletionSuggestionBuilder.Reader.;
+            Suggest suggestResponse = getSuggestionResponse(text, size, indices);
 
-            Suggest suggestResponse = SearchReponse.getSuggest();
-
-            SearchResponse suggestRespone
-            SuggestBuilders.
-            SuggestResponse suggestResponse = getSuggestionResponse(text, size, indices);
-            suggestBuilder.
 
             //Add each option(value) to a set to ensure no repetition
             for (Suggest.Suggestion.Entry.Option option : suggestResponse
@@ -54,7 +45,7 @@ public class CompletionSuggestion {
                     .iterator()
                     .next()
                     .getOptions()) {
-                // Lowecasing is done via ubb-rdf-river
+                // Lowercasing is done via ubb-rdf-river
                 // suggestValues.add(option.getText().string().toLowerCase());
                 suggestValues.add(option.getText().string());
             }
@@ -72,10 +63,9 @@ public class CompletionSuggestion {
      * @return a suggestion response.
      **/
     public static Suggest getSuggestionResponse(String text, int size, @Nullable String... indices) {
-        SuggestionBuilder suggestionsBuilder = new CompletionSuggestionBuilder("completion_suggestion");
+        SuggestionBuilder<CompletionSuggestionBuilder> suggestionsBuilder = new CompletionSuggestionBuilder("completion_suggestion");
 
         Suggest suggestResponse = null;
-        SuggestBuilder suggestRequest;
 
 
         try {
@@ -83,15 +73,15 @@ public class CompletionSuggestion {
             suggestionsBuilder.text(text);
             suggestionsBuilder.size(size);
 
-             SearchRequestBuilder searchRequest = ClientFactory.getTransportClient().prepareSearch().suggest( new SuggestBuilder().addSuggestion());
-            suggestRequest.;
+            SearchRequestBuilder searchRequest = ClientFactory.getTransportClient().prepareSearch();
+            searchRequest.suggest(new SuggestBuilder().addSuggestion(SUGGEST_FIELD, suggestionsBuilder));
 
             if (indices != null && indices.length > 0) {
-                suggestRequest.setIndices(indices);
+                searchRequest.setIndices(indices);
             }
 
             //Execute suggestions
-            suggestResponse = suggestRequest.execute().actionGet();
+            suggestResponse = searchRequest.execute().actionGet().getSuggest();
 
         } catch (Exception e) {
            logger.error("Exception " +  e.getLocalizedMessage());
