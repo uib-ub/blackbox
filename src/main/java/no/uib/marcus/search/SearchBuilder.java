@@ -3,8 +3,8 @@ package no.uib.marcus.search;
 import org.elasticsearch.action.search.SearchRequestBuilder;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.client.Client;
-import org.elasticsearch.common.Nullable;
-import org.elasticsearch.index.query.FilterBuilder;
+import org.elasticsearch.core.Nullable;
+import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.search.sort.SortBuilder;
 
 import javax.validation.constraints.NotNull;
@@ -87,12 +87,12 @@ public interface SearchBuilder<S> {
     /**
      * Sets post filter
      */
-    S setPostFilter(FilterBuilder postFilter);
+    S setPostFilter(QueryBuilder postFilter);
 
     /**
      * Sets filter (filtered_query)
      */
-    S setFilter(FilterBuilder postFilter);
+    S setFilter(QueryBuilder postFilter);
 
 
     /**

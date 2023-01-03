@@ -1,16 +1,20 @@
 package no.uib.marcus.search;
 
 import no.uib.marcus.common.util.AggregationUtils;
+import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.elasticsearch.action.search.SearchPhaseExecutionException;
 import org.elasticsearch.action.search.SearchRequestBuilder;
 import org.elasticsearch.action.search.SearchResponse;
+
 import org.elasticsearch.client.Client;
-import org.elasticsearch.common.Nullable;
+import org.elasticsearch.core.Nullable;
+
+
 import org.elasticsearch.common.Strings;
-import org.elasticsearch.common.xcontent.XContentBuilder;
-import org.elasticsearch.common.xcontent.XContentFactory;
-import org.elasticsearch.index.query.FilterBuilder;
+import org.elasticsearch.xcontent.XContentBuilder;
+import org.elasticsearch.xcontent.XContentFactory;
+import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.search.sort.SortBuilder;
 
 import javax.validation.constraints.NotNull;
@@ -29,7 +33,7 @@ import java.util.Map;
  * 2016-04-15
  */
 public abstract class AbstractSearchBuilder<T extends AbstractSearchBuilder<T>> implements SearchBuilder<T> {
-    private final Logger logger = Logger.getLogger(getClass().getName());
+    private final Logger logger = LogManager.getLogger(getClass().getName());
     private Client client;
     @Nullable
     private String[] indices;
@@ -37,7 +41,7 @@ public abstract class AbstractSearchBuilder<T extends AbstractSearchBuilder<T>> 
     private String[] types;
     @Nullable
     private String queryString;
-    private FilterBuilder filter, postFilter;
+    private QueryBuilder filter, postFilter;
     private Map<String, List<String>> selectedFacets;
     private String aggregations;
     private SortBuilder sortBuilder;
@@ -114,7 +118,7 @@ public abstract class AbstractSearchBuilder<T extends AbstractSearchBuilder<T>> 
     /**
      * Get sort builder or <tt>null</tt> if not set
      **/
-    public FilterBuilder getFilter() {
+    public QueryBuilder getFilter() {
         return filter;
     }
 
@@ -125,7 +129,7 @@ public abstract class AbstractSearchBuilder<T extends AbstractSearchBuilder<T>> 
      * @return this object where filter has been set
      */
     @SuppressWarnings("unchecked")
-    public T setFilter(FilterBuilder filter) {
+    public T setFilter(QueryBuilder filter) {
         this.filter = filter;
         return (T) this;
     }
@@ -133,7 +137,7 @@ public abstract class AbstractSearchBuilder<T extends AbstractSearchBuilder<T>> 
     /**
      * Get post filter or <tt>null</tt> if not set
      */
-    public FilterBuilder getPostFilter() {
+    public QueryBuilder getPostFilter() {
         return postFilter;
     }
 
@@ -145,7 +149,7 @@ public abstract class AbstractSearchBuilder<T extends AbstractSearchBuilder<T>> 
      * @return this object where post_filter has been set
      */
     @SuppressWarnings("unchecked")
-    public T setPostFilter(FilterBuilder filter) {
+    public T setPostFilter(QueryBuilder filter) {
         if(filter != null) {
             this.postFilter = filter;
         }
@@ -360,7 +364,7 @@ public abstract class AbstractSearchBuilder<T extends AbstractSearchBuilder<T>> 
                     .field("size", getSize())
                     .field("aggregations", getAggregations() == null ? Strings.EMPTY_ARRAY : getAggregations())
                     .endObject();
-            return jsonObj.string();
+            return jsonObj.toString();
         } catch (IOException e) {
             return "{ \"error\" : \"" + e.getMessage() + "\"}";
         }

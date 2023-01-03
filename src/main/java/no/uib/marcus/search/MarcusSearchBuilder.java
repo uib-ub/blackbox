@@ -3,6 +3,7 @@ package no.uib.marcus.search;
 import no.uib.marcus.common.util.AggregationUtils;
 import no.uib.marcus.common.util.QueryUtils;
 import no.uib.marcus.common.util.SignatureUtils;
+import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.elasticsearch.ElasticsearchException;
 import org.elasticsearch.action.search.SearchRequestBuilder;
@@ -30,7 +31,7 @@ import static org.elasticsearch.index.query.functionscore.ScoreFunctionBuilders.
  */
 public class MarcusSearchBuilder extends AbstractSearchBuilder<MarcusSearchBuilder> {
 
-    private final Logger logger = Logger.getLogger(getClass().getName());
+    private final Logger logger = LogManager.getLogger(getClass().getName());
 
     //A list of images that will be randomly
     // loaded at the front page on page load, if nothing is specified

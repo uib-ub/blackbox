@@ -8,7 +8,7 @@ import no.uib.marcus.search.SearchBuilderFactory;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.client.Client;
 import org.elasticsearch.common.Strings;
-import org.elasticsearch.common.xcontent.XContentFactory;
+import org.elasticsearch.xcontent.XContentFactory;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -97,7 +97,7 @@ public class DiscoveryServlet extends HttpServlet {
                     .field("code", 405)
                     .field("message", "Method Not Allowed")
                     .endObject()
-                    .string()
+                    .toString()
             );
         }
     }

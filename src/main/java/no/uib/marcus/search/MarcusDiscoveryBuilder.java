@@ -1,5 +1,6 @@
 package no.uib.marcus.search;
 
+import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.elasticsearch.ElasticsearchException;
 import org.elasticsearch.action.search.SearchRequestBuilder;
@@ -14,7 +15,7 @@ import org.elasticsearch.search.builder.SearchSourceBuilderException;
  * @author Hemed Ali
  */
 public class MarcusDiscoveryBuilder extends AbstractSearchBuilder<MarcusDiscoveryBuilder> {
-    private static final Logger logger = Logger.getLogger(MarcusDiscoveryBuilder.class);
+    private static final Logger logger = LogManager.getLogger(MarcusDiscoveryBuilder.class);
 
     MarcusDiscoveryBuilder(Client client) {
         super(client);

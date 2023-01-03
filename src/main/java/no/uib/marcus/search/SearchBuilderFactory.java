@@ -2,7 +2,8 @@ package no.uib.marcus.search;
 
 import no.uib.marcus.common.ServiceName;
 import org.elasticsearch.client.Client;
-import org.elasticsearch.common.Nullable;
+import org.elasticsearch.core.Nullable;
+
 
 /**
  * A set of static factory methods for creation of {@link SearchBuilder}s.

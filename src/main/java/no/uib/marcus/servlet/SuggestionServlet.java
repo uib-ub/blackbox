@@ -4,7 +4,7 @@ import com.google.gson.Gson;
 import no.uib.marcus.common.Params;
 import no.uib.marcus.search.suggestion.CompletionSuggestion;
 import org.elasticsearch.common.Strings;
-import org.elasticsearch.common.xcontent.XContentFactory;
+import org.elasticsearch.xcontent.XContentFactory;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -73,7 +73,7 @@ public class SuggestionServlet extends HttpServlet {
                     .field("code", 405)
                     .field("message", "Method Not Allowed")
                     .endObject()
-                    .string()
+                    .toString()
             );
         }
     }

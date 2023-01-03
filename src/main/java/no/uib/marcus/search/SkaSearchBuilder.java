@@ -2,11 +2,12 @@ package no.uib.marcus.search;
 
 import no.uib.marcus.common.util.AggregationUtils;
 import no.uib.marcus.common.util.QueryUtils;
+import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.elasticsearch.action.search.SearchRequestBuilder;
 import org.elasticsearch.client.Client;
 import org.elasticsearch.common.Strings;
-import org.elasticsearch.index.query.FilterBuilders;
+import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.index.query.functionscore.ScoreFunctionBuilders;
@@ -18,7 +19,7 @@ import org.elasticsearch.search.builder.SearchSourceBuilderException;
  * @author Hemed Al Ruwehy
  */
 public class SkaSearchBuilder extends MarcusSearchBuilder {
-    private final Logger logger = Logger.getLogger(getClass().getName());
+    private final Logger logger = LogManager.getLogger(getClass().getName());
 
     SkaSearchBuilder(Client client) {
         super(client);
@@ -47,8 +48,8 @@ public class SkaSearchBuilder extends MarcusSearchBuilder {
                 query = QueryUtils.buildMarcusQueryString(getQueryString());
             } else {
                 //Boost documents of type "Manuskript" if nothing specified
-                query = QueryBuilders.functionScoreQuery(QueryBuilders.matchAllQuery())
-                        .add(FilterBuilders.termFilter("type", BoostType.INTERVJU),
+                query = QueryBuilders.functionScoreQuery(QueryBuilders.matchAllQuery(),).
+                        .add(QueryBuilders.termQuery("type", BoostType.INTERVJU),
                                 ScoreFunctionBuilders.weightFactorFunction(2));
             }
             //Set query whether with or without filter

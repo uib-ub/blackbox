@@ -9,13 +9,15 @@ import no.uib.marcus.common.util.SortUtils;
 import no.uib.marcus.range.DateRange;
 import no.uib.marcus.search.SearchBuilder;
 import no.uib.marcus.search.SearchBuilderFactory;
+import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.client.Client;
-import org.elasticsearch.common.Booleans;
+import org.elasticsearch.core.Booleans;
 import org.elasticsearch.common.Strings;
-import org.elasticsearch.common.xcontent.XContentFactory;
-import org.elasticsearch.index.query.BoolFilterBuilder;
+import org.elasticsearch.index.query.BoolQueryBuilder;
+import org.elasticsearch.xcontent.XContentFactory;
+import org.elasticsearch.index.query.QueryBuilder;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -42,7 +44,7 @@ import java.util.Map;
         description = "Servlet for handling search requests")
 
 public class SearchServlet extends HttpServlet {
-    private static final Logger logger = Logger.getLogger(SearchServlet.class);
+    private static final Logger logger = LogManager.getLogger(SearchServlet.class);
     private static final long serialVersionUID = 1L;
 
     /**
@@ -101,14 +103,14 @@ public class SearchServlet extends HttpServlet {
                     .setIndexToBoost(indexToBoost);
 
             //Add top level filter, for "AND" aggregations
-            BoolFilterBuilder topFilter = FilterUtils.getTopFilter(
+            BoolQueryBuilder topFilter = FilterUtils.getTopFilter(
                     selectedFacets, aggs, DateRange.of(fromDate, toDate)
             );
             if (topFilter.hasClauses()) {
                 builder.setFilter(topFilter);
             }
             //Add post filter for "OR" aggregations if any
-            BoolFilterBuilder postFilter = FilterUtils.getPostFilter(selectedFacets, aggs);
+            BoolQueryBuilder postFilter = FilterUtils.getPostFilter(selectedFacets, aggs);
             if (postFilter.hasClauses()) {
                 builder.setPostFilter(postFilter);
             }
@@ -116,7 +118,7 @@ public class SearchServlet extends HttpServlet {
             SearchResponse searchResponse = builder.executeSearch();
 
             //Decide whether to get a pretty JSON output or not
-            String searchResponseString = Booleans.isExplicitTrue(isPretty)
+            String searchResponseString = Booleans.isTrue(isPretty)
                     ? QueryUtils.toJsonString(searchResponse, true)
                     : QueryUtils.toJsonString(searchResponse, false);
 
@@ -152,7 +154,7 @@ public class SearchServlet extends HttpServlet {
                     .field("code", 405)
                     .field("message", "Method Not Allowed")
                     .endObject()
-                    .string()
+                    .toString()
              );
         }
     }

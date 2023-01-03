@@ -3,10 +3,12 @@ package no.uib.marcus.search;
 
 import no.uib.marcus.common.util.AggregationUtils;
 import no.uib.marcus.common.util.SignatureUtils;
+import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.elasticsearch.action.search.SearchRequestBuilder;
 import org.elasticsearch.client.Client;
 import org.elasticsearch.common.Strings;
+import org.elasticsearch.common.lucene.search.Queries;
 import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.index.query.SimpleQueryStringBuilder;
@@ -16,7 +18,7 @@ import org.elasticsearch.search.builder.SearchSourceBuilderException;
  * A custom search builder for WAB
  */
 public class WabSearchBuilder extends AbstractSearchBuilder<WabSearchBuilder> {
-    private final Logger logger = Logger.getLogger(getClass().getName());
+    private final Logger logger = LogManager.getLogger(getClass().getName());
 
     WabSearchBuilder(Client client) {
         super(client);
@@ -62,7 +64,7 @@ public class WabSearchBuilder extends AbstractSearchBuilder<WabSearchBuilder> {
             }
             //Set Query, whether with or without filter
             if (getFilter() != null) {
-                searchRequest.setQuery(QueryBuilders.filteredQuery(query, getFilter()));
+                searchRequest.setQuery(Queries.filtered(query, getFilter().toQuery()));
             } else {
                 searchRequest.setQuery(query);
             }

@@ -1,6 +1,6 @@
 package no.uib.marcus.range;
 
-import org.elasticsearch.common.Nullable;
+import org.elasticsearch.core.Nullable;
 import org.elasticsearch.common.Strings;
 
 import javax.validation.constraints.NotNull;
@@ -9,6 +9,7 @@ import javax.xml.datatype.DatatypeConstants;
 import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.XMLGregorianCalendar;
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.Objects;
 import java.util.logging.Logger;
 
@@ -84,7 +85,7 @@ public class DateRange implements Range<LocalDate> {
     public LocalDate parseToDate(String toDateString) {
         LocalDate toDate = parse(toDateString);
         if (toDate != null && isXSDgYear(toDateString)) {// when only year is specified
-            return new LocalDate(toDate.getYear(), 12, 31);
+            return  LocalDate.of(toDate.getYear(), 12, 31);
         }
         return toDate;
     }
@@ -125,7 +126,7 @@ public class DateRange implements Range<LocalDate> {
     @Override
     public LocalDate parse(String input) {
         if (Strings.hasText(input)) {
-            return Joda.forPattern(getDateFormat()).parser().parseLocalDate(input);
+            return LocalDate.parse(input, DateTimeFormatter.ofPattern(getDateFormat()));
         }
         return null;
     }
@@ -214,10 +215,10 @@ public class DateRange implements Range<LocalDate> {
                     );
             gCalendar.toXMLFormat();
         } catch (NumberFormatException nfe) {
-            logger.warn("gYear must be a number: " + nfe.getLocalizedMessage());
+            logger.warning("gYear must be a number: " + nfe.getLocalizedMessage());
             return false;
         } catch (DatatypeConfigurationException | IllegalArgumentException ex) {
-            logger.warn(ex.getLocalizedMessage());
+            logger.warning(ex.getLocalizedMessage());
             return false;
         }
         return true;

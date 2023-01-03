@@ -2,12 +2,17 @@ package no.uib.marcus.search.suggestion;
 
 import com.google.gson.Gson;
 import no.uib.marcus.client.ClientFactory;
+import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.elasticsearch.action.suggest.SuggestRequestBuilder;
-import org.elasticsearch.action.suggest.SuggestResponse;
-import org.elasticsearch.common.Nullable;
+import org.elasticsearch.action.search.SearchRequestBuilder;
+import org.elasticsearch.action.search.SearchResponse;
+import org.elasticsearch.search.suggest.SuggestBuilder;
+import org.elasticsearch.search.suggest.SuggestBuilders;
+
+import org.elasticsearch.search.suggest.SuggestionBuilder;
+
+import org.elasticsearch.core.Nullable;
 import org.elasticsearch.search.suggest.Suggest;
-import org.elasticsearch.search.suggest.SuggestBuilder.SuggestionBuilder;
 import org.elasticsearch.search.suggest.completion.CompletionSuggestionBuilder;
 
 import java.util.*;
@@ -20,7 +25,7 @@ import java.util.*;
  */
 public class CompletionSuggestion {
 
-    private static final Logger logger = Logger.getLogger(CompletionSuggestion.class);
+    private static final Logger logger = LogManager.getLogger(CompletionSuggestion.class);
     private static final String SUGGEST_FIELD = "suggest";
 
     /**A method to get a list of suggestions.
@@ -32,11 +37,14 @@ public class CompletionSuggestion {
     public static Set<String> getSuggestions(String text, int size, @Nullable String... indices) {
         Set<String> suggestValues = new HashSet<>();
         try {
+            SearchResponse suggestRespone
+            SuggestBuilders.
             SuggestResponse suggestResponse = getSuggestionResponse(text, size, indices);
+            suggestBuilder.
 
             //Add each option(value) to a set to ensure no repetition
             for (Suggest.Suggestion.Entry.Option option : suggestResponse
-                    .getSuggest()
+
                     .getSuggestion("completion_suggestion")
                     .iterator()
                     .next()
@@ -58,18 +66,20 @@ public class CompletionSuggestion {
      * @param indices array of one or more setIndices, can be <code>null</code>
      * @return a suggestion response.
      **/
-    public static SuggestResponse getSuggestionResponse(String text, int size, @Nullable String... indices) {
+    public static Suggest getSuggestionResponse(String text, int size, @Nullable String... indices) {
         SuggestionBuilder suggestionsBuilder = new CompletionSuggestionBuilder("completion_suggestion");
-        SuggestResponse suggestResponse = null;
-        SuggestRequestBuilder suggestRequest;
+
+        Suggest suggestResponse = null;
+        SuggestBuilder suggestRequest;
+
 
         try {
-            suggestionsBuilder.field(SUGGEST_FIELD);
+            suggestionsBuilder.field();
             suggestionsBuilder.text(text);
             suggestionsBuilder.size(size);
 
-            suggestRequest = ClientFactory.getTransportClient().prepareSuggest();
-            suggestRequest.addSuggestion(suggestionsBuilder);
+             SearchRequestBuilder searchRequest = ClientFactory.getTransportClient().prepareSearch().suggest( new SuggestBuilder().addSuggestion());
+            suggestRequest.;
 
             if (indices != null && indices.length > 0) {
                 suggestRequest.setIndices(indices);
