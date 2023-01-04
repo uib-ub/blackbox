@@ -1,7 +1,8 @@
 package no.uib.marcus.search;
 
 import no.uib.marcus.common.ServiceName;
-import org.elasticsearch.client.internal.Client;
+
+import org.elasticsearch.client.Client;
 import org.elasticsearch.core.Nullable;
 
 

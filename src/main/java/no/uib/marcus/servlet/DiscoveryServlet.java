@@ -6,7 +6,7 @@ import no.uib.marcus.common.util.QueryUtils;
 import no.uib.marcus.search.MarcusDiscoveryBuilder;
 import no.uib.marcus.search.SearchBuilderFactory;
 import org.elasticsearch.action.search.SearchResponse;
-import org.elasticsearch.client.internal.Client;
+import org.elasticsearch.client.Client;
 import org.elasticsearch.common.Strings;
 import org.elasticsearch.xcontent.XContentBuilder;
 import org.elasticsearch.xcontent.XContentFactory;
@@ -17,7 +17,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.io.Serial;
 
 /**
  * Discovery service which is available at "/discover" endpoint only allow
@@ -30,7 +29,7 @@ import java.io.Serial;
         urlPatterns = {"/discover"}
 )
 public class DiscoveryServlet extends HttpServlet {
-    @Serial  private static final long serialVersionUID = 3L;
+    private static final long serialVersionUID = 3L;
 
     /**
      * Process a request

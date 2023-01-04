@@ -38,8 +38,8 @@ public class NaturenSearchBuilder extends MarcusSearchBuilder {
             if (Strings.hasText(getQueryString())) {
                 query = QueryUtils.buildMarcusQueryString(getQueryString());
             } else {
-                query = QueryBuilders.functionScoreQuery(QueryBuilders.matchAllQuery())
-                        .add(FilterBuilders.rangeFilter(Params.DateField.AVAILABLE)
+                query = QueryBuilders.(QueryBuilders.matchAllQuery()).
+                        .add(QueryBuilders.rangeQuery(Params.DateField.AVAILABLE)
                                 .from(LocalDate.now().minusDays(1)), weightFactorFunction(2))
                         .add(FilterBuilders.existsFilter("hasThumbnail"), weightFactorFunction(2));
 

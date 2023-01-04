@@ -9,6 +9,7 @@ import org.elasticsearch.action.search.SearchRequestBuilder;
 import org.elasticsearch.client.Client;
 import org.elasticsearch.common.Strings;
 import org.elasticsearch.common.lucene.search.Queries;
+import org.elasticsearch.index.query.Operator;
 import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.index.query.SimpleQueryStringBuilder;
@@ -58,13 +59,13 @@ public class WabSearchBuilder extends AbstractSearchBuilder<WabSearchBuilder> {
                         //.field("hasPart")
                         //.field("refersTo")
                         .field("_all")
-                        .defaultOperator(SimpleQueryStringBuilder.Operator.AND);
+                        .defaultOperator(Operator.AND);
             } else {
                 query = QueryBuilders.matchAllQuery();
             }
             //Set Query, whether with or without filter
             if (getFilter() != null) {
-                searchRequest.setQuery(Queries.filtered(query, getFilter().toQuery()));
+                searchRequest.setQuery(Queries.filtered(query, fi));
             } else {
                 searchRequest.setQuery(query);
             }
