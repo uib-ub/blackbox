@@ -2,16 +2,17 @@ package no.uib.marcus.common.loader;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
+import com.google.gson.Gson;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import  org.elasticsearch.xcontent.json.JsonXContent;
+import org.elasticsearch.common.settings.Settings;
 
-import org.elasticsearch.common.settings.JsonSettingsLoader;
 
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.nio.file.Path;
 import java.util.Map;
 
 /**
@@ -19,7 +20,7 @@ import java.util.Map;
  * <p>
  * author Hemed Ali
  */
-public class JsonFileLoader extends JsonSettingsLoader {
+public class JsonFileLoader {
 
     /* https://www.javadoc.io/doc/org.elasticsearch/elasticsearch/latest/org.elasticsearch.server/org/elasticsearch/common/settings/Settings.Builder.html
     * Use builder
@@ -51,7 +52,7 @@ public class JsonFileLoader extends JsonSettingsLoader {
      * @param fileName
      * @return returns a string representation of file contents
      */
-    public String loadFromResource(String fileName) {
+    public Map<String, String> loadFromResource(String fileName) {
         return loadFromStream(getPathFromResource(fileName));
     }
 
@@ -61,7 +62,7 @@ public class JsonFileLoader extends JsonSettingsLoader {
      * @param filePath a file path
      * @return returns a string representation of the file contents.
      */
-    public String loadFromStream(String filePath) {
+    public Map<String, String>  loadFromStream(String filePath) {
         BufferedReader reader;
         try {
             reader = new BufferedReader(new FileReader(filePath));
@@ -69,9 +70,9 @@ public class JsonFileLoader extends JsonSettingsLoader {
             logger.error("File path does not exist for " + filePath);
             throw new UnavailableResourceException("Unavailable file for blackbox settings. " +
                     "Make sure this path exist: " + filePath);
+
         }
-        JsonElement json =  JsonParser.parseReader(reader);
-        return json.toString();
+        return  new Gson().fromJson(JsonParser.parseReader(reader), Map.class);
     }
 
     /**
@@ -82,7 +83,7 @@ public class JsonFileLoader extends JsonSettingsLoader {
      * @throws IOException
      */
     public Map<String, String> toMap(String source) throws IOException {
-        return super.load(source);
+        return loadFromResource(source);
     }
 
     /**
@@ -91,7 +92,7 @@ public class JsonFileLoader extends JsonSettingsLoader {
      * @return a file converted to Java map
      */
     public Map<String, String> loadBlackboxConfigFromResource() throws IOException {
-        return toMap(loadFromResource(CONFIG_TEMPLATE));
+        return loadFromResource(CONFIG_TEMPLATE);
     }
 
 }
