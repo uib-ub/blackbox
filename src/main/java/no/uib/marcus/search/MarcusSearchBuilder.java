@@ -9,11 +9,10 @@ import org.elasticsearch.ElasticsearchException;
 import org.elasticsearch.action.search.SearchRequestBuilder;
 import org.elasticsearch.action.search.SearchResponse;
 
-import org.elasticsearch.client.Client;
+import org.elasticsearch.client.internal.Client;
 import org.elasticsearch.common.Strings;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.index.query.QueryBuilder;
-import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.index.query.functionscore.FunctionScoreQueryBuilder;
 import org.elasticsearch.search.builder.SearchSourceBuilderException;
 
@@ -95,15 +94,17 @@ public class MarcusSearchBuilder extends AbstractSearchBuilder<MarcusSearchBuild
             } else {
                 //Boost documents inside the "random list" of places because they beautify the front page.
                 //This is just for coolness and it has no effect if the query yields no results
+                // functionScoreQueryBuilder = QueryBuilders.boolQuery().filter(QueryBuilders.matchAllQuery()).must()
+                //                       .add(QueryBuilders.(QueryBuilders.simpleQueryStringQuery(randomQueryString))
                 String randomQueryString = randomPictures[new Random().nextInt(randomPictures.length)];
-                functionScoreQueryBuilder = QueryBuilders.boolQuery().filter(QueryBuilders.matchAllQuery()).must()
-                        .add(QueryBuilders.(QueryBuilders.simpleQueryStringQuery(randomQueryString)),
-                                weightFactorFunction(2));
+                functionScoreQueryBuilder = QueryBuilders.boolQuery().filter(QueryBuilders.matchAllQuery()).must(); add(
+                        QueryBuilders.simpleQueryStringQuery(randomQueryString));
+
             }
             //Boost documents of type "Fotografi" for every query performed.
             query = functionScoreQueryBuilder
-                    .add(FilterBuilders.termFilter("type", BoostType.FOTOGRAFI), weightFactorFunction(3))
-                    .add(FilterBuilders.termFilter("type", BoostType.BILDE), weightFactorFunction(3));
+                    .add(QueryBuilders.termQuery("type", BoostType.FOTOGRAFI), weightFactorFunction(3))
+                    .add(FilterBuilders.termQuery("type", BoostType.BILDE), weightFactorFunction(3));
 
             //Set filtered query with top_filter
             if (getFilter() != null) {
