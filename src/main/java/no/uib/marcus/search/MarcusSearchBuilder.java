@@ -11,16 +11,23 @@ import org.elasticsearch.action.search.SearchResponse;
 
 import org.elasticsearch.client.internal.Client;
 import org.elasticsearch.common.Strings;
+import org.elasticsearch.index.query.MatchAllQueryBuilder;
+import org.elasticsearch.index.query.MatchQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.index.query.QueryBuilder;
+
 import org.elasticsearch.index.query.functionscore.FunctionScoreQueryBuilder;
+import org.elasticsearch.index.query.functionscore.WeightBuilder;
 import org.elasticsearch.search.builder.SearchSourceBuilderException;
 
 import javax.validation.constraints.NotNull;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 import java.util.Random;
 
 import static org.elasticsearch.index.query.functionscore.ScoreFunctionBuilders.weightFactorFunction;
+
 
 /**
  * Builder for Marcus search service
@@ -77,10 +84,10 @@ public class MarcusSearchBuilder extends AbstractSearchBuilder<MarcusSearchBuild
                 searchRequest.setIndices(getIndices());
             }
 
-            //Set types (Types removed in ES8)
-            //if (isNeitherNullNorEmpty(getTypes())) {
-            //    searchRequest.setTypes(getTypes());
-            //}
+            //Set types
+         //   if (isNeitherNullNorEmpty(getTypes())) {
+        //        searchRequest.setTypes(getTypes());
+        //    }
 
             //Set from and size
             searchRequest.setFrom(getFrom());
@@ -94,17 +101,17 @@ public class MarcusSearchBuilder extends AbstractSearchBuilder<MarcusSearchBuild
             } else {
                 //Boost documents inside the "random list" of places because they beautify the front page.
                 //This is just for coolness and it has no effect if the query yields no results
-                // functionScoreQueryBuilder = QueryBuilders.boolQuery().filter(QueryBuilders.matchAllQuery()).must()
-                //                       .add(QueryBuilders.(QueryBuilders.simpleQueryStringQuery(randomQueryString))
                 String randomQueryString = randomPictures[new Random().nextInt(randomPictures.length)];
-                functionScoreQueryBuilder = QueryBuilders.boolQuery().filter(QueryBuilders.matchAllQuery()).must(); add(
-                        QueryBuilders.simpleQueryStringQuery(randomQueryString));
-
+                List functionBuilders = new ArrayList<>();
+                MatchAllQueryBuilder matchAll = QueryBuilders(QueryBuilders.matchAllQuery();
+                WeightBuilder randomImageFactor =
+                        .add(QueryBuilders.queryFilter(QueryBuilders.simpleQueryStringQuery(randomQueryString)),
+                                weightFactorFunction(2));
             }
             //Boost documents of type "Fotografi" for every query performed.
             query = functionScoreQueryBuilder
-                    .add(QueryBuilders.termQuery("type", BoostType.FOTOGRAFI), weightFactorFunction(3))
-                    .add(FilterBuilders.termQuery("type", BoostType.BILDE), weightFactorFunction(3));
+                    .add(FilterBuilders.termFilter("type", BoostType.FOTOGRAFI), weightFactorFunction(3))
+                    .add(FilterBuilders.termFilter("type", BoostType.BILDE), weightFactorFunction(3));
 
             //Set filtered query with top_filter
             if (getFilter() != null) {
@@ -166,4 +173,5 @@ public class MarcusSearchBuilder extends AbstractSearchBuilder<MarcusSearchBuild
         final static String BILDE = "bilde";
     }
 }
+
 
