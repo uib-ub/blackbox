@@ -1,5 +1,8 @@
 package no.uib.marcus.search;
 
+import static org.elasticsearch.index.query.QueryBuilders.constantScoreQuery;
+import static org.elasticsearch.index.query.QueryBuilders.*;
+import static org.elasticsearch.index.query.functionscore.ScoreFunctionBuilders.*;
 import no.uib.marcus.common.util.AggregationUtils;
 import no.uib.marcus.common.util.QueryUtils;
 import no.uib.marcus.common.util.SignatureUtils;
@@ -17,7 +20,6 @@ import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.index.query.QueryBuilder;
 
 import org.elasticsearch.index.query.functionscore.FunctionScoreQueryBuilder;
-import org.elasticsearch.index.query.functionscore.WeightBuilder;
 import org.elasticsearch.search.builder.SearchSourceBuilderException;
 
 import javax.validation.constraints.NotNull;
@@ -93,32 +95,41 @@ public class MarcusSearchBuilder extends AbstractSearchBuilder<MarcusSearchBuild
             searchRequest.setFrom(getFrom());
             searchRequest.setSize(getSize());
 
+            List functionBuilders = new ArrayList<>();
+
             //Set query
             if (Strings.hasText(getQueryString())) {
                 //Use query_string query with AND operator
-                functionScoreQueryBuilder = QueryBuilders
-                        .functionScoreQuery(QueryUtils.buildMarcusQueryString(getQueryString()));
+                functionScoreQueryBuilder = functionScoreQuery(QueryUtils.buildMarcusQueryString(getQueryString()));
             } else {
                 //Boost documents inside the "random list" of places because they beautify the front page.
                 //This is just for coolness and it has no effect if the query yields no results
                 String randomQueryString = randomPictures[new Random().nextInt(randomPictures.length)];
-                List functionBuilders = new ArrayList<>();
-                MatchAllQueryBuilder matchAll = QueryBuilders(QueryBuilders.matchAllQuery();
-                WeightBuilder randomImageFactor =
-                        .add(QueryBuilders.queryFilter(QueryBuilders.simpleQueryStringQuery(randomQueryString)),
-                                weightFactorFunction(2));
+                MatchAllQueryBuilder matchAll = QueryBuilders.matchAllQuery();
+                FunctionScoreQueryBuilder randomImageFactor = functionScoreQuery(QueryBuilders.simpleQueryStringQuery(randomQueryString),
+                        weightFactorFunction(2));
+                functionBuilders.add(matchAll);
+                functionBuilders.add(randomImageFactor);
             }
-            //Boost documents of type "Fotografi" for every query performed.
-            query = functionScoreQueryBuilder
-                    .add(FilterBuilders.termFilter("type", BoostType.FOTOGRAFI), weightFactorFunction(3))
-                    .add(FilterBuilders.termFilter("type", BoostType.BILDE), weightFactorFunction(3));
+
+                FunctionScoreQueryBuilder boostFotografi = functionScoreQuery(QueryBuilders.termQuery("type", BoostType.FOTOGRAFI),weightFactorFunction(3));
+                FunctionScoreQueryBuilder boostBilde = functionScoreQuery(QueryBuilders.termQuery("type", BoostType.BILDE),weightFactorFunction(3));
+            constantScoreQuery()
+            functionScoreQuery();
+                query = functionsScoreQuery(functionBuilders);
+                    functionBuilders.add(matchAll);
+                functionBuilders.add(randomImageFactor);
+                functionBuilders.add(boostFotografi);
+                functionBuilders.add(boostBilde);
+
 
             //Set filtered query with top_filter
             if (getFilter() != null) {
                 //Note: Filtered query is deprecated from ES v2.0
                 //in favour of a new filter clause on the bool query
                 //Read https://www.elastic.co/blog/better-query-execution-coming-elasticsearch-2-0
-                searchRequest.setQuery(QueryBuilders.filteredQuery(query, getFilter()));
+                //  Use the bool query instead with a must clause for the query and a filter clause for the filter.
+                searchRequest.setQuery(QueryBuilders.boolQuery().must()filteredQuery(query, getFilter()));
             } else {
                 searchRequest.setQuery(query);
             }
