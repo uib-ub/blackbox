@@ -16,6 +16,7 @@ import org.elasticsearch.client.internal.Client;
 import org.elasticsearch.common.Strings;
 import org.elasticsearch.index.query.MatchAllQueryBuilder;
 import org.elasticsearch.index.query.MatchQueryBuilder;
+import static org.elasticsearch.index.query.functionscore.ScoreFunctionBuilders.*;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.index.query.QueryBuilder;
 
@@ -95,33 +96,39 @@ public class MarcusSearchBuilder extends AbstractSearchBuilder<MarcusSearchBuild
             searchRequest.setFrom(getFrom());
             searchRequest.setSize(getSize());
 
-            List functionBuilders = new ArrayList<>();
+            FunctionScoreQueryBuilder.FilterFunctionBuilder[] functions;
+
+            List functionBuilders = new ArrayList<FunctionScoreQueryBuilder.FilterFunctionBuilder[]>();
 
             //Set query
             if (Strings.hasText(getQueryString())) {
                 //Use query_string query with AND operator
                 functionScoreQueryBuilder = functionScoreQuery(QueryUtils.buildMarcusQueryString(getQueryString()));
+                functionBuilders.add(functionScoreQueryBuilder);
             } else {
                 //Boost documents inside the "random list" of places because they beautify the front page.
                 //This is just for coolness and it has no effect if the query yields no results
                 String randomQueryString = randomPictures[new Random().nextInt(randomPictures.length)];
-                MatchAllQueryBuilder matchAll = QueryBuilders.matchAllQuery();
+                FunctionScoreQueryBuilder.FilterFunctionBuilder matchAll =  new FunctionScoreQueryBuilder.FilterFunctionBuilder(matchAllQuery(),randomFunction());
                 FunctionScoreQueryBuilder randomImageFactor = functionScoreQuery(QueryBuilders.simpleQueryStringQuery(randomQueryString),
                         weightFactorFunction(2));
                 functionBuilders.add(matchAll);
                 functionBuilders.add(randomImageFactor);
+
             }
 
                 FunctionScoreQueryBuilder boostFotografi = functionScoreQuery(QueryBuilders.termQuery("type", BoostType.FOTOGRAFI),weightFactorFunction(3));
                 FunctionScoreQueryBuilder boostBilde = functionScoreQuery(QueryBuilders.termQuery("type", BoostType.BILDE),weightFactorFunction(3));
-            constantScoreQuery()
-            functionScoreQuery();
-                query = functionsScoreQuery(functionBuilders);
-                    functionBuilders.add(matchAll);
-                functionBuilders.add(randomImageFactor);
+          //  constantScoreQuery()
+           // functionScoreQuery();
+            // query = functionsScoreQuery(functionBuilders);
+
                 functionBuilders.add(boostFotografi);
                 functionBuilders.add(boostBilde);
 
+                functions = new FunctionScoreQueryBuilder.FilterFunctionBuilder[functionBuilders.size()];
+
+                functions = (FunctionScoreQueryBuilder.FilterFunctionBuilder[]) functionBuilders.toArray(functions);
 
             //Set filtered query with top_filter
             if (getFilter() != null) {
@@ -129,9 +136,11 @@ public class MarcusSearchBuilder extends AbstractSearchBuilder<MarcusSearchBuild
                 //in favour of a new filter clause on the bool query
                 //Read https://www.elastic.co/blog/better-query-execution-coming-elasticsearch-2-0
                 //  Use the bool query instead with a must clause for the query and a filter clause for the filter.
-                searchRequest.setQuery(QueryBuilders.boolQuery().must()filteredQuery(query, getFilter()));
+                QueryBuilders.boolQuery().filter(getFilter()).must();
+                searchRequest.setQuery(
+                        QueryBuilders.boolQuery().filter(getFilter()).must());
             } else {
-                searchRequest.setQuery(query);
+                searchRequest.setsetQuery(functions.);
             }
             //Set post filter if available
             if (getPostFilter() != null) {
@@ -154,7 +163,7 @@ public class MarcusSearchBuilder extends AbstractSearchBuilder<MarcusSearchBuild
             //logger.info(searchRequest.toString());
             //System.out.println(searchRequest.toString());
         } catch (SearchSourceBuilderException e) {
-            logger.error("Exception occurred when building search request: " + e.getMostSpecificCause());
+            logger.error("Exception occurred when building search request: " + e.getDetailedMessage());
         }
         return searchRequest;
     }
@@ -169,7 +178,7 @@ public class MarcusSearchBuilder extends AbstractSearchBuilder<MarcusSearchBuild
         Optional<SearchResponse> optionalResponse = Optional.empty();
         try {
             SearchResponse response = request.execute().actionGet();
-            if (response.getHits().getTotalHits() > -1) {
+            if ( response.getHits().getTotalHits().value > -1) {
                 optionalResponse = Optional.of(response);
             }
         } catch (ElasticsearchException e) {
