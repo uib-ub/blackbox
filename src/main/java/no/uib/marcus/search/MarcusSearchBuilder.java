@@ -126,6 +126,7 @@ public class MarcusSearchBuilder extends AbstractSearchBuilder<MarcusSearchBuild
                 functionBuilders.add(boostFotografi);
                 functionBuilders.add(boostBilde);
 
+
                 functions = new FunctionScoreQueryBuilder.FilterFunctionBuilder[functionBuilders.size()];
 
                 functions = (FunctionScoreQueryBuilder.FilterFunctionBuilder[]) functionBuilders.toArray(functions);
@@ -136,11 +137,11 @@ public class MarcusSearchBuilder extends AbstractSearchBuilder<MarcusSearchBuild
                 //in favour of a new filter clause on the bool query
                 //Read https://www.elastic.co/blog/better-query-execution-coming-elasticsearch-2-0
                 //  Use the bool query instead with a must clause for the query and a filter clause for the filter.
-                QueryBuilders.boolQuery().filter(getFilter()).must();
+
                 searchRequest.setQuery(
-                        QueryBuilders.boolQuery().filter(getFilter()).must());
+                        QueryBuilders.boolQuery().filter(getFilter()).must(QueryBuilders.functionScoreQuery(functions)));
             } else {
-                searchRequest.setsetQuery(functions.);
+                searchRequest.setQuery(QueryBuilders.functionScoreQuery(functions));
             }
             //Set post filter if available
             if (getPostFilter() != null) {

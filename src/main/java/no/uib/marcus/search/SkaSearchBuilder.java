@@ -41,22 +41,22 @@ public class SkaSearchBuilder extends MarcusSearchBuilder {
 
             //Set types
             if (isNeitherNullNorEmpty(getTypes())) {
-                searchRequest.setTypes(getTypes());
+            //    searchRequest.setTypes(getTypes());
             }
             //Set query
             if (Strings.hasText(getQueryString())) {
                 query = QueryUtils.buildMarcusQueryString(getQueryString());
             } else {
                 //Boost documents of type "Manuskript" if nothing specified
-                query = QueryBuilders.functionScoreQuery(QueryBuilders.matchAllQuery(),).
-                        .add(QueryBuilders.termQuery("type", BoostType.INTERVJU),
-                                ScoreFunctionBuilders.weightFactorFunction(2));
+          //      query = QueryBuilders.functionScoreQuery(QueryBuilders.matchAllQuery(),).
+            //            .add(QueryBuilders.termQuery("type", BoostType.INTERVJU),
+              //                  ScoreFunctionBuilders.weightFactorFunction(2));
             }
             //Set query whether with or without filter
             if (getFilter() != null) {
-                searchRequest.setQuery(QueryBuilders.filteredQuery(query, getFilter()));
+                searchRequest.setQuery(QueryBuilders.boolQuery().filter(getFilter()));
             } else {
-                searchRequest.setQuery(query);
+          //      searchRequest.setQuery(query);
             }
 
             //Set post filter
@@ -83,7 +83,7 @@ public class SkaSearchBuilder extends MarcusSearchBuilder {
             //Show builder for debugging purpose
             //logger.info(searchRequest.toString());
         } catch (SearchSourceBuilderException e) {
-            logger.error("Exception occurred when building search request: " + e.getMostSpecificCause());
+            logger.error("Exception occurred when building search request: " + e.getRootCause().getMessage());
         }
         return searchRequest;
     }
