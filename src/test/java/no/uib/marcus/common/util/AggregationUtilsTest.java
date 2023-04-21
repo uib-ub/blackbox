@@ -4,6 +4,7 @@ import com.carrotsearch.randomizedtesting.RandomizedTest;
 import com.carrotsearch.randomizedtesting.annotations.Repeat;
 import com.carrotsearch.randomizedtesting.annotations.Seed;
 import no.uib.marcus.range.DateRange;
+import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.elasticsearch.index.query.BoolFilterBuilder;
 import org.elasticsearch.index.query.FilterBuilders;
@@ -17,7 +18,7 @@ import static no.uib.marcus.common.util.AggregationUtils.contains;
  * @author Hemed Ali
  */
 public class AggregationUtilsTest extends RandomizedTest {
-    private final Logger logger = Logger.getLogger(getClass().getName());
+    private final Logger logger = LogManager.getLogger(getClass().getName());
         private static final String AGGS = "["
                 + "{\"field\": \"assigned_to\", \"order\": \"term_asc\"},"
                 + "{\"field\": \"subject.exact\", \"size\": 10}," + "                              "

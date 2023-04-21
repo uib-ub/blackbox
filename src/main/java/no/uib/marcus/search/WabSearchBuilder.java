@@ -64,8 +64,8 @@ public class WabSearchBuilder extends AbstractSearchBuilder<WabSearchBuilder> {
                 query = QueryBuilders.matchAllQuery();
             }
             //Set Query, whether with or without filter
-            if (getFilter() != null) {
-                searchRequest.setQuery(Queries.filtered(query.toQuery(), getFilter()));
+            if (getFilter() != null) { // @todo
+            //    searchRequest.setQuery(Queries.filtered(query.)toQuery(), getFilter()));
             } else {
                 searchRequest.setQuery(query);
             }

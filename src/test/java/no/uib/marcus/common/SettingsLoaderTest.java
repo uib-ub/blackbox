@@ -1,16 +1,19 @@
 package no.uib.marcus.common;
 
-import com.carrotsearch.randomizedtesting.RandomizedTest;
+//import com.carrotsearch.randomizedtesting.RandomizedTest;
 import no.uib.marcus.common.loader.JsonFileLoader;
 import no.uib.marcus.common.loader.UnavailableResourceException;
+import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.junit.Test;
 
 import java.io.IOException;
 import java.util.Map;
 
-public class SettingsLoaderTest extends RandomizedTest {
-    private final Logger logger = Logger.getLogger(getClass().getName());
+import static org.junit.Assert.*;
+
+public class SettingsLoaderTest  {
+    private final Logger logger = LogManager.getLogger(getClass().getName());
 
     /**
      * Test using fixed values
@@ -53,19 +56,18 @@ public class SettingsLoaderTest extends RandomizedTest {
         String fileName = "config.template.example.json";
         JsonFileLoader loader = new JsonFileLoader();
         String jsonString;
+        Map<String, String> settings = null;
         try {
-            jsonString = loader.loadFromResource(fileName);
+            settings = loader.loadFromResource(fileName);
         } catch (UnavailableResourceException ex) {
             //Load from resource
             fileName = "config.template.json";
-            jsonString = loader.loadFromResource(fileName);
+          //  jsonString = loader.loadFromResource(fileName);
         }
 
         logger.info("Validating config file from: " + loader.getPathFromResource(fileName));
-        Map<String, String> settings = loader.toMap(jsonString);
-        assertNotNull(jsonString);
+        assertTrue(!settings.isEmpty());
         assertNotNull(settings);
-        assertTrue(!jsonString.isEmpty());
         assertTrue("Does cluster name exist? : ", !settings.get("cluster.name").isEmpty());
         assertTrue("Does host name exist? : ", !settings.get("cluster.host").isEmpty());
         assertTrue("Does port exist? : ", !settings.get("cluster.port").isEmpty());
