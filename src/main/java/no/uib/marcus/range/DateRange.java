@@ -48,8 +48,9 @@ public class DateRange implements Range<LocalDate> {
 
     public DateRange(String from, String to, String format) {
         this(format);
-        this.fromDate = parseFromDate(from);
-        this.toDate = parseToDate(to);
+
+        this.fromDate = !from.isEmpty() ? parseFromDate(from) : null;
+        this.toDate = !to.isEmpty() ? parseToDate(to) : null;
     }
 
     public static DateRange of(@Nullable String from, @Nullable String to) {
@@ -83,18 +84,27 @@ public class DateRange implements Range<LocalDate> {
      * to 31st of December.
      */
     public LocalDate parseToDate(String toDateString) {
-        LocalDate toDate = parse(toDateString);
-        if (toDate != null && isXSDgYear(toDateString)) {// when only year is specified
-            return  LocalDate.of(toDate.getYear(), 12, 31);
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        boolean bool = isXSDgYear(toDateString);
+        logger.warning("bool: " + bool);
+        if (isXSDgYear(toDateString)) {// when only year is specified
+
+          return LocalDate.parse(toDateString + "-12-31", formatter);
+
         }
-        return toDate;
+        return   LocalDate.parse(toDateString ,formatter);
     }
+
 
     /**
      * Joda Time parses from_date correctly
      */
     public LocalDate parseFromDate(String fromDateString) {
-        return parse(fromDateString);
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        if (fromDateString.length() == 4) {
+            return LocalDate.parse(fromDateString + "-01-01", formatter);
+        }
+        return  LocalDate.parse(fromDateString,formatter);
     }
 
     /**
@@ -215,7 +225,7 @@ public class DateRange implements Range<LocalDate> {
                     );
             gCalendar.toXMLFormat();
         } catch (NumberFormatException nfe) {
-            logger.warning("gYear must be a number: " + nfe.getLocalizedMessage());
+            logger.warning("OLG gYear must be a number: " + nfe.getLocalizedMessage());
             return false;
         } catch (DatatypeConfigurationException | IllegalArgumentException ex) {
             logger.warning(ex.getLocalizedMessage());

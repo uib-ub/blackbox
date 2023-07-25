@@ -52,7 +52,7 @@ public class JsonFileLoader {
      * @param fileName
      * @return returns a string representation of file contents
      */
-    public Map<String, String> loadFromResource(String fileName) {
+    public Map<String, Map> loadFromResource(String fileName) {
         return loadFromStream(getPathFromResource(fileName));
     }
 
@@ -62,7 +62,7 @@ public class JsonFileLoader {
      * @param filePath a file path
      * @return returns a string representation of the file contents.
      */
-    public Map<String, String>  loadFromStream(String filePath) {
+    public Map<String, Map>  loadFromStream(String filePath) {
         BufferedReader reader;
         try {
             reader = new BufferedReader(new FileReader(filePath));
@@ -83,7 +83,7 @@ public class JsonFileLoader {
      * @throws IOException
      */
     public Map<String, String> toMap(String source) throws IOException {
-        return loadFromResource(source);
+        return loadFromResource(source).get("cluster");
     }
 
     /**
@@ -92,7 +92,7 @@ public class JsonFileLoader {
      * @return a file converted to Java map
      */
     public Map<String, String> loadBlackboxConfigFromResource() throws IOException {
-        return loadFromResource(CONFIG_TEMPLATE);
+        return loadFromResource(CONFIG_TEMPLATE).get("cluster");
     }
 
 }

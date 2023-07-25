@@ -43,12 +43,12 @@ final public class ClientFactory {
     private static Client createTransportClient(Map<String, String> properties) {
         try {
             Settings settings = Settings.builder()
-                    .put("cluster.name", BlackboxUtils.getValueAsString(properties, "cluster.name"))
-                    .put("node.name", BlackboxUtils.getValueAsString(properties, "cluster.node_name"))
+                    .put("cluster.name", BlackboxUtils.getValueAsString(properties, "name"))
+                    .put("node.name", BlackboxUtils.getValueAsString(properties, "node_name"))
                     .build();
             RestHighLevelClient client = new RestHighLevelClient(
                     RestClient.builder(
-                            new HttpHost(InetAddress.getByName(BlackboxUtils.getValueAsString(properties, "cluster.host")),  BlackboxUtils.getValueAsInt(properties, "cluster.port"), "https")
+                            new HttpHost(InetAddress.getByName(BlackboxUtils.getValueAsString(properties, "host")),  BlackboxUtils.getValueAsInt(properties, "port"), "https")
                          ));
             ClusterHealthRequest ch = new ClusterHealthRequest();
             ClusterHealthResponse hr = client.cluster().health(ch, RequestOptions.DEFAULT);
