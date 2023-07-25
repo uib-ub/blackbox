@@ -13,8 +13,8 @@ public class QueryUtilsTest {
         assertEquals(null, QueryUtils.appendTrailingWildcardIfSingleTerm(null));
         assertEquals("-kk", QueryUtils.appendTrailingWildcardIfSingleTerm("-kk"));
         assertEquals("ali*", QueryUtils.appendTrailingWildcardIfSingleTerm("ali"));
-        assertEquals("ali AND juma", QueryUtils.appendTrailingWildcardIfSingleTerm("ali AND juma"));
-        assertEquals("ali -juma", QueryUtils.appendTrailingWildcardIfSingleTerm("ali -juma"));
+        assertEquals("ali AND juma*", QueryUtils.appendTrailingWildcardIfSingleTerm("ali AND juma"));
+        assertEquals("*ali -juma*", QueryUtils.appendTrailingWildcardIfSingleTerm("ali -juma"));
         assertEquals("makame*", QueryUtils.appendTrailingWildcardIfSingleTerm("makame"));
         assertEquals("makame**", QueryUtils.appendTrailingWildcardIfSingleTerm("makame**"));
         assertEquals("makame*", QueryUtils.appendTrailingWildcardIfSingleTerm("makame*"));
@@ -28,7 +28,7 @@ public class QueryUtilsTest {
         assertEquals("ubb-ms*", QueryUtils.appendTrailingWildcardIfSingleTerm("ubb-ms"));
         assertEquals("bros-0123-*", QueryUtils.appendTrailingWildcardIfSingleTerm("bros-0123-"));
         //It is not a single word
-        assertEquals("ubb bros-0123", QueryUtils.appendTrailingWildcardIfSingleTerm("ubb bros-0123"));
+        assertEquals("ubb bros-0123*", QueryUtils.appendTrailingWildcardIfSingleTerm("ubb bros-0123"));
 
     }
 

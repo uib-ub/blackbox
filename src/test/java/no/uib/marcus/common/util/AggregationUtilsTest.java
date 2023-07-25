@@ -6,8 +6,9 @@ import com.carrotsearch.randomizedtesting.annotations.Seed;
 import no.uib.marcus.range.DateRange;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.elasticsearch.index.query.BoolFilterBuilder;
-import org.elasticsearch.index.query.FilterBuilders;
+import org.elasticsearch.index.query.BoolQueryBuilder;
+import org.elasticsearch.index.query.QueryBuilder;
+import org.elasticsearch.index.query.QueryBuilders;
 import org.junit.Test;
 
 import java.util.*;
@@ -104,7 +105,7 @@ public class AggregationUtilsTest extends RandomizedTest {
 
         @Test
         public void testBoolFilterOnDates(){
-            BoolFilterBuilder boolFilter = FilterBuilders.boolFilter();
+            BoolQueryBuilder boolFilter = QueryBuilders.boolQuery();
             //Filter will not contain any clause because dates are empty
             assertFalse(FilterUtils.addDateRangeFilter(boolFilter, new DateRange("","")).hasClauses());
             //Filter shall contain must or should clauses

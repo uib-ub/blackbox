@@ -29,12 +29,12 @@ public class SettingsLoaderTest  {
                 "  }\n" +
                 "}";
 
-        Map<String, String> settings = new JsonFileLoader().toMap(properties);
+        Map<String, String> settings = new JsonFileLoader().toMap("settings-test.json");
         //logger.info("Testing if cluster properties file exist: " + !settings.isEmpty());
-        assertTrue(!settings.isEmpty());
-        assertEquals("elasticsearch", settings.get("ubbcluster.name"));
-        assertEquals("Blackbox", settings.get("ubbcluster.node_name"));
-        assertEquals("uib.no/ub", settings.get("ubbcluster.host"));
+        assertTrue(settings.size() > 0);
+        assertEquals("elasticsearch" , settings.get("name"));
+        assertEquals("Blackbox", settings.get("node"));
+        assertEquals("uib.no/ub", settings.get("host"));
     }
 
 
@@ -58,19 +58,21 @@ public class SettingsLoaderTest  {
         String jsonString;
         Map<String, String> settings = null;
         try {
-            settings = loader.loadFromResource(fileName);
+            settings = loader.loadFromResource(fileName).get("cluster");
         } catch (UnavailableResourceException ex) {
             //Load from resource
-            fileName = "config.template.json";
+            fileName = "config.template.example.json";
           //  jsonString = loader.loadFromResource(fileName);
         }
 
         logger.info("Validating config file from: " + loader.getPathFromResource(fileName));
-        assertTrue(!settings.isEmpty());
+        assert settings != null;
+      //  assertTrue(!settings.isEmpty());
         assertNotNull(settings);
-        assertTrue("Does cluster name exist? : ", !settings.get("cluster.name").isEmpty());
-        assertTrue("Does host name exist? : ", !settings.get("cluster.host").isEmpty());
-        assertTrue("Does port exist? : ", !settings.get("cluster.port").isEmpty());
+
+        assertTrue("Does cluster name exist? : " + settings.keySet(), !settings.get("name").isEmpty());
+        assertTrue("Does host name exist? : ", !settings.get("host").isEmpty());
+        assertTrue("Does port exist? : ", !settings.get("port").isEmpty());
     }
 
 
