@@ -10,6 +10,9 @@ import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.XMLGregorianCalendar;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeFormatterBuilder;
+import java.time.temporal.ChronoField;
+import java.time.temporal.ChronoUnit;
 import java.util.Objects;
 import java.util.logging.Logger;
 
@@ -24,6 +27,15 @@ import java.util.logging.Logger;
 public class DateRange implements Range<LocalDate> {
     //Default date format, any one of these is OK
     public static final String DEFAULT_DATE_FORMAT = "yyyy-MM-dd||yyyy-MM||yyyy";
+
+    // default values set for from date
+    public static final  DateTimeFormatter DEFAULT_DATE_FORMATTER = new DateTimeFormatterBuilder()
+            .appendPattern("[yyyy-MM-dd]")
+            .appendPattern("[yyyy-MM]")
+            .appendPattern("[yyyy]")
+            .parseDefaulting(ChronoField.MONTH_OF_YEAR, 1)
+            .parseDefaulting(ChronoField.DAY_OF_MONTH, 1)
+            .toFormatter();
     private static final Logger logger = Logger.getLogger(String.valueOf(DateRange.class));
 
     //Null indicates unbounded/infinite value
@@ -49,8 +61,9 @@ public class DateRange implements Range<LocalDate> {
     public DateRange(String from, String to, String format) {
         this(format);
 
-        this.fromDate = !from.isEmpty() ? parseFromDate(from) : null;
-        this.toDate = !to.isEmpty() ? parseToDate(to) : null;
+
+        this.fromDate = from != null && !from.isEmpty()  ? parseFromDate(from) : null;
+        this.toDate = to != null && !to.isEmpty()  ? parseToDate(to) : null;
     }
 
     public static DateRange of(@Nullable String from, @Nullable String to) {
@@ -79,32 +92,31 @@ public class DateRange implements Range<LocalDate> {
     }
 
     /**
-     * When only year is specified as "to_date", Joda Time parser assumes that it is 1st of January. This makes
-     * sense for "from_date" but not for "to_date". Therefore, this method tries to modify day and month of "to_date"
-     * to 31st of December.
+     * Logic for getting last date
      */
     public LocalDate parseToDate(String toDateString) {
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-        boolean bool = isXSDgYear(toDateString);
-        logger.warning("bool: " + bool);
-        if (isXSDgYear(toDateString)) {// when only year is specified
+        if (toDateString.trim().isEmpty())
+            return null;
 
-          return LocalDate.parse(toDateString + "-12-31", formatter);
+        String defaultDay = "";
+        String defaultMonth = toDateString.length() == 4 ? "-12" : "";
 
+        if (!toDateString.matches("^\\d{4}-\\d{2}-\\d{2}$") && toDateString.matches("^\\d{4}-\\d{2}-\\d{2}$")){
+            if (toDateString.length() != 7)
+                isXSDgYear(toDateString);
+            LocalDate nextMonthFirstDay  = LocalDate.parse(toDateString + defaultMonth + "-01").plusMonths(1);
+            defaultDay = "-" +Integer.toString(nextMonthFirstDay.minusDays(1).get(ChronoField.DAY_OF_MONTH));
         }
-        return   LocalDate.parse(toDateString ,formatter);
+
+        return   LocalDate.parse(toDateString + defaultMonth + defaultDay ,DEFAULT_DATE_FORMATTER);
     }
 
 
     /**
-     * Joda Time parses from_date correctly
+     * From date is handled by default formatter
      */
     public LocalDate parseFromDate(String fromDateString) {
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-        if (fromDateString.length() == 4) {
-            return LocalDate.parse(fromDateString + "-01-01", formatter);
-        }
-        return  LocalDate.parse(fromDateString,formatter);
+            return LocalDate.parse(fromDateString , DEFAULT_DATE_FORMATTER);
     }
 
     /**
@@ -225,7 +237,7 @@ public class DateRange implements Range<LocalDate> {
                     );
             gCalendar.toXMLFormat();
         } catch (NumberFormatException nfe) {
-            logger.warning("OLG gYear must be a number: " + nfe.getLocalizedMessage());
+           // logger.warning("OLG gYear must be a number: " + nfe.getLocalizedMessage());
             return false;
         } catch (DatatypeConfigurationException | IllegalArgumentException ex) {
             logger.warning(ex.getLocalizedMessage());
