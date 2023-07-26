@@ -53,7 +53,7 @@ public class SignatureUtils {
         if (isNeitherNullNorEmpty(value)) {
             value = value.trim();
             if (Character.isLetter(value.charAt(0))
-                    && !value.matches("\\s")
+                    && !value.contains(" ")
                     && !containsReservedChars(value)) {
 
                 //"ubb-ms-01" should be transformed to "ubb-ms-01*" but not ubb+ms
