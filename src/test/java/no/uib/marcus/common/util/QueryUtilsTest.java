@@ -14,7 +14,7 @@ public class QueryUtilsTest {
         assertEquals("-kk", QueryUtils.appendTrailingWildcardIfSingleTerm("-kk"));
         assertEquals("ali*", QueryUtils.appendTrailingWildcardIfSingleTerm("ali"));
         assertEquals("ali AND juma*", QueryUtils.appendTrailingWildcardIfSingleTerm("ali AND juma"));
-        assertEquals("*ali -juma*", QueryUtils.appendTrailingWildcardIfSingleTerm("ali -juma"));
+        assertEquals("ali -juma*", QueryUtils.appendTrailingWildcardIfSingleTerm("ali -juma"));
         assertEquals("makame*", QueryUtils.appendTrailingWildcardIfSingleTerm("makame"));
         assertEquals("makame**", QueryUtils.appendTrailingWildcardIfSingleTerm("makame**"));
         assertEquals("makame*", QueryUtils.appendTrailingWildcardIfSingleTerm("makame*"));
