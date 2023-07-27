@@ -3,6 +3,11 @@ package no.uib.marcus.client;
 import no.uib.marcus.common.loader.JsonFileLoader;
 import no.uib.marcus.common.util.BlackboxUtils;
 import org.apache.http.HttpHost;
+import org.apache.http.auth.AuthScope;
+import org.apache.http.auth.UsernamePasswordCredentials;
+import org.apache.http.client.CredentialsProvider;
+import org.apache.http.impl.client.BasicCredentialsProvider;
+import org.apache.http.impl.nio.client.HttpAsyncClientBuilder;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.LogManager;
 import org.elasticsearch.action.admin.cluster.health.ClusterHealthRequest;
@@ -28,8 +33,10 @@ import java.util.Map;
  */
 final public class ClientFactory {
 
-    private static final Logger logger =  LogManager.getLogger(ClientFactory.class);
+    private static final Logger logger = LogManager.getLogger(ClientFactory.class);
     private static Client client;
+
+    private static final CredentialsProvider credentialsProvider = new BasicCredentialsProvider();
 
     /**
      * Prevent direct instantiation of this class
@@ -42,14 +49,27 @@ final public class ClientFactory {
      */
     private static Client createTransportClient(Map<String, String> properties) {
         try {
+
+            credentialsProvider.setCredentials(AuthScope.ANY, new UsernamePasswordCredentials(BlackboxUtils.getValueAsString(properties, "username"), BlackboxUtils.getValueAsString(properties, "password")));
             Settings settings = Settings.builder()
                     .put("cluster.name", BlackboxUtils.getValueAsString(properties, "name"))
                     .put("node.name", BlackboxUtils.getValueAsString(properties, "node_name"))
                     .build();
-            RestHighLevelClient client = new RestHighLevelClient(
-                    RestClient.builder(
-                            new HttpHost(InetAddress.getByName(BlackboxUtils.getValueAsString(properties, "host")),  BlackboxUtils.getValueAsInt(properties, "port"), "https")
-                         ));
+            RestHighLevelClient client =
+                    new RestHighLevelClientBuilder(
+                            RestClient.builder(
+                                            new HttpHost(InetAddress.getByName(BlackboxUtils.getValueAsString(properties, "host")), BlackboxUtils.getValueAsInt(properties, "port"), "https")
+                                    ).setHttpClientConfigCallback(new RestClientBuilder.HttpClientConfigCallback() {
+                                        @Override
+                                        public HttpAsyncClientBuilder customizeHttpClient(HttpAsyncClientBuilder httpAsyncClientBuilder) {
+                                            return httpAsyncClientBuilder.setDefaultCredentialsProvider(
+                                                    credentialsProvider
+                                            );
+                                        }
+                                    })
+                                    .build())
+                            .setApiCompatibilityMode(true)
+                            .build();
             ClusterHealthRequest ch = new ClusterHealthRequest();
             ClusterHealthResponse hr = client.cluster().health(ch, RequestOptions.DEFAULT);
             logger.info("Connected to Elasticsearch cluster: " + hr);
