@@ -49,7 +49,6 @@ final public class ClientFactory {
      */
     private static Client createTransportClient(Map<String, String> properties) {
         try {
-
             credentialsProvider.setCredentials(AuthScope.ANY, new UsernamePasswordCredentials(BlackboxUtils.getValueAsString(properties, "username"), BlackboxUtils.getValueAsString(properties, "password")));
             Settings settings = Settings.builder()
                     .put("cluster.name", BlackboxUtils.getValueAsString(properties, "name"))
