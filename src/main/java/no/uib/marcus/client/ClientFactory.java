@@ -59,7 +59,7 @@ final public class ClientFactory {
                             RestClient.builder(
                                             new HttpHost(InetAddress.getByName(BlackboxUtils.getValueAsString(properties, "host")), BlackboxUtils.getValueAsInt(properties, "port"), "https")
                                     ).setHttpClientConfigCallback(new RestClientBuilder.HttpClientConfigCallback() {
-                                        @Override
+                                        @Override // something here fails
                                         public HttpAsyncClientBuilder customizeHttpClient(HttpAsyncClientBuilder httpAsyncClientBuilder) {
                                             return httpAsyncClientBuilder.setDefaultCredentialsProvider(
                                                     credentialsProvider
