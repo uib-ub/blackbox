@@ -15,7 +15,7 @@
           Note that the Elasticsearch Java client must be set from the same major version as the nodes;
           otherwise, they may not be able to communicate each other.
         -->
-        <elasticsearch.version>8.5.3</elasticsearch.version>
+        <elasticsearch.version>8.8.2</elasticsearch.version>
     </properties>
     
     <developers>
@@ -50,7 +50,7 @@
         <dependency>
             <groupId>com.google.guava</groupId>
             <artifactId>guava</artifactId>
-            <version>31.1-jre</version>
+            <version>32.1.2-jre</version>
         </dependency>
 
         <dependency>
@@ -86,7 +86,7 @@
         <dependency>
             <groupId>org.elasticsearch.client</groupId>
             <artifactId>elasticsearch-rest-high-level-client</artifactId>
-            <version>7.17.8</version>
+            <version>7.17.12</version>
         </dependency>
 
         <dependency>
@@ -99,13 +99,13 @@
     <dependency>
             <groupId>com.google.code.gson</groupId>
             <artifactId>gson</artifactId>
-            <version>2.9.1</version>
+            <version>2.10.1</version>
         </dependency>
 
         <dependency>
             <groupId>org.apache.logging.log4j</groupId>
             <artifactId>log4j-core</artifactId>
-            <version>2.19.0</version>
+            <version>2.20.0</version>
         </dependency>
         <dependency>
             <groupId>org.jetbrains</groupId>
