@@ -63,11 +63,11 @@ final public class ClientFactory {
                                         public HttpAsyncClientBuilder customizeHttpClient(HttpAsyncClientBuilder httpAsyncClientBuilder) {
                                             return httpAsyncClientBuilder.setDefaultCredentialsProvider(
                                                     credentialsProvider
-                                            );
+                                            ).setSSLHostnameVerifier((s, sslSession) -> true);
+
                                         }
                                     })
                                     // turn off host name verification
-                                    .setSSLHostnameVerifier((s, sslSession) -> true)
                                     .build())
                             .setApiCompatibilityMode(true)
                             .build();
