@@ -2,7 +2,8 @@ package no.uib.marcus.search;
 
 import org.elasticsearch.action.search.SearchRequestBuilder;
 import org.elasticsearch.action.search.SearchResponse;
-import org.elasticsearch.client.internal.Client;
+//import org.elasticsearch.client.internal.Client;
+import org.elasticsearch.client.Client;
 import org.elasticsearch.core.Nullable;
 import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.search.sort.SortBuilder;

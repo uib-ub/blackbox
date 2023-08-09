@@ -13,7 +13,7 @@ import java.util.Map;
 import static org.junit.Assert.*;
 
 public class SettingsLoaderTest  {
-    private final Logger logger = LogManager.getLogger(getClass().getName());
+    private final Logger logger = LogManager.getLogger("Test");
 
     /**
      * Test using fixed values
