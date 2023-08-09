@@ -66,6 +66,8 @@ final public class ClientFactory {
                                             );
                                         }
                                     })
+                                    // turn off host name verification
+                                    .setSSLHostnameVerifier((s, sslSession) -> true)
                                     .build())
                             .setApiCompatibilityMode(true)
                             .build();
