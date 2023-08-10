@@ -77,7 +77,7 @@ final public class ClientFactory {
             throw new RuntimeException(e);
         }
         if (client == null)
-        logger.error("client should not be null");
+        logger.warn("client should not be null");
         return client;
     }
 
