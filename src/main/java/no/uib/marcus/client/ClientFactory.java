@@ -54,20 +54,14 @@ final public class ClientFactory {
                     .put("cluster.name", BlackboxUtils.getValueAsString(properties, "name"))
                     .put("node.name", BlackboxUtils.getValueAsString(properties, "node_name"))
                     .build();
+            // something here fails
             RestHighLevelClient client =
                     new RestHighLevelClientBuilder(
                             RestClient.builder(
                                             new HttpHost(InetAddress.getByName(BlackboxUtils.getValueAsString(properties, "host")), BlackboxUtils.getValueAsInt(properties, "port"), "https")
-                                    ).setHttpClientConfigCallback(new RestClientBuilder.HttpClientConfigCallback() {
-                                        @Override // something here fails
-                                        public HttpAsyncClientBuilder customizeHttpClient(HttpAsyncClientBuilder httpAsyncClientBuilder) {
-                                            return httpAsyncClientBuilder.setDefaultCredentialsProvider(
-                                                    credentialsProvider
-                                            ).setSSLHostnameVerifier((s, sslSession) -> true);
-
-                                        }
-                                    })
-                                    // turn off host name verification
+                                    ).setHttpClientConfigCallback(httpAsyncClientBuilder -> httpAsyncClientBuilder.setDefaultCredentialsProvider(
+                                            credentialsProvider
+                                    ).setSSLHostnameVerifier((s, sslSession) -> true))
                                     .build())
                             .setApiCompatibilityMode(true)
                             .build();
@@ -82,6 +76,8 @@ final public class ClientFactory {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+        if (client == null)
+        logger.error("client should not be null");
         return client;
     }
 
