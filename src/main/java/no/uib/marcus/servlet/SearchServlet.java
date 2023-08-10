@@ -80,8 +80,9 @@ public class SearchServlet extends HttpServlet {
         String indexToBoost = request.getParameter(Params.INDEX_BOOST);
 
         try (PrintWriter out = response.getWriter()) {
+            logger.warn("before transport client");
             Client client = ClientFactory.getTransportClient();
-
+            logger.warn("after transport client");
             //Assign default values, if needs be
             int _from = Strings.hasText(from) ? Integer.parseInt(from) : Params.DEFAULT_FROM;
             int _size = Strings.hasText(size) ? Integer.parseInt(size) : Params.DEFAULT_SIZE;
