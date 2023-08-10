@@ -79,6 +79,8 @@ public class SearchServlet extends HttpServlet {
         String service = request.getParameter(Params.SERVICE);
         String indexToBoost = request.getParameter(Params.INDEX_BOOST);
 
+        logger.warn("before try clause");
+
         try (PrintWriter out = response.getWriter()) {
             logger.warn("before transport client");
             Client client = ClientFactory.getTransportClient();
