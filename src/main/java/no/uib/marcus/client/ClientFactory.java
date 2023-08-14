@@ -8,7 +8,10 @@ import org.apache.http.auth.UsernamePasswordCredentials;
 import org.apache.http.client.CredentialsProvider;
 import org.apache.http.impl.client.BasicCredentialsProvider;
 import org.apache.http.impl.nio.client.HttpAsyncClientBuilder;
-import org.apache.logging.log4j.Logger;
+
+import java.util.logging.Level;
+import java.util.logging.Logger;
+//import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.LogManager;
 import org.elasticsearch.action.admin.cluster.health.ClusterHealthRequest;
 import org.elasticsearch.action.admin.cluster.health.ClusterHealthResponse;
@@ -33,7 +36,7 @@ import java.util.Map;
  */
 final public class ClientFactory {
 
-    private static final Logger logger = LogManager.getLogger(ClientFactory.class);
+    private static final Logger logger = Logger.getLogger(ClientFactory.class.getName());
     private static Client client;
 
     private static final CredentialsProvider credentialsProvider = new BasicCredentialsProvider();
@@ -67,17 +70,17 @@ final public class ClientFactory {
                             .build();
             ClusterHealthRequest ch = new ClusterHealthRequest();
             ClusterHealthResponse hr = client.cluster().health(ch, RequestOptions.DEFAULT);
-            logger.info("Connected to Elasticsearch cluster: " + hr);
+            logger.log(Level.INFO, "Connected to Elasticsearch cluster: " + hr);
         } catch (UnknownHostException ue) {
-            logger.error("Unknown host: " + ue.getMessage());
+            logger.log(Level.SEVERE, "Unknown host: " + ue.getMessage());
         } catch (ConnectTransportException e) {
-            logger.warn("Unable to connect to Elasticsearch cluster. Is Elasticsearch running? "
+            logger.log(Level.SEVERE, "Unable to connect to Elasticsearch cluster. Is Elasticsearch running? "
                     + e.getDetailedMessage());
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
         if (client == null)
-        logger.warn("client should not be null");
+            logger.log(Level.WARNING, "client should not be null");
         return client;
     }
 
