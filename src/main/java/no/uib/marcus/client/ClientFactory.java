@@ -71,6 +71,7 @@ final public class ClientFactory {
                 hr = restHighLevelClient.cluster().health(ch, RequestOptions.DEFAULT);
                 logger.log(Level.INFO, "Connected to Elasticsearch cluster: " + hr);
                 client = (Client) restHighLevelClient.getLowLevelClient();
+                logger.warning("Client: " + client.toString());
                 return client;
             } catch (UnknownHostException ue) {
                 logger.log(Level.SEVERE, "Unknown host: " + ue.getMessage());
