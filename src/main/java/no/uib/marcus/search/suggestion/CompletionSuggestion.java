@@ -4,7 +4,10 @@ import com.google.gson.Gson;
 import no.uib.marcus.client.ClientFactory;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.elasticsearch.action.search.SearchRequest;
 import org.elasticsearch.action.search.SearchRequestBuilder;
+import org.elasticsearch.client.RequestOptions;
+import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.elasticsearch.search.suggest.SuggestBuilder;
 import org.elasticsearch.search.suggest.SuggestionBuilder;
 
@@ -73,15 +76,21 @@ public class CompletionSuggestion {
             suggestionsBuilder.text(text);
             suggestionsBuilder.size(size);
 
-            SearchRequestBuilder searchRequest = ClientFactory.getTransportClient().prepareSearch();
-            searchRequest.suggest(new SuggestBuilder().addSuggestion(SUGGEST_FIELD, suggestionsBuilder));
+            SearchRequest searchRequest = new SearchRequest(indices);
+            //ClientFactory.getTransportClient().getLowLevelClient()
+            SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
+            searchSourceBuilder.suggest(new SuggestBuilder().addSuggestion(SUGGEST_FIELD, suggestionsBuilder));
+            searchRequest.source(searchSourceBuilder);
+
+
 
             if (indices != null && indices.length > 0) {
-                searchRequest.setIndices(indices);
+          //      searchRequest.setIndices(indices);
             }
 
             //Execute suggestions
-            suggestResponse = searchRequest.execute().actionGet().getSuggest();
+            //suggestResponse = searchRequest.execute().actionGet().getSuggest();
+            ClientFactory.getTransportClient().search(searchRequest, RequestOptions.DEFAULT);
 
         } catch (Exception e) {
            logger.error("Exception " +  e.getLocalizedMessage());

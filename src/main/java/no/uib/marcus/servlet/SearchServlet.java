@@ -13,6 +13,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.client.Client;
+import org.elasticsearch.client.RestHighLevelClient;
 import org.elasticsearch.core.Booleans;
 import org.elasticsearch.common.Strings;
 import org.elasticsearch.index.query.BoolQueryBuilder;
@@ -83,7 +84,7 @@ public class SearchServlet extends HttpServlet {
 
         try (PrintWriter out = response.getWriter()) {
             logger.warn("before transport client");
-            Client client = ClientFactory.getTransportClient();
+            RestHighLevelClient client = ClientFactory.getTransportClient();
             logger.warn("after transport client");
             //Assign default values, if needs be
             int _from = Strings.hasText(from) ? Integer.parseInt(from) : Params.DEFAULT_FROM;
@@ -95,7 +96,7 @@ public class SearchServlet extends HttpServlet {
 
             //Get and build corresponding search builder based on the "service" parameter
             SearchBuilder<? extends SearchBuilder<?>> builder = SearchBuilderFactory
-                    .getSearchBuilder(service, client)
+                    .getSearchBuilder(service, client.getLowLevelClient())
                     .setIndices(indices)
                     .setTypes(types)
                     .setQueryString(queryString)

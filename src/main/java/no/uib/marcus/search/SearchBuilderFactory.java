@@ -3,6 +3,7 @@ package no.uib.marcus.search;
 import no.uib.marcus.common.ServiceName;
 
 import org.elasticsearch.client.Client;
+import org.elasticsearch.client.RestHighLevelClient;
 import org.elasticsearch.core.Nullable;
 
 
@@ -65,7 +66,7 @@ public class SearchBuilderFactory {
      */
     public static SearchBuilder<? extends AbstractSearchBuilder<?>> getSearchBuilder(
             @Nullable String serviceString,
-            Client client) {
+            RestHighLevelClient client) {
         ServiceName service = ServiceName.toEnum(serviceString);
         switch (service) {
             case SKA:

@@ -37,7 +37,7 @@ import java.util.Map;
 final public class ClientFactory {
 
     private static final Logger logger = Logger.getLogger(ClientFactory.class.getName());
-    private static Client client;
+    private static RestHighLevelClient client;
 
     private static final CredentialsProvider credentialsProvider = new BasicCredentialsProvider();
 
@@ -50,7 +50,7 @@ final public class ClientFactory {
     /**
      * Create a transport client
      */
-    private static Client createTransportClient(Map<String, String> properties) {
+    private static RestHighLevelClient createTransportClient(Map<String, String> properties) {
         try {
             credentialsProvider.setCredentials(AuthScope.ANY, new UsernamePasswordCredentials(BlackboxUtils.getValueAsString(properties, "username"), BlackboxUtils.getValueAsString(properties, "password")));
             Settings settings = Settings.builder()
@@ -58,19 +58,21 @@ final public class ClientFactory {
                     .put("node.name", BlackboxUtils.getValueAsString(properties, "node_name"))
                     .build();
             // something here fails
-            RestHighLevelClient client =
-                    new RestHighLevelClientBuilder(
-                            RestClient.builder(
-                                            new HttpHost(InetAddress.getByName(BlackboxUtils.getValueAsString(properties, "host")), BlackboxUtils.getValueAsInt(properties, "port"), "https")
-                                    ).setHttpClientConfigCallback(httpAsyncClientBuilder -> httpAsyncClientBuilder.setDefaultCredentialsProvider(
-                                            credentialsProvider
-                                    ).setSSLHostnameVerifier((s, sslSession) -> true))
-                                    .build())
-                            .setApiCompatibilityMode(true)
-                            .build();
-            ClusterHealthRequest ch = new ClusterHealthRequest();
-            ClusterHealthResponse hr = client.cluster().health(ch, RequestOptions.DEFAULT);
+            ClusterHealthResponse hr;
+            try (RestHighLevelClient client = new RestHighLevelClientBuilder(
+                    RestClient.builder(
+                                    new HttpHost(InetAddress.getByName(BlackboxUtils.getValueAsString(properties, "host")), BlackboxUtils.getValueAsInt(properties, "port"), "https")
+                            ).setHttpClientConfigCallback(httpAsyncClientBuilder -> httpAsyncClientBuilder.setDefaultCredentialsProvider(
+                                    credentialsProvider
+                            ).setSSLHostnameVerifier((s, sslSession) -> true))
+                            .build())
+                    .setApiCompatibilityMode(true)
+                    .build()) {
+                ClusterHealthRequest ch = new ClusterHealthRequest();
+                hr = client.cluster().health(ch, RequestOptions.DEFAULT);
+            }
             logger.log(Level.INFO, "Connected to Elasticsearch cluster: " + hr);
+            return client;
         } catch (UnknownHostException ue) {
             logger.log(Level.SEVERE, "Unknown host: " + ue.getMessage());
         } catch (ConnectTransportException e) {
@@ -80,14 +82,16 @@ final public class ClientFactory {
             throw new RuntimeException(e);
         }
         if (client == null)
-            logger.log(Level.WARNING, "client should not be null");
+        logger.log(Level.WARNING, "client should not be null");
         return client;
+
+
     }
 
     /**
      * Syncronize the call so that different threads do not end up creating multiple instances
      */
-    public static synchronized Client getTransportClient() throws IOException {
+    public static synchronized RestHighLevelClient getTransportClient() throws IOException {
         if (client == null) {
             JsonFileLoader loader = new JsonFileLoader();
             Map<String, String> properties = loader.loadBlackboxConfigFromResource();
