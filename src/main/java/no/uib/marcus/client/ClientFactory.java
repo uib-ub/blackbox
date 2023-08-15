@@ -87,7 +87,7 @@ final public class ClientFactory {
                 logger.log(Level.WARNING, "finally clause");
            //     return client;
             }
-        }
+
         logger.info("should already have returned from here");
         return client;
     }
