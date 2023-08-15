@@ -1,32 +1,29 @@
 package no.uib.marcus.search;
 
-import static org.elasticsearch.index.query.QueryBuilders.constantScoreQuery;
 import static org.elasticsearch.index.query.QueryBuilders.*;
 import static org.elasticsearch.index.query.functionscore.ScoreFunctionBuilders.*;
+
+import co.elastic.clients.elasticsearch.core.SearchRequest;
 import no.uib.marcus.common.util.AggregationUtils;
 import no.uib.marcus.common.util.QueryUtils;
 import no.uib.marcus.common.util.SignatureUtils;
+
+import java.util.*;
 import java.util.logging.Logger;
 import org.elasticsearch.ElasticsearchException;
 import org.elasticsearch.action.search.SearchRequestBuilder;
 import org.elasticsearch.action.search.SearchResponse;
 
-import org.elasticsearch.client.Client;
+import org.elasticsearch.client.RestHighLevelClient;
 import org.elasticsearch.common.Strings;
-import org.elasticsearch.index.query.MatchAllQueryBuilder;
-import org.elasticsearch.index.query.MatchQueryBuilder;
-import static org.elasticsearch.index.query.functionscore.ScoreFunctionBuilders.*;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.index.query.QueryBuilder;
 
 import org.elasticsearch.index.query.functionscore.FunctionScoreQueryBuilder;
+import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.elasticsearch.search.builder.SearchSourceBuilderException;
 
 import javax.validation.constraints.NotNull;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.Random;
 
 import static org.elasticsearch.index.query.functionscore.ScoreFunctionBuilders.weightFactorFunction;
 
@@ -57,10 +54,10 @@ public class MarcusSearchBuilder extends AbstractSearchBuilder<MarcusSearchBuild
     /**
      * Build Marcus search service
      *
-     * @param client Elasticsearch client to communicate with a cluster.
+     * @param restHighLevelClient Elasticsearch client to communicate with a cluster.
      */
-    public MarcusSearchBuilder(@NotNull Client client) {
-        super(client);
+    public MarcusSearchBuilder(@NotNull RestHighLevelClient restHighLevelClient) {
+        super(restHighLevelClient);
     }
 
     /**
@@ -75,15 +72,16 @@ public class MarcusSearchBuilder extends AbstractSearchBuilder<MarcusSearchBuild
      * Construct search request based on the service settings.
      */
     @Override
-    public SearchRequestBuilder constructSearchRequest() {
+    public co.elastic.clients.elasticsearch.core.SearchRequest.Builder constructSearchRequest() {
         QueryBuilder query;
         FunctionScoreQueryBuilder functionScoreQueryBuilder;
-        SearchRequestBuilder searchRequest = getClient().prepareSearch();
+        SearchSourceBuilder sourceBuilder = new SearchSourceBuilder();
+        SearchRequest.Builder searchRequest = new SearchRequest.Builder();
 
         try {
             //Set indices
             if (isNeitherNullNorEmpty(getIndices())) {
-                searchRequest.setIndices(getIndices());
+                searchRequest.index(Arrays.asList(getIndices()));
             }
 
             //Set types
@@ -92,8 +90,8 @@ public class MarcusSearchBuilder extends AbstractSearchBuilder<MarcusSearchBuild
         //    }
 
             //Set from and size
-            searchRequest.setFrom(getFrom());
-            searchRequest.setSize(getSize());
+            sourceBuilder.from(getFrom());
+            sourceBuilder.size(getSize());
 
             FunctionScoreQueryBuilder.FilterFunctionBuilder[] functions;
 
@@ -137,26 +135,26 @@ public class MarcusSearchBuilder extends AbstractSearchBuilder<MarcusSearchBuild
                 //Read https://www.elastic.co/blog/better-query-execution-coming-elasticsearch-2-0
                 //  Use the bool query instead with a must clause for the query and a filter clause for the filter.
 
-                searchRequest.setQuery(
+                sourceBuilder.query(
                         QueryBuilders.boolQuery().filter(getFilter()).must(QueryBuilders.functionScoreQuery(functions)));
             } else {
-                searchRequest.setQuery(QueryBuilders.functionScoreQuery(functions));
+                sourceBuilder.query(QueryBuilders.functionScoreQuery(functions));
             }
             //Set post filter if available
             if (getPostFilter() != null) {
-                searchRequest.setPostFilter(getPostFilter());
+                sourceBuilder.query(getPostFilter());
             }
             //Set index to boost
             if (getIndexToBoost() != null) {
-                searchRequest.addIndexBoost(getIndexToBoost(), 4.0f);
+                sourceBuilder.indexBoost(getIndexToBoost(), 4.0f);
             }
             //Set options
             if (getSortBuilder() != null) {
-                searchRequest.addSort(getSortBuilder());
+                sourceBuilder.sort(getSortBuilder());
             }
             //Append aggregations to the request builder
             if (Strings.hasText(getAggregations())) {
-                AggregationUtils.addAggregations(searchRequest, getAggregations(), getSelectedFacets());
+                AggregationUtils.addAggregations(sourceBuilder, getAggregations(), getSelectedFacets());
             }
 
             //Show builder for debugging purpose
@@ -165,7 +163,9 @@ public class MarcusSearchBuilder extends AbstractSearchBuilder<MarcusSearchBuild
         } catch (SearchSourceBuilderException e) {
             logger.severe("Exception occurred when building search request: " + e.getDetailedMessage());
         }
-        return searchRequest;
+        SearchRequest r = searchRequest.source();
+
+        return r;
     }
 
     /**

@@ -1,14 +1,14 @@
 package no.uib.marcus.search;
 
+import co.elastic.clients.elasticsearch.core.SearchRequest;
 import no.uib.marcus.common.util.AggregationUtils;
 import java.util.logging.Logger;
 
 import org.elasticsearch.action.search.SearchPhaseExecutionException;
-import org.elasticsearch.action.search.SearchRequestBuilder;
 import org.elasticsearch.action.search.SearchResponse;
 
 
-import org.elasticsearch.client.Client;
+import org.elasticsearch.client.RestHighLevelClient;
 import org.elasticsearch.core.Nullable;
 
 
@@ -35,7 +35,7 @@ import java.util.Map;
  */
 public abstract class AbstractSearchBuilder<T extends AbstractSearchBuilder<T>> implements SearchBuilder<T> {
     private final Logger logger = Logger.getLogger(AbstractSearchBuilder.class.getName());
-    private Client client;
+    private RestHighLevelClient restHighLevelClient;
     @Nullable
     private String[] indices;
     @Nullable
@@ -53,13 +53,13 @@ public abstract class AbstractSearchBuilder<T extends AbstractSearchBuilder<T>> 
     /**
      * Sole constructor. (For invocation by subclass constructors, typically implicit.)
      *
-     * @param client a non-null Elasticsearch client to communicate with a cluster.
+     * @param restHighLevelClient a non-null Elasticsearch client to communicate with a cluster.
      */
-    protected AbstractSearchBuilder(@NotNull Client client) {
-        if (client == null) {
+    protected AbstractSearchBuilder(@NotNull RestHighLevelClient restHighLevelClient) {
+        if (restHighLevelClient == null) {
             throw new IllegalParameterException("Unable to initialize service. Client cannot be null");
         }
-        this.client = client;
+        this.restHighLevelClient = restHighLevelClient;
     }
 
     /**
@@ -201,22 +201,22 @@ public abstract class AbstractSearchBuilder<T extends AbstractSearchBuilder<T>> 
     /**
      * Get Elasticsearch client for this service
      */
-    public Client getClient() {
-        return client;
+    public RestHighLevelClient getRestHighLevelClient() {
+        return restHighLevelClient;
     }
 
     /**
      * Set Elasticsearch client
      *
-     * @param client Elasticsearch client to communicate with a cluster. Cannot be <code>null</code>
+     * @param restHighLevelClient Elasticsearch client to communicate with a cluster. Cannot be <code>null</code>
      * @return this object where client has been set
      */
     @SuppressWarnings("unchecked")
-    public final T setClient(@NotNull Client client) {
-        if (client == null) {
+    public final T setRestHighLevelClient(@NotNull RestHighLevelClient restHighLevelClient) {
+        if (restHighLevelClient == null) {
             throw new IllegalParameterException("Unable to initialize service. Client cannot be null");
         }
-        this.client = client;
+        this.restHighLevelClient = restHighLevelClient;
         return (T) this;
     }
 
@@ -324,7 +324,7 @@ public abstract class AbstractSearchBuilder<T extends AbstractSearchBuilder<T>> 
      * Construct search request based on the service settings. Should be implemented by subclasses
      */
     @Override
-    public abstract SearchRequestBuilder constructSearchRequest();
+    public abstract SearchRequest.Builder constructSearchRequest();
 
     /**
      * Get all documents based on the service settings.

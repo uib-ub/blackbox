@@ -7,14 +7,12 @@ import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.UsernamePasswordCredentials;
 import org.apache.http.client.CredentialsProvider;
 import org.apache.http.impl.client.BasicCredentialsProvider;
-import org.apache.http.impl.nio.client.HttpAsyncClientBuilder;
 
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.elasticsearch.action.admin.cluster.health.ClusterHealthRequest;
 import org.elasticsearch.action.admin.cluster.health.ClusterHealthResponse;
 import org.elasticsearch.client.*;
-import org.elasticsearch.client.Client;
 import org.elasticsearch.common.settings.Settings;
 import org.elasticsearch.transport.ConnectTransportException;
 
@@ -25,30 +23,27 @@ import java.util.Map;
 
 
 /**
- * A singleton that connects to Elasticsearch cluster through Transport client
+ * A singleton that connects to Elasticsearch cluster through HighLevel Request client
  * <p>
- * Note that you should define the same cluster name as the one you defined on
- * your running nodes. Otherwise, your Transport Client won't connect to the
- * node. Note also that you must define the transport client port (9300-9399)
- * and not the REST port (9200-9299). Transport client does not use REST API.
+ * The Client uses the REST ports (default 9200)
  */
-final public class ClientFactory {
+final public class RestHighLevelClientFactory {
 
-    private static final Logger logger = Logger.getLogger(ClientFactory.class.getName());
-    private static Client client;
+    private static final Logger logger = Logger.getLogger(RestHighLevelClientFactory.class.getName());
+    private static RestHighLevelClient restHighLevelClient;
 
     private static final CredentialsProvider credentialsProvider = new BasicCredentialsProvider();
 
     /**
      * Prevent direct instantiation of this class
      */
-    private ClientFactory() {
+    private RestHighLevelClientFactory() {
     }
 
     /**
      * Create a transport client
      */
-    private static Client createTransportClient(Map<String, String> properties) {
+    private static RestHighLevelClient createTransportClient(Map<String, String> properties) {
         try {
             credentialsProvider.setCredentials(AuthScope.ANY, new UsernamePasswordCredentials(BlackboxUtils.getValueAsString(properties, "username"), BlackboxUtils.getValueAsString(properties, "password")));
             Settings settings = Settings.builder()
@@ -70,9 +65,8 @@ final public class ClientFactory {
                 ClusterHealthRequest ch = new ClusterHealthRequest();
                 hr = restHighLevelClient.cluster().health(ch, RequestOptions.DEFAULT);
                 logger.log(Level.INFO, "Connected to Elasticsearch cluster: " + hr);
-                client = (Client) restHighLevelClient.getLowLevelClient();
-                logger.warning("Client: " + client.toString());
-                return client;
+                logger.warning("Client: " + RestHighLevelClientFactory.restHighLevelClient.toString());
+                return RestHighLevelClientFactory.restHighLevelClient;
             } catch (UnknownHostException ue) {
                 logger.log(Level.SEVERE, "Unknown host: " + ue.getMessage());
             } catch (ConnectTransportException e) {
@@ -85,13 +79,13 @@ final public class ClientFactory {
 
         } finally {
 
-           // if (client == null) {
-                logger.log(Level.WARNING, "finally clause");
-           //     return client;
-            }
+            // if (client == null) {
+            logger.log(Level.WARNING, "finally clause");
+            //     return client;
+        }
 
         logger.info("should already have returned from here");
-        return client;
+        return restHighLevelClient;
     }
 
 
@@ -99,19 +93,19 @@ final public class ClientFactory {
     /**
      * Syncronize the call so that different threads do not end up creating multiple instances
      */
-    public static synchronized Client getTransportClient() throws IOException {
-        if (client == null) {
+    public static synchronized RestHighLevelClient getHighLevelRestClient() throws IOException {
+        if (restHighLevelClient == null) {
             JsonFileLoader loader = new JsonFileLoader();
             Map<String, String> properties = loader.loadBlackboxConfigFromResource();
             logger.info("Loaded config template from: " + loader.getPathFromResource(JsonFileLoader.CONFIG_TEMPLATE));
-            client = createTransportClient(properties);
+            restHighLevelClient = createTransportClient(properties);
         }
-        return (Client) client;
+        return restHighLevelClient;
     }
 
     //Main method for easy debugging..
     public static void main(String[] args) throws IOException {
-        getTransportClient();
+        getHighLevelRestClient();
     }
 
     /**
@@ -124,3 +118,5 @@ final public class ClientFactory {
 
 
 }
+
+

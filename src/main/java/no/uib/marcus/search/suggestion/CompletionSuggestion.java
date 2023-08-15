@@ -1,9 +1,10 @@
 package no.uib.marcus.search.suggestion;
 
 import com.google.gson.Gson;
-import no.uib.marcus.client.ClientFactory;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import no.uib.marcus.client.RestHighLevelClientFactory;
 import org.elasticsearch.action.search.SearchRequest;
 import org.elasticsearch.action.search.SearchRequestBuilder;
 import org.elasticsearch.client.RequestOptions;
@@ -89,7 +90,7 @@ public class CompletionSuggestion {
             }
 
             //Execute suggestions
-            suggestResponse = ClientFactory.getTransportClient().search(searchRequest).actionGet().getSuggest();
+            suggestResponse = RestHighLevelClientFactory.getHighLevelRestClient().search(searchRequest).actionGet().getSuggest();
 
         } catch (Exception e) {
            logger.severe("Exception " +  e.getLocalizedMessage());

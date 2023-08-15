@@ -1,20 +1,16 @@
 package no.uib.marcus.search;
 
-import no.uib.marcus.common.Params;
+import co.elastic.clients.elasticsearch.core.SearchRequest;
 import no.uib.marcus.common.util.QueryUtils;
 import java.util.logging.Logger;
-import org.elasticsearch.action.search.SearchRequestBuilder;
-import org.elasticsearch.client.Client;
+
+import org.elasticsearch.client.RestHighLevelClient;
 import org.elasticsearch.common.Strings;
 //import org.elasticsearch.index.query.FilterBuilders;
 import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.search.builder.SearchSourceBuilderException;
 import org.elasticsearch.search.fetch.subphase.highlight.HighlightBuilder;
-
-import java.time.LocalDate;
-
-import static org.elasticsearch.index.query.functionscore.ScoreFunctionBuilders.weightFactorFunction;
 
 /***
  * A search builder for naturen
@@ -24,14 +20,14 @@ public class NaturenSearchBuilder extends MarcusSearchBuilder {
 
     private final Logger logger = Logger.getLogger(NaturenSearchBuilder.class.getName());
 
-    NaturenSearchBuilder(Client client) {
+    NaturenSearchBuilder(RestHighLevelClient client) {
         super(client);
     }
 
     @Override
-    public SearchRequestBuilder constructSearchRequest() {
+    public SearchRequest.Builder constructSearchRequest() {
         QueryBuilder query;
-        SearchRequestBuilder searchRequest = super.constructSearchRequest();
+        SearchRequest.Builder searchRequest = super.constructSearchRequest();
 
         try {
             //Set query

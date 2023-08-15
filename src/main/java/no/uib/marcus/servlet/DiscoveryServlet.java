@@ -1,12 +1,12 @@
 package no.uib.marcus.servlet;
 
-import no.uib.marcus.client.ClientFactory;
+import no.uib.marcus.client.RestHighLevelClientFactory;
 import no.uib.marcus.common.Params;
 import no.uib.marcus.common.util.QueryUtils;
 import no.uib.marcus.search.MarcusDiscoveryBuilder;
 import no.uib.marcus.search.SearchBuilderFactory;
 import org.elasticsearch.action.search.SearchResponse;
-import org.elasticsearch.client.Client;
+import org.elasticsearch.client.RestHighLevelClient;
 import org.elasticsearch.common.Strings;
 import org.elasticsearch.xcontent.XContentBuilder;
 import org.elasticsearch.xcontent.XContentFactory;
@@ -46,7 +46,7 @@ public class DiscoveryServlet extends HttpServlet {
 
         int _size = Strings.hasText(size) ? Integer.parseInt(size) : Params.DEFAULT_SIZE;
         int _from = Strings.hasText(from) ? Integer.parseInt(from) : Params.DEFAULT_FROM;
-        Client client = ClientFactory.getTransportClient();
+        RestHighLevelClient client = RestHighLevelClientFactory.getHighLevelRestClient();
 
         //Build a discovery service
         MarcusDiscoveryBuilder service = SearchBuilderFactory.marcusDiscovery(client)

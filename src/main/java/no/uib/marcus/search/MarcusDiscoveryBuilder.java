@@ -2,10 +2,10 @@ package no.uib.marcus.search;
 
 import java.util.logging.Logger;
 
+import co.elastic.clients.elasticsearch.core.SearchRequest;
 import org.elasticsearch.ElasticsearchException;
-import org.elasticsearch.action.search.SearchRequestBuilder;
 
-import org.elasticsearch.client.Client;
+import org.elasticsearch.client.RestHighLevelClient;
 import org.elasticsearch.common.Strings;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.search.builder.SearchSourceBuilderException;
@@ -18,8 +18,8 @@ import org.elasticsearch.search.builder.SearchSourceBuilderException;
 public class MarcusDiscoveryBuilder extends AbstractSearchBuilder<MarcusDiscoveryBuilder> {
     private static final Logger logger = Logger.getLogger(MarcusDiscoveryBuilder.class.getName());
 
-    MarcusDiscoveryBuilder(Client client) {
-        super(client);
+    MarcusDiscoveryBuilder(RestHighLevelClient restHighLevelClient) {
+        super(restHighLevelClient);
     }
 
 
@@ -27,8 +27,9 @@ public class MarcusDiscoveryBuilder extends AbstractSearchBuilder<MarcusDiscover
      * Construct search request based on the service settings
      **/
     @Override
-    public SearchRequestBuilder constructSearchRequest() {
-        SearchRequestBuilder searchRequest = getClient().prepareSearch();
+    public SearchRequest.Builder constructSearchRequest() {
+        //SearchRequestBuilder searchRequest = getRestHighLevelClient().prepareSearch();
+        SearchRequest.Builder searchRequestBuilder = new SearchRequest.Builder();
         try {
             //Set indices
             if (isNeitherNullNorEmpty(getIndices())) {

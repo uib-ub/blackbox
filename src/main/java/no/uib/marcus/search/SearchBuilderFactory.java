@@ -21,8 +21,8 @@ public class SearchBuilderFactory {
     /**
      * Create a new search service for Marcus data set
      */
-    public static MarcusSearchBuilder marcusSearch(Client client) {
-        return new MarcusSearchBuilder(client);
+    public static MarcusSearchBuilder marcusSearch(RestHighLevelClient restHighLevelClient) {
+        return new MarcusSearchBuilder(restHighLevelClient);
     }
 
 
@@ -52,7 +52,7 @@ public class SearchBuilderFactory {
      * It is a subset of search service with minimal capabilities.
      * For search, @see SearchBuilderFactory#marcusSearch(Client)
      **/
-    public static MarcusDiscoveryBuilder marcusDiscovery(Client client) {
+    public static MarcusDiscoveryBuilder marcusDiscovery(RestHighLevelClient client) {
         return new MarcusDiscoveryBuilder(client);
     }
 
@@ -66,7 +66,7 @@ public class SearchBuilderFactory {
      */
     public static SearchBuilder<? extends AbstractSearchBuilder<?>> getSearchBuilder(
             @Nullable String serviceString,
-            Client client) {
+            RestHighLevelClient client) {
         ServiceName service = ServiceName.toEnum(serviceString);
         switch (service) {
             case SKA:

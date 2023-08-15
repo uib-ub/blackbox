@@ -1,17 +1,16 @@
 package no.uib.marcus.search;
 
 
+import co.elastic.clients.elasticsearch.core.SearchRequest;
 import no.uib.marcus.common.util.AggregationUtils;
 import no.uib.marcus.common.util.SignatureUtils;
 import java.util.logging.Logger;
 import org.elasticsearch.action.search.SearchRequestBuilder;
 import org.elasticsearch.client.Client;
 import org.elasticsearch.common.Strings;
-import org.elasticsearch.common.lucene.search.Queries;
 import org.elasticsearch.index.query.Operator;
 import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
-import org.elasticsearch.index.query.SimpleQueryStringBuilder;
 import org.elasticsearch.search.builder.SearchSourceBuilderException;
 
 /**
@@ -36,9 +35,9 @@ public class WabSearchBuilder extends AbstractSearchBuilder<WabSearchBuilder> {
      * Builds query for WAB
      */
     @Override
-    public SearchRequestBuilder constructSearchRequest() {
+    public SearchRequest.Builder constructSearchRequest() {
         QueryBuilder query;
-        SearchRequestBuilder searchRequest = getClient().prepareSearch();
+        SearchRequestBuilder searchRequest = getRestHighLevelClient().prepareSearch();
         try {
             //Set indices
             if (isNeitherNullNorEmpty(getIndices())) {

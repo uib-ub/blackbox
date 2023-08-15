@@ -17,6 +17,7 @@ import org.elasticsearch.search.aggregations.BucketOrder;
 import org.elasticsearch.search.aggregations.bucket.histogram.DateHistogramAggregationBuilder;
 import org.elasticsearch.search.aggregations.bucket.histogram.DateHistogramInterval;
 import org.elasticsearch.search.aggregations.bucket.terms.TermsAggregationBuilder;
+import org.elasticsearch.search.builder.SearchSourceBuilder;
 
 import java.util.HashMap;
 import java.util.List;
@@ -93,24 +94,24 @@ public final class AggregationUtils {
     /**
      * A method to append aggregations to the search request builder.
      *
-     * @param searchRequest a search request builder
+     * @param searchSourceBuilder a search request builder
      * @param aggregations  aggregations as JSON array string
      * @return the same search request where aggregations have been added to
      * it.
      */
-    public static SearchRequestBuilder addAggregations(SearchRequestBuilder searchRequest, String aggregations) {
-        return addAggregations(searchRequest, aggregations, null);
+    public static SearchRequestBuilder addAggregations(SearchSourceBuilder searchSourceBuilder, String aggregations) {
+        return addAggregations(searchSourceBuilder, aggregations, null);
     }
 
     /**
      * A method to append aggregations to the search request builder.
      *
-     * @param searchRequest  a search request builder
+     * @param searchSourceBuilder  a search request builder
      * @param selectedFacets a map that contains selected facets
      * @return the same search request where aggregations have been added to
      * it.
      */
-    public static SearchRequestBuilder addAggregations(SearchRequestBuilder searchRequest,
+    public static SearchSourceBuilder addAggregations(SearchSourceBuilder searchSourceBuilder,
                                                        String aggregations,
                                                        Map<String, List<String>> selectedFacets)
             throws JsonParseException, IllegalStateException {
@@ -120,7 +121,7 @@ public final class AggregationUtils {
             if (facet.has("field")) {
                 //Add DateHistogram aggregations
                 if (facet.has("type") && facet.get("type").getAsString().equals("date_histogram")) {
-                    searchRequest.addAggregation(AggregationUtils.getDateHistogramAggregation(facet));
+                    searchSourceBuilder.aggregation(AggregationUtils.getDateHistogramAggregation(facet));
                 } else {
                     AggregationBuilder termsAggs = constructTermsAggregation(facet);
                     if (selectedFacets != null && selectedFacets.size() > 0) {
@@ -141,11 +142,11 @@ public final class AggregationUtils {
                             termsAggs = addSubAggregationFilter(aggregations, facet, termsAggs, selectedFacets);
                         }
                     }
-                    searchRequest.addAggregation(termsAggs);
+                    searchSourceBuilder.aggregation(termsAggs);
                 }
             }
         }
-        return searchRequest;
+        return searchSourceBuilder;
     }
 
     /**

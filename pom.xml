@@ -83,17 +83,18 @@
             <artifactId>elasticsearch-java</artifactId>
             <version>${elasticsearch.version}</version>
         </dependency>
-        <dependency>
+
+        <!--<dependency>
             <groupId>org.elasticsearch.client</groupId>
             <artifactId>elasticsearch-rest-high-level-client</artifactId>
             <version>7.17.12</version>
-        </dependency>
+        </dependency>-->
 
-        <dependency>
+    <!--    <dependency>
         <groupId>org.elasticsearch</groupId>
         <artifactId>elasticsearch</artifactId>
         <version>7.17.12</version>
-    </dependency>
+    </dependency>-->
 
         <dependency>
             <groupId>org.apache.logging.log4j</groupId>

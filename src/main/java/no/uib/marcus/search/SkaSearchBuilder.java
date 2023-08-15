@@ -1,16 +1,19 @@
 package no.uib.marcus.search;
 
+import co.elastic.clients.elasticsearch.core.SearchRequest;
+import co.elastic.clients.elasticsearch.core.SearchRequest.Builder;
 import no.uib.marcus.common.util.AggregationUtils;
 import no.uib.marcus.common.util.QueryUtils;
+
+import java.util.Arrays;
 import java.util.logging.Logger;
 
 import org.elasticsearch.action.search.SearchRequestBuilder;
 import org.elasticsearch.client.Client;
+import org.elasticsearch.client.RestClient;
 import org.elasticsearch.common.Strings;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.index.query.QueryBuilder;
-import org.elasticsearch.index.query.QueryBuilders;
-import org.elasticsearch.index.query.functionscore.ScoreFunctionBuilders;
 import org.elasticsearch.search.builder.SearchSourceBuilderException;
 
 /**
@@ -21,7 +24,7 @@ import org.elasticsearch.search.builder.SearchSourceBuilderException;
 public class SkaSearchBuilder extends MarcusSearchBuilder {
     private final Logger logger = Logger.getLogger(SkaSearchBuilder.class.getName());
 
-    SkaSearchBuilder(Client client) {
+    SkaSearchBuilder(RestClient client) {
         super(client);
     }
 
@@ -29,14 +32,14 @@ public class SkaSearchBuilder extends MarcusSearchBuilder {
      * Construct a specific search request for SkA dataset
      **/
     @Override
-    public SearchRequestBuilder constructSearchRequest() {
+    public Builder constructSearchRequest() {
         QueryBuilder query;
-        SearchRequestBuilder searchRequest = getClient().prepareSearch();
+        SearchRequest.Builder searchRequest = new SearchRequest.Builder();
         try {
 
             //Set indices
             if (isNeitherNullNorEmpty(getIndices())) {
-                searchRequest.setIndices(getIndices());
+                searchRequest.index(Arrays.asList(getIndices()));
             }
 
             //Set types
@@ -54,7 +57,7 @@ public class SkaSearchBuilder extends MarcusSearchBuilder {
             }
             //Set query whether with or without filter
             if (getFilter() != null) {
-                searchRequest.setQuery(QueryBuilders.boolQuery().filter(getFilter()));
+                searchRequest.query(QueryBuilders.boolQuery().filter(getFilter()));
             } else {
           //      searchRequest.setQuery(query);
             }

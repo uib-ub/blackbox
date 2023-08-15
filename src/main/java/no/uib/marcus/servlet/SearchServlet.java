@@ -1,6 +1,6 @@
 package no.uib.marcus.servlet;
 
-import no.uib.marcus.client.ClientFactory;
+import no.uib.marcus.client.RestHighLevelClientFactory;
 import no.uib.marcus.common.Params;
 import no.uib.marcus.common.util.FilterUtils;
 import no.uib.marcus.common.util.LogUtils;
@@ -12,7 +12,6 @@ import no.uib.marcus.search.SearchBuilderFactory;
 import java.util.logging.Logger;
 
 import org.elasticsearch.action.search.SearchResponse;
-import org.elasticsearch.client.Client;
 import org.elasticsearch.client.RestHighLevelClient;
 import org.elasticsearch.core.Booleans;
 import org.elasticsearch.common.Strings;
@@ -83,9 +82,9 @@ public class SearchServlet extends HttpServlet {
         logger.warning("before try clause");
 
         try (PrintWriter out = response.getWriter()) {
-            logger.warning("before transport client");
-            Client client = ClientFactory.getTransportClient();
-            logger.warning("after transport client");
+            logger.warning("before transport restHighLevelClient");
+            RestHighLevelClient restHighLevelClient = RestHighLevelClientFactory.getHighLevelRestClient();
+            logger.warning("after transport restHighLevelClient");
             //Assign default values, if needs be
             int _from = Strings.hasText(from) ? Integer.parseInt(from) : Params.DEFAULT_FROM;
             int _size = Strings.hasText(size) ? Integer.parseInt(size) : Params.DEFAULT_SIZE;
@@ -98,7 +97,7 @@ public class SearchServlet extends HttpServlet {
 
             //Get and build corresponding search builder based on the "service" parameter
             SearchBuilder<? extends SearchBuilder<?>> builder = SearchBuilderFactory
-                    .getSearchBuilder(service, client)
+                    .getSearchBuilder(service, restHighLevelClient)
                     .setIndices(indices)
                     .setTypes(types)
                     .setQueryString(queryString)
@@ -134,7 +133,7 @@ public class SearchServlet extends HttpServlet {
 
             logger.info("SearchResponseString" + searchResponseString);
 
-            //Write response to the client
+            //Write response to the restHighLevelClient
             out.write(searchResponseString);
 
             // Log search response

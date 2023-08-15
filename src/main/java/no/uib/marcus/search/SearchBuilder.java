@@ -1,9 +1,11 @@
 package no.uib.marcus.search;
 
+import co.elastic.clients.elasticsearch.core.SearchRequest;
 import org.elasticsearch.action.search.SearchRequestBuilder;
 import org.elasticsearch.action.search.SearchResponse;
 //import org.elasticsearch.client.internal.Client;
 import org.elasticsearch.client.Client;
+import org.elasticsearch.client.RestHighLevelClient;
 import org.elasticsearch.core.Nullable;
 import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.search.sort.SortBuilder;
@@ -21,9 +23,9 @@ public interface SearchBuilder<S> {
     /**
      * Set Elasticsearch client to the service
      *
-     * @param client Elasticsearch client to communicate with a cluster. Cannot be <code>null</code>
+     * @param restHighLevelClient Elasticsearch client to communicate with a cluster. Cannot be <code>null</code>
      */
-    S setClient(@NotNull Client client);
+    S setRestHighLevelClient(@NotNull RestHighLevelClient restHighLevelClient);
 
     /**
      * Set up indices for the service, default to all indices in the cluster
@@ -99,7 +101,7 @@ public interface SearchBuilder<S> {
     /**
      * Construct search request based on the service settings
      */
-    SearchRequestBuilder constructSearchRequest();
+    SearchRequest.Builder constructSearchRequest();
 
     /**
      * Get documents based on the service settings.
