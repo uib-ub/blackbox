@@ -89,8 +89,7 @@ public class CompletionSuggestion {
             }
 
             //Execute suggestions
-            //suggestResponse = searchRequest.execute().actionGet().getSuggest();
-            ClientFactory.getTransportClient().search(searchRequest, RequestOptions.DEFAULT);
+            suggestResponse = ClientFactory.getTransportClient().search(searchRequest).actionGet().getSuggest();
 
         } catch (Exception e) {
            logger.error("Exception " +  e.getLocalizedMessage());

@@ -66,7 +66,7 @@ public class SearchBuilderFactory {
      */
     public static SearchBuilder<? extends AbstractSearchBuilder<?>> getSearchBuilder(
             @Nullable String serviceString,
-            RestHighLevelClient client) {
+            Client client) {
         ServiceName service = ServiceName.toEnum(serviceString);
         switch (service) {
             case SKA:

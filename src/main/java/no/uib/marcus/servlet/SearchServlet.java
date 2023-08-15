@@ -84,7 +84,7 @@ public class SearchServlet extends HttpServlet {
 
         try (PrintWriter out = response.getWriter()) {
             logger.warn("before transport client");
-            RestHighLevelClient client = ClientFactory.getTransportClient();
+            Client client = ClientFactory.getTransportClient();
             logger.warn("after transport client");
             //Assign default values, if needs be
             int _from = Strings.hasText(from) ? Integer.parseInt(from) : Params.DEFAULT_FROM;
@@ -96,7 +96,7 @@ public class SearchServlet extends HttpServlet {
 
             //Get and build corresponding search builder based on the "service" parameter
             SearchBuilder<? extends SearchBuilder<?>> builder = SearchBuilderFactory
-                    .getSearchBuilder(service, client.getLowLevelClient())
+                    .getSearchBuilder(service, client)
                     .setIndices(indices)
                     .setTypes(types)
                     .setQueryString(queryString)
