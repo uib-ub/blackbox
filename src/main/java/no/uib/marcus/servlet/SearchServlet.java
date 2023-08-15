@@ -107,6 +107,8 @@ public class SearchServlet extends HttpServlet {
                     .setSortBuilder(SortUtils.getSort(sortString))
                     .setIndexToBoost(indexToBoost);
 
+            logger.info("builder: " + builder.toString());
+
             //Add top level filter, for "AND" aggregations
             BoolQueryBuilder topFilter = FilterUtils.getTopFilter(
                     selectedFacets, aggs, DateRange.of(fromDate, toDate)
@@ -122,16 +124,19 @@ public class SearchServlet extends HttpServlet {
             //Send search request to Elasticsearch and execute
             SearchResponse searchResponse = builder.executeSearch();
 
+            logger.info("searchResponse: " + searchResponse.toString() );
             //Decide whether to get a pretty JSON output or not
             String searchResponseString = Booleans.isTrue(isPretty)
                     ? QueryUtils.toJsonString(searchResponse, true)
                     : QueryUtils.toJsonString(searchResponse, false);
 
+            logger.info("SearchResponseString" + searchResponseString);
+
             //Write response to the client
             out.write(searchResponseString);
 
             // Log search response
-            logger.info(LogUtils.createLogMessage(request, searchResponse));
+            logger.info("Request: " + request.toString() + " searchResponse: " + searchResponse.toString());
             // System.out.println("Builder class: " + builder.getClass().getName() + " " +
             //                 "\nBuilder toString: " + builder  );
         }
