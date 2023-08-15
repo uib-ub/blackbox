@@ -57,34 +57,41 @@ final public class ClientFactory {
                     .build();
             // something here fails
             ClusterHealthResponse hr;
-            try (RestHighLevelClient restHighLevelClient = new RestHighLevelClientBuilder(
-                    RestClient.builder(
-                                    new HttpHost(InetAddress.getByName(BlackboxUtils.getValueAsString(properties, "host")), BlackboxUtils.getValueAsInt(properties, "port"), "https")
-                            ).setHttpClientConfigCallback(httpAsyncClientBuilder -> httpAsyncClientBuilder.setDefaultCredentialsProvider(
-                                    credentialsProvider
-                            ).setSSLHostnameVerifier((s, sslSession) -> true))
-                            .build())
-                    .setApiCompatibilityMode(true)
-                    .build()) {
+            try {
+                RestHighLevelClient restHighLevelClient = new RestHighLevelClientBuilder(
+                        RestClient.builder(
+                                        new HttpHost(InetAddress.getByName(BlackboxUtils.getValueAsString(properties, "host")), BlackboxUtils.getValueAsInt(properties, "port"), "https")
+                                ).setHttpClientConfigCallback(httpAsyncClientBuilder -> httpAsyncClientBuilder.setDefaultCredentialsProvider(
+                                        credentialsProvider
+                                ).setSSLHostnameVerifier((s, sslSession) -> true))
+                                .build())
+                        .setApiCompatibilityMode(true)
+                        .build();
                 ClusterHealthRequest ch = new ClusterHealthRequest();
                 hr = restHighLevelClient.cluster().health(ch, RequestOptions.DEFAULT);
                 logger.log(Level.INFO, "Connected to Elasticsearch cluster: " + hr);
-                return (Client) restHighLevelClient.getLowLevelClient();
+                client = (Client) restHighLevelClient.getLowLevelClient();
+            } catch (UnknownHostException ue) {
+                logger.log(Level.SEVERE, "Unknown host: " + ue.getMessage());
+            } catch (ConnectTransportException e) {
+                logger.log(Level.SEVERE, "Unable to connect to Elasticsearch cluster. Is Elasticsearch running? "
+                        + e.getDetailedMessage());
+            } catch (IOException e) {
+                throw new RuntimeException(e);
             }
-        } catch (UnknownHostException ue) {
-            logger.log(Level.SEVERE, "Unknown host: " + ue.getMessage());
-        } catch (ConnectTransportException e) {
-            logger.log(Level.SEVERE, "Unable to connect to Elasticsearch cluster. Is Elasticsearch running? "
-                    + e.getDetailedMessage());
-        } catch (IOException e) {
-            throw new RuntimeException(e);
+
+        } finally {
+
+            if (client == null) {
+                logger.log(Level.WARNING, "client should not be null");
+                return client;
+            }
         }
-        if (client == null)
-        logger.log(Level.WARNING, "client should not be null");
+        logger.info("should already have returned from here");
         return client;
-
-
     }
+
+
 
     /**
      * Syncronize the call so that different threads do not end up creating multiple instances
