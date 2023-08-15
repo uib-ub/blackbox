@@ -83,9 +83,9 @@ final public class ClientFactory {
 
         } finally {
 
-            if (client == null) {
-                logger.log(Level.WARNING, "client should not be null");
-                return client;
+           // if (client == null) {
+                logger.log(Level.WARNING, "finally clause");
+           //     return client;
             }
         }
         logger.info("should already have returned from here");
