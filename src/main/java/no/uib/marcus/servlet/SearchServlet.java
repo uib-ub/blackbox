@@ -93,6 +93,8 @@ public class SearchServlet extends HttpServlet {
             // Build a facet map based on selected filters.
             // e.g {"subject.exact" = ["Flyfoto" , "Birkeland"], "type" = ["Brev"]}
             Map<String, List<String>> selectedFacets = FilterUtils.buildFilterMap(selectedFilters);
+            logger.warning("after build filter map");
+
 
             //Get and build corresponding search builder based on the "service" parameter
             SearchBuilder<? extends SearchBuilder<?>> builder = SearchBuilderFactory
