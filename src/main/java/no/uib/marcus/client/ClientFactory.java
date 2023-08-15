@@ -78,6 +78,7 @@ final public class ClientFactory {
                 logger.log(Level.SEVERE, "Unable to connect to Elasticsearch cluster. Is Elasticsearch running? "
                         + e.getDetailedMessage());
             } catch (IOException e) {
+                logger.severe(e.getMessage());
                 throw new RuntimeException(e);
             }
 
