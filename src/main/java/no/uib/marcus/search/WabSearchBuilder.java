@@ -1,17 +1,22 @@
 package no.uib.marcus.search;
 
 
+import co.elastic.clients.elasticsearch._types.query_dsl.Operator;
+import co.elastic.clients.elasticsearch._types.query_dsl.Query;
 import co.elastic.clients.elasticsearch.core.SearchRequest;
 import no.uib.marcus.common.util.AggregationUtils;
 import no.uib.marcus.common.util.SignatureUtils;
+
+import java.util.Arrays;
 import java.util.logging.Logger;
 import org.elasticsearch.action.search.SearchRequestBuilder;
 import org.elasticsearch.client.Client;
 import org.elasticsearch.common.Strings;
-import org.elasticsearch.index.query.Operator;
 import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.search.builder.SearchSourceBuilderException;
+
+import static org.elasticsearch.index.query.QueryBuilders.matchAllQuery;
 
 /**
  * A custom search builder for WAB
@@ -36,12 +41,13 @@ public class WabSearchBuilder extends AbstractSearchBuilder<WabSearchBuilder> {
      */
     @Override
     public SearchRequest.Builder constructSearchRequest() {
-        QueryBuilder query;
-        SearchRequestBuilder searchRequest = getRestHighLevelClient().prepareSearch();
+        Query.Builder query = new Query.Builder();
+
+        SearchRequest.Builder searchRequest = new SearchRequest.Builder();
         try {
             //Set indices
             if (isNeitherNullNorEmpty(getIndices())) {
-                searchRequest.setIndices(getIndices());
+                searchRequest.index(Arrays.asList(getIndices())).;
             }
             //Set types
             if (isNeitherNullNorEmpty(getTypes())) {
@@ -50,22 +56,27 @@ public class WabSearchBuilder extends AbstractSearchBuilder<WabSearchBuilder> {
 
             //Set query
             if (Strings.hasText(getQueryString())) {
-                query = QueryBuilders.simpleQueryStringQuery(getQueryString())
+                query = query.match(t -> t
                         .field("label")//whitespace analyzed
                         .field("publishedIn")//whitespace analyzed
                         .field("publishedInPart.exact")//not_analyzed
                         //.field("hasPart")
                         //.field("refersTo")
-                        .field("_all")
-                        .defaultOperator(Operator.AND);
+                        .field("_all");
+
+                searchRequest.query(query.build()).defaultOperator(Operator.And);
+
+
             } else {
-                query = QueryBuilders.matchAllQuery();
+                QueryBuilder qb = matchAllQuery();
+
+                searchRequest.query(QueryBuilders.matchAllQuery().toQuery() )
             }
             //Set Query, whether with or without filter
             if (getFilter() != null) { // @todo
             //    searchRequest.setQuery(Queries.filtered(query.)toQuery(), getFilter()));
             } else {
-                searchRequest.setQuery(query);
+                searchRequest.query(query);
             }
             //Set post filter
             if (getPostFilter() != null) {
