@@ -1,7 +1,7 @@
 package no.uib.marcus.search;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import java.util.logging.Logger;
+
 import org.elasticsearch.ElasticsearchException;
 import org.elasticsearch.action.search.SearchRequestBuilder;
 
@@ -16,7 +16,7 @@ import org.elasticsearch.search.builder.SearchSourceBuilderException;
  * @author Hemed Ali
  */
 public class MarcusDiscoveryBuilder extends AbstractSearchBuilder<MarcusDiscoveryBuilder> {
-    private static final Logger logger = LogManager.getLogger(MarcusDiscoveryBuilder.class);
+    private static final Logger logger = Logger.getLogger(MarcusDiscoveryBuilder.class.getName());
 
     MarcusDiscoveryBuilder(Client client) {
         super(client);
@@ -49,9 +49,9 @@ public class MarcusDiscoveryBuilder extends AbstractSearchBuilder<MarcusDiscover
             searchRequest.setSize(getSize());
 
         } catch (SearchSourceBuilderException se) {
-            logger.error("Exception on preparing the request: " + se.getDetailedMessage());
+            logger.severe("Exception on preparing the request: " + se.getDetailedMessage());
         } catch (ElasticsearchException ex) {
-            logger.error(ex.getDetailedMessage());
+            logger.severe(ex.getDetailedMessage());
         }
         return searchRequest;
     }

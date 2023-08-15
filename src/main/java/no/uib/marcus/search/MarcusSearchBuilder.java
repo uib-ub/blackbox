@@ -6,8 +6,7 @@ import static org.elasticsearch.index.query.functionscore.ScoreFunctionBuilders.
 import no.uib.marcus.common.util.AggregationUtils;
 import no.uib.marcus.common.util.QueryUtils;
 import no.uib.marcus.common.util.SignatureUtils;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import java.util.logging.Logger;
 import org.elasticsearch.ElasticsearchException;
 import org.elasticsearch.action.search.SearchRequestBuilder;
 import org.elasticsearch.action.search.SearchResponse;
@@ -41,7 +40,7 @@ import static org.elasticsearch.index.query.functionscore.ScoreFunctionBuilders.
  */
 public class MarcusSearchBuilder extends AbstractSearchBuilder<MarcusSearchBuilder> {
 
-    private final Logger logger = LogManager.getLogger(getClass().getName());
+    private final Logger logger = Logger.getLogger(MarcusSearchBuilder.class.getName());
 
     //A list of images that will be randomly
     // loaded at the front page on page load, if nothing is specified
@@ -164,7 +163,7 @@ public class MarcusSearchBuilder extends AbstractSearchBuilder<MarcusSearchBuild
             //logger.info(searchRequest.toString());
             //System.out.println(searchRequest.toString());
         } catch (SearchSourceBuilderException e) {
-            logger.error("Exception occurred when building search request: " + e.getDetailedMessage());
+            logger.severe("Exception occurred when building search request: " + e.getDetailedMessage());
         }
         return searchRequest;
     }
@@ -183,7 +182,7 @@ public class MarcusSearchBuilder extends AbstractSearchBuilder<MarcusSearchBuild
                 optionalResponse = Optional.of(response);
             }
         } catch (ElasticsearchException e) {
-            logger.error(e.getDetailedMessage());
+            logger.severe(e.getDetailedMessage());
         }
         return optionalResponse;
     }

@@ -9,8 +9,8 @@ import no.uib.marcus.common.util.SortUtils;
 import no.uib.marcus.range.DateRange;
 import no.uib.marcus.search.SearchBuilder;
 import no.uib.marcus.search.SearchBuilderFactory;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import java.util.logging.Logger;
+
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.client.Client;
 import org.elasticsearch.client.RestHighLevelClient;
@@ -46,7 +46,7 @@ import java.util.Map;
         description = "Servlet for handling search requests")
 
 public class SearchServlet extends HttpServlet {
-    private static final Logger logger = LogManager.getLogger(SearchServlet.class);
+    private static final Logger logger = Logger.getLogger(SearchServlet.class.getName());
     private static final long serialVersionUID = 1L;
 
     /**
@@ -80,12 +80,12 @@ public class SearchServlet extends HttpServlet {
         String service = request.getParameter(Params.SERVICE);
         String indexToBoost = request.getParameter(Params.INDEX_BOOST);
 
-        logger.warn("before try clause");
+        logger.warning("before try clause");
 
         try (PrintWriter out = response.getWriter()) {
-            logger.warn("before transport client");
+            logger.warning("before transport client");
             Client client = ClientFactory.getTransportClient();
-            logger.warn("after transport client");
+            logger.warning("after transport client");
             //Assign default values, if needs be
             int _from = Strings.hasText(from) ? Integer.parseInt(from) : Params.DEFAULT_FROM;
             int _size = Strings.hasText(size) ? Integer.parseInt(size) : Params.DEFAULT_SIZE;

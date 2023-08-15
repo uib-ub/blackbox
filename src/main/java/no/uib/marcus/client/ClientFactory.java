@@ -11,8 +11,6 @@ import org.apache.http.impl.nio.client.HttpAsyncClientBuilder;
 
 import java.util.logging.Level;
 import java.util.logging.Logger;
-//import org.apache.logging.log4j.Logger;
-import org.apache.logging.log4j.LogManager;
 import org.elasticsearch.action.admin.cluster.health.ClusterHealthRequest;
 import org.elasticsearch.action.admin.cluster.health.ClusterHealthResponse;
 import org.elasticsearch.client.*;

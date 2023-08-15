@@ -2,8 +2,8 @@ package no.uib.marcus.search.suggestion;
 
 import com.google.gson.Gson;
 import no.uib.marcus.client.ClientFactory;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.elasticsearch.action.search.SearchRequest;
 import org.elasticsearch.action.search.SearchRequestBuilder;
 import org.elasticsearch.client.RequestOptions;
@@ -25,7 +25,7 @@ import java.util.*;
  */
 public class CompletionSuggestion {
 
-    private static final Logger logger = LogManager.getLogger(CompletionSuggestion.class);
+    private static final Logger logger = Logger.getLogger(CompletionSuggestion.class.getName());
     private static final String SUGGEST_FIELD = "suggest";
 
     /**A method to get a list of suggestions.
@@ -53,7 +53,7 @@ public class CompletionSuggestion {
                 suggestValues.add(option.getText().string());
             }
         } catch (Exception e) {
-            logger.error("Unable to perform suggestion for text: [" + text + "]. Message: " + e.getLocalizedMessage()) ;
+            logger.log(Level.SEVERE, "Unable to perform suggestion for text: [" + text + "]. Message: " + e.getLocalizedMessage()) ;
         }
         //We want suggestion values to be sorted, hence we put them in a tree set
         return new TreeSet<>(suggestValues);
@@ -92,7 +92,7 @@ public class CompletionSuggestion {
             suggestResponse = ClientFactory.getTransportClient().search(searchRequest).actionGet().getSuggest();
 
         } catch (Exception e) {
-           logger.error("Exception " +  e.getLocalizedMessage());
+           logger.severe("Exception " +  e.getLocalizedMessage());
         }
         return suggestResponse;
     }

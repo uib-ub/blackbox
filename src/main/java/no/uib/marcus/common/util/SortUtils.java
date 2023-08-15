@@ -1,8 +1,8 @@
 package no.uib.marcus.common.util;
 
 import no.uib.marcus.search.IllegalParameterException;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import java.util.logging.Logger;
+
 import org.elasticsearch.ElasticsearchException;
 import org.elasticsearch.common.Strings;
 import org.elasticsearch.search.sort.SortBuilder;
@@ -18,7 +18,7 @@ import java.util.Optional;
  * University of Bergen Library
  */
 public final class SortUtils {
-    private static final Logger logger = LogManager.getLogger(SortUtils.class);
+    private static final Logger logger = Logger.getLogger(SortUtils.class.getName());
     private static final char FIELD_SORT_TYPE_SEPARATOR = ':';
     private static final String SORT_FIELD = "sort_field";
     private static final String SORT_ORDER = "sort_order";
@@ -69,7 +69,7 @@ public final class SortUtils {
             fieldSortMap.put(SORT_FIELD, field);
             fieldSortMap.put(SORT_ORDER, order);
         } catch (StringIndexOutOfBoundsException e) {
-            logger.error(e.getMessage() + " for input " + sortString);
+            logger.severe(e.getMessage() + " for input " + sortString);
         }
         return fieldSortMap;
     }
@@ -100,7 +100,7 @@ public final class SortUtils {
                 sortBuilder.order(sortOrder);
             }
         } catch (ElasticsearchException e) {
-            logger.error("Sorting cannot be constructed. " + e.getDetailedMessage());
+            logger.severe("Sorting cannot be constructed. " + e.getDetailedMessage());
         }
         return sortBuilder;
     }
@@ -115,7 +115,7 @@ public final class SortUtils {
             sortBuilder = SortBuilders.scoreSort()
                     .order(SortOrder.DESC) ;
         } catch (ElasticsearchException e) {
-            logger.error("Score sorting cannot be constructed. " + e.getDetailedMessage());
+            logger.severe("Score sorting cannot be constructed. " + e.getDetailedMessage());
         }
         return sortBuilder;
     }

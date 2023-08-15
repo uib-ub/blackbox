@@ -3,8 +3,8 @@ package no.uib.marcus.common.loader;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
 import com.google.gson.Gson;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import java.util.logging.Logger;
+
 import org.elasticsearch.common.settings.Settings;
 
 
@@ -26,7 +26,7 @@ public class JsonFileLoader {
     * Use builder
     *  */
     public final static String CONFIG_TEMPLATE = "config.template.json";
-    private final Logger logger = LogManager.getLogger(getClass().getName());
+    private final Logger logger = Logger.getLogger(JsonFileLoader.class.getName());
 
     /**
      * Get the file path from the resource folder
@@ -67,7 +67,7 @@ public class JsonFileLoader {
         try {
             reader = new BufferedReader(new FileReader(filePath));
         } catch (FileNotFoundException e) {
-            logger.error("File path does not exist for " + filePath);
+            logger.severe("File path does not exist for " + filePath);
             throw new UnavailableResourceException("Unavailable file for blackbox settings. " +
                     "Make sure this path exist: " + filePath);
 

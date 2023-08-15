@@ -1,8 +1,8 @@
 package no.uib.marcus.search;
 
 import no.uib.marcus.common.util.AggregationUtils;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import java.util.logging.Logger;
+
 import org.elasticsearch.action.search.SearchPhaseExecutionException;
 import org.elasticsearch.action.search.SearchRequestBuilder;
 import org.elasticsearch.action.search.SearchResponse;
@@ -34,7 +34,7 @@ import java.util.Map;
  * 2016-04-15
  */
 public abstract class AbstractSearchBuilder<T extends AbstractSearchBuilder<T>> implements SearchBuilder<T> {
-    private final Logger logger = LogManager.getLogger(getClass().getName());
+    private final Logger logger = Logger.getLogger(AbstractSearchBuilder.class.getName());
     private Client client;
     @Nullable
     private String[] indices;

@@ -2,8 +2,7 @@ package no.uib.marcus.search;
 
 import no.uib.marcus.common.Params;
 import no.uib.marcus.common.util.QueryUtils;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import java.util.logging.Logger;
 import org.elasticsearch.action.search.SearchRequestBuilder;
 import org.elasticsearch.client.Client;
 import org.elasticsearch.common.Strings;
@@ -23,7 +22,7 @@ import static org.elasticsearch.index.query.functionscore.ScoreFunctionBuilders.
  */
 public class NaturenSearchBuilder extends MarcusSearchBuilder {
 
-    private final Logger logger = LogManager.getLogger(getClass().getName());
+    private final Logger logger = Logger.getLogger(NaturenSearchBuilder.class.getName());
 
     NaturenSearchBuilder(Client client) {
         super(client);
@@ -73,7 +72,7 @@ public class NaturenSearchBuilder extends MarcusSearchBuilder {
             //logger.info(searchRequest.toString());
             //System.out.println(searchRequest.toString());
         } catch (SearchSourceBuilderException e) {
-            logger.error("Exception occurred when building search request: " + e.getRootCause().getMessage());
+            logger.severe("Exception occurred when building search request: " + e.getRootCause().getMessage());
         }
         return searchRequest;
     }
