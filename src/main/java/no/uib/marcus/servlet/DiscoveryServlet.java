@@ -1,6 +1,6 @@
 package no.uib.marcus.servlet;
 
-import no.uib.marcus.client.RestHighLevelClientFactory;
+import no.uib.marcus.client.RestClientFactory;
 import no.uib.marcus.common.Params;
 import no.uib.marcus.common.util.QueryUtils;
 import no.uib.marcus.search.MarcusDiscoveryBuilder;
@@ -46,7 +46,7 @@ public class DiscoveryServlet extends HttpServlet {
 
         int _size = Strings.hasText(size) ? Integer.parseInt(size) : Params.DEFAULT_SIZE;
         int _from = Strings.hasText(from) ? Integer.parseInt(from) : Params.DEFAULT_FROM;
-        RestHighLevelClient client = RestHighLevelClientFactory.getHighLevelRestClient();
+        RestHighLevelClient client = RestClientFactory.getHighLevelRestClient();
 
         //Build a discovery service
         MarcusDiscoveryBuilder service = SearchBuilderFactory.marcusDiscovery(client)

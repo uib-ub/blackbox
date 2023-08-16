@@ -3,6 +3,7 @@ package no.uib.marcus.search;
 
 import co.elastic.clients.elasticsearch._types.query_dsl.Operator;
 import co.elastic.clients.elasticsearch._types.query_dsl.Query;
+import co.elastic.clients.elasticsearch._types.query_dsl.QueryBuilders;
 import co.elastic.clients.elasticsearch.core.SearchRequest;
 import no.uib.marcus.common.util.AggregationUtils;
 import no.uib.marcus.common.util.SignatureUtils;
@@ -68,9 +69,9 @@ public class WabSearchBuilder extends AbstractSearchBuilder<WabSearchBuilder> {
 
 
             } else {
-                QueryBuilder qb = matchAllQuery();
+                Query.Builder qb =  new Query.Builder();
 
-                searchRequest.query(QueryBuilders.matchAllQuery().toQuery() )
+                searchRequest.query(qb.matchAll()QueryBuilders.matchAllQuery().toQuery() )
             }
             //Set Query, whether with or without filter
             if (getFilter() != null) { // @todo

@@ -1,9 +1,8 @@
 package no.uib.marcus.servlet;
 
-import no.uib.marcus.client.RestHighLevelClientFactory;
+import no.uib.marcus.client.RestClientFactory;
 import no.uib.marcus.common.Params;
 import no.uib.marcus.common.util.FilterUtils;
-import no.uib.marcus.common.util.LogUtils;
 import no.uib.marcus.common.util.QueryUtils;
 import no.uib.marcus.common.util.SortUtils;
 import no.uib.marcus.range.DateRange;
@@ -83,7 +82,7 @@ public class SearchServlet extends HttpServlet {
 
         try (PrintWriter out = response.getWriter()) {
             logger.warning("before transport restHighLevelClient");
-            RestHighLevelClient restHighLevelClient = RestHighLevelClientFactory.getHighLevelRestClient();
+            RestHighLevelClient restHighLevelClient = RestClientFactory.getHighLevelRestClient();
             logger.warning("after transport restHighLevelClient");
             //Assign default values, if needs be
             int _from = Strings.hasText(from) ? Integer.parseInt(from) : Params.DEFAULT_FROM;
