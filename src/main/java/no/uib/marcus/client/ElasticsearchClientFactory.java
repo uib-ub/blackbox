@@ -31,7 +31,7 @@ import java.util.Map;
 final public class ElasticsearchClientFactory {
 
     private static final Logger logger = Logger.getLogger(ElasticsearchClientFactory.class.getName());
-    private static ElasticsearchClient restHighLevelClient;
+    private static ElasticsearchClient elasticsearchClient;
 
     private static final CredentialsProvider credentialsProvider = new BasicCredentialsProvider();
 
@@ -47,6 +47,7 @@ final public class ElasticsearchClientFactory {
      */
     private static ElasticsearchClient createTransportClient(Map<String, String> properties) {
         try {
+
             credentialsProvider.setCredentials(AuthScope.ANY, new UsernamePasswordCredentials(BlackboxUtils.getValueAsString(properties, "username"), BlackboxUtils.getValueAsString(properties, "password")));
 
             RestClient restClient = RestClient.builder(
@@ -55,6 +56,7 @@ final public class ElasticsearchClientFactory {
                             credentialsProvider
                     ).setSSLHostnameVerifier((s, sslSession) -> true))
                     .build();
+
             JacksonJsonpMapper jsonMapper = new JacksonJsonpMapper();
             ElasticsearchTransport elasticsearchTransport = new RestClientTransport(restClient, jsonMapper);
                 ElasticsearchClient client = new ElasticsearchClient(elasticsearchTransport);
@@ -75,15 +77,16 @@ final public class ElasticsearchClientFactory {
 
     /**
      * Syncronize the call so that different threads do not end up creating multiple instances
+     * Do we still need synchronize after changing to use the java client which uses rest?
      */
     public static synchronized ElasticsearchClient getElasticsearchClient() throws IOException {
-        if (restHighLevelClient == null) {
+        if (elasticsearchClient == null) {
             JsonFileLoader loader = new JsonFileLoader();
             Map<String, String> properties = loader.loadBlackboxConfigFromResource();
             logger.info("Loaded config template from: " + loader.getPathFromResource(JsonFileLoader.CONFIG_TEMPLATE));
-            restHighLevelClient = createTransportClient(properties);
+            elasticsearchClient = createTransportClient(properties);
         }
-        return restHighLevelClient;
+        return elasticsearchClient;
     }
 
     //Main method for easy debugging..
