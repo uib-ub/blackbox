@@ -1,6 +1,7 @@
 package no.uib.marcus.search;
 
 
+import co.elastic.clients.elasticsearch.ElasticsearchClient;
 import co.elastic.clients.elasticsearch._types.query_dsl.Operator;
 import co.elastic.clients.elasticsearch._types.query_dsl.Query;
 import co.elastic.clients.elasticsearch._types.query_dsl.QueryBuilders;
@@ -10,14 +11,7 @@ import no.uib.marcus.common.util.SignatureUtils;
 
 import java.util.Arrays;
 import java.util.logging.Logger;
-import org.elasticsearch.action.search.SearchRequestBuilder;
-import org.elasticsearch.client.Client;
-import org.elasticsearch.common.Strings;
-import org.elasticsearch.index.query.QueryBuilder;
-import org.elasticsearch.index.query.QueryBuilders;
-import org.elasticsearch.search.builder.SearchSourceBuilderException;
-
-import static org.elasticsearch.index.query.QueryBuilders.matchAllQuery;
+//import org.elasticsearch.common.Strings;
 
 /**
  * A custom search builder for WAB
@@ -25,7 +19,7 @@ import static org.elasticsearch.index.query.QueryBuilders.matchAllQuery;
 public class WabSearchBuilder extends AbstractSearchBuilder<WabSearchBuilder> {
     private final Logger logger = Logger.getLogger(WabSearchBuilder.class.getName());
 
-    WabSearchBuilder(Client client) {
+    WabSearchBuilder(ElasticsearchClient client) {
         super(client);
     }
 
@@ -48,7 +42,7 @@ public class WabSearchBuilder extends AbstractSearchBuilder<WabSearchBuilder> {
         try {
             //Set indices
             if (isNeitherNullNorEmpty(getIndices())) {
-                searchRequest.index(Arrays.asList(getIndices())).;
+                searchRequest.index(Arrays.asList(getIndices()));
             }
             //Set types
             if (isNeitherNullNorEmpty(getTypes())) {

@@ -1,22 +1,10 @@
 package no.uib.marcus.search;
 
+import co.elastic.clients.elasticsearch.ElasticsearchClient;
+import co.elastic.clients.elasticsearch._types.query_dsl.Query;
 import co.elastic.clients.elasticsearch.core.SearchRequest;
 import no.uib.marcus.common.util.AggregationUtils;
 import java.util.logging.Logger;
-
-import org.elasticsearch.action.search.SearchPhaseExecutionException;
-import org.elasticsearch.action.search.SearchResponse;
-
-
-import org.elasticsearch.client.RestHighLevelClient;
-import org.elasticsearch.core.Nullable;
-
-
-import org.elasticsearch.common.Strings;
-import org.elasticsearch.xcontent.XContentBuilder;
-import org.elasticsearch.xcontent.XContentFactory;
-import org.elasticsearch.index.query.QueryBuilder;
-import org.elasticsearch.search.sort.SortBuilder;
 
 import javax.validation.constraints.NotNull;
 import java.io.IOException;
@@ -35,14 +23,14 @@ import java.util.Map;
  */
 public abstract class AbstractSearchBuilder<T extends AbstractSearchBuilder<T>> implements SearchBuilder<T> {
     private final Logger logger = Logger.getLogger(AbstractSearchBuilder.class.getName());
-    private RestHighLevelClient restHighLevelClient;
+    private ElasticsearchClient elasticsearchClient;
     @Nullable
     private String[] indices;
     @Nullable
     private String[] types;
     @Nullable
     private String queryString;
-    private QueryBuilder filter, postFilter;
+    private Query.Builder filter, postFilter;
     private Map<String, List<String>> selectedFacets;
     private String aggregations;
     private SortBuilder sortBuilder;
@@ -53,13 +41,13 @@ public abstract class AbstractSearchBuilder<T extends AbstractSearchBuilder<T>> 
     /**
      * Sole constructor. (For invocation by subclass constructors, typically implicit.)
      *
-     * @param restHighLevelClient a non-null Elasticsearch client to communicate with a cluster.
+     * @param elasticsearchClient a non-null Elasticsearch client to communicate with a cluster.
      */
-    protected AbstractSearchBuilder(@NotNull RestHighLevelClient restHighLevelClient) {
-        if (restHighLevelClient == null) {
+    protected AbstractSearchBuilder(@NotNull ElasticsearchClient elasticsearchClient) {
+        if (elasticsearchClient == null) {
             throw new IllegalParameterException("Unable to initialize service. Client cannot be null");
         }
-        this.restHighLevelClient = restHighLevelClient;
+        this.elasticsearchClient = elasticsearchClient;
     }
 
     /**
@@ -100,7 +88,7 @@ public abstract class AbstractSearchBuilder<T extends AbstractSearchBuilder<T>> 
     /**
      * Get sort builder or <tt>null</tt> if not set
      */
-    public SortBuilder getSortBuilder() {
+    public  getSortBuilder() {
         return sortBuilder;
     }
 

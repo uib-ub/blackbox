@@ -11,10 +11,6 @@
     <properties>
         <endorsed.dir>${project.build.directory}/endorsed</endorsed.dir>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <!--
-          Note that the Elasticsearch Java client must be set from the same major version as the nodes;
-          otherwise, they may not be able to communicate each other.
-        -->
         <elasticsearch.version>8.8.2</elasticsearch.version>
     </properties>
     
@@ -22,7 +18,7 @@
         <developer>
             <name>Hemed Ali Al Ruwehy</name>
             <email>hemed.ruwehy@uib.no</email>
-            <organization>University of Bergen (previously)</organization>
+            <organization>University of Bergen (formerly)</organization>
             <organizationUrl>http://uib.no</organizationUrl>
             <roles>
                 <role>Software Engineer</role>
