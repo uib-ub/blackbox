@@ -1,6 +1,7 @@
 package no.uib.marcus.search;
 
 import co.elastic.clients.elasticsearch.ElasticsearchClient;
+import co.elastic.clients.elasticsearch._types.SortOptions;
 import co.elastic.clients.elasticsearch._types.query_dsl.Query;
 import co.elastic.clients.elasticsearch.core.SearchRequest;
 import no.uib.marcus.common.util.AggregationUtils;
@@ -33,7 +34,7 @@ public abstract class AbstractSearchBuilder<T extends AbstractSearchBuilder<T>> 
     private Query.Builder filter, postFilter;
     private Map<String, List<String>> selectedFacets;
     private String aggregations;
-    private SortBuilder sortBuilder;
+    private SortOptions.Builder sortBuilder;
     private String indexToBoost;
     private int from = 0;
     private int size = 10;
@@ -99,7 +100,7 @@ public abstract class AbstractSearchBuilder<T extends AbstractSearchBuilder<T>> 
      * @return this object where sort has been set
      */
     @SuppressWarnings("unchecked")
-    public T setSortBuilder(SortBuilder sortBuilder) {
+    public T setSortBuilder(SortOptions.Builder sortBuilder) {
         this.sortBuilder = sortBuilder;
         return (T) this;
     }
@@ -107,7 +108,7 @@ public abstract class AbstractSearchBuilder<T extends AbstractSearchBuilder<T>> 
     /**
      * Get sort builder or <tt>null</tt> if not set
      **/
-    public QueryBuilder getFilter() {
+    public Query.Builder getFilter() {
         return filter;
     }
 
@@ -118,7 +119,7 @@ public abstract class AbstractSearchBuilder<T extends AbstractSearchBuilder<T>> 
      * @return this object where filter has been set
      */
     @SuppressWarnings("unchecked")
-    public T setFilter(QueryBuilder filter) {
+    public T setFilter(Query.Builder filter) {
         this.filter = filter;
         return (T) this;
     }
@@ -126,7 +127,7 @@ public abstract class AbstractSearchBuilder<T extends AbstractSearchBuilder<T>> 
     /**
      * Get post filter or <tt>null</tt> if not set
      */
-    public QueryBuilder getPostFilter() {
+    public Query.Builder getPostFilter() {
         return postFilter;
     }
 
@@ -138,7 +139,7 @@ public abstract class AbstractSearchBuilder<T extends AbstractSearchBuilder<T>> 
      * @return this object where post_filter has been set
      */
     @SuppressWarnings("unchecked")
-    public T setPostFilter(QueryBuilder filter) {
+    public T setPostFilter(Query.Builder filter) {
         if(filter != null) {
             this.postFilter = filter;
         }
@@ -157,7 +158,7 @@ public abstract class AbstractSearchBuilder<T extends AbstractSearchBuilder<T>> 
      */
     @SuppressWarnings("unchecked")
     public T setIndexToBoost(String indexToBoost) {
-        if(Strings.hasText(indexToBoost)) {
+        if(!indexToBoost.isEmpty()) {
             this.indexToBoost = indexToBoost;
         }
         return (T) this;
@@ -189,22 +190,22 @@ public abstract class AbstractSearchBuilder<T extends AbstractSearchBuilder<T>> 
     /**
      * Get Elasticsearch client for this service
      */
-    public RestHighLevelClient getRestHighLevelClient() {
-        return restHighLevelClient;
+    public ElasticsearchClient getElasticsearchClient() {
+        return elasticsearchClient;
     }
 
     /**
      * Set Elasticsearch client
      *
-     * @param restHighLevelClient Elasticsearch client to communicate with a cluster. Cannot be <code>null</code>
+     * @param elasticsearchClient Elasticsearch client to communicate with a cluster. Cannot be <code>null</code>
      * @return this object where client has been set
      */
     @SuppressWarnings("unchecked")
-    public final T setRestHighLevelClient(@NotNull RestHighLevelClient restHighLevelClient) {
-        if (restHighLevelClient == null) {
+    public final T setElasticsearchClient(@NotNull ElasticsearchClient elasticsearchClient) {
+        if (elasticsearchClient == null) {
             throw new IllegalParameterException("Unable to initialize service. Client cannot be null");
         }
-        this.restHighLevelClient = restHighLevelClient;
+        this.elasticsearchClient = elasticsearchClient;
         return (T) this;
     }
 
@@ -322,6 +323,7 @@ public abstract class AbstractSearchBuilder<T extends AbstractSearchBuilder<T>> 
     @Override
     @Nullable
     public SearchResponse executeSearch() {
+        
         SearchResponse response = null;
         try {
             response = constructSearchRequest().execute().actionGet();

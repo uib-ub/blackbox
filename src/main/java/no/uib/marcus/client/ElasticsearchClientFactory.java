@@ -84,7 +84,8 @@ final public class ElasticsearchClientFactory {
             JsonFileLoader loader = new JsonFileLoader();
             Map<String, String> properties = loader.loadBlackboxConfigFromResource();
             logger.info("Loaded config template from: " + loader.getPathFromResource(JsonFileLoader.CONFIG_TEMPLATE));
-            elasticsearchClient = createTransportClient(properties);
+            elasticsearchClient = createTransportClient(properties)
+            ;
         }
         return elasticsearchClient;
     }
