@@ -1,6 +1,8 @@
 package no.uib.marcus.servlet;
 
-import no.uib.marcus.client.RestClientFactory;
+import co.elastic.clients.elasticsearch.ElasticsearchClient;
+import co.elastic.clients.elasticsearch._types.query_dsl.BoolQuery;
+import no.uib.marcus.client.ElasticsearchClientFactory;
 import no.uib.marcus.common.Params;
 import no.uib.marcus.common.util.FilterUtils;
 import no.uib.marcus.common.util.QueryUtils;
@@ -10,14 +12,7 @@ import no.uib.marcus.search.SearchBuilder;
 import no.uib.marcus.search.SearchBuilderFactory;
 import java.util.logging.Logger;
 
-import org.elasticsearch.action.search.SearchResponse;
-import org.elasticsearch.client.RestHighLevelClient;
-import org.elasticsearch.core.Booleans;
-import org.elasticsearch.common.Strings;
-import org.elasticsearch.index.query.BoolQueryBuilder;
-import org.elasticsearch.xcontent.XContentBuilder;
-import org.elasticsearch.xcontent.XContentFactory;
-import org.elasticsearch.index.query.QueryBuilder;
+;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -81,12 +76,12 @@ public class SearchServlet extends HttpServlet {
         logger.warning("before try clause");
 
         try (PrintWriter out = response.getWriter()) {
-            logger.warning("before transport restHighLevelClient");
-            RestHighLevelClient restHighLevelClient = RestClientFactory.getHighLevelRestClient();
-            logger.warning("after transport restHighLevelClient");
+            logger.warning("before transport elasticSearchClient");
+            ElasticsearchClient elasticsearchClient = ElasticsearchClientFactory.getElasticsearchClient();
+            logger.warning("after transport elasticSearchClient");
             //Assign default values, if needs be
-            int _from = Strings.hasText(from) ? Integer.parseInt(from) : Params.DEFAULT_FROM;
-            int _size = Strings.hasText(size) ? Integer.parseInt(size) : Params.DEFAULT_SIZE;
+            int _from = from.length() > 0 ? Integer.parseInt(from) : Params.DEFAULT_FROM;
+            int _size = size.length() > 0 ? Integer.parseInt(size) : Params.DEFAULT_SIZE;
 
             // Build a facet map based on selected filters.
             // e.g {"subject.exact" = ["Flyfoto" , "Birkeland"], "type" = ["Brev"]}
@@ -96,7 +91,7 @@ public class SearchServlet extends HttpServlet {
 
             //Get and build corresponding search builder based on the "service" parameter
             SearchBuilder<? extends SearchBuilder<?>> builder = SearchBuilderFactory
-                    .getSearchBuilder(service, restHighLevelClient)
+                    .getSearchBuilder(service, elasticsearchClient)
                     .setIndices(indices)
                     .setTypes(types)
                     .setQueryString(queryString)
@@ -110,7 +105,7 @@ public class SearchServlet extends HttpServlet {
             logger.info("builder: " + builder.toString());
 
             //Add top level filter, for "AND" aggregations
-            BoolQueryBuilder topFilter = FilterUtils.getTopFilter(
+            BoolQuery.Builder topFilter = FilterUtils.getTopFilter(
                     selectedFacets, aggs, DateRange.of(fromDate, toDate)
             );
             if (topFilter.hasClauses()) {
@@ -132,7 +127,7 @@ public class SearchServlet extends HttpServlet {
 
             logger.info("SearchResponseString" + searchResponseString);
 
-            //Write response to the restHighLevelClient
+            //Write response to the elasticSearchClient
             out.write(searchResponseString);
 
             // Log search response
