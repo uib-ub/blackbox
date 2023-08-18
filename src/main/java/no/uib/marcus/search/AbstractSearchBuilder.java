@@ -4,6 +4,7 @@ import co.elastic.clients.elasticsearch.ElasticsearchClient;
 import co.elastic.clients.elasticsearch._types.SortOptions;
 import co.elastic.clients.elasticsearch._types.query_dsl.Query;
 import co.elastic.clients.elasticsearch.core.SearchRequest;
+import co.elastic.clients.elasticsearch.core.SearchResponse;
 import no.uib.marcus.common.util.AggregationUtils;
 import java.util.logging.Logger;
 
@@ -322,11 +323,11 @@ public abstract class AbstractSearchBuilder<T extends AbstractSearchBuilder<T>> 
      */
     @Override
     @Nullable
-    public SearchResponse executeSearch() {
-        
+    public SearchResponse<doc> executeSearch() {
+
         SearchResponse response = null;
         try {
-            response = constructSearchRequest().execute().actionGet();
+            response = constructSearchRequest(.execute().actionGet();
             //Show response for debugging purpose
             //logger.info(response.toString());
             //System.out.println(response.toString());
