@@ -1,8 +1,7 @@
 package no.uib.marcus.search;
 
 import co.elastic.clients.elasticsearch.core.SearchRequest;
-import org.elasticsearch.action.search.SearchRequestBuilder;
-import org.elasticsearch.action.search.SearchResponse;
+import co.elastic.clients.elasticsearch.core.SearchResponse;
 //import org.elasticsearch.client.internal.Client;
 import org.elasticsearch.client.Client;
 import org.elasticsearch.client.RestHighLevelClient;
