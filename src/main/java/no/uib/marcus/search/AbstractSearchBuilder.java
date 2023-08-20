@@ -7,7 +7,10 @@ import co.elastic.clients.elasticsearch.core.SearchRequest;
 import co.elastic.clients.elasticsearch.core.SearchResponse;
 import no.uib.marcus.common.util.AggregationUtils;
 import java.util.logging.Logger;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
+
+import javax.annotation.Nullable;
 import javax.validation.constraints.NotNull;
 import java.io.IOException;
 import java.util.List;
@@ -90,7 +93,7 @@ public abstract class AbstractSearchBuilder<T extends AbstractSearchBuilder<T>> 
     /**
      * Get sort builder or <tt>null</tt> if not set
      */
-    public  getSortBuilder() {
+    public SortOptions.Builder getSortBuilder() {
         return sortBuilder;
     }
 
@@ -323,19 +326,19 @@ public abstract class AbstractSearchBuilder<T extends AbstractSearchBuilder<T>> 
      */
     @Override
     @Nullable
-    public SearchResponse<doc> executeSearch() {
+    public SearchResponse executeSearch() {
 
         SearchResponse response = null;
         try {
-            response = constructSearchRequest(.execute().actionGet();
+            response = elasticsearchClient.search(constructSearchRequest().build(), ObjectNode.class);
             //Show response for debugging purpose
             //logger.info(response.toString());
             //System.out.println(response.toString());
-        } catch (SearchPhaseExecutionException e) {
+        } catch (java.io.IOException e) {
             //I've not found a direct way to validate a query string. Therefore, the idea here is to catch any
             //exception that is related to search execution.
             //logger.error("Could not execute search: " + e.getDetailedMessage());
-            throw e;
+           // throw e;
         }
         return response;
     }
