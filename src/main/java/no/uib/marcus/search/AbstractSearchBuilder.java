@@ -5,7 +5,10 @@ import co.elastic.clients.elasticsearch._types.SortOptions;
 import co.elastic.clients.elasticsearch._types.query_dsl.Query;
 import co.elastic.clients.elasticsearch.core.SearchRequest;
 import co.elastic.clients.elasticsearch.core.SearchResponse;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import no.uib.marcus.common.util.AggregationUtils;
+
+import java.util.Arrays;
 import java.util.logging.Logger;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
@@ -351,18 +354,16 @@ public abstract class AbstractSearchBuilder<T extends AbstractSearchBuilder<T>> 
      */
     @Override
     public String toString() {
-        try {
-            XContentBuilder jsonObj = XContentFactory.jsonBuilder().prettyPrint()
-                    .startObject()
-                    .field("indices", getIndices() == null ? Strings.EMPTY_ARRAY : getIndices())
-                    .field("type", getTypes() == null ? Strings.EMPTY_ARRAY : getTypes())
-                    .field("from", getFrom())
-                    .field("size", getSize())
-                    .field("aggregations", getAggregations() == null ? Strings.EMPTY_ARRAY : getAggregations())
-                    .endObject();
-            return jsonObj.toString();
-        } catch (IOException e) {
-            return "{ \"error\" : \"" + e.getMessage() + "\"}";
-        }
+        ObjectMapper mapper = new ObjectMapper();
+
+        ObjectNode jsonObj = mapper.createObjectNode();;
+
+        jsonObj = jsonObj.put("indices",  getIndices().length > 0   ?  "" : Arrays.toString(getIndices()))
+               .put("type", getTypes() == null ? "" : Arrays.toString(getTypes()))
+               .put("from", getFrom())
+               .put("size", getSize())
+               .put("aggregations", getAggregations() == null ? "" : getAggregations()).;
+
+        return jsonObj.toString();
     }
 }
