@@ -2,6 +2,10 @@ package no.uib.marcus.servlet;
 
 import co.elastic.clients.elasticsearch.ElasticsearchClient;
 import co.elastic.clients.elasticsearch._types.query_dsl.BoolQuery;
+import co.elastic.clients.elasticsearch.core.SearchResponse;
+import co.elastic.clients.json.JsonData;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import no.uib.marcus.client.ElasticsearchClientFactory;
 import no.uib.marcus.common.Params;
 import no.uib.marcus.common.util.FilterUtils;
@@ -112,7 +116,7 @@ public class SearchServlet extends HttpServlet {
                 builder.setFilter(topFilter);
             }
             //Add post filter for "OR" aggregations if any
-            BoolQueryBuilder postFilter = FilterUtils.getPostFilter(selectedFacets, aggs);
+            BoolQuery.Builder postFilter = FilterUtils.getPostFilter(selectedFacets, aggs);
             if (postFilter.hasClauses()) {
                 builder.setPostFilter(postFilter);
             }
@@ -121,8 +125,8 @@ public class SearchServlet extends HttpServlet {
 
             logger.info("searchResponse: " + searchResponse.toString() );
             //Decide whether to get a pretty JSON output or not
-            String searchResponseString = Booleans.isTrue(isPretty)
-                    ? QueryUtils.toJsonString(searchResponse, true)
+            String searchResponseString = Booleans.isTrue(isPretty.)
+                    ? QueryUtils.toJsonString(searchResponse., true)
                     : QueryUtils.toJsonString(searchResponse, false);
 
             logger.info("SearchResponseString" + searchResponseString);
@@ -152,17 +156,18 @@ public class SearchServlet extends HttpServlet {
 
         request.setCharacterEncoding("UTF-8");
         response.setContentType("application/json;charset=UTF-8");
+        ObjectMapper mapper = new ObjectMapper();
+        ObjectNode rootNode = mapper.createObjectNode();
+        rootNode.put("code", 405);
+        rootNode.put("message", "Method Not Allowed");
 
         try (PrintWriter out = response.getWriter();
-             XContentBuilder xContentBuilder = XContentFactory.jsonBuilder()) {
-            out.write(xContentBuilder
-                    .startObject()
-                    .field("code", 405)
-                    .field("message", "Method Not Allowed")
-                    .endObject()
-                    .toString()
-             );
-        }
+
+
+             // Create the JSON object
+
+            out.write(rootNode.toString());
+
     }
 
     @Override

@@ -1,13 +1,14 @@
 package no.uib.marcus.search;
 
+import co.elastic.clients.elasticsearch._types.query_dsl.BoolQuery;
 import co.elastic.clients.elasticsearch.core.SearchRequest;
 import co.elastic.clients.elasticsearch.core.SearchResponse;
 //import org.elasticsearch.client.internal.Client;
-import org.elasticsearch.client.Client;
-import org.elasticsearch.client.RestHighLevelClient;
-import org.elasticsearch.core.Nullable;
-import org.elasticsearch.index.query.QueryBuilder;
-import org.elasticsearch.search.sort.SortBuilder;
+import co.elastic.clients.elasticsearch.ElasticsearchClient;
+import javax.annotation.Nullable;
+import javax.validation.constraints.NotNull;
+import co.elastic.clients.elasticsearch._types.query_dsl.Query;
+import co.elastic.clients.elasticsearch._types.SortOptions;
 
 import javax.validation.constraints.NotNull;
 import java.util.List;
@@ -22,9 +23,9 @@ public interface SearchBuilder<S> {
     /**
      * Set Elasticsearch client to the service
      *
-     * @param restHighLevelClient Elasticsearch client to communicate with a cluster. Cannot be <code>null</code>
+     * @param elasticsearchClient Elasticsearch client to communicate with a cluster. Cannot be <code>null</code>
      */
-    S setRestHighLevelClient(@NotNull RestHighLevelClient restHighLevelClient);
+    S setElasticsearchClient(@NotNull ElasticsearchClient elasticsearchClient);
 
     /**
      * Set up indices for the service, default to all indices in the cluster
@@ -83,18 +84,18 @@ public interface SearchBuilder<S> {
     /**
      * Sets sort builder
      */
-    S setSortBuilder(SortBuilder sortBuilder);
+    S setSortBuilder(SortOptions.Builder sortBuilder);
 
 
     /**
      * Sets post filter
      */
-    S setPostFilter(QueryBuilder postFilter);
+    S setPostFilter(BoolQuery.Builder postFilter);
 
     /**
      * Sets filter (filtered_query)
      */
-    S setFilter(QueryBuilder postFilter);
+    S setFilter(BoolQuery.Builder postFilter);
 
 
     /**

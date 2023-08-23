@@ -362,7 +362,7 @@ public abstract class AbstractSearchBuilder<T extends AbstractSearchBuilder<T>> 
                .put("type", getTypes() == null ? "" : Arrays.toString(getTypes()))
                .put("from", getFrom())
                .put("size", getSize())
-               .put("aggregations", getAggregations() == null ? "" : getAggregations()).;
+               .put("aggregations", getAggregations() == null ? "" : getAggregations());
 
         return jsonObj.toString();
     }
