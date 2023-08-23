@@ -1,5 +1,10 @@
 package no.uib.marcus.common.util;
 
+import co.elastic.clients.elasticsearch._types.FieldSort;
+import co.elastic.clients.elasticsearch._types.SortOptions;
+import co.elastic.clients.elasticsearch._types.SortOptionsBuilders;
+import co.elastic.clients.elasticsearch._types.SortOrder;
+import co.elastic.clients.util.WithJsonObjectBuilderBase;
 import no.uib.marcus.search.IllegalParameterException;
 import java.util.logging.Logger;
 
@@ -34,12 +39,12 @@ public final class SortUtils {
      * @param sortString a sort string
      * @return either a score sort, field sort or null if the sort string is empty
      */
-    public static SortBuilder getSort(String sortString) {
-        if(Strings.hasText(sortString)) {
+    public static WithJsonObjectBuilderBase<? extends WithJsonObjectBuilderBase<?>> getSort(String sortString) {
+        if(!sortString.isEmpty()) {
             if (sortString.equals("_score")) {
-                return getScoreSort();
+                return SortOptionsBuilders.score();
             } else {
-                return getFieldSort(sortString);
+                return new FieldSort.Builder().field(sortString);
             }
         }
         return null;
@@ -80,9 +85,9 @@ public final class SortUtils {
      * @param sortString
      * @return a field sort
      */
-    public static SortBuilder getFieldSort(String sortString) {
+    public static SortOptions.Builder getFieldSort(String sortString) {
         SortBuilder sortBuilder = null;
-        SortOrder sortOrder = null;
+         = null;
         try {
             String field = extractSortField(sortString).get(SORT_FIELD);
             String order = extractSortField(sortString).get(SORT_ORDER);
