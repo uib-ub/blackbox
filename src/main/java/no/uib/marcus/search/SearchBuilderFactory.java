@@ -4,10 +4,6 @@ import co.elastic.clients.elasticsearch.ElasticsearchClient;
 import no.uib.marcus.client.ElasticsearchClientFactory;
 import no.uib.marcus.common.ServiceName;
 
-import org.elasticsearch.client.Client;
-import org.elasticsearch.client.RestHighLevelClient;
-import org.elasticsearch.core.Nullable;
-
 
 /**
  * A set of static factory methods for creation of {@link SearchBuilder}s.
@@ -23,29 +19,29 @@ public class SearchBuilderFactory {
     /**
      * Create a new search service for Marcus data set
      */
-    public static MarcusSearchBuilder marcusSearch(RestHighLevelClient restHighLevelClient) {
-        return new MarcusSearchBuilder(restHighLevelClient);
+    public static MarcusSearchBuilder marcusSearch(ElasticsearchClient elasticsearchClient) {
+        return new MarcusSearchBuilder(elasticsearchClient);
     }
 
 
     /**
      * Create a Skeivtarkiv(SkA) search builder
      */
-    public static SkaSearchBuilder skaSearch(Client client) {
+    public static SkaSearchBuilder skaSearch(ElasticsearchClient client) {
         return new SkaSearchBuilder(client);
     }
 
     /**
      * Create a Wittgenstein Archives search builder
      **/
-    public static WabSearchBuilder wabSearch(Client client) {
+    public static WabSearchBuilder wabSearch(ElasticsearchClient client) {
         return new WabSearchBuilder(client);
     }
 
     /**
      * Create a Skeivtarkiv(SkA) search builder
      */
-    public static NaturenSearchBuilder naturenSearch(Client client) {
+    public static NaturenSearchBuilder naturenSearch(ElasticsearchClient client) {
         return new NaturenSearchBuilder(client);
     }
 
@@ -54,7 +50,7 @@ public class SearchBuilderFactory {
      * It is a subset of search service with minimal capabilities.
      * For search, @see SearchBuilderFactory#marcusSearch(Client)
      **/
-    public static MarcusDiscoveryBuilder marcusDiscovery(RestHighLevelClient client) {
+    public static MarcusDiscoveryBuilder marcusDiscovery(ElasticsearchClient client) {
         return new MarcusDiscoveryBuilder(client);
     }
 
