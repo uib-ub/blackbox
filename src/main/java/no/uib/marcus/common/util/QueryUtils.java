@@ -1,17 +1,14 @@
 package no.uib.marcus.common.util;
 
-import org.elasticsearch.action.search.SearchResponse;
-import org.elasticsearch.common.Strings;
-import org.elasticsearch.xcontent.ToXContent;
-import org.elasticsearch.xcontent.XContentBuilder;
-import org.elasticsearch.xcontent.XContentFactory;
+import co.elastic.clients.elasticsearch._types.query_dsl.Operator;
+import co.elastic.clients.elasticsearch._types.query_dsl.QueryStringQuery;
+import co.elastic.clients.elasticsearch._types.query_dsl.SimpleQueryStringQuery;
+import co.elastic.clients.elasticsearch.core.SearchResponse;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
-import org.elasticsearch.index.query.Operator;
-import org.elasticsearch.index.query.QueryBuilders;
-import org.elasticsearch.index.query.QueryStringQueryBuilder;
-import org.elasticsearch.index.query.SimpleQueryStringBuilder;
 
 import java.io.IOException;
+import java.util.List;
 
 import static no.uib.marcus.common.util.BlackboxUtils.isNullOrEmpty;
 
@@ -37,13 +34,12 @@ public final class QueryUtils {
      * @param queryString a query string
      * @return a builder for simple query string
      */
-    public static SimpleQueryStringBuilder buildMarcusSimpleQueryString(String queryString) {
-        return QueryBuilders.simpleQueryStringQuery(queryString)
+    public static SimpleQueryStringQuery.Builder buildMarcusSimpleQueryString(String queryString) {
+        SimpleQueryStringQuery.Builder builder = new SimpleQueryStringQuery.Builder();
+        return  builder.query(queryString)
                 .analyzer("default")//The custom "default" analyzer is defined in the "_settings".
-                .field("identifier")//Not analyzed field
-                .field("label", 3)//Not analyzed field.
-                .field("_all")
-                .defaultOperator(Operator.AND);
+                .fields(List.of("identifier", "label", "_all"))
+                .defaultOperator(Operator.And);
     }
 
     /**
@@ -52,14 +48,14 @@ public final class QueryUtils {
      * @param queryString a query string
      * @return a builder for query string
      */
-    public static QueryStringQueryBuilder buildMarcusQueryString(String queryString) {
-
-        return QueryBuilders.queryStringQuery(queryString)
+    public static QueryStringQuery.Builder buildMarcusQueryString(String queryString) {
+        QueryStringQuery.Builder builder = new QueryStringQuery.Builder();
+        return builder.query(queryString)
                 .analyzer("default")//The custom "default" analyzer is defined in the "_settings".
-                .field("identifier")//Not analyzed field
-                .field("label", 3)//Not analyzed field.
-                .field("_all")
-                .defaultOperator(Operator.AND);
+                .fields(List.of("identifier" //Not analyzed field
+                ,"label" //Not analyzed field.
+                ,"_all"))
+                .defaultOperator(Operator.And);
     }
 
 
@@ -108,21 +104,26 @@ public final class QueryUtils {
      * @param isPretty a boolean value to show whether the JSON string should be pretty printed.
      * @return search hits as a JSON string
      **/
-    public static String toJsonString(final SearchResponse response, final boolean isPretty) {
+    public static String toJsonString(final SearchResponse<ObjectNode> response, final boolean isPretty) {
+
         try {
-            if (response == null) {
-                return "{ \"error\" : \"" + "Could not execute search. See internal server logs" + "\"}";
-            }
-            XContentBuilder builder = XContentFactory.jsonBuilder();
-            if (isPretty) {
-                builder.prettyPrint();
-            }
-            builder.startObject();
-            response.toXContent(builder, ToXContent.EMPTY_PARAMS);
-            builder.endObject();
-            return builder.toString();
-        } catch (IOException e) {
-            return "{ \"error\" : \"" + e.getMessage() + "\"}";
-        }
-    }
+           if (response == null) {
+               return "{ \"error\" : \"" + "Could not execute search. See internal server logs" + "\"}";
+
+           }
+            return response.toString();
+
+
+            //        XContentBuilder builder = XContentFactory.jsonBuilder();
+    //        if (isPretty) {
+     //           builder.prettyPrint();
+     //       }
+    //        builder.startObject();
+      //      response.toXContent(builder, ToXContent.EMPTY_PARAMS);
+        //    builder.endObject();
+      //      return builder.toString();
+    //     } catch (IOException e) {
+      //      return "{ \"error\" : \"" + e.getMessage() + "\"}";
+ //       }
+    return "@todo serialize result using jsonp";}
 }

@@ -3,14 +3,12 @@ package no.uib.marcus.search;
 import co.elastic.clients.elasticsearch._types.query_dsl.BoolQuery;
 import co.elastic.clients.elasticsearch.core.SearchRequest;
 import co.elastic.clients.elasticsearch.core.SearchResponse;
-//import org.elasticsearch.client.internal.Client;
 import co.elastic.clients.elasticsearch.ElasticsearchClient;
 import javax.annotation.Nullable;
 import javax.validation.constraints.NotNull;
-import co.elastic.clients.elasticsearch._types.query_dsl.Query;
 import co.elastic.clients.elasticsearch._types.SortOptions;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
-import javax.validation.constraints.NotNull;
 import java.util.List;
 import java.util.Map;
 
@@ -106,6 +104,6 @@ public interface SearchBuilder<S> {
     /**
      * Get documents based on the service settings.
      */
-    SearchResponse executeSearch();
+    SearchResponse<ObjectNode> executeSearch();
 
 }

@@ -1,5 +1,7 @@
 package no.uib.marcus.servlet;
 
+import co.elastic.clients.elasticsearch.core.SearchResponse;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import no.uib.marcus.client.RestClientFactory;
 import no.uib.marcus.common.Params;
 import no.uib.marcus.common.util.QueryUtils;
@@ -57,7 +59,7 @@ public class DiscoveryServlet extends HttpServlet {
                 .setQueryString(queryString);
 
         try (PrintWriter out = response.getWriter()) {
-            SearchResponse searchResponse = service.executeSearch();
+            SearchResponse<ObjectNode> searchResponse = service.executeSearch();
             out.write(QueryUtils.toJsonString(searchResponse, true));
         }
     }

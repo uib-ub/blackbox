@@ -41,7 +41,7 @@ public class SettingsLoaderTest  {
      * Testing loading non-existing file from resource
      */
     @Test(expected = UnavailableResourceException.class)
-    public void testFileUnavailableFileFromResource() {
+    public void testFileUnavailableFileFromResource() throws IOException {
         new JsonFileLoader().loadFromResource("hakuna-matata.json");
     }
 

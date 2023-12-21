@@ -1,10 +1,10 @@
 package no.uib.marcus.common.util;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.util.JSONPObject;
 import no.uib.marcus.common.Params;
-import org.elasticsearch.action.search.SearchResponse;
-import org.elasticsearch.search.SearchHits;
-import org.elasticsearch.xcontent.XContentBuilder;
-import org.elasticsearch.xcontent.XContentFactory;
+import co.elastic.clients.elasticsearch.core.SearchResponse;
+
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
@@ -28,12 +28,13 @@ public final class LogUtils {
      *
      * @return  logs a JSON string
      ***/
-    public static String createLogMessage(HttpServletRequest request, SearchResponse searchResponse) throws IOException {
+    public static String createLogMessage(HttpServletRequest request, SearchResponse<JsonNode> searchResponse) throws IOException {
         //Get a copy of a parameter map
         Map<String, Object> parameterMapCopy = new HashMap<>(request.getParameterMap());
         //Remove aggregations from the logs
         parameterMapCopy.remove(Params.AGGREGATIONS);
-
+        JSONPObject searchResponseJson = new JSONPObject(searchResponse.toString());
+        searchResponseJson
         //Build log message
         XContentBuilder builder = XContentFactory.jsonBuilder()
                 .startObject()
@@ -41,7 +42,7 @@ public final class LogUtils {
                 // InetAddress.getLocalHost() : request.getRemoteAddr())
                 .field("status", searchResponse == null? 404 : searchResponse.status().getStatus())
                 .field("params", jsonify(parameterMapCopy))
-                .field("took", searchResponse == null ? -1 : searchResponse.getTook())
+                .field("took", searchResponse == null ? -1 : searchResponsegetTook())
                 .endObject();
         return  builder.toString();
     }

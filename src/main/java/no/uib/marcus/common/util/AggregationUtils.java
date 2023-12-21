@@ -1,5 +1,10 @@
 package no.uib.marcus.common.util;
 
+import co.elastic.clients.elasticsearch._types.SortOrder;
+import co.elastic.clients.elasticsearch._types.Time;
+import co.elastic.clients.elasticsearch._types.aggregations.*;
+import co.elastic.clients.elasticsearch.core.SearchRequest;
+import co.elastic.clients.util.NamedValue;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
@@ -7,7 +12,8 @@ import com.google.gson.JsonParser;
 import no.uib.marcus.search.IllegalParameterException;
 import java.util.logging.Logger;
 
-import org.elasticsearch.action.search.SearchRequestBuilder;
+import org.elasticsearch.search.aggregations.bucket.histogram.DateHistogramInterval;
+
 import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.common.Strings;
@@ -36,6 +42,7 @@ public final class AggregationUtils {
 
     //Enforce non-instatiability
     private AggregationUtils() {
+
     }
 
     /**
@@ -69,7 +76,7 @@ public final class AggregationUtils {
     public static boolean contains(String aggregations, String field, String key, String value) {
         try {
             //If there is no aggregations, no need to continue.
-            if (!Strings.hasText(aggregations)) {
+            if (aggregations.isBlank()) {
                 return false;
             }
             JsonElement facets = new JsonParser().parse(aggregations);
@@ -99,7 +106,7 @@ public final class AggregationUtils {
      * @return the same search request where aggregations have been added to
      * it.
      */
-    public static SearchRequestBuilder addAggregations(SearchSourceBuilder searchSourceBuilder, String aggregations) {
+    public static SearchRequest.Builder addAggregations(SearchRequest.Builder searchSourceBuilder, String aggregations) {
         return addAggregations(searchSourceBuilder, aggregations, null);
     }
 
@@ -111,7 +118,7 @@ public final class AggregationUtils {
      * @return the same search request where aggregations have been added to
      * it.
      */
-    public static SearchSourceBuilder addAggregations(SearchSourceBuilder searchSourceBuilder,
+    public static SearchRequest.Builder addAggregations(SearchRequest.Builder searchSourceBuilder,
                                                        String aggregations,
                                                        Map<String, List<String>> selectedFacets)
             throws JsonParseException, IllegalStateException {
@@ -121,7 +128,7 @@ public final class AggregationUtils {
             if (facet.has("field")) {
                 //Add DateHistogram aggregations
                 if (facet.has("type") && facet.get("type").getAsString().equals("date_histogram")) {
-                    searchSourceBuilder.aggregation(AggregationUtils.getDateHistogramAggregation(facet));
+                    searchSourceBuilder.aggregations(AggregationUtils.getDateHistogramAggregation(facet));
                 } else {
                     AggregationBuilder termsAggs = constructTermsAggregation(facet);
                     if (selectedFacets != null && selectedFacets.size() > 0) {
@@ -173,37 +180,45 @@ public final class AggregationUtils {
      * @param facet a JSON object
      * @return a date histogram builder
      */
-    public static DateHistogramAggregationBuilder getDateHistogramAggregation(JsonObject facet) {
+    public static  DateHistogramAggregation.Builder getDateHistogramAggregation(JsonObject facet) {
         String field = facet.get("field").getAsString();
         //Create date histogram
-        DateHistogramAggregationBuilder dateHistogram = AggregationBuilders
-                .dateHistogram(field)
-                .field(field);
+        DateHistogramAggregation.Builder dateHistogram = new DateHistogramAggregation.Builder()
+        .field(field) ;
+
+
         //Set date format
         if (facet.has("format")) {
             dateHistogram.format(facet.get("format").getAsString());
+            BucketSortAggregation.Builder bucket = new BucketSortAggregation.Builder();
         }
         //Set interval
         if (facet.has("interval")) {
-            dateHistogram.fixedInterval(new DateHistogramInterval(facet.get("interval").getAsString()));
+            dateHistogram.fixedInterval(new Time.Builder().time(facet.get("interval").getAsString()).build() );
         }
         //Set number of minimum documents that should be returned
         if (facet.has("min_doc_count")) {
-            dateHistogram.minDocCount(facet.get("min_doc_count").getAsLong());
+            dateHistogram.minDocCount(facet.get("min_doc_count").getAsInt());
         }
         //Set order
         if (facet.has("order")) {
-            BucketOrder order = BucketOrder.key(true);
+
             if (facet.get("order").getAsString().equalsIgnoreCase("count_asc")) {
-                order =  BucketOrder.count(true);
+                dateHistogram.order(NamedValue.of("_count",SortOrder.Asc));
+
             } else if (facet.get("order").getAsString().equalsIgnoreCase("count_desc")) {
-                order =  BucketOrder.count(false);
+                dateHistogram.order(NamedValue.of("_count",SortOrder.Desc));
             } else if (facet.get("order").getAsString().equalsIgnoreCase("key_desc")) {
-                order =  BucketOrder.key(false);
+                dateHistogram.order(NamedValue.of("_key", SortOrder.Desc));
             }
-            dateHistogram.order(order);
-        }
+            else
+                dateHistogram.order(NamedValue.of("_key", SortOrder.Asc));
+
+
+            }
         return dateHistogram;
+        }
+
     }
 
     /**
@@ -213,18 +228,20 @@ public final class AggregationUtils {
      * @param sortBySubAggregation a flag whether to sort by sub aggregation filter
      * @return a term builder
      */
-    public static AggregationBuilder constructTermsAggregation(JsonObject facet, boolean sortBySubAggregation) {
+    public static Aggregation.Builder constructTermsAggregation(JsonObject facet, boolean sortBySubAggregation) {
         String field = facet.get("field").getAsString();
       //  Object filterList;
        // QueryBuilders.termsQuery("keyword", toLowerCase(filterList));
-        TermsAggregationBuilder termsBuilder = AggregationBuilders.terms(field).field(field);
+        TermsAggregation.Builder termsBuilder = new TermsAggregation.Builder();
+        termsBuilder.field(field).;
         //Set size
         if (facet.has("size")) {
             int size = facet.get("size").getAsInt();
             termsBuilder.size(size);
         }
         //Set order
-        BucketOrder subAggregationOrder =  BucketOrder.aggregation(AGGS_FILTER_KEY, false);
+        BucketOrder. subAggregationOrder =  BucketOrder.aggregation(AGGS_FILTER_KEY, false);
+        termsBuilder
         if (facet.has("order")) {
             BucketOrder order = BucketOrder.count(false);//default order (count descending)
             if (facet.get("order").getAsString().equalsIgnoreCase("count_asc")) {
@@ -238,6 +255,7 @@ public final class AggregationUtils {
                 subAggregationOrder = order; // for term_desc, sort by parent aggregation
             }
             if (sortBySubAggregation) {//Sort using sub aggregation
+                termsBuilder.order()
                 termsBuilder.order(subAggregationOrder);
             } else { //sort normally using top aggregation
                 termsBuilder.order(order);

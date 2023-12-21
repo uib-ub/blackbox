@@ -329,9 +329,9 @@ public abstract class AbstractSearchBuilder<T extends AbstractSearchBuilder<T>> 
      */
     @Override
     @Nullable
-    public SearchResponse executeSearch() {
+    public SearchResponse<ObjectNode> executeSearch() {
 
-        SearchResponse response = null;
+        SearchResponse<ObjectNode> response = null;
         try {
             response = elasticsearchClient.search(constructSearchRequest().build(), ObjectNode.class);
             //Show response for debugging purpose

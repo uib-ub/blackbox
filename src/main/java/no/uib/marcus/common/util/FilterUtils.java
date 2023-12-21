@@ -13,6 +13,7 @@ import java.util.logging.Logger;
 import java.time.LocalDate;;
 
 import com.google.common.collect.Lists;
+import org.jetbrains.annotations.Nullable;
 
 import javax.validation.constraints.NotNull;
 import java.util.*;
@@ -230,6 +231,7 @@ public final class FilterUtils {
                 return Collections.emptyMap();
             }
             for (String entry : selectedFilters) {
+                assert entry != null;
                 if (entry.lastIndexOf(FILTER_KEY_VALUE_SEPARATOR) != -1) {
                     //Get the index for the last occurrence of a separator
                     int lastIndex = entry.lastIndexOf(FILTER_KEY_VALUE_SEPARATOR);

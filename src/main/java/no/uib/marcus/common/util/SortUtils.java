@@ -87,7 +87,6 @@ public final class SortUtils {
      */
     public static SortOptions.Builder getFieldSort(String sortString) {
         SortBuilder sortBuilder = null;
-         = null;
         try {
             String field = extractSortField(sortString).get(SORT_FIELD);
             String order = extractSortField(sortString).get(SORT_ORDER);

@@ -73,9 +73,7 @@ public class MarcusSearchBuilder extends AbstractSearchBuilder<MarcusSearchBuild
      */
     @Override
     public co.elastic.clients.elasticsearch.core.SearchRequest.Builder constructSearchRequest() {
-        QueryBuilder query;
-        FunctionScoreQueryBuilder functionScoreQueryBuilder;
-        SearchSourceBuilder sourceBuilder = new SearchSourceBuilder();
+
         SearchRequest.Builder searchRequest = new SearchRequest.Builder();
 
         try {
@@ -90,8 +88,9 @@ public class MarcusSearchBuilder extends AbstractSearchBuilder<MarcusSearchBuild
         //    }
 
             //Set from and size
-            sourceBuilder.from(getFrom());
-            sourceBuilder.size(getSize());
+            searchRequest.from(getFrom());
+            searchRequest.from(getSize());
+
 
             FunctionScoreQueryBuilder.FilterFunctionBuilder[] functions;
 
@@ -99,6 +98,7 @@ public class MarcusSearchBuilder extends AbstractSearchBuilder<MarcusSearchBuild
 
             //Set query
             if (Strings.hasText(getQueryString())) {
+                searchRequest.
                 //Use query_string query with AND operator
                 functionScoreQueryBuilder = functionScoreQuery(QueryUtils.buildMarcusQueryString(getQueryString()));
                 functionBuilders.add(functionScoreQueryBuilder);

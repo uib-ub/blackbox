@@ -1,11 +1,10 @@
 package no.uib.marcus.servlet;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.gson.Gson;
 import no.uib.marcus.common.Params;
 import no.uib.marcus.search.suggestion.CompletionSuggestion;
-import org.elasticsearch.common.Strings;
-import org.elasticsearch.xcontent.XContentBuilder;
-import org.elasticsearch.xcontent.XContentFactory;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -40,7 +39,7 @@ public class SuggestionServlet extends HttpServlet {
         String jsonString;
 
         try (PrintWriter out = response.getWriter()) {
-            int suggestSize = Strings.hasText(size) ? Integer.parseInt(size) : DEFAULT_SIZE;
+            int suggestSize = !size.isEmpty() ? Integer.parseInt(size) : DEFAULT_SIZE;
             jsonString = new Gson()
                     .toJson(CompletionSuggestion.getSuggestions(suggestText, suggestSize, indices));
             out.write(jsonString);
@@ -67,8 +66,12 @@ public class SuggestionServlet extends HttpServlet {
 
         request.setCharacterEncoding("UTF-8");
         response.setContentType("application/json;charset=UTF-8");
-
+        ObjectMapper mapper = new ObjectMapper();
+        ObjectNode jsonObj = mapper.createObjectNode();
         try (PrintWriter out = response.getWriter();
+
+
+             ObjectNode jsonObj = mapper.createObjectNode();
              XContentBuilder xContentBuilder = XContentFactory.jsonBuilder()) {
             out.write(xContentBuilder
                     .startObject()

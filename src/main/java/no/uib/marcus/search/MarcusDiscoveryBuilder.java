@@ -40,7 +40,7 @@ public class MarcusDiscoveryBuilder extends AbstractSearchBuilder<MarcusDiscover
               //  searchRequest.setTypes(getTypes());
             }
             //Set query
-            if (Strings.hasText(getQueryString())) {
+            if (Strings.hasText(getQueryString().)) {
                 searchRequest.setQuery(QueryBuilders.queryStringQuery(getQueryString()));
             } else {
                 searchRequest.setQuery(QueryBuilders.matchAllQuery());

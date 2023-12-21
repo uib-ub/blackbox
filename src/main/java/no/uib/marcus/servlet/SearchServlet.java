@@ -121,12 +121,12 @@ public class SearchServlet extends HttpServlet {
                 builder.setPostFilter(postFilter);
             }
             //Send search request to Elasticsearch and execute
-            SearchResponse searchResponse = builder.executeSearch();
+            SearchResponse<ObjectNode> searchResponse = builder.executeSearch();
 
             logger.info("searchResponse: " + searchResponse.toString() );
             //Decide whether to get a pretty JSON output or not
-            String searchResponseString = Booleans.isTrue(isPretty.)
-                    ? QueryUtils.toJsonString(searchResponse., true)
+            String searchResponseString = Booleans.isTrue(isPretty)
+                    ? QueryUtils.toJsonString(searchResponse, true)
                     : QueryUtils.toJsonString(searchResponse, false);
 
             logger.info("SearchResponseString" + searchResponseString);
