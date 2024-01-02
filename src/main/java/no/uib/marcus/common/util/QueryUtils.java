@@ -36,7 +36,7 @@ public final class QueryUtils {
      */
     public static SimpleQueryStringQuery.Builder buildMarcusSimpleQueryString(String queryString) {
         SimpleQueryStringQuery.Builder builder = new SimpleQueryStringQuery.Builder();
-        return  builder.query(queryString)
+        return builder.query(queryString)
                 .analyzer("default")//The custom "default" analyzer is defined in the "_settings".
                 .fields(List.of("identifier", "label", "_all"))
                 .defaultOperator(Operator.And);
@@ -53,8 +53,8 @@ public final class QueryUtils {
         return builder.query(queryString)
                 .analyzer("default")//The custom "default" analyzer is defined in the "_settings".
                 .fields(List.of("identifier" //Not analyzed field
-                ,"label" //Not analyzed field.
-                ,"_all"))
+                        , "label" //Not analyzed field.
+                        , "_all"))
                 .defaultOperator(Operator.And);
     }
 
@@ -75,7 +75,6 @@ public final class QueryUtils {
         }
         return queryString;
     }
-
 
 
     /**
@@ -107,23 +106,13 @@ public final class QueryUtils {
     public static String toJsonString(final SearchResponse<ObjectNode> response, final boolean isPretty) {
 
         try {
-           if (response == null) {
-               return "{ \"error\" : \"" + "Could not execute search. See internal server logs" + "\"}";
+            if (response == null) {
+                return "{ \"error\" : \"" + "Could not execute search. See internal server logs" + "\"}";
 
-           }
+            }
             return response.toString();
+        } finally {
 
-
-            //        XContentBuilder builder = XContentFactory.jsonBuilder();
-    //        if (isPretty) {
-     //           builder.prettyPrint();
-     //       }
-    //        builder.startObject();
-      //      response.toXContent(builder, ToXContent.EMPTY_PARAMS);
-        //    builder.endObject();
-      //      return builder.toString();
-    //     } catch (IOException e) {
-      //      return "{ \"error\" : \"" + e.getMessage() + "\"}";
- //       }
-    return "@todo serialize result using jsonp";}
+        }
+    }
 }

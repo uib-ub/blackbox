@@ -1,22 +1,13 @@
 package no.uib.marcus.common.util;
 
-import co.elastic.clients.elasticsearch._types.FieldSort;
-import co.elastic.clients.elasticsearch._types.SortOptions;
-import co.elastic.clients.elasticsearch._types.SortOptionsBuilders;
-import co.elastic.clients.elasticsearch._types.SortOrder;
+import co.elastic.clients.elasticsearch._types.*;
 import co.elastic.clients.util.WithJsonObjectBuilderBase;
 import no.uib.marcus.search.IllegalParameterException;
 import java.util.logging.Logger;
 
-import org.elasticsearch.ElasticsearchException;
-import org.elasticsearch.common.Strings;
-import org.elasticsearch.search.sort.SortBuilder;
-import org.elasticsearch.search.sort.SortBuilders;
-import org.elasticsearch.search.sort.SortOrder;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Optional;
 
 /**
  * @author Hemed Ali
@@ -57,70 +48,24 @@ public final class SortUtils {
      *                   the form of "field:asc" or "field:desc"
      * @return a map with keys sort_field and sort_order
      */
-    public static Map<String, String> extractSortField(String sortString) {
-        Map<String, String> fieldSortMap = new HashMap<>();
-        try {
-            int lastIndex = sortString.lastIndexOf(FIELD_SORT_TYPE_SEPARATOR);
-            //Fail first, if colon is not found.
-            if (lastIndex == -1) {
-                throw new IllegalParameterException("The sort string does not contain a colon, "
-                        + "hence cannot be split into field-value pair. "
-                        + "The method expects to find a colon that separate a field and it's sort type "
-                        + "but found: " + sortString);
-            }
-            String field = sortString.substring(0, lastIndex).trim();
-            String order = sortString.substring(lastIndex + 1).trim();
-            //Insert values to the map
-            fieldSortMap.put(SORT_FIELD, field);
-            fieldSortMap.put(SORT_ORDER, order);
-        } catch (StringIndexOutOfBoundsException e) {
-            logger.severe(e.getMessage() + " for input " + sortString);
-        }
-        return fieldSortMap;
-    }
-
     /**
      * Build a field sort
      *
      * @param sortString
      * @return a field sort
+     *
+     * https://github.com/weenhall/springboot-instance/blob/f6ca05aa4ff5ae237126fe3027149bf3ac92b80f/springboot-es/src/main/java/com/ween/service/SongCiService.java#L38
+     * 		SortOptions sortOptions= new SortOptions.Builder().field(SortOptionsBuilders.field().field("author").order(SortOrder.Asc).build()).build();
+     *
+     * 		Highlight highlight=new Highlight.Builder().fields(field, new HighlightField.Builder().preTags("<font color='red'>").postTags("</font>").build()).build();
      */
-    public static SortOptions.Builder getFieldSort(String sortString) {
-        SortBuilder sortBuilder = null;
-        try {
-            String field = extractSortField(sortString).get(SORT_FIELD);
-            String order = extractSortField(sortString).get(SORT_ORDER);
 
-            if (order.equalsIgnoreCase("asc")) {
-                sortOrder = SortOrder.ASC;
-            }
-            if (order.equalsIgnoreCase("desc")) {
-                sortOrder = SortOrder.DESC;
-            }
-            //Build sort
-            sortBuilder = SortBuilders.fieldSort(field).missing("_last");
-
-            if (sortBuilder != null) {
-                sortBuilder.order(sortOrder);
-            }
-        } catch (ElasticsearchException e) {
-            logger.severe("Sorting cannot be constructed. " + e.getDetailedMessage());
-        }
-        return sortBuilder;
-    }
 
     /**
      * Building a score sort with descending order by default.
      **/
-    public static SortBuilder getScoreSort() {
-        SortBuilder sortBuilder = null;
-        try {
-            //Build score sorting
-            sortBuilder = SortBuilders.scoreSort()
-                    .order(SortOrder.DESC) ;
-        } catch (ElasticsearchException e) {
-            logger.severe("Score sorting cannot be constructed. " + e.getDetailedMessage());
-        }
-        return sortBuilder;
+    public static  ScoreSort.Builder getScoreSort() {
+        ScoreSort.Builder scoreBuilder =  new ScoreSort.Builder();
+        return scoreBuilder.order(SortOrder.Desc);
     }
 }

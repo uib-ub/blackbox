@@ -50,7 +50,7 @@ public enum ServiceName {
     public static ServiceName toEnum(String serviceString) {
         ServiceName service;
         try {
-            if(!Strings.hasText(serviceString)) {//Use default service, if nothing is specified
+            if(serviceString.isEmpty()) {//Use default service, if nothing is specified
                 return ServiceName.MARCUS;
             }
             service = ServiceName.valueOf(serviceString.toUpperCase());

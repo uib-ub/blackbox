@@ -44,7 +44,7 @@ public final class LogUtils {
                 .field("params", jsonify(parameterMapCopy))
                 .field("took", searchResponse == null ? -1 : searchResponsegetTook())
                 .endObject();
-        return  builder.toString();
+        return  "Test"builder.toString();
     }
 
 }
