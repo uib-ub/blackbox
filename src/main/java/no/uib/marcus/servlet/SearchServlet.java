@@ -1,6 +1,7 @@
 package no.uib.marcus.servlet;
 
-import no.uib.marcus.client.ClientFactory;
+import co.elastic.clients.elasticsearch.ElasticsearchClient;
+import no.uib.marcus.client.ElasticsearchClientFactory;
 import no.uib.marcus.common.Params;
 import no.uib.marcus.common.util.FilterUtils;
 import no.uib.marcus.common.util.LogUtils;
@@ -77,7 +78,7 @@ public class SearchServlet extends HttpServlet {
         String indexToBoost = request.getParameter(Params.INDEX_BOOST);
 
         try (PrintWriter out = response.getWriter()) {
-            Client client = ClientFactory.getTransportClient();
+            ElasticsearchClient client = ElasticsearchClientFactory.getElasticsearchClient();
 
             //Assign default values, if needs be
             int _from = StringUtils.hasText(from) ? Integer.parseInt(from) : Params.DEFAULT_FROM;

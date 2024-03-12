@@ -1,7 +1,7 @@
 package no.uib.marcus.search;
 
 import junit.framework.TestCase;
-import no.uib.marcus.client.ClientFactory;
+import no.uib.marcus.client.ElasticsearchClientFactory;
 import org.apache.log4j.Logger;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.client.Client;
@@ -42,7 +42,7 @@ public class MarcusSearchServiceIT extends TestCase {
     protected void setUp() throws IOException{
         try {
             //Establish a transport client
-            client = ClientFactory.getTransportClient();
+            client = ElasticsearchClientFactory.getElasticsearchClient();
             //Delete index "test", if exists
             client.admin()
                     .indices()
@@ -53,7 +53,7 @@ public class MarcusSearchServiceIT extends TestCase {
         }
 
         logger.info("=====>Creating index of name: " + indexName);
-        ClientFactory.getTransportClient()
+        ElasticsearchClientFactory.getElasticsearchClient()
                 .admin()
                 .indices()
                 .prepareCreate("test")

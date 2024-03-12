@@ -1,7 +1,7 @@
 package no.uib.marcus.search.suggestion;
 
 import com.google.gson.Gson;
-import no.uib.marcus.client.ClientFactory;
+import no.uib.marcus.client.ElasticsearchClientFactory;
 import org.apache.log4j.Logger;
 import org.elasticsearch.action.suggest.SuggestRequestBuilder;
 import org.elasticsearch.action.suggest.SuggestResponse;
@@ -68,7 +68,7 @@ public class CompletionSuggestion {
             suggestionsBuilder.text(text);
             suggestionsBuilder.size(size);
 
-            suggestRequest = ClientFactory.getTransportClient().prepareSuggest();
+            suggestRequest = ElasticsearchClientFactory.getElasticsearchClient().prepareSuggest();
             suggestRequest.addSuggestion(suggestionsBuilder);
 
             if (indices != null && indices.length > 0) {
