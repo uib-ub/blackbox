@@ -1,7 +1,7 @@
 package no.uib.marcus.common.util;
 
 import org.elasticsearch.action.search.SearchResponse;
-import org.elasticsearch.common.Strings;
+import no.uib.marcus.common.util.StringUtils;
 import org.elasticsearch.common.xcontent.ToXContent;
 import org.elasticsearch.common.xcontent.XContentBuilder;
 import org.elasticsearch.common.xcontent.XContentFactory;

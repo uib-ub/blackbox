@@ -6,7 +6,7 @@ import no.uib.marcus.common.util.SignatureUtils;
 import org.apache.log4j.Logger;
 import org.elasticsearch.action.search.SearchRequestBuilder;
 import org.elasticsearch.client.Client;
-import org.elasticsearch.common.Strings;
+import no.uib.marcus.common.util.StringUtils;
 import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.index.query.SimpleQueryStringBuilder;
@@ -48,7 +48,7 @@ public class WabSearchBuilder extends AbstractSearchBuilder<WabSearchBuilder> {
             }
 
             //Set query
-            if (Strings.hasText(getQueryString())) {
+            if (StringUtils.hasText(getQueryString())) {
                 query = QueryBuilders.simpleQueryStringQuery(getQueryString())
                         .field("label")//whitespace analyzed
                         .field("publishedIn")//whitespace analyzed
@@ -75,7 +75,7 @@ public class WabSearchBuilder extends AbstractSearchBuilder<WabSearchBuilder> {
                 searchRequest.addSort(getSortBuilder());
             }
             //Append aggregations to the request builder
-            if (Strings.hasText(getAggregations())) {
+            if (StringUtils.hasText(getAggregations())) {
                 AggregationUtils.addAggregations(searchRequest, getAggregations(), getSelectedFacets());
             }
 

@@ -8,7 +8,7 @@ import no.uib.marcus.search.IllegalParameterException;
 import org.apache.log4j.Logger;
 import org.elasticsearch.action.search.SearchRequestBuilder;
 import org.elasticsearch.common.Nullable;
-import org.elasticsearch.common.Strings;
+import no.uib.marcus.common.util.StringUtils;
 import org.elasticsearch.common.collect.Lists;
 import org.elasticsearch.index.query.BoolFilterBuilder;
 import org.elasticsearch.search.aggregations.AggregationBuilder;
@@ -70,7 +70,7 @@ public final class AggregationUtils {
     public static boolean contains(String aggregations, String field, String key, String value) {
         try {
             //If there is no aggregations, no need to continue.
-            if (!Strings.hasText(aggregations)) {
+            if (!StringUtils.hasText(aggregations)) {
                 return false;
             }
             JsonElement facets = new JsonParser().parse(aggregations);

@@ -3,7 +3,7 @@ package no.uib.marcus.common.util;
 import no.uib.marcus.search.IllegalParameterException;
 import org.apache.log4j.Logger;
 import org.elasticsearch.ElasticsearchException;
-import org.elasticsearch.common.Strings;
+import no.uib.marcus.common.util.StringUtils;
 import org.elasticsearch.search.sort.SortBuilder;
 import org.elasticsearch.search.sort.SortBuilders;
 import org.elasticsearch.search.sort.SortOrder;
@@ -34,7 +34,7 @@ public final class SortUtils {
      * @return either a score sort, field sort or null if the sort string is empty
      */
     public static SortBuilder getSort(String sortString) {
-        if(Strings.hasText(sortString)) {
+        if(StringUtils.hasText(sortString)) {
             if (sortString.equals("_score")) {
                 return getScoreSort();
             } else {

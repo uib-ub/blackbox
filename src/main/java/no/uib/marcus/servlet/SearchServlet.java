@@ -13,7 +13,7 @@ import org.apache.log4j.Logger;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.client.Client;
 import org.elasticsearch.common.Booleans;
-import org.elasticsearch.common.Strings;
+import no.uib.marcus.common.util.StringUtils;
 import org.elasticsearch.common.xcontent.XContentFactory;
 import org.elasticsearch.index.query.BoolFilterBuilder;
 
@@ -80,8 +80,8 @@ public class SearchServlet extends HttpServlet {
             Client client = ClientFactory.getTransportClient();
 
             //Assign default values, if needs be
-            int _from = Strings.hasText(from) ? Integer.parseInt(from) : Params.DEFAULT_FROM;
-            int _size = Strings.hasText(size) ? Integer.parseInt(size) : Params.DEFAULT_SIZE;
+            int _from = StringUtils.hasText(from) ? Integer.parseInt(from) : Params.DEFAULT_FROM;
+            int _size = StringUtils.hasText(size) ? Integer.parseInt(size) : Params.DEFAULT_SIZE;
 
             // Build a facet map based on selected filters.
             // e.g {"subject.exact" = ["Flyfoto" , "Birkeland"], "type" = ["Brev"]}

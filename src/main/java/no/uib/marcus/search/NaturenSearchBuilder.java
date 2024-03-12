@@ -5,7 +5,7 @@ import no.uib.marcus.common.util.QueryUtils;
 import org.apache.log4j.Logger;
 import org.elasticsearch.action.search.SearchRequestBuilder;
 import org.elasticsearch.client.Client;
-import org.elasticsearch.common.Strings;
+import no.uib.marcus.common.util.StringUtils;
 import org.elasticsearch.index.query.FilterBuilders;
 import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
@@ -34,7 +34,7 @@ public class NaturenSearchBuilder extends MarcusSearchBuilder {
 
         try {
             //Set query
-            if (Strings.hasText(getQueryString())) {
+            if (StringUtils.hasText(getQueryString())) {
                 query = QueryUtils.buildMarcusQueryString(getQueryString());
             } else {
                 query = QueryBuilders.functionScoreQuery(QueryBuilders.matchAllQuery())

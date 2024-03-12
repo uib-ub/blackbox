@@ -1,6 +1,6 @@
 package no.uib.marcus.common.util;
 
-import org.elasticsearch.common.Strings;
+import no.uib.marcus.common.util.StringUtils;
 
 import java.util.Locale;
 

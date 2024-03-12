@@ -1,7 +1,7 @@
 package no.uib.marcus.common;
 
 import org.apache.log4j.Logger;
-import org.elasticsearch.common.Strings;
+import no.uib.marcus.common.util.StringUtils;
 
 import java.util.Arrays;
 
@@ -49,7 +49,7 @@ public enum ServiceName {
     public static ServiceName toEnum(String serviceString) {
         ServiceName service;
         try {
-            if(!Strings.hasText(serviceString)) {//Use default service, if nothing is specified
+            if(!StringUtils.hasText(serviceString)) {//Use default service, if nothing is specified
                 return ServiceName.MARCUS;
             }
             service = ServiceName.valueOf(serviceString.toUpperCase());

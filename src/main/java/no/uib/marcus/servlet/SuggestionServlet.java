@@ -2,8 +2,8 @@ package no.uib.marcus.servlet;
 
 import com.google.gson.Gson;
 import no.uib.marcus.common.Params;
+import no.uib.marcus.common.util.StringUtils;
 import no.uib.marcus.search.suggestion.CompletionSuggestion;
-import org.elasticsearch.common.Strings;
 import org.elasticsearch.common.xcontent.XContentFactory;
 
 import javax.servlet.ServletException;
@@ -39,7 +39,7 @@ public class SuggestionServlet extends HttpServlet {
         String jsonString;
 
         try (PrintWriter out = response.getWriter()) {
-            int suggestSize = Strings.hasText(size) ? Integer.parseInt(size) : DEFAULT_SIZE;
+            int suggestSize = StringUtils.hasText(size) ? Integer.parseInt(size) : DEFAULT_SIZE;
             jsonString = new Gson()
                     .toJson(CompletionSuggestion.getSuggestions(suggestText, suggestSize, indices));
             out.write(jsonString);

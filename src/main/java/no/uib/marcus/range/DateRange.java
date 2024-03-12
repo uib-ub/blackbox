@@ -2,7 +2,7 @@ package no.uib.marcus.range;
 
 import org.apache.log4j.Logger;
 import org.elasticsearch.common.Nullable;
-import org.elasticsearch.common.Strings;
+import no.uib.marcus.common.util.StringUtils;
 import org.elasticsearch.common.joda.Joda;
 import org.elasticsearch.common.joda.time.LocalDate;
 
@@ -125,7 +125,7 @@ public class DateRange implements Range<LocalDate> {
      */
     @Override
     public LocalDate parse(String input) {
-        if (Strings.hasText(input)) {
+        if (StringUtils.hasText(input)) {
             return Joda.forPattern(getDateFormat()).parser().parseLocalDate(input);
         }
         return null;

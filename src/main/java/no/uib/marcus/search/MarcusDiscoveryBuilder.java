@@ -4,7 +4,7 @@ import org.apache.log4j.Logger;
 import org.elasticsearch.ElasticsearchException;
 import org.elasticsearch.action.search.SearchRequestBuilder;
 import org.elasticsearch.client.Client;
-import org.elasticsearch.common.Strings;
+import no.uib.marcus.common.util.StringUtils;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.search.builder.SearchSourceBuilderException;
 
@@ -37,7 +37,7 @@ public class MarcusDiscoveryBuilder extends AbstractSearchBuilder<MarcusDiscover
                 searchRequest.setTypes(getTypes());
             }
             //Set query
-            if (Strings.hasText(getQueryString())) {
+            if (StringUtils.hasText(getQueryString())) {
                 searchRequest.setQuery(QueryBuilders.queryStringQuery(getQueryString()));
             } else {
                 searchRequest.setQuery(QueryBuilders.matchAllQuery());

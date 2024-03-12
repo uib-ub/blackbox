@@ -8,7 +8,7 @@ import org.elasticsearch.ElasticsearchException;
 import org.elasticsearch.action.search.SearchRequestBuilder;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.client.Client;
-import org.elasticsearch.common.Strings;
+import no.uib.marcus.common.util.StringUtils;
 import org.elasticsearch.index.query.FilterBuilders;
 import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
@@ -86,7 +86,7 @@ public class MarcusSearchBuilder extends AbstractSearchBuilder<MarcusSearchBuild
             searchRequest.setSize(getSize());
 
             //Set query
-            if (Strings.hasText(getQueryString())) {
+            if (StringUtils.hasText(getQueryString())) {
                 //Use query_string query with AND operator
                 functionScoreQueryBuilder = QueryBuilders
                         .functionScoreQuery(QueryUtils.buildMarcusQueryString(getQueryString()));
@@ -125,7 +125,7 @@ public class MarcusSearchBuilder extends AbstractSearchBuilder<MarcusSearchBuild
                 searchRequest.addSort(getSortBuilder());
             }
             //Append aggregations to the request builder
-            if (Strings.hasText(getAggregations())) {
+            if (StringUtils.hasText(getAggregations())) {
                 AggregationUtils.addAggregations(searchRequest, getAggregations(), getSelectedFacets());
             }
 

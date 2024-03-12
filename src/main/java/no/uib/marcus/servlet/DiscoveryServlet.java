@@ -7,7 +7,7 @@ import no.uib.marcus.search.MarcusDiscoveryBuilder;
 import no.uib.marcus.search.SearchBuilderFactory;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.client.Client;
-import org.elasticsearch.common.Strings;
+import no.uib.marcus.common.util.StringUtils;
 import org.elasticsearch.common.xcontent.XContentFactory;
 
 import javax.servlet.ServletException;
@@ -44,8 +44,8 @@ public class DiscoveryServlet extends HttpServlet {
         String[] types = request.getParameterValues(Params.INDEX_TYPES);
         String queryString = request.getParameter(Params.QUERY_STRING);
 
-        int _size = Strings.hasText(size) ? Integer.parseInt(size) : Params.DEFAULT_SIZE;
-        int _from = Strings.hasText(from) ? Integer.parseInt(from) : Params.DEFAULT_FROM;
+        int _size = StringUtils.hasText(size) ? Integer.parseInt(size) : Params.DEFAULT_SIZE;
+        int _from = StringUtils.hasText(from) ? Integer.parseInt(from) : Params.DEFAULT_FROM;
         Client client = ClientFactory.getTransportClient();
 
         //Build a discovery service
