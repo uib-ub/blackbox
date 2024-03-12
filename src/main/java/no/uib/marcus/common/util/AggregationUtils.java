@@ -1,5 +1,6 @@
 package no.uib.marcus.common.util;
 
+import co.elastic.clients.elasticsearch.core.SearchRequest;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
@@ -100,7 +101,7 @@ public final class AggregationUtils {
      * @return the same search request where aggregations have been added to
      * it.
      */
-    public static SearchRequestBuilder addAggregations(SearchRequestBuilder searchRequest, String aggregations) {
+    public static SearchRequest.Builder addAggregations(SearchRequest.Builder searchRequest, String aggregations) {
         return addAggregations(searchRequest, aggregations, null);
     }
 
@@ -112,11 +113,11 @@ public final class AggregationUtils {
      * @return the same search request where aggregations have been added to
      * it.
      */
-    public static SearchRequestBuilder addAggregations(SearchRequestBuilder searchRequest,
-                                                       String aggregations,
-                                                       Map<String, List<String>> selectedFacets)
+    public static SearchRequest.Builder addAggregations(SearchRequest.Builder searchRequest,
+                                                        String aggregations,
+                                                        Map<String, List<String>> selectedFacets)
             throws JsonParseException, IllegalStateException {
-        JsonElement jsonElement = new JsonParser().parse(aggregations);
+        JsonElement jsonElement = JsonParser.parse(aggregations);
         for (JsonElement facets : jsonElement.getAsJsonArray()) {
             JsonObject facet = facets.getAsJsonObject();
             if (facet.has("field")) {
