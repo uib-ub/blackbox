@@ -2,7 +2,7 @@ package no.uib.marcus.search;
 
 import junit.framework.TestCase;
 import no.uib.marcus.client.ElasticsearchClientFactory;
-import org.apache.log4j.Logger;
+import java.util.logging.Logger;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.client.Client;
 import org.elasticsearch.common.base.Predicate;
@@ -33,7 +33,7 @@ import static org.elasticsearch.test.ElasticsearchTestCase.awaitBusy;
 //scope = ElasticsearchIntegrationTest.Scope.SUITE, transportClientRatio = 0.0)
 public class MarcusSearchServiceIT extends TestCase {
 
-    private static final Logger logger = Logger.getLogger(MarcusSearchServiceIT.class);
+    private static final Logger logger = Logger.getLogger(MarcusSearchServiceIT.class.getName());
     private final String indexName = "test";
     private Client client;
 

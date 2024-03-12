@@ -1,6 +1,6 @@
 package no.uib.marcus.range;
 
-import org.apache.log4j.Logger;
+import java.util.logging.Logger;
 import org.elasticsearch.common.Nullable;
 import no.uib.marcus.common.util.StringUtils;
 import org.elasticsearch.common.joda.Joda;
@@ -24,7 +24,7 @@ import java.util.Objects;
 public class DateRange implements Range<LocalDate> {
     //Default date format, any one of these is OK
     public static final String DEFAULT_DATE_FORMAT = "yyyy-MM-dd||yyyy-MM||yyyy";
-    private static final Logger logger = Logger.getLogger(DateRange.class);
+    private static final Logger logger = Logger.getLogger(DateRange.class.getName());
 
     //Null indicates unbounded/infinite value
     @Nullable
@@ -215,10 +215,10 @@ public class DateRange implements Range<LocalDate> {
                     );
             gCalendar.toXMLFormat();
         } catch (NumberFormatException nfe) {
-            logger.warn("gYear must be a number: " + nfe.getLocalizedMessage());
+            logger.warning("gYear must be a number: " + nfe.getLocalizedMessage());
             return false;
         } catch (DatatypeConfigurationException | IllegalArgumentException ex) {
-            logger.warn(ex.getLocalizedMessage());
+            logger.warning(ex.getLocalizedMessage());
             return false;
         }
         return true;

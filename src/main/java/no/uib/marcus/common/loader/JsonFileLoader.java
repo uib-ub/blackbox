@@ -2,7 +2,7 @@ package no.uib.marcus.common.loader;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
-import org.apache.log4j.Logger;
+import java.util.logging.Logger;
 import org.elasticsearch.common.settings.loader.JsonSettingsLoader;
 
 import java.io.BufferedReader;
@@ -59,7 +59,7 @@ public class JsonFileLoader extends JsonSettingsLoader {
         try {
             reader = new BufferedReader(new FileReader(filePath));
         } catch (FileNotFoundException e) {
-            logger.error("File path does not exist for " + filePath);
+            logger.severe("File path does not exist for " + filePath);
             throw new UnavailableResourceException("Unavailable file for blackbox settings. " +
                     "Make sure this path exist: " + filePath);
         }

@@ -5,7 +5,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
 import com.google.gson.JsonParser;
 import no.uib.marcus.search.IllegalParameterException;
-import org.apache.log4j.Logger;
+import java.util.logging.Logger;
 import org.elasticsearch.action.search.SearchRequestBuilder;
 import org.elasticsearch.common.Nullable;
 import no.uib.marcus.common.util.StringUtils;
@@ -32,7 +32,7 @@ import java.util.Map;
  * University of Bergen
  */
 public final class AggregationUtils {
-    private static final Logger logger = Logger.getLogger(AggregationUtils.class);
+    private static final Logger logger = Logger.getLogger(AggregationUtils.class.getName());
     private static final String AGGS_FILTER_KEY = "aggs_filter";
 
     //Enforce non-instatiability
@@ -85,7 +85,7 @@ public final class AggregationUtils {
                 }
             }
         } catch (JsonParseException e) {
-            logger.warn("Aggregations should be valid JSON array, check the syntax for [" + aggregations + "]");
+            logger.warning("Aggregations should be valid JSON array, check the syntax for [" + aggregations + "]");
             return false;
         }
         return false;

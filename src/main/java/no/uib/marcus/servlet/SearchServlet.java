@@ -10,7 +10,7 @@ import no.uib.marcus.common.util.SortUtils;
 import no.uib.marcus.range.DateRange;
 import no.uib.marcus.search.SearchBuilder;
 import no.uib.marcus.search.SearchBuilderFactory;
-import org.apache.log4j.Logger;
+import java.util.logging.Logger;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.client.Client;
 import org.elasticsearch.common.Booleans;
@@ -43,7 +43,7 @@ import java.util.Map;
         description = "Servlet for handling search requests")
 
 public class SearchServlet extends HttpServlet {
-    private static final Logger logger = Logger.getLogger(SearchServlet.class);
+    private static final Logger logger = Logger.getLogger(SearchServlet.class.getName());
     private static final long serialVersionUID = 1L;
 
     /**

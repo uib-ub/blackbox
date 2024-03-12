@@ -2,7 +2,7 @@ package no.uib.marcus.common.util;
 
 import no.uib.marcus.common.Params;
 import no.uib.marcus.range.DateRange;
-import org.apache.log4j.Logger;
+import java.util.logging.Logger;
 import org.elasticsearch.common.Nullable;
 import org.elasticsearch.common.collect.Lists;
 import org.elasticsearch.common.joda.time.LocalDate;
@@ -20,7 +20,7 @@ import java.util.*;
  */
 
 public final class FilterUtils {
-    private static final Logger logger = Logger.getLogger(FilterUtils.class);
+    private static final Logger logger = Logger.getLogger(FilterUtils.class.getName());
     private static final String TOP_FILTER = "top_filter";
     private static final String POST_FILTER = "post_filter";
     private static final char FILTER_KEY_VALUE_SEPARATOR = '#';
@@ -94,7 +94,7 @@ public final class FilterUtils {
                 }
             }
         } catch (Exception ex) {
-            logger.error("Exception occurred when constructing bool_filter [ " + ex + " ]");
+            logger.severe("Exception occurred when constructing bool_filter [ " + ex + " ]");
             throw ex;
         }
 
@@ -232,7 +232,7 @@ public final class FilterUtils {
                 }
             }
         } catch (Exception ex) {
-            logger.error("Exception occurred while constructing a map from selected filters: " + ex.getMessage());
+            logger.severe("Exception occurred while constructing a map from selected filters: " + ex.getMessage());
         }
         return filters;
     }

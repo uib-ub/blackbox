@@ -2,7 +2,7 @@ package no.uib.marcus.search;
 
 import no.uib.marcus.common.util.AggregationUtils;
 import no.uib.marcus.common.util.QueryUtils;
-import org.apache.log4j.Logger;
+import java.util.logging.Logger;
 import org.elasticsearch.action.search.SearchRequestBuilder;
 import org.elasticsearch.client.Client;
 import no.uib.marcus.common.util.StringUtils;
@@ -82,7 +82,7 @@ public class SkaSearchBuilder extends MarcusSearchBuilder {
             //Show builder for debugging purpose
             //logger.info(searchRequest.toString());
         } catch (SearchSourceBuilderException e) {
-            logger.error("Exception occurred when building search request: " + e.getMostSpecificCause());
+            logger.severe("Exception occurred when building search request: " + e.getMostSpecificCause());
         }
         return searchRequest;
     }

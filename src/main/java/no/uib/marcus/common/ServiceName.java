@@ -1,6 +1,6 @@
 package no.uib.marcus.common;
 
-import org.apache.log4j.Logger;
+import java.util.logging.Logger;
 import no.uib.marcus.common.util.StringUtils;
 
 import java.util.Arrays;
@@ -38,7 +38,7 @@ public enum ServiceName {
     /**
      * Logger
      */
-    private static final Logger logger = Logger.getLogger(ServiceName.class);
+    private static final Logger logger = Logger.getLogger(ServiceName.class.getName());
 
     /**
      * Get corresponding enum from it's string representation
@@ -55,7 +55,7 @@ public enum ServiceName {
             service = ServiceName.valueOf(serviceString.toUpperCase());
         }
         catch (IllegalArgumentException e){
-            logger.error("Service parameter is not recognized. Found [" + serviceString + "]" +
+            logger.severe("Service parameter is not recognized. Found [" + serviceString + "]" +
                     " but expected one of " + Arrays.asList(ServiceName.values()).toString());
             /*Fail and do not continue*/
             throw e;

@@ -3,7 +3,7 @@ package no.uib.marcus.search;
 
 import no.uib.marcus.common.util.AggregationUtils;
 import no.uib.marcus.common.util.SignatureUtils;
-import org.apache.log4j.Logger;
+import java.util.logging.Logger;
 import org.elasticsearch.action.search.SearchRequestBuilder;
 import org.elasticsearch.client.Client;
 import no.uib.marcus.common.util.StringUtils;
@@ -86,7 +86,7 @@ public class WabSearchBuilder extends AbstractSearchBuilder<WabSearchBuilder> {
             //Show builder for debugging purpose
             //logger.info(searchRequest.toString());
         } catch (SearchSourceBuilderException e) {
-            logger.error("Exception occurred when building search request: " + e.getDetailedMessage());
+            logger.severe( "Exception occurred when building search request: " + e.getDetailedMessage());
         }
         return searchRequest;
     }

@@ -1,7 +1,7 @@
 package no.uib.marcus.search;
 
 import no.uib.marcus.common.util.AggregationUtils;
-import org.apache.log4j.Logger;
+import java.util.logging.Logger;
 import org.elasticsearch.action.search.SearchPhaseExecutionException;
 import org.elasticsearch.action.search.SearchRequestBuilder;
 import org.elasticsearch.action.search.SearchResponse;
@@ -337,7 +337,7 @@ public abstract class AbstractSearchBuilder<T extends AbstractSearchBuilder<T>> 
         } catch (SearchPhaseExecutionException e) {
             //I've not found a direct way to validate a query string. Therefore, the idea here is to catch any
             //exception that is related to search execution.
-            //logger.error("Could not execute search: " + e.getDetailedMessage());
+            //logger.severe("Could not execute search: " + e.getDetailedMessage());
             throw e;
         }
         return response;
