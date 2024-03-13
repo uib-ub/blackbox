@@ -116,8 +116,9 @@ public final class AggregationUtils {
             JsonObject facet = facets.getAsJsonObject();
             if (facet.has("field")) {
                 //Add DateHistogram aggregations
+                //@todo add map of Map<String, Aggregation> and send once
                 if (facet.has("type") && facet.get("type").getAsString().equals("date_histogram")) {
-                    searchRequest.ag(AggregationUtils.getDateHistogramAggregation(facet));
+                    searchRequest.aggregations(Map.of(facet.get("field").getAsString(),AggregationUtils.getDateHistogramAggregation(facet).build()._toAggregation()));
                 } else {
                     TermsAggregation.Builder termsAggs = constructTermsAggregation(facet);
                     if (selectedFacets != null && selectedFacets.size() > 0) {
@@ -138,7 +139,7 @@ public final class AggregationUtils {
                             termsAggs = addSubAggregationFilter(aggregations, facet, termsAggs, selectedFacets);
                         }
                     }
-                    searchRequest.addAggregation(termsAggs);
+                    searchRequest.aggregations(termsAggs.build());
                 }
             }
         }
@@ -148,8 +149,8 @@ public final class AggregationUtils {
     /**
      * Adds sub aggregation filter with the name "aggs_filter". Sub aggregations are added only to "OR" facets
      */
-    private static AggregationBuilder addSubAggregationFilter(String aggs, JsonObject currentFacet,
-                                                              AggregationBuilder termsAggs,
+    private static Aggregation.Builder addSubAggregationFilter(String aggs, JsonObject currentFacet,
+                                                              Aggregation.Builder termsAggs,
                                                               Map<String, List<String>> selectedFacets)
     {
         BoolFilterBuilder aggsFilter = FilterUtils.getPostFilter(selectedFacets, aggs);
@@ -190,7 +191,7 @@ public final class AggregationUtils {
         }
         //Set order
         if (facet.has("order")) {
-            NamedValue<SortOrder> order;
+            NamedValue<SortOrder> order = new NamedValue<>("_count", SortOrder.Asc);;
 
             if (facet.get("order").getAsString().equalsIgnoreCase("count_asc")) {
                 order = new NamedValue<>("_count", SortOrder.Asc);
@@ -223,6 +224,7 @@ public final class AggregationUtils {
             termsBuilder.size(size);
         }
         //Set order
+        termsBuilder.order()
         Terms.Order subAggregationOrder = Terms.Order.aggregation(AGGS_FILTER_KEY, false);
         if (facet.has("order")) {
             Terms.Order order = Terms.Order.count(false);//default order (count descending)
@@ -230,6 +232,7 @@ public final class AggregationUtils {
                 order = Terms.Order.count(true);
                 subAggregationOrder = Terms.Order.aggregation(AGGS_FILTER_KEY, true);
             } else if (facet.get("order").getAsString().equalsIgnoreCase("term_asc")) {
+
                 order = Terms.Order.term(true);
                 subAggregationOrder = order; // for term_asc, sort by parent aggregation
             } else if (facet.get("order").getAsString().equalsIgnoreCase("term_desc")) {
