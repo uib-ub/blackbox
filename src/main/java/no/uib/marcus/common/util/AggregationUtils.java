@@ -3,6 +3,7 @@ package no.uib.marcus.common.util;
 import co.elastic.clients.elasticsearch._types.SortOrder;
 import co.elastic.clients.elasticsearch._types.Time;
 import co.elastic.clients.elasticsearch._types.aggregations.Aggregation;
+import co.elastic.clients.elasticsearch._types.aggregations.AggregationBuilders;
 import co.elastic.clients.elasticsearch._types.aggregations.DateHistogramAggregation;
 import co.elastic.clients.elasticsearch._types.aggregations.TermsAggregation;
 import co.elastic.clients.elasticsearch.core.SearchRequest;
@@ -112,13 +113,15 @@ public final class AggregationUtils {
                                                         Map<String, List<String>> selectedFacets)
             throws JsonParseException, IllegalStateException {
         JsonElement jsonElement = new JsonParser().parse(aggregations);
+        Map<String, Aggregation> aggregationMap = new HashMap<>() ;
         for (JsonElement facets : jsonElement.getAsJsonArray()) {
             JsonObject facet = facets.getAsJsonObject();
             if (facet.has("field")) {
                 //Add DateHistogram aggregations
                 //@todo add map of Map<String, Aggregation> and send once
                 if (facet.has("type") && facet.get("type").getAsString().equals("date_histogram")) {
-                    searchRequest.aggregations(Map.of(facet.get("field").getAsString(),AggregationUtils.getDateHistogramAggregation(facet).build()._toAggregation()));
+                    aggregationMap.put(facet.get("field").getAsString(),
+                            AggregationUtils.getDateHistogramAggregation(facet).build()._toAggregation());
                 } else {
                     TermsAggregation.Builder termsAggs = constructTermsAggregation(facet);
                     if (selectedFacets != null && selectedFacets.size() > 0) {
@@ -139,21 +142,22 @@ public final class AggregationUtils {
                             termsAggs = addSubAggregationFilter(aggregations, facet, termsAggs, selectedFacets);
                         }
                     }
-                    searchRequest.aggregations(termsAggs.build());
+
+                    aggregationMap.put(facet.get("Field").getAsString(), termsAggs.build()._toAggregation())
                 }
             }
         }
-        return searchRequest;
+        return searchRequest.aggregations(aggregationMap);
     }
 
     /**
      * Adds sub aggregation filter with the name "aggs_filter". Sub aggregations are added only to "OR" facets
      */
-    private static Aggregation.Builder addSubAggregationFilter(String aggs, JsonObject currentFacet,
+    private static TermsAggregation.Builder addSubAggregationFilter(String aggs, JsonObject currentFacet,
                                                               Aggregation.Builder termsAggs,
                                                               Map<String, List<String>> selectedFacets)
     {
-        BoolFilterBuilder aggsFilter = FilterUtils.getPostFilter(selectedFacets, aggs);
+        Boo.Builder aggsFilter = FilterUtils.getPostFilter(selectedFacets, aggs);
         if (aggsFilter.hasClauses()) {
             termsAggs = constructTermsAggregation(currentFacet, true);
             termsAggs.subAggregation(AggregationBuilders.filter(AGGS_FILTER_KEY).filter(aggsFilter));
@@ -251,7 +255,7 @@ public final class AggregationUtils {
         }
         //Set number of minimum documents that should be returned
         if (facet.has("min_doc_count")) {
-            long minDocCount = facet.get("min_doc_count").getAsLong();
+            int minDocCount = facet.get("min_doc_count").getAsInt();
             termsBuilder.minDocCount(minDocCount);
         }
         return termsBuilder;
