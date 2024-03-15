@@ -1,6 +1,8 @@
 package no.uib.marcus.servlet;
 
 import co.elastic.clients.elasticsearch.ElasticsearchClient;
+import com.fasterxml.jackson.databind.json.JsonMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import no.uib.marcus.client.ElasticsearchClientFactory;
 import no.uib.marcus.common.Params;
 import no.uib.marcus.common.util.FilterUtils;
@@ -10,12 +12,13 @@ import no.uib.marcus.common.util.SortUtils;
 import no.uib.marcus.range.DateRange;
 import no.uib.marcus.search.SearchBuilder;
 import no.uib.marcus.search.SearchBuilderFactory;
+
+import java.util.HashMap;
 import java.util.logging.Logger;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.client.Client;
 import org.elasticsearch.common.Booleans;
 import no.uib.marcus.common.util.StringUtils;
-import org.elasticsearch.common.xcontent.XContentFactory;
 import org.elasticsearch.index.query.BoolFilterBuilder;
 
 import javax.servlet.ServletException;
@@ -144,16 +147,16 @@ public class SearchServlet extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
+        ObjectNode objectNode = new JsonMapper().createObjectNode();
+        objectNode.put("field", 405);
+        objectNode.put("message","Method Not Allowed");
+
+
         request.setCharacterEncoding("UTF-8");
         response.setContentType("application/json;charset=UTF-8");
 
         try (PrintWriter out = response.getWriter()) {
-            out.write(XContentFactory.jsonBuilder()
-                    .startObject()
-                    .field("code", 405)
-                    .field("message", "Method Not Allowed")
-                    .endObject()
-                    .string()
+            out.write(objectNode.toPrettyString()
              );
         }
     }

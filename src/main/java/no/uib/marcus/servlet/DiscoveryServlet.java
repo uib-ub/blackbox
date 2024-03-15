@@ -1,6 +1,9 @@
 package no.uib.marcus.servlet;
 
 import co.elastic.clients.elasticsearch.ElasticsearchClient;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.json.JsonMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import no.uib.marcus.client.ElasticsearchClientFactory;
 import no.uib.marcus.common.Params;
 import no.uib.marcus.common.util.QueryUtils;
@@ -9,7 +12,6 @@ import no.uib.marcus.search.SearchBuilderFactory;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.client.Client;
 import no.uib.marcus.common.util.StringUtils;
-import org.elasticsearch.common.xcontent.XContentFactory;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -18,6 +20,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Discovery service which is available at "/discover" endpoint only allow
@@ -91,14 +95,11 @@ public class DiscoveryServlet extends HttpServlet {
 
         request.setCharacterEncoding("UTF-8");
         response.setContentType("application/json;charset=UTF-8");
-
+        ObjectNode objectNode = new ObjectMapper().createObjectNode();
+        objectNode.put("code", 405);
+        objectNode.put("message", "Method Not Allowed");
         try (PrintWriter out = response.getWriter()) {
-            out.write(XContentFactory.jsonBuilder()
-                    .startObject()
-                    .field("code", 405)
-                    .field("message", "Method Not Allowed")
-                    .endObject()
-                    .string()
+            out.write(objectNode.toPrettyString()
             );
         }
     }
