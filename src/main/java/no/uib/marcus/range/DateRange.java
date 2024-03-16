@@ -1,17 +1,19 @@
 package no.uib.marcus.range;
 
-import java.util.logging.Logger;
-import org.elasticsearch.common.Nullable;
 import no.uib.marcus.common.util.StringUtils;
-import org.elasticsearch.common.joda.Joda;
-import org.elasticsearch.common.joda.time.LocalDate;
 
+import javax.annotation.Nullable;
 import javax.validation.constraints.NotNull;
 import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.datatype.DatatypeConstants;
 import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.XMLGregorianCalendar;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeFormatterBuilder;
+import java.time.temporal.ChronoField;
 import java.util.Objects;
+import java.util.logging.Logger;
 
 /**
  * DateRange class that manipulates ranges for Local Dates.
@@ -24,7 +26,16 @@ import java.util.Objects;
 public class DateRange implements Range<LocalDate> {
     //Default date format, any one of these is OK
     public static final String DEFAULT_DATE_FORMAT = "yyyy-MM-dd||yyyy-MM||yyyy";
-    private static final Logger logger = Logger.getLogger(DateRange.class.getName());
+
+    // default values set for from date
+    public static final  DateTimeFormatter DEFAULT_DATE_FORMATTER = new DateTimeFormatterBuilder()
+            .appendPattern("[yyyy-MM-dd]")
+            .appendPattern("[yyyy-MM]")
+            .appendPattern("[yyyy]")
+            .parseDefaulting(ChronoField.MONTH_OF_YEAR, 1)
+            .parseDefaulting(ChronoField.DAY_OF_MONTH, 1)
+            .toFormatter();
+    private static final Logger logger = Logger.getLogger(String.valueOf(DateRange.class));
 
     //Null indicates unbounded/infinite value
     @Nullable
@@ -78,23 +89,31 @@ public class DateRange implements Range<LocalDate> {
     }
 
     /**
-     * When only year is specified as "to_date", Joda Time parser assumes that it is 1st of January. This makes
-     * sense for "from_date" but not for "to_date". Therefore, this method tries to modify day and month of "to_date"
-     * to 31st of December.
+     * Logic for getting last date
      */
     public LocalDate parseToDate(String toDateString) {
-        LocalDate toDate = parse(toDateString);
-        if (toDate != null && isXSDgYear(toDateString)) {// when only year is specified
-            return new LocalDate(toDate.getYear(), 12, 31);
+        if (toDateString.trim().isEmpty())
+            return null;
+
+        String defaultDay = "";
+        String defaultMonth = toDateString.length() == 4 ? "-12" : "";
+
+        if (!toDateString.matches("^\\d{4}-\\d{2}-\\d{2}$") && toDateString.matches("^\\d{4}-\\d{2}-\\d{2}$")){
+            if (toDateString.length() != 7)
+                isXSDgYear(toDateString);
+            LocalDate nextMonthFirstDay  = LocalDate.parse(toDateString + defaultMonth + "-01").plusMonths(1);
+            defaultDay = "-" +Integer.toString(nextMonthFirstDay.minusDays(1).get(ChronoField.DAY_OF_MONTH));
         }
-        return toDate;
+
+        return   LocalDate.parse(toDateString + defaultMonth + defaultDay ,DEFAULT_DATE_FORMATTER);
     }
 
+
     /**
-     * Joda Time parses from_date correctly
+     * From date is handled by default formatter
      */
     public LocalDate parseFromDate(String fromDateString) {
-        return parse(fromDateString);
+            return LocalDate.parse(fromDateString , DEFAULT_DATE_FORMATTER);
     }
 
     /**
@@ -126,7 +145,7 @@ public class DateRange implements Range<LocalDate> {
     @Override
     public LocalDate parse(String input) {
         if (StringUtils.hasText(input)) {
-            return Joda.forPattern(getDateFormat()).parser().parseLocalDate(input);
+            return LocalDate.parse(input, DateTimeFormatter.ofPattern(getDateFormat()));
         }
         return null;
     }
