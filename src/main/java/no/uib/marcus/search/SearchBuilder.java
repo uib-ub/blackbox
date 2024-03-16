@@ -1,6 +1,6 @@
 package no.uib.marcus.search;
 
-import co.elastic.clients.elasticsearch._types.query_dsl.BoolQuery;
+import co.elastic.clients.elasticsearch._types.query_dsl.Query;
 import co.elastic.clients.elasticsearch.core.SearchRequest;
 import co.elastic.clients.elasticsearch.core.SearchResponse;
 import co.elastic.clients.elasticsearch.ElasticsearchClient;
@@ -88,12 +88,12 @@ public interface SearchBuilder<S> {
     /**
      * Sets post filter
      */
-    S setPostFilter(BoolQuery.Builder postFilter);
+    S setPostFilter(Query.Builder postFilter);
 
     /**
      * Sets filter (filtered_query)
      */
-    S setFilter(BoolQuery.Builder postFilter);
+    S setFilter(Query.Builder postFilter);
 
 
     /**
