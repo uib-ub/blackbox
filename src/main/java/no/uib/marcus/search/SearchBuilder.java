@@ -1,9 +1,14 @@
 package no.uib.marcus.search;
 
-import co.elastic.clients.elasticsearch.ElasticsearchClient;
+import co.elastic.clients.elasticsearch._types.query_dsl.BoolQuery;
+import co.elastic.clients.elasticsearch.core.SearchRequest;
 import co.elastic.clients.elasticsearch.core.SearchResponse;
-
+import co.elastic.clients.elasticsearch.ElasticsearchClient;
+import javax.annotation.Nullable;
 import javax.validation.constraints.NotNull;
+import co.elastic.clients.elasticsearch._types.SortOptions;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+
 import java.util.List;
 import java.util.Map;
 
@@ -77,24 +82,24 @@ public interface SearchBuilder<S> {
     /**
      * Sets sort builder
      */
-    S setSortBuilder(SortBuilder sortBuilder);
+    S setSortBuilder(SortOptions.Builder sortBuilder);
 
 
     /**
      * Sets post filter
      */
-    S setPostFilter(FilterBuilder postFilter);
+    S setPostFilter(BoolQuery.Builder postFilter);
 
     /**
      * Sets filter (filtered_query)
      */
-    S setFilter(FilterBuilder postFilter);
+    S setFilter(BoolQuery.Builder postFilter);
 
 
     /**
      * Construct search request based on the service settings
      */
-    SearchRequestBuilder constructSearchRequest();
+    SearchRequest.Builder constructSearchRequest();
 
     /**
      * Get documents based on the service settings.
