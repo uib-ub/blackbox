@@ -2,16 +2,18 @@ package no.uib.marcus.search;
 
 
 import co.elastic.clients.elasticsearch.ElasticsearchClient;
+import co.elastic.clients.elasticsearch._types.query_dsl.*;
+import co.elastic.clients.elasticsearch.core.SearchRequest;
+import co.elastic.clients.util.ObjectBuilder;
+import com.google.gson.JsonParseException;
 import no.uib.marcus.common.util.AggregationUtils;
 import no.uib.marcus.common.util.SignatureUtils;
+
+import java.util.Arrays;
+import java.util.List;
 import java.util.logging.Logger;
-import org.elasticsearch.action.search.SearchRequestBuilder;
-import org.elasticsearch.client.Client;
+
 import no.uib.marcus.common.util.StringUtils;
-import org.elasticsearch.index.query.QueryBuilder;
-import org.elasticsearch.index.query.QueryBuilders;
-import org.elasticsearch.index.query.SimpleQueryStringBuilder;
-import org.elasticsearch.search.builder.SearchSourceBuilderException;
 
 /**
  * A custom search builder for WAB
@@ -35,45 +37,44 @@ public class WabSearchBuilder extends AbstractSearchBuilder<WabSearchBuilder> {
      * Builds query for WAB
      */
     @Override
-    public SearchRequestBuilder constructSearchRequest() {
-        QueryBuilder query;
-        SearchRequestBuilder searchRequest = getClient().prepareSearch();
+    public SearchRequest.Builder constructSearchRequest() {
+        Query query;
+        SearchRequest.Builder searchRequest = new SearchRequest.Builder();
         try {
             //Set indices
             if (isNeitherNullNorEmpty(getIndices())) {
-                searchRequest.setIndices(getIndices());
+                searchRequest.index(Arrays.asList(getIndices()));
             }
-            //Set types
-            if (isNeitherNullNorEmpty(getTypes())) {
-                searchRequest.setTypes(getTypes());
-            }
+
 
             //Set query
             if (StringUtils.hasText(getQueryString())) {
-                query = QueryBuilders.simpleQueryStringQuery(getQueryString())
-                        .field("label")//whitespace analyzed
-                        .field("publishedIn")//whitespace analyzed
-                        .field("publishedInPart.exact")//not_analyzed
-                        //.field("hasPart")
-                        //.field("refersTo")
-                        .field("_all")
-                        .defaultOperator(SimpleQueryStringBuilder.Operator.AND);
+                query = QueryBuilders.simpleQueryString()
+                        .query(getQueryString())
+                        .defaultOperator(Operator.And)
+                        .fields(List.of("label",
+                                        "publishedIn",
+                                        "publishedInPart.exact",
+                                        "_all")).build()._toQuery();//whitespace analyzed
+
             } else {
-                query = QueryBuilders.matchAllQuery();
+                query = QueryBuilders.matchAll().build()._toQuery();
             }
-            //Set Query, whether with or without filter
+            FunctionScoreQuery.Builder functions = new FunctionScoreQuery.Builder() ;
+            // @todo find out
+            // Set Query, whether with or without filter
             if (getFilter() != null) {
-                searchRequest.setQuery(QueryBuilders.filteredQuery(query, getFilter()));
+                searchRequest.query(QueryBuilders.bool().filter(List.of(getFilter().build())).must( query).build()._toQuery());
             } else {
-                searchRequest.setQuery(query);
+                searchRequest.query(query);
             }
             //Set post filter
             if (getPostFilter() != null) {
-                searchRequest.setPostFilter(getPostFilter());
+                searchRequest.postFilter(getPostFilter().build());
             }
             //Set sortBuilder
             if (getSortBuilder() != null) {
-                searchRequest.addSort(getSortBuilder());
+                searchRequest.sort(List.of(getSortBuilder().build()));
             }
             //Append aggregations to the request builder
             if (StringUtils.hasText(getAggregations())) {
@@ -81,13 +82,15 @@ public class WabSearchBuilder extends AbstractSearchBuilder<WabSearchBuilder> {
             }
 
             //Set from and size
-            searchRequest.setFrom(getFrom());
-            searchRequest.setSize(getSize());
+            searchRequest.from(getFrom());
+            searchRequest.size(getSize());
 
             //Show builder for debugging purpose
             //logger.info(searchRequest.toString());
-        } catch (SearchSourceBuilderException e) {
-            logger.severe( "Exception occurred when building search request: " + e.getDetailedMessage());
+        } catch (JsonParseException e) {
+            throw new RuntimeException(e);
+        } catch (IllegalStateException e) {
+            throw new RuntimeException(e);
         }
         return searchRequest;
     }
