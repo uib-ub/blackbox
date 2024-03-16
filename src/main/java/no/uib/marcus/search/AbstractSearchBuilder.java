@@ -1,6 +1,11 @@
 package no.uib.marcus.search;
 
+import co.elastic.clients.elasticsearch.core.SearchResponse;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import no.uib.marcus.common.util.AggregationUtils;
+
+import java.util.Arrays;
 import java.util.logging.Logger;
 import org.elasticsearch.action.search.SearchPhaseExecutionException;
 import org.elasticsearch.action.search.SearchRequestBuilder;
@@ -8,8 +13,6 @@ import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.client.Client;
 import org.elasticsearch.common.Nullable;
 import no.uib.marcus.common.util.StringUtils;
-import org.elasticsearch.common.xcontent.XContentBuilder;
-import org.elasticsearch.common.xcontent.XContentFactory;
 import org.elasticsearch.index.query.FilterBuilder;
 import org.elasticsearch.search.sort.SortBuilder;
 
@@ -125,7 +128,7 @@ public abstract class AbstractSearchBuilder<T extends AbstractSearchBuilder<T>> 
      * @return this object where filter has been set
      */
     @SuppressWarnings("unchecked")
-    public T setFilter(FilterBuilder filter) {
+    public T setFilter( filter) {
         this.filter = filter;
         return (T) this;
     }
@@ -327,7 +330,7 @@ public abstract class AbstractSearchBuilder<T extends AbstractSearchBuilder<T>> 
      */
     @Override
     @Nullable
-    public SearchResponse executeSearch() {
+    public SearchResponse<ObjectNode> executeSearch() {
         SearchResponse response = null;
         try {
             response = constructSearchRequest().execute().actionGet();
@@ -351,18 +354,15 @@ public abstract class AbstractSearchBuilder<T extends AbstractSearchBuilder<T>> 
      */
     @Override
     public String toString() {
-        try {
-            XContentBuilder jsonObj = XContentFactory.jsonBuilder().prettyPrint()
-                    .startObject()
-                    .field("indices", getIndices() == null ? Strings.EMPTY_ARRAY : getIndices())
-                    .field("type", getTypes() == null ? Strings.EMPTY_ARRAY : getTypes())
-                    .field("from", getFrom())
-                    .field("size", getSize())
-                    .field("aggregations", getAggregations() == null ? Strings.EMPTY_ARRAY : getAggregations())
-                    .endObject();
-            return jsonObj.string();
-        } catch (IOException e) {
-            return "{ \"error\" : \"" + e.getMessage() + "\"}";
-        }
+        ObjectNode jsonObj = new ObjectMapper().createObjectNode();
+
+        jsonObj = jsonObj.put("indices",  getIndices().length > 0   ?  "" : Arrays.toString(getIndices()))
+                .put("type", getTypes() == null ? "" : Arrays.toString(getTypes()))
+                .put("from", getFrom())
+                .put("size", getSize())
+                .put("aggregations", getAggregations() == null ? "" : getAggregations());
+
+        return jsonObj.toString();
+
     }
 }

@@ -1,9 +1,10 @@
 package no.uib.marcus.common.util;
 
+import co.elastic.clients.elasticsearch.core.SearchResponse;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.json.JsonMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import no.uib.marcus.common.Params;
-import org.elasticsearch.action.search.SearchResponse;
-import org.elasticsearch.common.xcontent.XContentBuilder;
-import org.elasticsearch.common.xcontent.XContentFactory;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
@@ -27,22 +28,27 @@ public final class LogUtils {
      *
      * @return  logs a JSON string
      ***/
-    public static String createLogMessage(HttpServletRequest request, SearchResponse searchResponse) throws IOException {
+    public static String createLogMessage(HttpServletRequest request, SearchResponse<JsonNode> searchResponse) throws IOException {
         //Get a copy of a parameter map
         Map<String, Object> parameterMapCopy = new HashMap<>(request.getParameterMap());
         //Remove aggregations from the logs
         parameterMapCopy.remove(Params.AGGREGATIONS);
         //Build log message
-        XContentBuilder builder = XContentFactory.jsonBuilder()
-                .startObject()
-                //.field("host", request.getRemoteAddr().equals("0:0:0:0:0:0:0:1") ?
-                // InetAddress.getLocalHost() : request.getRemoteAddr())
-                .field("status", searchResponse == null? 404 : searchResponse.status().getStatus())
-                .field("params", jsonify(parameterMapCopy))
-                .field("hits", searchResponse == null ? -1 : searchResponse.getHits().getTotalHits())
-                .field("took", searchResponse == null ? -1 : searchResponse.getTook())
-                .endObject();
-        return  builder.string();
+        Map<String, Object> responseMap = new HashMap<>();
+
+        responseMap.put("params", jsonify(parameterMapCopy));
+        responseMap.put("hits", searchResponse == null ? -1 : searchResponse.hits().total().toString());
+        responseMap.put("took", searchResponse == null ? -1 : searchResponse.took());
+
+        ObjectNode objectNode = new JsonMapper().createObjectNode()
+                .setAll(new JsonMapper().convertValue(jsonify(parameterMapCopy),ObjectNode.class));
+        objectNode
+
+        //@todo not able to find status .field("status", searchResponse == null? 404 : searchResponse.status().getStatus())
+            //    .put("stats", searchResponse.terminatedEarly()hits() )
+                .put("hits", searchResponse == null ? "-1" : searchResponse.hits().total().toString())
+                .put("took", searchResponse == null ? -1 : searchResponse.took());
+        return  objectNode.toPrettyString();
     }
 
 }

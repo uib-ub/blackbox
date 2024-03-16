@@ -1,5 +1,7 @@
 package no.uib.marcus.common.util;
 
+import co.elastic.clients.elasticsearch.core.SearchResponse;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.elasticsearch.action.search.SearchResponse;
 import no.uib.marcus.common.util.StringUtils;
 import org.elasticsearch.common.xcontent.ToXContent;
@@ -69,7 +71,7 @@ public final class QueryUtils {
     public static String appendTrailingWildcardIfSingleTerm(String queryString) {
         if (!isNullOrEmpty(queryString)
                 && Character.isLetter(queryString.charAt(0))
-                && !Strings.containsWhitespace(queryString)
+                && !StringUtils.containsWhitespace(queryString)
                 && !containsReservedChars(queryString)) {
 
             return queryString + WILDCARD;
@@ -105,21 +107,15 @@ public final class QueryUtils {
      * @param isPretty a boolean value to show whether the JSON string should be pretty printed.
      * @return search hits as a JSON string
      **/
-    public static String toJsonString(final SearchResponse response, final boolean isPretty) {
-        try {
-            if (response == null) {
-                return "{ \"error\" : \"" + "Could not execute search. See internal server logs" + "\"}";
-            }
-            XContentBuilder builder = XContentFactory.jsonBuilder();
-            if (isPretty) {
-                builder.prettyPrint();
-            }
-            builder.startObject();
-            response.toXContent(builder, ToXContent.EMPTY_PARAMS);
-            builder.endObject();
-            return builder.string();
-        } catch (IOException e) {
-            return "{ \"error\" : \"" + e.getMessage() + "\"}";
+    public static String toJsonString(final SearchResponse<ObjectNode> response, final boolean isPretty) {
+        if (response == null) {
+            return "{ \"error\" : \"" + "Could not execute search. See internal server logs" + "\"}";
         }
+        if (isPretty) {
+            //@todo
+            response.toString();
+        }
+        response.toString();
+
     }
 }

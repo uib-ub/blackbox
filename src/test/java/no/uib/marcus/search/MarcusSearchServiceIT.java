@@ -1,18 +1,22 @@
 package no.uib.marcus.search;
 
+import com.fasterxml.jackson.databind.json.JsonMapper;
 import junit.framework.TestCase;
 import no.uib.marcus.client.ElasticsearchClientFactory;
+
+import java.util.HashMap;
+import java.util.Map;
 import java.util.logging.Logger;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.client.Client;
 import org.elasticsearch.common.base.Predicate;
-import org.elasticsearch.common.xcontent.XContentFactory;
 import org.elasticsearch.index.query.FilterBuilders;
 import org.elasticsearch.indices.IndexMissingException;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
+import javax.json.Json;
 import java.io.IOException;
 import java.util.concurrent.TimeUnit;
 
@@ -95,14 +99,13 @@ public class MarcusSearchServiceIT extends TestCase {
 
         final MarcusSearchBuilder searchService = (MarcusSearchBuilder) SearchBuilderFactory.marcusSearch(client)
                 .setIndices(indexName);
-
+        JsonMapper jsonMapper = new JsonMapper();
+        Map<String, Object> requestMap = new HashMap<>();
+        requestMap.put("identifier", "ubb-ms-01");
+        requestMap.put("title","Zanzibar ni njema, atakae aje");
         //Index 1 document
         client.prepareIndex(indexName, "doc", "1")
-                .setSource(XContentFactory.jsonBuilder()
-                        .startObject()
-                        .field("identifier", "ubb-ms-01")
-                        .field("title", "Zanzibar ni njema, atakae aje")
-                        .endObject())
+                .setSource(requestMap)
                 .execute()
                 .actionGet();
 
