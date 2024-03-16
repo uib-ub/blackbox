@@ -1,14 +1,18 @@
 package no.uib.marcus.common.util;
 
+import co.elastic.clients.elasticsearch._types.FieldValue;
+import co.elastic.clients.elasticsearch._types.query_dsl.BoolQuery;
+import co.elastic.clients.elasticsearch._types.query_dsl.QueryBuilders;
+import co.elastic.clients.elasticsearch._types.query_dsl.TermsQueryField;
+import co.elastic.clients.json.JsonData;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import no.uib.marcus.common.Params;
 import no.uib.marcus.range.DateRange;
 import java.util.logging.Logger;
-import org.elasticsearch.common.Nullable;
-import org.elasticsearch.common.collect.Lists;
-import org.elasticsearch.common.joda.time.LocalDate;
-import org.elasticsearch.index.query.BoolFilterBuilder;
-import org.elasticsearch.index.query.FilterBuilders;
 
+import java.time.LocalDate;
+
+import javax.annotation.Nullable;
 import javax.validation.constraints.NotNull;
 import java.util.*;
 
@@ -32,24 +36,24 @@ public final class FilterUtils {
     /**
      * A wrapper for building filter without dates
      ***/
-    public static Map<String, BoolFilterBuilder> buildBoolFilter(@NotNull Map<String, List<String>> filterMap, String aggs) {
+    public static Map<String, BoolQuery.Builder> buildBoolFilter(@NotNull Map<String, List<String>> filterMap, String aggs) {
         return buildBoolFilter(filterMap, aggs, null);
     }
 
     /**
      * Gets top filter from the given filter map or empty filter if it does not exist
      */
-    public static BoolFilterBuilder getTopFilter(@NotNull Map<String, List<String>> selectedFacets, String aggs, DateRange dateRange) {
-        Map<String, BoolFilterBuilder> filter = FilterUtils.buildBoolFilter(selectedFacets, aggs, dateRange);
-        return filter.getOrDefault(TOP_FILTER, FilterBuilders.boolFilter());
+    public static BoolQuery.Builder getTopFilter(@NotNull Map<String, List<String>> selectedFacets, String aggs, DateRange dateRange) {
+        Map<String, BoolQuery.Builder> filter = FilterUtils.buildBoolFilter(selectedFacets, aggs, dateRange);
+        return filter.getOrDefault(TOP_FILTER, QueryBuilders.bool());
     }
 
     /**
      * Gets post filter from the given filter map or empty filter if it does not exist
      */
-    public static BoolFilterBuilder getPostFilter(@NotNull Map<String, List<String>> selectedFacets, String aggs) {
-        Map<String, BoolFilterBuilder> filter = FilterUtils.buildBoolFilter(selectedFacets, aggs);
-        return filter.getOrDefault(POST_FILTER, FilterBuilders.boolFilter());
+    public static BoolQuery.Builder getPostFilter(@NotNull Map<String, List<String>> selectedFacets, String aggs) {
+        Map<String, BoolQuery.Builder> filter = FilterUtils.buildBoolFilter(selectedFacets, aggs);
+        return filter.getOrDefault(POST_FILTER, QueryBuilders.bool());
     }
 
     /**
@@ -61,34 +65,37 @@ public final class FilterUtils {
      * @return a map which contains AND and OR bool filters based on the aggregations, with the keys
      * "top_filter" and "post_filter" respectively
      */
-    private static Map<String, BoolFilterBuilder> buildBoolFilter(
+    private static Map<String, BoolQuery.Builder> buildBoolFilter(
             @NotNull Map<String, List<String>> filterMap,
             @Nullable String aggregations,
             DateRange dateRange
     ) {
-        Map<String, BoolFilterBuilder> boolFilterMap = new HashMap<>();
-        BoolFilterBuilder topFilter = FilterBuilders.boolFilter();
-        BoolFilterBuilder postFilter = FilterBuilders.boolFilter();
+        Map<String, BoolQuery.Builder> boolFilterMap = new HashMap<>();
+        BoolQuery.Builder topFilter = QueryBuilders.bool();
+        BoolQuery.Builder postFilter = QueryBuilders.bool();
 
         try {
             //Building a filter based on the user selected facets. Starting with AND filter
             for (Map.Entry<String, List<String>> entry : filterMap.entrySet()) {
                 if (entry.getValue() != null && entry.getValue().size() > 0) {
+                    TermsQueryField entryTerms = new TermsQueryField.Builder()
+                            .value(entry.getValue().stream().map(FieldValue::of).toList())
+                            .build();
+
                     if (hasOROperator(aggregations, entry.getKey())) {
                         //Building "OR" filter that will be used as post_filter.
                         //post_filter only affects search results but NOT aggregations.
-                        postFilter.must(FilterBuilders.termsFilter(entry.getKey(), entry.getValue()));
+                        postFilter.must(QueryBuilders.terms().field(entry.getKey()).terms(entryTerms).build()._toQuery());
                     } else if (entry.getKey().startsWith(BlackboxUtils.MINUS)) {
                         //Exclude any filter that begins with minus sign
-                        topFilter.mustNot(FilterBuilders.termsFilter(entry.getKey().substring(1), entry.getValue()));
+                        topFilter.mustNot(QueryBuilders.terms().field(entry.getKey().substring(1)).terms(entryTerms).build()._toQuery());
                     } else { //default is "AND" filter that will be used as top_filter
                         for (Object value : entry.getValue()) {
                             if (entry.getKey().startsWith(BlackboxUtils.MINUS)) {
                                 //Exclude any filter that begins with minus sign
-                                topFilter.mustNot(FilterBuilders.termFilter(entry.getKey().substring(1), value));
+                                topFilter.mustNot(QueryBuilders.terms().field(entry.getKey().substring(1)).terms(entryTerms).build()._toQuery());
                             } else {//Building "AND" filter
-                                topFilter.must(FilterBuilders.termFilter(entry.getKey(), value));
-                            }
+                                topFilter.must(QueryBuilders.terms().field(entry.getKey()).terms(entryTerms).build()._toQuery());}
                         }
                     }
                 }
@@ -133,7 +140,7 @@ public final class FilterUtils {
      * @return a bool_filter with date ranges appended
      */
 
-    public static BoolFilterBuilder addDateRangeFilter(BoolFilterBuilder boolFilter, DateRange dateRange) {
+    public static BoolQuery.Builder addDateRangeFilter(BoolQuery.Builder boolFilter, DateRange dateRange) {
         if (boolFilter == null) {
             throw new NullPointerException("Cannot append date ranges to a null bool_filter");
         }
@@ -148,7 +155,7 @@ public final class FilterUtils {
             if (Objects.nonNull(fromDate) || Objects.nonNull(toDate)) {
 
                 //Range within "created" field
-                boolFilter.should(FilterBuilders.rangeFilter(Params.DateField.CREATED).gte(fromDate).lte(toDate));
+                boolFilter.should(QueryBuilders.range().field(Params.DateField.CREATED).gte(JsonData.of(fromDate)).lte(JsonData.of(toDate)).build()._toQuery());
 
 
                 /*
@@ -162,8 +169,8 @@ public final class FilterUtils {
                                    from_date-----to_date
                                    madeAfter================================madeBefore
                 */
-                boolFilter.should(FilterBuilders.boolFilter()
-                        .must(FilterBuilders.rangeFilter(Params.DateField.MADE_AFTER).gte(fromDate).lte(toDate)));
+                boolFilter.should(QueryBuilders.bool()
+                        .must(QueryBuilders.range().field(Params.DateField.MADE_AFTER).gte(JsonData.of(fromDate)).lte(JsonData.of(toDate)).build()._toQuery()).build()._toQuery());
 
                /*
                  Here the condition in which madeBefore >= from_date and madeBefore <= to_date, we don't care
@@ -173,8 +180,8 @@ public final class FilterUtils {
                                                             from_date|------|to_date
                                    madeAfter================================|madeBefore
                 */
-                boolFilter.should(FilterBuilders.boolFilter()
-                        .must(FilterBuilders.rangeFilter(Params.DateField.MADE_BEFORE).gte(fromDate).lte(toDate)));
+                boolFilter.should(QueryBuilders.bool()
+                        .must(QueryBuilders.range().field(Params.DateField.MADE_BEFORE).gte(JsonData.of(fromDate)).lte(JsonData.of(toDate)).build()._toQuery()).build()._toQuery());
 
                  /*
                   This is a case that fromDate and toDate are within madeAfter and madeBefore range.
@@ -186,9 +193,12 @@ public final class FilterUtils {
                      made_after|---------------------------------------------------|made_before
                  */
                 if (dateRange.isPositive()) {
-                    boolFilter.should(FilterBuilders.boolFilter()
-                            .must(FilterBuilders.rangeFilter(Params.DateField.MADE_AFTER).lte(fromDate))
-                            .must(FilterBuilders.rangeFilter(Params.DateField.MADE_BEFORE).gte(toDate)));
+                    boolFilter.should(QueryBuilders.bool()
+                            .must(QueryBuilders.
+                                    range().field(Params.DateField.MADE_AFTER).lte(JsonData.of(fromDate)).build()._toQuery())
+                            .must(QueryBuilders.
+                                    range().field(Params.DateField.MADE_BEFORE).gte(JsonData.of(toDate)).build()._toQuery())
+                            .build()._toQuery());
 
                 }
             }
@@ -219,13 +229,14 @@ public final class FilterUtils {
                 return Collections.emptyMap();
             }
             for (String entry : selectedFilters) {
+                assert entry != null;
                 if (entry.lastIndexOf(FILTER_KEY_VALUE_SEPARATOR) != -1) {
                     //Get the index for the last occurrence of a separator
                     int lastIndex = entry.lastIndexOf(FILTER_KEY_VALUE_SEPARATOR);
                     String key = entry.substring(0, lastIndex).trim();
                     String value = entry.substring(lastIndex + 1).trim();
                     if (!filters.containsKey(key)) {
-                        filters.put(key, Lists.newArrayList(value));
+                        filters.put(key, List.of(value));
                     } else {
                         filters.get(key).add(value);
                     }
