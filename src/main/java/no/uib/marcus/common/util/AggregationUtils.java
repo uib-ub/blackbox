@@ -142,8 +142,7 @@ public final class AggregationUtils {
                             termsAggs = addSubAggregationFilter(aggregations, facet, termsAggs, selectedFacets);
                         }
                     }
-
-                    aggregationMap.put(facet.get("Field").getAsString(), termsAggs.build()._toAggregation())
+                    aggregationMap.put(facet.get("Field").getAsString(), termsAggs.build()._toAggregation());
                 }
             }
         }
@@ -154,7 +153,7 @@ public final class AggregationUtils {
      * Adds sub aggregation filter with the name "aggs_filter". Sub aggregations are added only to "OR" facets
      */
     private static TermsAggregation.Builder addSubAggregationFilter(String aggs, JsonObject currentFacet,
-                                                              Aggregation.Builder termsAggs,
+                                                              TermsAggregation.Builder termsAggs,
                                                               Map<String, List<String>> selectedFacets)
     {
         Boo.Builder aggsFilter = FilterUtils.getPostFilter(selectedFacets, aggs);

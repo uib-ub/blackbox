@@ -28,7 +28,7 @@ public final class LogUtils {
      *
      * @return  logs a JSON string
      ***/
-    public static String createLogMessage(HttpServletRequest request, SearchResponse<JsonNode> searchResponse) throws IOException {
+    public static String createLogMessage(HttpServletRequest request, SearchResponse<ObjectNode> searchResponse) throws IOException {
         //Get a copy of a parameter map
         Map<String, Object> parameterMapCopy = new HashMap<>(request.getParameterMap());
         //Remove aggregations from the logs
