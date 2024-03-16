@@ -1,6 +1,8 @@
 package no.uib.marcus.servlet;
 
 import co.elastic.clients.elasticsearch.ElasticsearchClient;
+import co.elastic.clients.elasticsearch.core.SearchResponse;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.json.JsonMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import no.uib.marcus.client.ElasticsearchClientFactory;
@@ -15,11 +17,8 @@ import no.uib.marcus.search.SearchBuilderFactory;
 
 import java.util.HashMap;
 import java.util.logging.Logger;
-import org.elasticsearch.action.search.SearchResponse;
-import org.elasticsearch.client.Client;
-import org.elasticsearch.common.Booleans;
+
 import no.uib.marcus.common.util.StringUtils;
-import org.elasticsearch.index.query.BoolFilterBuilder;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -117,10 +116,10 @@ public class SearchServlet extends HttpServlet {
                 builder.setPostFilter(postFilter);
             }
             //Send search request to Elasticsearch and execute
-            SearchResponse searchResponse = builder.executeSearch();
+            SearchResponse<ObjectNode> searchResponse = builder.executeSearch();
 
             //Decide whether to get a pretty JSON output or not
-            String searchResponseString = Booleans.isExplicitTrue(isPretty)
+            String searchResponseString =  Boolean.getBoolean(isPretty)
                     ? QueryUtils.toJsonString(searchResponse, true)
                     : QueryUtils.toJsonString(searchResponse, false);
 

@@ -2,7 +2,6 @@ package no.uib.marcus.servlet;
 
 import com.fasterxml.jackson.databind.json.JsonMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.google.gson.Gson;
 import no.uib.marcus.common.Params;
 import no.uib.marcus.common.util.StringUtils;
 import no.uib.marcus.search.suggestion.CompletionSuggestion;
@@ -43,8 +42,7 @@ public class SuggestionServlet extends HttpServlet {
 
         try (PrintWriter out = response.getWriter()) {
             int suggestSize = StringUtils.hasText(size) ? Integer.parseInt(size) : DEFAULT_SIZE;
-            jsonString = new Gson()
-                    .toJson(CompletionSuggestion.getSuggestions(suggestText, suggestSize, indices));
+            jsonString = new JsonMapper().writeValueAsString(CompletionSuggestion.getSuggestions(suggestText, suggestSize, indices));
             out.write(jsonString);
         }
     }
