@@ -1,6 +1,7 @@
 package no.uib.marcus.servlet;
 
 import co.elastic.clients.elasticsearch.ElasticsearchClient;
+import co.elastic.clients.elasticsearch.core.SearchResponse;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.json.JsonMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -9,8 +10,7 @@ import no.uib.marcus.common.Params;
 import no.uib.marcus.common.util.QueryUtils;
 import no.uib.marcus.search.MarcusDiscoveryBuilder;
 import no.uib.marcus.search.SearchBuilderFactory;
-import org.elasticsearch.action.search.SearchResponse;
-import org.elasticsearch.client.Client;
+
 import no.uib.marcus.common.util.StringUtils;
 
 import javax.servlet.ServletException;
@@ -62,7 +62,7 @@ public class DiscoveryServlet extends HttpServlet {
                 .setQueryString(queryString);
 
         try (PrintWriter out = response.getWriter()) {
-            SearchResponse searchResponse = service.executeSearch();
+            SearchResponse<ObjectNode> searchResponse =  service.executeSearch();
             out.write(QueryUtils.toJsonString(searchResponse, true));
         }
     }

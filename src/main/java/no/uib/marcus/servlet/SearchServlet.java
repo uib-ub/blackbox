@@ -1,6 +1,7 @@
 package no.uib.marcus.servlet;
 
 import co.elastic.clients.elasticsearch.ElasticsearchClient;
+import co.elastic.clients.elasticsearch._types.query_dsl.BoolQuery;
 import co.elastic.clients.elasticsearch.core.SearchResponse;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.json.JsonMapper;
@@ -104,14 +105,14 @@ public class SearchServlet extends HttpServlet {
                     .setIndexToBoost(indexToBoost);
 
             //Add top level filter, for "AND" aggregations
-            BoolFilterBuilder topFilter = FilterUtils.getTopFilter(
+            BoolQuery.Builder topFilter = FilterUtils.getTopFilter(
                     selectedFacets, aggs, DateRange.of(fromDate, toDate)
             );
             if (topFilter.hasClauses()) {
                 builder.setFilter(topFilter);
             }
             //Add post filter for "OR" aggregations if any
-            BoolFilterBuilder postFilter = FilterUtils.getPostFilter(selectedFacets, aggs);
+            BoolQuery.Builder postFilter = FilterUtils.getPostFilter(selectedFacets, aggs);
             if (postFilter.hasClauses()) {
                 builder.setPostFilter(postFilter);
             }
