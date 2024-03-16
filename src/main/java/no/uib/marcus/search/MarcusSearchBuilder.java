@@ -1,5 +1,6 @@
 package no.uib.marcus.search;
 
+import co.elastic.clients.elasticsearch.ElasticsearchClient;
 import no.uib.marcus.common.util.AggregationUtils;
 import no.uib.marcus.common.util.QueryUtils;
 import no.uib.marcus.common.util.SignatureUtils;
@@ -49,7 +50,7 @@ public class MarcusSearchBuilder extends AbstractSearchBuilder<MarcusSearchBuild
      *
      * @param client Elasticsearch client to communicate with a cluster.
      */
-    public MarcusSearchBuilder(@NotNull Client client) {
+    public MarcusSearchBuilder(@NotNull ElasticsearchClient client) {
         super(client);
     }
 

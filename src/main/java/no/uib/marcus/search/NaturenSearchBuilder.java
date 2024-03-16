@@ -1,5 +1,6 @@
 package no.uib.marcus.search;
 
+import co.elastic.clients.elasticsearch.ElasticsearchClient;
 import no.uib.marcus.common.Params;
 import no.uib.marcus.common.util.QueryUtils;
 import java.util.logging.Logger;
@@ -23,7 +24,7 @@ public class NaturenSearchBuilder extends MarcusSearchBuilder {
 
     private final Logger logger = Logger.getLogger(getClass().getName());
 
-    NaturenSearchBuilder(Client client) {
+    NaturenSearchBuilder(ElasticsearchClient client) {
         super(client);
     }
 

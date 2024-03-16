@@ -1,6 +1,8 @@
 package no.uib.marcus.search;
 
 import java.util.logging.Logger;
+
+import co.elastic.clients.elasticsearch.ElasticsearchClient;
 import org.elasticsearch.ElasticsearchException;
 import org.elasticsearch.action.search.SearchRequestBuilder;
 import org.elasticsearch.client.Client;
@@ -16,7 +18,7 @@ import org.elasticsearch.search.builder.SearchSourceBuilderException;
 public class MarcusDiscoveryBuilder extends AbstractSearchBuilder<MarcusDiscoveryBuilder> {
     private static final Logger logger = Logger.getLogger(MarcusDiscoveryBuilder.class.getName());
 
-    MarcusDiscoveryBuilder(Client client) {
+    MarcusDiscoveryBuilder(ElasticsearchClient client) {
         super(client);
     }
 

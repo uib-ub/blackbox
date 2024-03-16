@@ -1,6 +1,7 @@
 package no.uib.marcus.search;
 
 
+import co.elastic.clients.elasticsearch.ElasticsearchClient;
 import no.uib.marcus.common.util.AggregationUtils;
 import no.uib.marcus.common.util.SignatureUtils;
 import java.util.logging.Logger;
@@ -18,7 +19,7 @@ import org.elasticsearch.search.builder.SearchSourceBuilderException;
 public class WabSearchBuilder extends AbstractSearchBuilder<WabSearchBuilder> {
     private final Logger logger = Logger.getLogger(getClass().getName());
 
-    WabSearchBuilder(Client client) {
+    WabSearchBuilder(ElasticsearchClient client) {
         super(client);
     }
 

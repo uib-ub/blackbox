@@ -1,5 +1,6 @@
 package no.uib.marcus.search;
 
+import co.elastic.clients.elasticsearch.ElasticsearchClient;
 import no.uib.marcus.common.util.AggregationUtils;
 import no.uib.marcus.common.util.QueryUtils;
 import java.util.logging.Logger;
@@ -20,7 +21,7 @@ import org.elasticsearch.search.builder.SearchSourceBuilderException;
 public class SkaSearchBuilder extends MarcusSearchBuilder {
     private final Logger logger = Logger.getLogger(getClass().getName());
 
-    SkaSearchBuilder(Client client) {
+    SkaSearchBuilder(ElasticsearchClient client) {
         super(client);
     }
 

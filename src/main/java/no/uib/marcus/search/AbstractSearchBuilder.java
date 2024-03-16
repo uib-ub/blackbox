@@ -1,5 +1,6 @@
 package no.uib.marcus.search;
 
+import co.elastic.clients.elasticsearch.ElasticsearchClient;
 import co.elastic.clients.elasticsearch.core.SearchResponse;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -33,7 +34,7 @@ import java.util.Map;
  */
 public abstract class AbstractSearchBuilder<T extends AbstractSearchBuilder<T>> implements SearchBuilder<T> {
     private final Logger logger = Logger.getLogger(getClass().getName());
-    private Client client;
+    private ElasticsearchClient client;
     @Nullable
     private String[] indices;
     @Nullable
@@ -53,7 +54,7 @@ public abstract class AbstractSearchBuilder<T extends AbstractSearchBuilder<T>> 
      *
      * @param client a non-null Elasticsearch client to communicate with a cluster.
      */
-    protected AbstractSearchBuilder(@NotNull Client client) {
+    protected AbstractSearchBuilder(@NotNull ElasticsearchClient client) {
         if (client == null) {
             throw new IllegalParameterException("Unable to initialize service. Client cannot be null");
         }

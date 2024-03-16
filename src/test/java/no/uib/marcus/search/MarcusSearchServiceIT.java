@@ -1,5 +1,6 @@
 package no.uib.marcus.search;
 
+import co.elastic.clients.elasticsearch.ElasticsearchClient;
 import com.fasterxml.jackson.databind.json.JsonMapper;
 import junit.framework.TestCase;
 import no.uib.marcus.client.ElasticsearchClientFactory;
@@ -39,7 +40,7 @@ public class MarcusSearchServiceIT extends TestCase {
 
     private static final Logger logger = Logger.getLogger(MarcusSearchServiceIT.class.getName());
     private final String indexName = "test";
-    private Client client;
+    private ElasticsearchClient client;
 
     @Override
     @Before

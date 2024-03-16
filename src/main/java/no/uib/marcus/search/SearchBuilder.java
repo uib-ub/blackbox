@@ -1,11 +1,7 @@
 package no.uib.marcus.search;
 
-import org.elasticsearch.action.search.SearchRequestBuilder;
-import org.elasticsearch.action.search.SearchResponse;
-import org.elasticsearch.client.Client;
-import org.elasticsearch.common.Nullable;
-import org.elasticsearch.index.query.FilterBuilder;
-import org.elasticsearch.search.sort.SortBuilder;
+import co.elastic.clients.elasticsearch.ElasticsearchClient;
+import co.elastic.clients.elasticsearch.core.SearchResponse;
 
 import javax.validation.constraints.NotNull;
 import java.util.List;
@@ -22,7 +18,7 @@ public interface SearchBuilder<S> {
      *
      * @param client Elasticsearch client to communicate with a cluster. Cannot be <code>null</code>
      */
-    S setClient(@NotNull Client client);
+    S setClient(@NotNull ElasticsearchClient client);
 
     /**
      * Set up indices for the service, default to all indices in the cluster
@@ -103,6 +99,6 @@ public interface SearchBuilder<S> {
     /**
      * Get documents based on the service settings.
      */
-    SearchResponse executeSearch();
+    SearchResponse<ObjectNode> executeSearch();
 
 }
