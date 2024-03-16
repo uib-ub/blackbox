@@ -1,24 +1,20 @@
 package no.uib.marcus.search;
 
 import co.elastic.clients.elasticsearch.ElasticsearchClient;
+import co.elastic.clients.elasticsearch._types.SortOptions;
+import co.elastic.clients.elasticsearch._types.query_dsl.Query;
+import co.elastic.clients.elasticsearch.core.SearchRequest;
 import co.elastic.clients.elasticsearch.core.SearchResponse;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import no.uib.marcus.common.util.AggregationUtils;
 
 import java.util.Arrays;
 import java.util.logging.Logger;
-import org.elasticsearch.action.search.SearchPhaseExecutionException;
-import org.elasticsearch.action.search.SearchRequestBuilder;
-import org.elasticsearch.action.search.SearchResponse;
-import org.elasticsearch.client.Client;
-import org.elasticsearch.common.Nullable;
-import no.uib.marcus.common.util.StringUtils;
-import org.elasticsearch.index.query.FilterBuilder;
-import org.elasticsearch.search.sort.SortBuilder;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
+
+import javax.annotation.Nullable;
 import javax.validation.constraints.NotNull;
-import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
@@ -41,10 +37,10 @@ public abstract class AbstractSearchBuilder<T extends AbstractSearchBuilder<T>> 
     private String[] types;
     @Nullable
     private String queryString;
-    private FilterBuilder filter, postFilter;
+    private Query.Builder filter, postFilter;
     private Map<String, List<String>> selectedFacets;
     private String aggregations;
-    private SortBuilder sortBuilder;
+    private SortOptions.Builder sortBuilder;
     private String indexToBoost;
     private int from = 0;
     private int size = 10;
@@ -61,11 +57,6 @@ public abstract class AbstractSearchBuilder<T extends AbstractSearchBuilder<T>> 
         this.client = client;
     }
 
-    /**
-     * A "getThis" trick is a way to recover the type of the this object in the class hierarchies.
-     * It avoids the "unchecked warnings" from the compiler.
-     */
-    //protected abstract T getThis();
 
     /**
      * Ensure this string or array of string is neither null nor empty
@@ -99,7 +90,7 @@ public abstract class AbstractSearchBuilder<T extends AbstractSearchBuilder<T>> 
     /**
      * Get sort builder or <tt>null</tt> if not set
      */
-    public SortBuilder getSortBuilder() {
+    public SortOptions.Builder getSortBuilder() {
         return sortBuilder;
     }
 
@@ -110,7 +101,7 @@ public abstract class AbstractSearchBuilder<T extends AbstractSearchBuilder<T>> 
      * @return this object where sort has been set
      */
     @SuppressWarnings("unchecked")
-    public T setSortBuilder(SortBuilder sortBuilder) {
+    public T setSortBuilder(SortOptions.Builder sortBuilder) {
         this.sortBuilder = sortBuilder;
         return (T) this;
     }
@@ -118,7 +109,7 @@ public abstract class AbstractSearchBuilder<T extends AbstractSearchBuilder<T>> 
     /**
      * Get sort builder or <tt>null</tt> if not set
      **/
-    public FilterBuilder getFilter() {
+    public Query.Builder getFilter() {
         return filter;
     }
 
@@ -129,7 +120,7 @@ public abstract class AbstractSearchBuilder<T extends AbstractSearchBuilder<T>> 
      * @return this object where filter has been set
      */
     @SuppressWarnings("unchecked")
-    public T setFilter( filter) {
+    public T setFilter(Query.Builder filter) {
         this.filter = filter;
         return (T) this;
     }
@@ -137,7 +128,7 @@ public abstract class AbstractSearchBuilder<T extends AbstractSearchBuilder<T>> 
     /**
      * Get post filter or <tt>null</tt> if not set
      */
-    public FilterBuilder getPostFilter() {
+    public Query.Builder getPostFilter() {
         return postFilter;
     }
 
@@ -149,7 +140,7 @@ public abstract class AbstractSearchBuilder<T extends AbstractSearchBuilder<T>> 
      * @return this object where post_filter has been set
      */
     @SuppressWarnings("unchecked")
-    public T setPostFilter(FilterBuilder filter) {
+    public T setPostFilter(Query.Builder filter) {
         if(filter != null) {
             this.postFilter = filter;
         }
@@ -168,7 +159,7 @@ public abstract class AbstractSearchBuilder<T extends AbstractSearchBuilder<T>> 
      */
     @SuppressWarnings("unchecked")
     public T setIndexToBoost(String indexToBoost) {
-        if(StringUtils.hasText(indexToBoost)) {
+        if(!indexToBoost.isEmpty()) {
             this.indexToBoost = indexToBoost;
         }
         return (T) this;
@@ -200,7 +191,7 @@ public abstract class AbstractSearchBuilder<T extends AbstractSearchBuilder<T>> 
     /**
      * Get Elasticsearch client for this service
      */
-    public Client getClient() {
+    public ElasticsearchClient getClient() {
         return client;
     }
 
@@ -211,7 +202,7 @@ public abstract class AbstractSearchBuilder<T extends AbstractSearchBuilder<T>> 
      * @return this object where client has been set
      */
     @SuppressWarnings("unchecked")
-    public T setClient(@NotNull Client client) {
+    public T setClient(@NotNull ElasticsearchClient client) {
         if (client == null) {
             throw new IllegalParameterException("Unable to initialize service. Client cannot be null");
         }
@@ -240,6 +231,7 @@ public abstract class AbstractSearchBuilder<T extends AbstractSearchBuilder<T>> 
 
     /**
      * Get index types for this service
+     * Types are removed in elasticsearch 8
      */
     public String[] getTypes() {
         return types;
@@ -322,7 +314,7 @@ public abstract class AbstractSearchBuilder<T extends AbstractSearchBuilder<T>> 
      * Construct search request based on the service settings. Should be implemented by subclasses
      */
     @Override
-    public abstract SearchRequestBuilder constructSearchRequest();
+    public abstract SearchRequest.Builder constructSearchRequest();
 
     /**
      * Get all documents based on the service settings.
@@ -332,17 +324,18 @@ public abstract class AbstractSearchBuilder<T extends AbstractSearchBuilder<T>> 
     @Override
     @Nullable
     public SearchResponse<ObjectNode> executeSearch() {
-        SearchResponse response = null;
+
+        SearchResponse<ObjectNode> response = null;
         try {
-            response = constructSearchRequest().execute().actionGet();
+            response = client.search(constructSearchRequest().build(), ObjectNode.class);
             //Show response for debugging purpose
-            //logger.info(response.toString());
+            logger.info(response.toString());
             //System.out.println(response.toString());
-        } catch (SearchPhaseExecutionException e) {
+        } catch (java.io.IOException e) {
             //I've not found a direct way to validate a query string. Therefore, the idea here is to catch any
             //exception that is related to search execution.
-            //logger.severe("Could not execute search: " + e.getDetailedMessage());
-            throw e;
+            logger.severe("Could not execute search: " + e.getMessage());
+           // throw e;
         }
         return response;
     }
