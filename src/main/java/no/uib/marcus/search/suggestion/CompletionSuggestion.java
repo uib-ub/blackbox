@@ -1,6 +1,7 @@
 package no.uib.marcus.search.suggestion;
 
-import com.google.gson.Gson;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.json.JsonMapper;
 import no.uib.marcus.client.ElasticsearchClientFactory;
 import java.util.logging.Logger;
 import org.elasticsearch.action.suggest.SuggestRequestBuilder;
@@ -85,9 +86,8 @@ public class CompletionSuggestion {
     }
 
     //Main method for easy debugging
-    public static void main(String[] args) {
-        Gson gson = new Gson();
-        String jsonString = gson.toJson(
+    public static void main(String[] args) throws JsonProcessingException {
+        String jsonString = new JsonMapper().writeValueAsString(
                 CompletionSuggestion
                         .getSuggestions("Ms-114,120v[7]", 10, "wab"));
 
