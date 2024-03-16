@@ -1,17 +1,13 @@
 package no.uib.marcus.common.util;
 
+import co.elastic.clients.elasticsearch._types.query_dsl.Operator;
+import co.elastic.clients.elasticsearch._types.query_dsl.QueryStringQuery;
+import co.elastic.clients.elasticsearch._types.query_dsl.SimpleQueryStringQuery;
 import co.elastic.clients.elasticsearch.core.SearchResponse;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import org.elasticsearch.action.search.SearchResponse;
-import no.uib.marcus.common.util.StringUtils;
-import org.elasticsearch.common.xcontent.ToXContent;
-import org.elasticsearch.common.xcontent.XContentBuilder;
-import org.elasticsearch.common.xcontent.XContentFactory;
-import org.elasticsearch.index.query.QueryBuilders;
-import org.elasticsearch.index.query.QueryStringQueryBuilder;
-import org.elasticsearch.index.query.SimpleQueryStringBuilder;
 
-import java.io.IOException;
+
+import java.util.List;
 
 import static no.uib.marcus.common.util.BlackboxUtils.isNullOrEmpty;
 
@@ -37,13 +33,12 @@ public final class QueryUtils {
      * @param queryString a query string
      * @return a builder for simple query string
      */
-    public static SimpleQueryStringBuilder buildMarcusSimpleQueryString(String queryString) {
-        return QueryBuilders.simpleQueryStringQuery(queryString)
+    public static SimpleQueryStringQuery.Builder buildMarcusSimpleQueryString(String queryString) {
+        return new SimpleQueryStringQuery.Builder().query
+                (queryString)
                 .analyzer("default")//The custom "default" analyzer is defined in the "_settings".
-                .field("identifier")//Not analyzed field
-                .field("label", 3)//Not analyzed field.
-                .field("_all")
-                .defaultOperator(SimpleQueryStringBuilder.Operator.AND);
+                .fields(List.of("identifier","label","_all"))
+                .defaultOperator(Operator.And);
     }
 
     /**
@@ -52,13 +47,14 @@ public final class QueryUtils {
      * @param queryString a query string
      * @return a builder for query string
      */
-    public static QueryStringQueryBuilder buildMarcusQueryString(String queryString) {
-        return QueryBuilders.queryStringQuery(queryString)
+    public static QueryStringQuery.Builder buildMarcusQueryString(String queryString) {
+        QueryStringQuery.Builder builder = new QueryStringQuery.Builder();
+        return builder.query(queryString)
                 .analyzer("default")//The custom "default" analyzer is defined in the "_settings".
-                .field("identifier")//Not analyzed field
-                .field("label", 3)//Not analyzed field.
-                .field("_all")
-                .defaultOperator(QueryStringQueryBuilder.Operator.AND);
+                .fields(List.of("identifier" //Not analyzed field
+                        , "label" //Not analyzed field.
+                        , "_all"))
+                .defaultOperator(Operator.And);
     }
 
 
@@ -78,7 +74,6 @@ public final class QueryUtils {
         }
         return queryString;
     }
-
 
 
     /**
@@ -113,9 +108,9 @@ public final class QueryUtils {
         }
         if (isPretty) {
             //@todo
-            response.toString();
+          return  response.toString();
         }
-        response.toString();
+        return response.toString();
 
     }
 }
