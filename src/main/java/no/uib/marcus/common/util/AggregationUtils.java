@@ -6,14 +6,18 @@ import co.elastic.clients.elasticsearch._types.aggregations.Aggregation;
 import co.elastic.clients.elasticsearch._types.aggregations.AggregationBuilders;
 import co.elastic.clients.elasticsearch._types.aggregations.DateHistogramAggregation;
 import co.elastic.clients.elasticsearch._types.aggregations.TermsAggregation;
+import co.elastic.clients.elasticsearch._types.query_dsl.BoolQuery;
 import co.elastic.clients.elasticsearch.core.SearchRequest;
 import co.elastic.clients.util.NamedValue;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParseException;
-import com.google.gson.JsonParser;
+
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.json.JsonMapper;
 import no.uib.marcus.search.IllegalParameterException;
 
+import javax.json.Json;
 import java.util.logging.Logger;
 import java.util.HashMap;
 import java.util.List;
@@ -36,18 +40,46 @@ public final class AggregationUtils {
     }
 
     /**
+     *  Map<String, Aggregation> map = new HashMap<>();
+     *
+     *     Aggregation subAggregation = new Aggregation.Builder()
+     *         .avg(new AverageAggregation.Builder().field("revenue").build())
+     *         .build();
+     *
+     *     Aggregation aggregation = new Aggregation.Builder()
+     *         .terms(new TermsAggregation.Builder().field("director.keyword").build())
+     *         .aggregations(new HashMap<>() {{
+     *           put("avg_renevue", subAggregation);
+     *         }}).build();
+     *
+     *     map.put("agg_director", aggregation);
+     *
+     *     SearchRequest searchRequest = new SearchRequest.Builder()
+     *         .index("idx_name")
+     *         .size(0)
+     *         .aggregations(map)
+     *         .build();
+     */
+    /**
      * Validate aggregations
      *
      * @param jsonString aggregations as JSON string
-     * @return true if string is JSON array
+     * @ expects input to be valid json. Throws an exception if the string is not parseable as a json array
      * @throws IllegalParameterException if string is not JSON array
-     * @throws JsonParseException        is string is not valid JSON
      **/
     public static void validateAggregations(String jsonString) {
-        JsonElement element = new JsonParser().parse(jsonString);
-        if (!element.isJsonArray()) {
+        // rewrite from AI assistant using Jackson
+        ObjectMapper mapper = new ObjectMapper();
+        try {
+        JsonNode node = mapper.readTree(jsonString);
+        if (!node.isArray()){
             throw new IllegalParameterException(
                     "Aggregations must be valid JSON. Expected JSON Array of objects but found : [" + jsonString + "]");
+        }
+        } catch (JsonMappingException e) {
+            throw new RuntimeException(e);
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
         }
     }
 
@@ -69,26 +101,29 @@ public final class AggregationUtils {
             if (!StringUtils.hasText(aggregations)) {
                 return false;
             }
-            JsonElement facets = new JsonParser().parse(aggregations);
-            for (JsonElement e : facets.getAsJsonArray()) {
-                JsonObject facet = e.getAsJsonObject();
-                if (facet.has("field") && facet.has(key)) {
-                    String currentField = facet.get("field").getAsString();
-                    String currentValue = facet.get(key).getAsString();
-                    if (currentField.equals(field) && currentValue.equalsIgnoreCase(value)) {
-                        return true;
-                    }
-                }
+            ObjectMapper mapper = new ObjectMapper();
+            try {
+                JsonNode facets = mapper.readTree(aggregations);
+                for (JsonNode facet : facets)
+                    if (facet.has("field") && facet.has(key)) {
+                         String currentField = facet.get("field").asText();
+                         String currentValue = facet.get(key).asText();
+                         if (currentField.equals(field) && currentValue.equalsIgnoreCase(value)) {
+                             return true;
+                         }
+                     }
+            } catch (JsonMappingException e) {
+                throw new RuntimeException(e);
+            } catch (JsonProcessingException e) {
+                throw new RuntimeException(e);
             }
-        } catch (JsonParseException e) {
-            logger.warning("Aggregations should be valid JSON array, check the syntax for [" + aggregations + "]");
-            return false;
+        } catch (RuntimeException e) {
+            throw new RuntimeException(e);
         }
         return false;
     }
 
-
-    /**
+        /**
      * A method to append aggregations to the search request builder.
      *
      * @param searchRequest a search request builder
@@ -110,23 +145,27 @@ public final class AggregationUtils {
      */
     public static SearchRequest.Builder addAggregations(SearchRequest.Builder searchRequest,
                                                         String aggregations,
-                                                        Map<String, List<String>> selectedFacets)
-            throws JsonParseException, IllegalStateException {
-        JsonElement jsonElement = new JsonParser().parse(aggregations);
+                                                        Map<String, List<String>> selectedFacets) {
+        JsonMapper mapper = new JsonMapper();
+        JsonNode facets = null;
+        try {
+            facets = mapper.readTree(aggregations);
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
+        }
         Map<String, Aggregation> aggregationMap = new HashMap<>() ;
-        for (JsonElement facets : jsonElement.getAsJsonArray()) {
-            JsonObject facet = facets.getAsJsonObject();
+        for (JsonNode facet : facets) {
             if (facet.has("field")) {
                 //Add DateHistogram aggregations
                 //@todo add map of Map<String, Aggregation> and send once
-                if (facet.has("type") && facet.get("type").getAsString().equals("date_histogram")) {
-                    aggregationMap.put(facet.get("field").getAsString(),
+                if (facet.has("type") && facet.get("type").asText().equals("date_histogram")) {
+                    aggregationMap.put(facet.get("field").asText(),
                             AggregationUtils.getDateHistogramAggregation(facet).build()._toAggregation());
                 } else {
                     TermsAggregation.Builder termsAggs = constructTermsAggregation(facet);
                     if (selectedFacets != null && selectedFacets.size() > 0) {
                         //Get current field
-                        String facetField = facet.get("field").getAsString();
+                        String facetField = facet.get("field").asText();
                         // Logic: Whenever a user selects value from an "OR" aggregation,
                         // you add a corresponding filter (here aggs_filter) to all aggregations as sub aggregation
                         // EXCEPT for the aggregation in which the selection was performed in.
@@ -142,7 +181,7 @@ public final class AggregationUtils {
                             termsAggs = addSubAggregationFilter(aggregations, facet, termsAggs, selectedFacets);
                         }
                     }
-                    aggregationMap.put(facet.get("Field").getAsString(), termsAggs.build()._toAggregation());
+                    aggregationMap.put(facet.get("Field").asText(), termsAggs.build()._toAggregation());
                 }
             }
         }
@@ -152,14 +191,15 @@ public final class AggregationUtils {
     /**
      * Adds sub aggregation filter with the name "aggs_filter". Sub aggregations are added only to "OR" facets
      */
-    private static TermsAggregation.Builder addSubAggregationFilter(String aggs, JsonObject currentFacet,
+    private static TermsAggregation.Builder addSubAggregationFilter(String aggs, JsonNode currentFacet,
                                                               TermsAggregation.Builder termsAggs,
                                                               Map<String, List<String>> selectedFacets)
     {
-        Boo.Builder aggsFilter = FilterUtils.getPostFilter(selectedFacets, aggs);
+        BoolQuery.Builder aggsFilter = FilterUtils.getPostFilter(selectedFacets, aggs);
         if (aggsFilter.hasClauses()) {
             termsAggs = constructTermsAggregation(currentFacet, true);
-            termsAggs.subAggregation(AggregationBuilders.filter(AGGS_FILTER_KEY).filter(aggsFilter));
+            // create a sub aggregation to add to an aggregation
+            termsAggs = addSubAggregationFilter(AggregationBuilders.filter(AGGS_FILTER_KEY).filter(aggsFilter));
         }
         return termsAggs;
     }
@@ -171,8 +211,8 @@ public final class AggregationUtils {
      * @param facet a JSON object
      * @return a date histogram builder
      */
-    public static DateHistogramAggregation.Builder getDateHistogramAggregation(JsonObject facet) {
-        String field = facet.get("field").getAsString();
+    public static DateHistogramAggregation.Builder getDateHistogramAggregation(JsonNode facet) {
+        String field = facet.get("field").asText();
         //Create date histogram
         Map<String, Aggregation> dateHistogram ;
 
@@ -182,25 +222,25 @@ public final class AggregationUtils {
 
         //Set date format
         if (facet.has("format")) {
-            dateHistBuilder.format(facet.get("format").getAsString());
+            dateHistBuilder.format(facet.get("format").asText());
         }
         //Set interval
         if (facet.has("interval")) {
-            dateHistBuilder.interval(new Time.Builder().time(facet.get("interval").getAsString()).build());
+            dateHistBuilder.interval(new Time.Builder().time(facet.get("interval").asText()).build());
         }
         //Set number of minimum documents that should be returned
         if (facet.has("min_doc_count")) {
-            dateHistBuilder.minDocCount(facet.get("min_doc_count").getAsInt());
+            dateHistBuilder.minDocCount(facet.get("min_doc_count").asInt());
         }
         //Set order
         if (facet.has("order")) {
             NamedValue<SortOrder> order = new NamedValue<>("_count", SortOrder.Asc);;
 
-            if (facet.get("order").getAsString().equalsIgnoreCase("count_asc")) {
+            if (facet.get("order").asText().equalsIgnoreCase("count_asc")) {
                 order = new NamedValue<>("_count", SortOrder.Asc);
-            } else if (facet.get("order").getAsString().equalsIgnoreCase("count_desc")) {
+            } else if (facet.get("order").asText().equalsIgnoreCase("count_desc")) {
                 order = new NamedValue<>("_count", SortOrder.Desc);
-            } else if (facet.get("order").getAsString().equalsIgnoreCase("key_desc")) {
+            } else if (facet.get("order").asText().equalsIgnoreCase("key_desc")) {
                 order = new NamedValue<>("_key", SortOrder.Desc);
             }
             else {
@@ -218,16 +258,15 @@ public final class AggregationUtils {
      * @param sortBySubAggregation a flag whether to sort by sub aggregation filter
      * @return a term builder
      */
-    public static TermsAggregation.Builder constructTermsAggregation(JsonObject facet, boolean sortBySubAggregation) {
-        String field = facet.get("field").getAsString();
+    public static TermsAggregation.Builder constructTermsAggregation(JsonNode facet, boolean sortBySubAggregation) {
+        String field = facet.get("field").asText();
         TermsAggregation.Builder termsBuilder = new TermsAggregation.Builder();
         //Set size
         if (facet.has("size")) {
-            int size = facet.get("size").getAsInt();
+            int size = facet.get("size").asInt();
             termsBuilder.size(size);
         }
         //Set order
-        termsBuilder.order()
         Terms.Order subAggregationOrder = Terms.Order.aggregation(AGGS_FILTER_KEY, false);
         if (facet.has("order")) {
             Terms.Order order = Terms.Order.count(false);//default order (count descending)
@@ -254,7 +293,7 @@ public final class AggregationUtils {
         }
         //Set number of minimum documents that should be returned
         if (facet.has("min_doc_count")) {
-            int minDocCount = facet.get("min_doc_count").getAsInt();
+            int minDocCount = facet.get("min_doc_count").asInt();
             termsBuilder.minDocCount(minDocCount);
         }
         return termsBuilder;
@@ -266,7 +305,7 @@ public final class AggregationUtils {
      * @param facet a JSON object
      * @return a term builder
      */
-    public static TermsAggregation.Builder constructTermsAggregation(JsonObject facet) {
+    public static TermsAggregation.Builder constructTermsAggregation(JsonNode facet) {
         return constructTermsAggregation(facet, false);
     }
 
