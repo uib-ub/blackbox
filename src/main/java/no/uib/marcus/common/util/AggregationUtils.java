@@ -11,19 +11,16 @@ import co.elastic.clients.elasticsearch.core.SearchRequest;
 import co.elastic.clients.util.NamedValue;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.json.JsonMapper;
 import no.uib.marcus.search.IllegalParameterException;
 
-import javax.json.Json;
 import java.util.logging.Logger;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static co.elastic.clients.elasticsearch.watcher.ScheduleBuilders.interval;
 
 /**
  * Utility class for constructing aggregations.
@@ -39,27 +36,7 @@ public final class AggregationUtils {
     private AggregationUtils() {
     }
 
-    /**
-     *  Map<String, Aggregation> map = new HashMap<>();
-     *
-     *     Aggregation subAggregation = new Aggregation.Builder()
-     *         .avg(new AverageAggregation.Builder().field("revenue").build())
-     *         .build();
-     *
-     *     Aggregation aggregation = new Aggregation.Builder()
-     *         .terms(new TermsAggregation.Builder().field("director.keyword").build())
-     *         .aggregations(new HashMap<>() {{
-     *           put("avg_renevue", subAggregation);
-     *         }}).build();
-     *
-     *     map.put("agg_director", aggregation);
-     *
-     *     SearchRequest searchRequest = new SearchRequest.Builder()
-     *         .index("idx_name")
-     *         .size(0)
-     *         .aggregations(map)
-     *         .build();
-     */
+
     /**
      * Validate aggregations
      *
@@ -76,8 +53,6 @@ public final class AggregationUtils {
             throw new IllegalParameterException(
                     "Aggregations must be valid JSON. Expected JSON Array of objects but found : [" + jsonString + "]");
         }
-        } catch (JsonMappingException e) {
-            throw new RuntimeException(e);
         } catch (JsonProcessingException e) {
             throw new RuntimeException(e);
         }
@@ -112,8 +87,6 @@ public final class AggregationUtils {
                              return true;
                          }
                      }
-            } catch (JsonMappingException e) {
-                throw new RuntimeException(e);
             } catch (JsonProcessingException e) {
                 throw new RuntimeException(e);
             }
@@ -147,7 +120,7 @@ public final class AggregationUtils {
                                                         String aggregations,
                                                         Map<String, List<String>> selectedFacets) {
         JsonMapper mapper = new JsonMapper();
-        JsonNode facets = null;
+        JsonNode facets ;
         try {
             facets = mapper.readTree(aggregations);
         } catch (JsonProcessingException e) {
@@ -163,7 +136,7 @@ public final class AggregationUtils {
                             AggregationUtils.getDateHistogramAggregation(facet).build()._toAggregation());
                 } else {
                     TermsAggregation.Builder termsAggs = constructTermsAggregation(facet);
-                    if (selectedFacets != null && selectedFacets.size() > 0) {
+                    if (selectedFacets != null && !selectedFacets.isEmpty()) {
                         //Get current field
                         String facetField = facet.get("field").asText();
                         // Logic: Whenever a user selects value from an "OR" aggregation,
@@ -199,6 +172,28 @@ public final class AggregationUtils {
         if (aggsFilter.hasClauses()) {
             termsAggs = constructTermsAggregation(currentFacet, true);
             // create a sub aggregation to add to an aggregation
+            /**
+             *  Map<String, Aggregation> map = new HashMap<>();
+             *
+             *     Aggregation subAggregation = new Aggregation.Builder()
+             *         .avg(new AverageAggregation.Builder().field("revenue").build())
+             *         .build();
+             *
+             *     Aggregation aggregation = new Aggregation.Builder()
+             *         .terms(new TermsAggregation.Builder().field("director.keyword").build())
+             *         .aggregations(new HashMap<>() {{
+             *           put("avg_renevue", subAggregation);
+             *         }}).build();
+             *
+             *     map.put("agg_director", aggregation);
+             *
+             *     SearchRequest searchRequest = new SearchRequest.Builder()
+             *         .index("idx_name")
+             *         .size(0)
+             *         .aggregations(map)
+             *         .build();
+             */
+         //   termsAggs.term
             termsAggs = addSubAggregationFilter(AggregationBuilders.filter(AGGS_FILTER_KEY).filter(aggsFilter));
         }
         return termsAggs;
@@ -214,8 +209,6 @@ public final class AggregationUtils {
     public static DateHistogramAggregation.Builder getDateHistogramAggregation(JsonNode facet) {
         String field = facet.get("field").asText();
         //Create date histogram
-        Map<String, Aggregation> dateHistogram ;
-
         DateHistogramAggregation.Builder dateHistBuilder = new DateHistogramAggregation.Builder();
 
          dateHistBuilder.field(field);
@@ -234,7 +227,8 @@ public final class AggregationUtils {
         }
         //Set order
         if (facet.has("order")) {
-            NamedValue<SortOrder> order = new NamedValue<>("_count", SortOrder.Asc);;
+            NamedValue<SortOrder> order ;
+            //new NamedValue<>("_count", SortOrder.Asc);
 
             if (facet.get("order").asText().equalsIgnoreCase("count_asc")) {
                 order = new NamedValue<>("_count", SortOrder.Asc);
@@ -267,22 +261,48 @@ public final class AggregationUtils {
             termsBuilder.size(size);
         }
         //Set order
-        Terms.Order subAggregationOrder = Terms.Order.aggregation(AGGS_FILTER_KEY, false);
-        if (facet.has("order")) {
-            Terms.Order order = Terms.Order.count(false);//default order (count descending)
-            if (facet.get("order").getAsString().equalsIgnoreCase("count_asc")) {
-                order = Terms.Order.count(true);
-                subAggregationOrder = Terms.Order.aggregation(AGGS_FILTER_KEY, true);
-            } else if (facet.get("order").getAsString().equalsIgnoreCase("term_asc")) {
+        /**
+         *  Map<String, Aggregation> map = new HashMap<>();
+         *
+         *     Aggregation subAggregation = new Aggregation.Builder()
+         *         .avg(new AverageAggregation.Builder().field("revenue").build())
+         *         .build();
+         *
+         *     Aggregation aggregation = new Aggregation.Builder()
+         *         .terms(new TermsAggregation.Builder().field("director.keyword").build())
+         *         .aggregations(new HashMap<>() {{
+         *           put("avg_renevue", subAggregation);
+         *         }}).build();
+         *
+         *     map.put("agg_director", aggregation);
+         *
+         *     SearchRequest searchRequest = new SearchRequest.Builder()
+         *         .index("idx_name")
+         *         .size(0)
+         *         .aggregations(map)
+         *         .build();
+         */
 
-                order = Terms.Order.term(true);
-                subAggregationOrder = order; // for term_asc, sort by parent aggregation
-            } else if (facet.get("order").getAsString().equalsIgnoreCase("term_desc")) {
-                order = Terms.Order.term(false);
-                subAggregationOrder = order; // for term_desc, sort by parent aggregation
+        NamedValue<SortOrder> subAggregationOrder = new NamedValue<>("_count", SortOrder.Asc);
+      //  termsBuilder.order();
+
+      //  Terms.Order subAggregationOrder = Terms.Order.aggregation(AGGS_FILTER_KEY, false);
+        if (facet.has("order")) {
+
+            NamedValue<SortOrder> order = new NamedValue<>("_count",SortOrder.Desc);//default order (count descending)
+            if (facet.get("order").asText().equalsIgnoreCase("count_asc")) {
+                order = new NamedValue<>("_count",SortOrder.Asc);
+             //   subAggregationOrder = Terms.Order.aggregation(AGGS_FILTER_KEY, true);
+            } else if (facet.get("order").asText().equalsIgnoreCase("term_asc")) {
+
+            //    order = Terms.Order.term(true);
+            //    subAggregationOrder = order; // for term_asc, sort by parent aggregation
+            } else if (facet.get("order").asText().equalsIgnoreCase("term_desc")) {
+           //     order = Terms.Order.term(false);
+           //     subAggregationOrder = order; // for term_desc, sort by parent aggregation
             }
             if (sortBySubAggregation) {//Sort using sub aggregation
-                termsBuilder.order(subAggregationOrder);
+            //    termsBuilder.order(subAggregationOrder);
             } else { //sort normally using top aggregation
                 termsBuilder.order(order);
             }
