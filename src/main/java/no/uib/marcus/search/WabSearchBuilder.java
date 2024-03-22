@@ -4,8 +4,6 @@ package no.uib.marcus.search;
 import co.elastic.clients.elasticsearch.ElasticsearchClient;
 import co.elastic.clients.elasticsearch._types.query_dsl.*;
 import co.elastic.clients.elasticsearch.core.SearchRequest;
-import co.elastic.clients.util.ObjectBuilder;
-import com.google.gson.JsonParseException;
 import no.uib.marcus.common.util.AggregationUtils;
 import no.uib.marcus.common.util.SignatureUtils;
 
@@ -87,9 +85,7 @@ public class WabSearchBuilder extends AbstractSearchBuilder<WabSearchBuilder> {
 
             //Show builder for debugging purpose
             //logger.info(searchRequest.toString());
-        } catch (JsonParseException e) {
-            throw new RuntimeException(e);
-        } catch (IllegalStateException e) {
+        }  catch (IllegalStateException e) {
             throw new RuntimeException(e);
         }
         return searchRequest;
