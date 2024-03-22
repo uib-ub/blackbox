@@ -86,7 +86,7 @@ public class SkaSearchBuilder extends MarcusSearchBuilder {
             //Show builder for debugging purpose
             //logger.info(searchRequest.toString());
         } finally {
-            
+
         }
         return searchRequest;
     }

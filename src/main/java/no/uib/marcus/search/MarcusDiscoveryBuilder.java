@@ -1,14 +1,12 @@
 package no.uib.marcus.search;
 
+import java.util.List;
 import java.util.logging.Logger;
 
 import co.elastic.clients.elasticsearch.ElasticsearchClient;
-import org.elasticsearch.ElasticsearchException;
-import org.elasticsearch.action.search.SearchRequestBuilder;
-import org.elasticsearch.client.Client;
+import co.elastic.clients.elasticsearch._types.query_dsl.QueryBuilders;
+import co.elastic.clients.elasticsearch.core.SearchRequest;
 import no.uib.marcus.common.util.StringUtils;
-import org.elasticsearch.index.query.QueryBuilders;
-import org.elasticsearch.search.builder.SearchSourceBuilderException;
 
 /**
  * A basic builder to explore Marcus dataset
@@ -27,31 +25,31 @@ public class MarcusDiscoveryBuilder extends AbstractSearchBuilder<MarcusDiscover
      * Construct search request based on the service settings
      **/
     @Override
-    public SearchRequestBuilder constructSearchRequest() {
-        SearchRequestBuilder searchRequest = getClient().prepareSearch();
+    public SearchRequest.Builder constructSearchRequest() {
+        SearchRequest.Builder searchRequest = new SearchRequest.Builder();
         try {
             //Set indices
             if (isNeitherNullNorEmpty(getIndices())) {
-                searchRequest.setIndices(getIndices());
+                searchRequest.index(List.of(getIndices()));
             }
             //Set types
-            if (isNeitherNullNorEmpty(getTypes())) {
-                searchRequest.setTypes(getTypes());
-            }
+            // types removes
+         //   if (isNeitherNullNorEmpty(getTypes())) {
+         //       searchRequest.setTypes(getTypes());
+         //   }
             //Set query
             if (StringUtils.hasText(getQueryString())) {
-                searchRequest.setQuery(QueryBuilders.queryStringQuery(getQueryString()));
+                searchRequest.q(getQueryString());
             } else {
-                searchRequest.setQuery(QueryBuilders.matchAllQuery());
+                searchRequest.query(QueryBuilders.matchAll().build()._toQuery());
             }
             //Set from and size
-            searchRequest.setFrom(getFrom());
-            searchRequest.setSize(getSize());
+            searchRequest.from(getFrom());
+            searchRequest.size(getSize());
 
-        } catch (SearchSourceBuilderException se) {
-            logger.severe("Exception on preparing the request: " + se.getDetailedMessage());
-        } catch (ElasticsearchException ex) {
-            logger.severe(ex.getDetailedMessage());
+        }
+        finally {
+
         }
         return searchRequest;
     }
