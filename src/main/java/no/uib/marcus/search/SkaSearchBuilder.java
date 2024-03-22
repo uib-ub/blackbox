@@ -1,17 +1,18 @@
 package no.uib.marcus.search;
 
 import co.elastic.clients.elasticsearch.ElasticsearchClient;
+import co.elastic.clients.elasticsearch._types.query_dsl.FunctionScore;
+import co.elastic.clients.elasticsearch._types.query_dsl.Query;
+import co.elastic.clients.elasticsearch._types.query_dsl.QueryBuilders;
+import co.elastic.clients.elasticsearch.core.SearchRequest;
 import no.uib.marcus.common.util.AggregationUtils;
 import no.uib.marcus.common.util.QueryUtils;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.logging.Logger;
-import org.elasticsearch.action.search.SearchRequestBuilder;
-import org.elasticsearch.client.Client;
 import no.uib.marcus.common.util.StringUtils;
-import org.elasticsearch.index.query.FilterBuilders;
-import org.elasticsearch.index.query.QueryBuilder;
-import org.elasticsearch.index.query.QueryBuilders;
-import org.elasticsearch.index.query.functionscore.ScoreFunctionBuilders;
-import org.elasticsearch.search.builder.SearchSourceBuilderException;
 
 /**
  * Building a search service for Skeivtarkiv
@@ -29,52 +30,54 @@ public class SkaSearchBuilder extends MarcusSearchBuilder {
      * Construct a specific search request for SkA dataset
      **/
     @Override
-    public SearchRequestBuilder constructSearchRequest() {
-        QueryBuilder query;
-        SearchRequestBuilder searchRequest = getClient().prepareSearch();
+    public SearchRequest.Builder constructSearchRequest() {
+        Query query;
+        SearchRequest.Builder searchRequest = new SearchRequest.Builder();
         try {
 
             //Set indices
             if (isNeitherNullNorEmpty(getIndices())) {
-                searchRequest.setIndices(getIndices());
+                searchRequest.index(List.of(getIndices()));
             }
 
-            //Set types
-            if (isNeitherNullNorEmpty(getTypes())) {
-                searchRequest.setTypes(getTypes());
-            }
+            // types are removed from elasticsearch 2
+            //    if (isNeitherNullNorEmpty(getTypes())) {
+            //        searchRequest.setTypes(getTypes());
+            //    }
             //Set query
             if (StringUtils.hasText(getQueryString())) {
-                query = QueryUtils.buildMarcusQueryString(getQueryString());
+                query = QueryBuilders.simpleQueryString()
+                        .query(getQueryString()).build()._toQuery();
             } else {
                 //Boost documents of type "Manuskript" if nothing specified
-                query = QueryBuilders.functionScoreQuery(QueryBuilders.matchAllQuery())
-                        .add(FilterBuilders.termFilter("type", BoostType.INTERVJU),
-                                ScoreFunctionBuilders.weightFactorFunction(2));
+                query = QueryBuilders.functionScore().functions(List.of(new FunctionScore.Builder().weight(2.0).build())).query(QueryBuilders.matchAll().build()._toQuery()).build().query();
+
             }
             //Set query whether with or without filter
             if (getFilter() != null) {
-                searchRequest.setQuery(QueryBuilders.filteredQuery(query, getFilter()));
+                searchRequest.query(QueryBuilders.bool().filter(List.of(getFilter().build())).build()._toQuery());
             } else {
-                searchRequest.setQuery(query);
+                searchRequest.query(query);
             }
 
             //Set post filter
             if (getPostFilter() != null) {
-                searchRequest.setPostFilter(getPostFilter());
+                searchRequest.postFilter(getPostFilter().build());
             }
 
             //Set from and size
-            searchRequest.setFrom(getFrom());
-            searchRequest.setSize(getSize());
+            searchRequest.from(getFrom());
+            searchRequest.size(getSize());
 
             //Set sortBuilder
             if (getSortBuilder() != null) {
-                searchRequest.addSort(getSortBuilder());
+                searchRequest.sort(List.of(getSortBuilder().build()));
             }
             //Boost specific index
             if (getIndexToBoost() != null) {
-                searchRequest.addIndexBoost(getIndexToBoost(), 5.0f);
+                Map<String, Double> indexToBoost = new HashMap<>();
+                indexToBoost.put(getIndexToBoost(), 5.0);
+                searchRequest.indicesBoost(List.of(indexToBoost));
             }
             //Append aggregations to the request builder
             if (StringUtils.hasText(getAggregations())) {
@@ -82,8 +85,8 @@ public class SkaSearchBuilder extends MarcusSearchBuilder {
             }
             //Show builder for debugging purpose
             //logger.info(searchRequest.toString());
-        } catch (SearchSourceBuilderException e) {
-            logger.severe("Exception occurred when building search request: " + e.getMostSpecificCause());
+        } finally {
+            
         }
         return searchRequest;
     }
