@@ -135,7 +135,7 @@ public final class AggregationUtils {
                     aggregationMap.put(facet.get("field").asText(),
                             AggregationUtils.getDateHistogramAggregation(facet).build()._toAggregation());
                 } else {
-                    TermsAggregation.Builder termsAggs = constructTermsAggregation(facet);
+                    Aggregation.Builder termsAggs = constructTermsAggregation(facet);
                     if (selectedFacets != null && !selectedFacets.isEmpty()) {
                         //Get current field
                         String facetField = facet.get("field").asText();
@@ -154,7 +154,7 @@ public final class AggregationUtils {
                             termsAggs = addSubAggregationFilter(aggregations, facet, termsAggs, selectedFacets);
                         }
                     }
-                    aggregationMap.put(facet.get("Field").asText(), termsAggs.build()._toAggregation());
+                    aggregationMap.put(facet.get("Field").asText(), termsAggs);
                 }
             }
         }
@@ -164,13 +164,17 @@ public final class AggregationUtils {
     /**
      * Adds sub aggregation filter with the name "aggs_filter". Sub aggregations are added only to "OR" facets
      */
-    private static TermsAggregation.Builder addSubAggregationFilter(String aggs, JsonNode currentFacet,
-                                                              TermsAggregation.Builder termsAggs,
+    private static Aggregation addSubAggregationFilter(String aggs, JsonNode currentFacet,
+                                                              Aggregation.Builder aggBuilder,
                                                               Map<String, List<String>> selectedFacets)
     {
         BoolQuery.Builder aggsFilter = FilterUtils.getPostFilter(selectedFacets, aggs);
+        Map<String, Aggregation> subAggregationMap = new HashMap<>();
         if (aggsFilter.hasClauses()) {
-            termsAggs = constructTermsAggregation(currentFacet, true);
+            aggBuilder = constructTermsAggregation(currentFacet, true);
+            subAggregationMap.put(AGGS_FILTER_KEY, new Aggregation.Builder().filter(aggsFilter.build()._toQuery()).build());
+            return  new Aggregation.Builder().aggregations(subAggregationMap).filter(aggsFilter.build()._toQuery()).build();
+
             // create a sub aggregation to add to an aggregation
             /**
              *  Map<String, Aggregation> map = new HashMap<>();
@@ -193,10 +197,9 @@ public final class AggregationUtils {
              *         .aggregations(map)
              *         .build();
              */
-         //   termsAggs.term
-            termsAggs = addSubAggregationFilter(AggregationBuilders.filter(AGGS_FILTER_KEY).filter(aggsFilter));
-        }
-        return termsAggs;
+         //   aggBuilder.term
+   }
+        return aggBuilder.aggregations(sub);
     }
 
 
@@ -219,7 +222,7 @@ public final class AggregationUtils {
         }
         //Set interval
         if (facet.has("interval")) {
-            dateHistBuilder.interval(new Time.Builder().time(facet.get("interval").asText()).build());
+            dateHistBuilder.fixedInterval(new Time.Builder().time(facet.get("interval").asText()).build());
         }
         //Set number of minimum documents that should be returned
         if (facet.has("min_doc_count")) {
@@ -252,8 +255,9 @@ public final class AggregationUtils {
      * @param sortBySubAggregation a flag whether to sort by sub aggregation filter
      * @return a term builder
      */
-    public static TermsAggregation.Builder constructTermsAggregation(JsonNode facet, boolean sortBySubAggregation) {
+    public static Aggregation.Builder constructTermsAggregation(JsonNode facet, boolean sortBySubAggregation) {
         String field = facet.get("field").asText();
+        Aggregation.Builder aggBuilder = new Aggregation.Builder();
         TermsAggregation.Builder termsBuilder = new TermsAggregation.Builder();
         //Set size
         if (facet.has("size")) {
@@ -316,7 +320,7 @@ public final class AggregationUtils {
             int minDocCount = facet.get("min_doc_count").asInt();
             termsBuilder.minDocCount(minDocCount);
         }
-        return termsBuilder;
+        return aggBuilder;
     }
 
     /**
@@ -325,7 +329,7 @@ public final class AggregationUtils {
      * @param facet a JSON object
      * @return a term builder
      */
-    public static TermsAggregation.Builder constructTermsAggregation(JsonNode facet) {
+    public static Aggregation.Builder constructTermsAggregation(JsonNode facet) {
         return constructTermsAggregation(facet, false);
     }
 
