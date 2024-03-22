@@ -136,6 +136,7 @@ public final class AggregationUtils {
                             AggregationUtils.getDateHistogramAggregation(facet).build()._toAggregation());
                 } else {
                     Aggregation.Builder termsAggs = constructTermsAggregation(facet);
+                    Aggregation agg;
                     if (selectedFacets != null && !selectedFacets.isEmpty()) {
                         //Get current field
                         String facetField = facet.get("field").asText();
@@ -149,12 +150,13 @@ public final class AggregationUtils {
                             selectedFacetCopy.remove(facetField);
                             //Build bool_filter for the copy of the selected facets.
                             //We build sub aggregation filter only for "OR" facets
-                            termsAggs = addSubAggregationFilter(aggregations, facet, termsAggs, selectedFacetCopy);
+                            agg = addSubAggregationFilter(aggregations, facet, termsAggs, selectedFacetCopy);
+                            aggregationMap.put(facet.get("field").asText(),agg);
                         } else {
-                            termsAggs = addSubAggregationFilter(aggregations, facet, termsAggs, selectedFacets);
+                            agg = addSubAggregationFilter(aggregations, facet, termsAggs, selectedFacets);
+                            aggregationMap.put(facet.get("field").asText(),agg);
                         }
                     }
-                    aggregationMap.put(facet.get("Field").asText(), termsAggs);
                 }
             }
         }
@@ -199,7 +201,7 @@ public final class AggregationUtils {
              */
          //   aggBuilder.term
    }
-        return aggBuilder.aggregations(sub);
+        return aggBuilder.filter(aggsFilter.build()._toQuery()).build();
     }
 
 
