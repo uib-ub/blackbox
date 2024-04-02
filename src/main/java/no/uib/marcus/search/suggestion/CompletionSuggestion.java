@@ -1,16 +1,18 @@
 package no.uib.marcus.search.suggestion;
 
+import co.elastic.clients.elasticsearch.ElasticsearchClient;
+import co.elastic.clients.elasticsearch.core.SearchResponse;
+import co.elastic.clients.elasticsearch.core.search.*;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.json.JsonMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import no.uib.marcus.client.ElasticsearchClientFactory;
-import java.util.logging.Logger;
-import org.elasticsearch.action.suggest.SuggestRequestBuilder;
-import org.elasticsearch.action.suggest.SuggestResponse;
-import org.elasticsearch.common.Nullable;
-import org.elasticsearch.search.suggest.Suggest;
-import org.elasticsearch.search.suggest.SuggestBuilder.SuggestionBuilder;
-import org.elasticsearch.search.suggest.completion.CompletionSuggestionBuilder;
+import co.elastic.clients.elasticsearch.core.SearchRequest.Builder;
 
+import javax.annotation.Nullable;
+import java.io.IOException;
+import java.util.logging.Logger;
 import java.util.*;
 
 /**
@@ -23,6 +25,7 @@ public class CompletionSuggestion {
 
     private static final Logger logger = Logger.getLogger(CompletionSuggestion.class.getName());
     private static final String SUGGEST_FIELD = "suggest";
+    private static Suggester.Builder suggesterBuilder;
 
     /**A method to get a list of suggestions.
      * @param text input text
@@ -32,19 +35,18 @@ public class CompletionSuggestion {
      **/
     public static Set<String> getSuggestions(String text, int size, @Nullable String... indices) {
         Set<String> suggestValues = new HashSet<>();
+        Builder builder = new Builder();
         try {
-            SuggestResponse suggestResponse = getSuggestionResponse(text, size, indices);
+            SearchResponse<ObjectNode> suggestResponse = getSuggestionResponse(text, size, indices);
 
             //Add each option(value) to a set to ensure no repetition
-            for (Suggest.Suggestion.Entry.Option option : suggestResponse
-                    .getSuggest()
-                    .getSuggestion("completion_suggestion")
-                    .iterator()
-                    .next()
-                    .getOptions()) {
+            for ( Suggestion<ObjectNode> option : suggestResponse
+                    .suggest()
+                    .get("completion_suggestion")
+                    ) {
                 // Lowecasing is done via ubb-rdf-river
                 // suggestValues.add(option.getText().string().toLowerCase());
-                suggestValues.add(option.getText().string());
+                suggestValues.add(option.toString());
             }
         } catch (Exception e) {
             logger.severe("Unable to perform suggestion for text: [" + text + "]. Message: " + e.getLocalizedMessage()) ;
@@ -59,30 +61,25 @@ public class CompletionSuggestion {
      * @param indices array of one or more setIndices, can be <code>null</code>
      * @return a suggestion response.
      **/
-    public static SuggestResponse getSuggestionResponse(String text, int size, @Nullable String... indices) {
-        SuggestionBuilder suggestionsBuilder = new CompletionSuggestionBuilder("completion_suggestion");
-        SuggestResponse suggestResponse = null;
-        SuggestRequestBuilder suggestRequest;
+    public static SearchResponse<ObjectNode> getSuggestionResponse(String text, int size, @Nullable String... indices) throws IOException {
+        Map<String, FieldSuggester> map = new HashMap<>();
+        map.put(SUGGEST_FIELD,FieldSuggester.of(fs -> fs
+                .completion(cs -> cs.skipDuplicates(true)
+                        .size(size)
+                        .field(SUGGEST_FIELD))));
 
-        try {
-            suggestionsBuilder.field(SUGGEST_FIELD);
-            suggestionsBuilder.text(text);
-            suggestionsBuilder.size(size);
-
-            suggestRequest = ElasticsearchClientFactory.getElasticsearchClient().prepareSuggest();
-            suggestRequest.addSuggestion(suggestionsBuilder);
-
-            if (indices != null && indices.length > 0) {
-                suggestRequest.setIndices(indices);
-            }
-
-            //Execute suggestions
-            suggestResponse = suggestRequest.execute().actionGet();
-
-        } catch (Exception e) {
-           logger.severe("Exception " +  e.getLocalizedMessage());
+        Suggester suggester = Suggester.of(sf -> sf.suggesters(map).text(text));
+       // Suggester.Builder suggesterBuilder = new Suggester.Builder().completion(new CompletionSuggester.Builder().field(SUGGEST_FIELD).size(size).build()._toFieldSuggester());
+        Builder builder = new Builder();
+        builder.suggest(suggester);
+       // builder.suggest(suggesterBuilder.suggesters("test", FieldSuggester.of(new FieldSuggester.Builder().)).text(text).build());
+        ElasticsearchClient client = ElasticsearchClientFactory.getElasticsearchClient();
+        if (indices != null && indices.length > 0) {
+            builder.index(List.of(indices));
         }
-        return suggestResponse;
+        builder.size(size);
+        SearchResponse<ObjectNode> response = client.search(builder.build(), ObjectNode.class);
+        return response;
     }
 
     //Main method for easy debugging
