@@ -101,7 +101,7 @@ public class SearchServlet extends HttpServlet {
                     .setFrom(_from)
                     .setSize(_size)
                     .setSelectedFacets(selectedFacets)
-                    .setSortBuilder(SortUtils.getSort(sortString))
+                // @todo   .setSortBuilder(SortUtils.getSort(sortString))
                     .setIndexToBoost(indexToBoost);
 
             //Add top level filter, for "AND" aggregations
@@ -109,12 +109,12 @@ public class SearchServlet extends HttpServlet {
                     selectedFacets, aggs, DateRange.of(fromDate, toDate)
             );
             if (topFilter.hasClauses()) {
-                builder.setFilter(topFilter);
+        // @todo        builder.setFilter(topFilter);
             }
             //Add post filter for "OR" aggregations if any
             BoolQuery.Builder postFilter = FilterUtils.getPostFilter(selectedFacets, aggs);
             if (postFilter.hasClauses()) {
-                builder.setPostFilter(postFilter);
+           // @todo     builder.setPostFilter(postFilter);
             }
             //Send search request to Elasticsearch and execute
             SearchResponse<ObjectNode> searchResponse = builder.executeSearch();
