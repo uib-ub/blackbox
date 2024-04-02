@@ -41,7 +41,7 @@ public final class LogUtils {
         responseMap.put("took", searchResponse == null ? -1 : searchResponse.took());
 
         ObjectNode objectNode = new JsonMapper().createObjectNode()
-                .setAll(new JsonMapper().convertValue(jsonify(parameterMapCopy),ObjectNode.class));
+                .setAll(new JsonMapper().convertValue(jsonify(responseMap),ObjectNode.class));
         objectNode
 
         //@todo not able to find status .field("status", searchResponse == null? 404 : searchResponse.status().getStatus())
