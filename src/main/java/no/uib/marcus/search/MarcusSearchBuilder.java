@@ -1,26 +1,22 @@
 package no.uib.marcus.search;
 
 import co.elastic.clients.elasticsearch.ElasticsearchClient;
+import co.elastic.clients.elasticsearch._types.query_dsl.FunctionScore;
+import co.elastic.clients.elasticsearch._types.query_dsl.FunctionScoreQuery;
+import co.elastic.clients.elasticsearch._types.query_dsl.Query;
+import co.elastic.clients.elasticsearch._types.query_dsl.QueryBuilders;
+import co.elastic.clients.elasticsearch.core.SearchRequest;
 import no.uib.marcus.common.util.AggregationUtils;
 import no.uib.marcus.common.util.QueryUtils;
 import no.uib.marcus.common.util.SignatureUtils;
+
+import java.util.*;
 import java.util.logging.Logger;
-import org.elasticsearch.ElasticsearchException;
-import org.elasticsearch.action.search.SearchRequestBuilder;
-import org.elasticsearch.action.search.SearchResponse;
-import org.elasticsearch.client.Client;
+
 import no.uib.marcus.common.util.StringUtils;
-import org.elasticsearch.index.query.FilterBuilders;
-import org.elasticsearch.index.query.QueryBuilder;
-import org.elasticsearch.index.query.QueryBuilders;
-import org.elasticsearch.index.query.functionscore.FunctionScoreQueryBuilder;
-import org.elasticsearch.search.builder.SearchSourceBuilderException;
 
 import javax.validation.constraints.NotNull;
-import java.util.Optional;
-import java.util.Random;
 
-import static org.elasticsearch.index.query.functionscore.ScoreFunctionBuilders.weightFactorFunction;
 
 /**
  * Builder for Marcus search service
@@ -66,102 +62,92 @@ public class MarcusSearchBuilder extends AbstractSearchBuilder<MarcusSearchBuild
      * Construct search request based on the service settings.
      */
     @Override
-    public SearchRequestBuilder constructSearchRequest() {
-        QueryBuilder query;
-        FunctionScoreQueryBuilder functionScoreQueryBuilder;
-        SearchRequestBuilder searchRequest = getClient().prepareSearch();
+    public SearchRequest.Builder constructSearchRequest() {
+        {
+            Query query;
+            FunctionScoreQuery.Builder functionScoreQueryBuilder;
+            SearchRequest.Builder searchRequest = new SearchRequest.Builder();
 
-        try {
-            //Set indices
-            if (isNeitherNullNorEmpty(getIndices())) {
-                searchRequest.setIndices(getIndices());
-            }
+            try {
+                //Set indices
+                if (isNeitherNullNorEmpty(getIndices())) {
+                    searchRequest.index(List.of(getIndices()));
+                }
 
-            //Set types
-            if (isNeitherNullNorEmpty(getTypes())) {
-                searchRequest.setTypes(getTypes());
-            }
+                //Set types
+                // removed in ES 2.X
+                //    if (isNeitherNullNorEmpty(getTypes())) {
+                //         searchRequest.setTypes(getTypes());
+                //     }
 
-            //Set from and size
-            searchRequest.setFrom(getFrom());
-            searchRequest.setSize(getSize());
+                //Set from and size
+                searchRequest.from(getFrom());
+                searchRequest.size(getSize());
 
-            //Set query
-            if (StringUtils.hasText(getQueryString())) {
-                //Use query_string query with AND operator
-                functionScoreQueryBuilder = QueryBuilders
-                        .functionScoreQuery(QueryUtils.buildMarcusQueryString(getQueryString()));
-            } else {
-                //Boost documents inside the "random list" of places because they beautify the front page.
-                //This is just for coolness and it has no effect if the query yields no results
-                String randomQueryString = randomPictures[new Random().nextInt(randomPictures.length)];
-                functionScoreQueryBuilder = QueryBuilders.functionScoreQuery(QueryBuilders.matchAllQuery())
-                        .add(FilterBuilders.queryFilter(QueryBuilders.simpleQueryStringQuery(randomQueryString)),
-                                weightFactorFunction(2));
-            }
-            //Boost documents of type "Fotografi" for every query performed.
-            query = functionScoreQueryBuilder
-                    .add(FilterBuilders.termFilter("type", BoostType.FOTOGRAFI), weightFactorFunction(3))
-                    .add(FilterBuilders.termFilter("type", BoostType.BILDE), weightFactorFunction(3));
+                //Set query
+                if (StringUtils.hasText(getQueryString())) {
+                    //Use query_string query with AND operator
+                    functionScoreQueryBuilder = QueryBuilders.functionScore().query(QueryUtils.buildMarcusQueryString(getQueryString()).build()._toQuery());
 
-            //Set filtered query with top_filter
-            if (getFilter() != null) {
-                //Note: Filtered query is deprecated from ES v2.0
-                //in favour of a new filter clause on the bool query
-                //Read https://www.elastic.co/blog/better-query-execution-coming-elasticsearch-2-0
-                searchRequest.setQuery(QueryBuilders.filteredQuery(query, getFilter()));
-            } else {
-                searchRequest.setQuery(query);
-            }
-            //Set post filter if available
-            if (getPostFilter() != null) {
-                searchRequest.setPostFilter(getPostFilter());
-            }
-            //Set index to boost
-            if (getIndexToBoost() != null) {
-                searchRequest.addIndexBoost(getIndexToBoost(), 4.0f);
-            }
-            //Set options
-            if (getSortBuilder() != null) {
-                searchRequest.addSort(getSortBuilder());
-            }
-            //Append aggregations to the request builder
-            if (StringUtils.hasText(getAggregations())) {
-                AggregationUtils.addAggregations(searchRequest, getAggregations(), getSelectedFacets());
-            }
+                } else {
+                    //Boost documents inside the "random list" of places because they beautify the front page.
+                    //This is just for coolness and it has no effect if the query yields no results
+                    String randomQueryString = randomPictures[new Random().nextInt(randomPictures.length)];
+                    functionScoreQueryBuilder = QueryBuilders.functionScore().query(QueryBuilders.matchAll().build()._toQuery()).functions(
+                            List.of(new FunctionScore.Builder().filter(QueryBuilders.simpleQueryString().query(randomQueryString).build()._toQuery()).weight(2.0).build()));
+                }
+                //Boost documents of type "Fotografi" for every query performed.
+                // @todo ? reimplement boost
+                //  query = functionScoreQueryBuilder.functions(List.of(new FunctionScore.Builder().filter(
+                //          QueryBuilders.terms().field("type").terms(FOTOGRAFI)
+                //          )))
+                //          .add(FilterBuilders.termFilter("type", BoostType.FOTOGRAFI), weightFactorFunction(3))
+                //          .add(FilterBuilders.termFilter("type", BoostType.BILDE), weightFactorFunction(3));
 
-            //Show builder for debugging purpose
-            //logger.info(searchRequest.toString());
-            //System.out.println(searchRequest.toString());
-        } catch (SearchSourceBuilderException e) {
-            logger.severe("Exception occurred when building search request: " + e.getMostSpecificCause());
+                //Set filtered query with top_filter
+                if (getFilter() != null) {
+                    //Note: Filtered query is deprecated from ES v2.0
+                    //in favour of a new filter clause on the bool query
+                    //Read https://www.elastic.co/blog/better-query-execution-coming-elasticsearch-2-0
+                    searchRequest.query(QueryBuilders.bool().filter(List.of(getFilter().build())).build()._toQuery());
+                } else {
+                    searchRequest.query(functionScoreQueryBuilder.build()._toQuery());
+                }
+                //Set post filter if available
+                if (getPostFilter() != null) {
+                    searchRequest.postFilter(getPostFilter().build());
+                }
+                //Set index to boost
+                if (getIndexToBoost() != null) {
+                    Map<String, Double> indexToBoost = new HashMap<>();
+                    indexToBoost.put(getIndexToBoost(), 5.0);
+                    searchRequest.indicesBoost(List.of(indexToBoost));
+                }
+
+
+                //Set options
+                if (getSortBuilder() != null) {
+                    searchRequest.sort(List.of(getSortBuilder().build()));
+                }
+                //Append aggregations to the request builder
+                if (StringUtils.hasText(getAggregations())) {
+                    AggregationUtils.addAggregations(searchRequest, getAggregations(), getSelectedFacets());
+                }
+
+                //Show builder for debugging purpose
+                //logger.info(searchRequest.toString());
+                //System.out.println(searchRequest.toString());
+
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+            return searchRequest;
         }
-        return searchRequest;
-    }
-
-    /**
-     * Experimental search response
-     *
-     * @param request
-     * @return optional search response
-     */
-    private Optional<SearchResponse> getSearchResponse(SearchRequestBuilder request) {
-        Optional<SearchResponse> optionalResponse = Optional.empty();
-        try {
-            SearchResponse response = request.execute().actionGet();
-            if (response.getHits().getTotalHits() > -1) {
-                optionalResponse = Optional.of(response);
-            }
-        } catch (ElasticsearchException e) {
-            logger.severe(e.getDetailedMessage());
-        }
-        return optionalResponse;
-    }
-
     //Type to be boosted if nothing is specified
-    static class BoostType {
-        final static String FOTOGRAFI = "fotografi";
-        final static String BILDE = "bilde";
-    }
+ //   static class BoostType {
+  //      final static String FOTOGRAFI = "fotografi";
+  //      final static String BILDE = "bilde";
+  //  }
+}
 }
 
