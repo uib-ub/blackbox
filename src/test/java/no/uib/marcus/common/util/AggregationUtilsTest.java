@@ -8,6 +8,7 @@ import java.util.logging.Logger;
 import org.elasticsearch.index.query.BoolFilterBuilder;
 import org.elasticsearch.index.query.FilterBuilders;
 import org.junit.Test;
+import static org.junit.Assert.*;
 
 import java.util.*;
 

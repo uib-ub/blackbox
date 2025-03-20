@@ -9,6 +9,8 @@ import org.junit.Test;
 import java.io.IOException;
 import java.util.Map;
 
+import static org.junit.Assert.*;
+
 public class SettingsLoaderTest extends RandomizedTest {
     private final Logger logger = Logger.getLogger(getClass().getName());
 
