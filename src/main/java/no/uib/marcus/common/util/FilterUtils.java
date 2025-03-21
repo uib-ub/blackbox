@@ -9,6 +9,7 @@ import co.elastic.clients.json.JsonData;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import no.uib.marcus.common.Params;
 import no.uib.marcus.range.DateRange;
+
 import java.util.logging.Logger;
 
 import java.time.LocalDate;
@@ -258,7 +259,7 @@ public final class FilterUtils {
                     String key = entry.substring(0, lastIndex).trim();
                     String value = entry.substring(lastIndex + 1).trim();
                     if (!filters.containsKey(key)) {
-                        filters.put(key, List.of(value));
+                        filters.put(key, new ArrayList<>(List.of(value)));
                     } else {
                         filters.get(key).add(value);
                     }
@@ -267,6 +268,7 @@ public final class FilterUtils {
         } catch (Exception ex) {
             logger.severe("Exception occurred while constructing a map from selected filters: " + ex.getMessage());
         }
+        logger.info("returning filters " + filters.toString());
         return filters;
     }
 }
