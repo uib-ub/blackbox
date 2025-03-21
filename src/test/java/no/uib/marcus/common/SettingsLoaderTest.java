@@ -9,6 +9,8 @@ import org.junit.Test;
 import java.io.IOException;
 import java.util.Map;
 
+import static org.junit.Assert.*;
+
 public class SettingsLoaderTest extends RandomizedTest {
     private final Logger logger = Logger.getLogger(getClass().getName());
 
@@ -39,7 +41,7 @@ public class SettingsLoaderTest extends RandomizedTest {
      * Testing loading non-existing file from resource
      */
     @Test(expected = UnavailableResourceException.class)
-    public void testFileUnavailableFileFromResource() {
+    public void testFileUnavailableFileFromResource() throws IOException {
         new JsonFileLoader().loadFromResource("hakuna-matata.json");
     }
 
@@ -52,16 +54,21 @@ public class SettingsLoaderTest extends RandomizedTest {
         //We use this for testing..
         String fileName = "config.template.example.json";
         JsonFileLoader loader = new JsonFileLoader();
-        String jsonString;
+        // String jsonString;
+        Map<String, Map> jsonStringMap;
         try {
-            jsonString = loader.loadFromResource(fileName);
+            // jsonString = loader.loadFromResource(fileName);
+            jsonStringMap = loader.loadFromResource(fileName);
         } catch (UnavailableResourceException ex) {
             //Load from resource
             fileName = "config.template.json";
-            jsonString = loader.loadFromResource(fileName);
+            // jsonString = loader.loadFromResource(fileName);
+            jsonStringMap = loader.loadFromResource(fileName);
         }
 
         logger.info("Validating config file from: " + loader.getPathFromResource(fileName));
+        // TODO: Simply try to convert Map to String to fix error here - Rui
+        String jsonString = jsonStringMap.toString();
         Map<String, String> settings = loader.toMap(jsonString);
         assertNotNull(jsonString);
         assertNotNull(settings);
