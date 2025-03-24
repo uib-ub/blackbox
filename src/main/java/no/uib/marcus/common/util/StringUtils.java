@@ -34,7 +34,9 @@ public final class StringUtils {
      *
      */
     public static boolean hasText(String str) {
-        return str != null && !str.isEmpty() && !str.isBlank();
+        if (str == null || str.isEmpty() || str.isBlank())
+            return false;
+        return true;
     }
 
     //---------------------------------------------------------------------
