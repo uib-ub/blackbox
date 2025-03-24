@@ -35,6 +35,13 @@ public class DateRange implements Range<LocalDate> {
             .parseDefaulting(ChronoField.MONTH_OF_YEAR, 1)
             .parseDefaulting(ChronoField.DAY_OF_MONTH, 1)
             .toFormatter();
+    public static final  DateTimeFormatter DEFAULT_TO_DATE_FORMATTER = new DateTimeFormatterBuilder()
+            .appendPattern("[yyyy-MM-dd]")
+            .appendPattern("[yyyy-MM]")
+            .appendPattern("[yyyy]")
+            .parseDefaulting(ChronoField.MONTH_OF_YEAR, 12)
+            .parseDefaulting(ChronoField.DAY_OF_MONTH, 31)
+            .toFormatter();
     private static final Logger logger = Logger.getLogger(String.valueOf(DateRange.class));
 
     //Null indicates unbounded/infinite value
@@ -61,6 +68,7 @@ public class DateRange implements Range<LocalDate> {
         this(format);
         this.fromDate = parseFromDate(from);
         this.toDate = parseToDate(to);
+
     }
 
     public static DateRange of(@Nullable String from, @Nullable String to) {
@@ -92,20 +100,9 @@ public class DateRange implements Range<LocalDate> {
      * Logic for getting last date
      */
     public LocalDate parseToDate(String toDateString) {
-        if (toDateString.trim().isEmpty())
+        if (!StringUtils.hasText(toDateString))
             return null;
-
-        String defaultDay = "";
-        String defaultMonth = toDateString.length() == 4 ? "-12" : "";
-
-        if (!toDateString.matches("^\\d{4}-\\d{2}-\\d{2}$") && toDateString.matches("^\\d{4}-\\d{2}-\\d{2}$")){
-            if (toDateString.length() != 7)
-                isXSDgYear(toDateString);
-            LocalDate nextMonthFirstDay  = LocalDate.parse(toDateString + defaultMonth + "-01").plusMonths(1);
-            defaultDay = "-" +Integer.toString(nextMonthFirstDay.minusDays(1).get(ChronoField.DAY_OF_MONTH));
-        }
-
-        return   LocalDate.parse(toDateString + defaultMonth + defaultDay ,DEFAULT_DATE_FORMATTER);
+        return   LocalDate.parse(toDateString , DEFAULT_TO_DATE_FORMATTER);
     }
 
 
@@ -113,7 +110,11 @@ public class DateRange implements Range<LocalDate> {
      * From date is handled by default formatter
      */
     public LocalDate parseFromDate(String fromDateString) {
-            return LocalDate.parse(fromDateString , DEFAULT_DATE_FORMATTER);
+        if (!StringUtils.hasText(fromDateString))
+            return null;
+        LocalDate ld = LocalDate.parse(fromDateString , DEFAULT_DATE_FORMATTER);
+        ld.isBefore(LocalDate.now());
+        return LocalDate.parse(fromDateString , DEFAULT_DATE_FORMATTER);
     }
 
     /**
