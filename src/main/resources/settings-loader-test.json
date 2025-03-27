@@ -1,0 +1,8 @@
+{
+  "ubbcluster": {
+    "name": "elasticsearch",
+    "node_name": "Blackbox",
+    "host": "uib.no/ub",
+    "transport_port": 80
+}
+}
