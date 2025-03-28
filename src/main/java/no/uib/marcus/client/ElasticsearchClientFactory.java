@@ -13,6 +13,7 @@ import org.apache.http.auth.UsernamePasswordCredentials;
 import org.apache.http.client.CredentialsProvider;
 import org.apache.http.impl.client.BasicCredentialsProvider;
 
+import java.util.HashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.elasticsearch.client.*;
@@ -82,10 +83,29 @@ final public class ElasticsearchClientFactory {
     public static synchronized ElasticsearchClient getElasticsearchClient() throws IOException {
         if (elasticsearchClient == null) {
             JsonFileLoader loader = new JsonFileLoader();
-            Map<String, String> properties = loader.loadBlackboxConfigFromResource();
+            //   "cluster": {
+            //    "name": "ubb-elasticsearch-docker",
+            //    "node_name": "Blackbox",
+            //    "host": "es",
+            //    "port": 9300
+            //  },
+            //  "_comment" : "application will look for these cluster settings when initializing"
+            //}
+            Map<String, String> properties;
+            if (System.getenv("ELASTICSEARCH_CLUSTER_NAME").isEmpty()) {
+                properties = loader.loadBlackboxConfigFromResource();
+            }
+            else {
+                properties = new HashMap<>();
+                properties.put("name", required("ELASTICSEARCH_CLUSTER_NAME"));
+                properties.put("node_name", required("ELASTICSEARCH_CLUSTER_NODE_NAME"));
+                properties.put("host", required("ELASTICSEARCH_CLUSTER_HOST"));
+                properties.put("port", required("ELASTICSEARCH_CLUSTER_PORT"));
+                properties.put("api_key", required("ELASTICSEARCH_CLUSTER_API_KEY"));
+            }
+
             logger.info("Loaded config template from: " + loader.getPathFromResource(JsonFileLoader.CONFIG_TEMPLATE));
-            elasticsearchClient = createTransportClient(properties)
-            ;
+            elasticsearchClient = createTransportClient(properties);
         }
         return elasticsearchClient;
     }
@@ -93,6 +113,14 @@ final public class ElasticsearchClientFactory {
     //Main method for easy debugging..
     public static void main(String[] args) throws IOException {
         getElasticsearchClient();
+    }
+
+    private static String required(String envVar) {
+        String value = System.getenv(envVar);
+        if (value == null) {
+            throw new IllegalArgumentException("Environment variable " + envVar + " is required but not set.");
+        }
+        return value;
     }
 
     /**
