@@ -23,3 +23,5 @@ build:
     dir: .
   extends:
     - .build_container_image
+  tags:
+  - spes
