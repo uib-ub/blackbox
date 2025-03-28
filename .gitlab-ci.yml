@@ -1,4 +1,4 @@
-image: docker:27
+image: docker:dind
 # Anchors  
 .docker_login: &docker_login
     - echo -n $CI_JOB_TOKEN | docker login -u gitlab-ci-token --password-stdin $CI_REGISTRY
