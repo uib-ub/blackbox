@@ -1,4 +1,4 @@
-image: docker:cli
+image: docker:27
 # Anchors  
 .docker_login: &docker_login
     - echo -n $CI_JOB_TOKEN | docker login -u gitlab-ci-token --password-stdin $CI_REGISTRY
@@ -19,7 +19,7 @@ build:
   stage: build
   variables:
     image_name: blackbox-search
-    dockerfile: Dockerfile
-    dir: docker
+    dockerfile: docker/Dockerfile
+    dir: .
   extends:
     - .build_container_image
