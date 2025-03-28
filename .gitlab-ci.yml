@@ -25,3 +25,41 @@ build:
     - .build_container_image
   tags:
   - spes
+
+.security_scan:
+  image:
+    name: aquasec/trivy:latest
+    entrypoint: [""]
+  script:
+    - apk add --no-cache curl docker-cli
+    - curl -sSL -o /tmp/trivy-gitlab.tpl https://github.com/aquasecurity/trivy/raw/main/contrib/gitlab.tpl
+    - *docker_login
+    - echo "disable-rules:" > trivy-secret.yaml
+    - echo "  - gitlab-pat" >> trivy-secret.yaml
+    - docker pull $CI_REGISTRY_IMAGE/$image_name:$image_tag
+    - trivy image --exit-code 0 --no-progress --severity "UNKNOWN,HIGH,CRITICAL" --format template --template "@/tmp/trivy-gitlab.tpl" -o gl-container-scanning-report.json $CI_REGISTRY_IMAGE/$image_name:$image_tag
+    - trivy image --exit-code 0 --no-progress --severity "UNKNOWN,HIGH,CRITICAL" -o gl-container-scanning-report.txt $CI_REGISTRY_IMAGE/$image_name:$image_tag
+    - trivy image --exit-code 0 --no-progress --severity "UNKNOWN,HIGH,CRITICAL" $CI_REGISTRY_IMAGE/$image_name:$image_tag
+    - trivy --quiet image --exit-code 1 --no-progress --severity CRITICAL $CI_REGISTRY_IMAGE/$image_name:$image_tag >/dev/null
+  artifacts:
+    paths:
+      - gl-container-scanning-report.json
+      - gl-container-scanning-report.txt
+  allow_failure: true
+
+## Scans
+security_scan:
+  stage: scan
+  parallel:
+    matrix:
+      - scan_image_name: blackbox-search
+        scan_image_tag: latest
+  variables:
+    image_name: $scan_image_name
+    image_tag: $scan_image_tag
+  extends:
+    - .security_scan
+
+stages:
+  - build
+  - scan
