@@ -113,7 +113,6 @@ public class DateRange implements Range<LocalDate> {
         if (!StringUtils.hasText(fromDateString))
             return null;
         LocalDate ld = LocalDate.parse(fromDateString , DEFAULT_DATE_FORMATTER);
-        ld.isBefore(LocalDate.now());
         return LocalDate.parse(fromDateString , DEFAULT_DATE_FORMATTER);
     }
 

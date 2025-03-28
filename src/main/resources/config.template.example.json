@@ -3,7 +3,7 @@
     "name": "ubb-elasticsearch-jambo",
     "node_name": "Blackbox",
     "host": "jambo.uib.no",
-    "port": 9300
+    "port": "9300"
   },
   "_comment" : "application will look for these cluster settings when initializing"
 }

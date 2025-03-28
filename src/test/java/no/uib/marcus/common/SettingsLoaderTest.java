@@ -28,12 +28,12 @@ public class SettingsLoaderTest extends RandomizedTest {
                 "  }\n" +
                 "}";
 
-        Map<String, String> settings = new JsonFileLoader().toMap(properties);
+        Map<String, String> settings = new  JsonFileLoader().toMap("settings-loader-test.json");
         //logger.info("Testing if cluster properties file exist: " + !settings.isEmpty());
         assertTrue(!settings.isEmpty());
-        assertEquals("elasticsearch", settings.get("ubbcluster.name"));
-        assertEquals("Blackbox", settings.get("ubbcluster.node_name"));
-        assertEquals("uib.no/ub", settings.get("ubbcluster.host"));
+        assertEquals("elasticsearch", settings.get("name"));
+        assertEquals("Blackbox", settings.get("node_name"));
+        assertEquals("uib.no/ub", settings.get("host"));
     }
 
 
@@ -61,7 +61,7 @@ public class SettingsLoaderTest extends RandomizedTest {
             jsonStringMap = loader.loadFromResource(fileName);
         } catch (UnavailableResourceException ex) {
             //Load from resource
-            fileName = "config.template.json";
+            fileName = "settings-loader-test.json";
             // jsonString = loader.loadFromResource(fileName);
             jsonStringMap = loader.loadFromResource(fileName);
         }
@@ -69,13 +69,16 @@ public class SettingsLoaderTest extends RandomizedTest {
         logger.info("Validating config file from: " + loader.getPathFromResource(fileName));
         // TODO: Simply try to convert Map to String to fix error here - Rui
         String jsonString = jsonStringMap.toString();
-        Map<String, String> settings = loader.toMap(jsonString);
+        Map<String,String> settings = new  JsonFileLoader().toMap(fileName);
+        //Map<String, String> settings = loader.loadFromResource(fileName);
         assertNotNull(jsonString);
         assertNotNull(settings);
         assertTrue(!jsonString.isEmpty());
-        assertTrue("Does cluster name exist? : ", !settings.get("cluster.name").isEmpty());
-        assertTrue("Does host name exist? : ", !settings.get("cluster.host").isEmpty());
-        assertTrue("Does port exist? : ", !settings.get("cluster.port").isEmpty());
+        logger.info("settings: " + settings.toString());
+
+        assertTrue("Does cluster name exist? : ", !settings.get("name").isEmpty());
+        assertTrue("Does host name exist? : ", !settings.get("host").isEmpty());
+        assertTrue("Does port exist? : ", !settings.get("port").isEmpty());
     }
 
 
