@@ -1,5 +1,5 @@
 FROM maven:3-eclipse-temurin-17 AS builder
-COPY ../. .
+COPY . .
 RUN mvn clean install && \ 
 ls -alh && ls -alh target && ls src
 FROM tomcat:9-jre17
