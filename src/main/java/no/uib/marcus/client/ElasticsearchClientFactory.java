@@ -7,6 +7,7 @@ import co.elastic.clients.transport.ElasticsearchTransport;
 import co.elastic.clients.transport.rest_client.RestClientTransport;
 import no.uib.marcus.common.loader.JsonFileLoader;
 import no.uib.marcus.common.util.BlackboxUtils;
+import org.apache.http.Header;
 import org.apache.http.HttpHost;
 import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.UsernamePasswordCredentials;
@@ -16,6 +17,8 @@ import org.apache.http.impl.client.BasicCredentialsProvider;
 import java.util.HashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import org.apache.http.message.BasicHeader;
 import org.elasticsearch.client.*;
 
 import java.io.IOException;
@@ -34,7 +37,7 @@ final public class ElasticsearchClientFactory {
     private static final Logger logger = Logger.getLogger(ElasticsearchClientFactory.class.getName());
     private static ElasticsearchClient elasticsearchClient;
 
-    private static final CredentialsProvider credentialsProvider = new BasicCredentialsProvider();
+    private static final CredentialsProvider credentialsProvider = new BasicCredentialsProvider().;
 
 
     /**
@@ -49,13 +52,13 @@ final public class ElasticsearchClientFactory {
     private static ElasticsearchClient createTransportClient(Map<String, String> properties) {
         try {
 
-            credentialsProvider.setCredentials(AuthScope.ANY, new UsernamePasswordCredentials(BlackboxUtils.getValueAsString(properties, "username"), BlackboxUtils.getValueAsString(properties, "password")));
-
+            Header[] defaultHeader = new Header[]{new BasicHeader("Authorization",
+                    "ApiKey " + BlackboxUtils.getValueAsString(properties, "api_key"))};
             RestClient restClient = RestClient.builder(
                             new HttpHost(InetAddress.getByName(BlackboxUtils.getValueAsString(properties, "host")), BlackboxUtils.getValueAsInt(properties, "port"), "https")
                     ).setHttpClientConfigCallback(httpAsyncClientBuilder -> httpAsyncClientBuilder.setDefaultCredentialsProvider(
                             credentialsProvider
-                    ).setSSLHostnameVerifier((s, sslSession) -> true))
+                    ).setSSLHostnameVerifier((s, sslSession) -> true)).setDefaultHeaders(defaultHeader)
                     .build();
 
             JacksonJsonpMapper jsonMapper = new JacksonJsonpMapper();
