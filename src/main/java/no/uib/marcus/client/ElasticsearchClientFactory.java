@@ -37,7 +37,6 @@ final public class ElasticsearchClientFactory {
     private static final Logger logger = Logger.getLogger(ElasticsearchClientFactory.class.getName());
     private static ElasticsearchClient elasticsearchClient;
 
-    private static final CredentialsProvider credentialsProvider = new BasicCredentialsProvider().;
 
 
     /**
@@ -56,9 +55,7 @@ final public class ElasticsearchClientFactory {
                     "ApiKey " + BlackboxUtils.getValueAsString(properties, "api_key"))};
             RestClient restClient = RestClient.builder(
                             new HttpHost(InetAddress.getByName(BlackboxUtils.getValueAsString(properties, "host")), BlackboxUtils.getValueAsInt(properties, "port"), "https")
-                    ).setHttpClientConfigCallback(httpAsyncClientBuilder -> httpAsyncClientBuilder.setDefaultCredentialsProvider(
-                            credentialsProvider
-                    ).setSSLHostnameVerifier((s, sslSession) -> true)).setDefaultHeaders(defaultHeader)
+                    ).setHttpClientConfigCallback(httpAsyncClientBuilder -> httpAsyncClientBuilder.setSSLHostnameVerifier((s, sslSession) -> true)).setDefaultHeaders(defaultHeader)
                     .build();
 
             JacksonJsonpMapper jsonMapper = new JacksonJsonpMapper();
