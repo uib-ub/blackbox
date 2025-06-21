@@ -6,6 +6,7 @@ import co.elastic.clients.elasticsearch._types.query_dsl.FunctionScoreQuery;
 import co.elastic.clients.elasticsearch._types.query_dsl.Query;
 import co.elastic.clients.elasticsearch._types.query_dsl.QueryBuilders;
 import co.elastic.clients.elasticsearch.core.SearchRequest;
+import co.elastic.clients.util.NamedValue;
 import no.uib.marcus.common.util.AggregationUtils;
 import no.uib.marcus.common.util.QueryUtils;
 import no.uib.marcus.common.util.SignatureUtils;
@@ -119,9 +120,7 @@ public class MarcusSearchBuilder extends AbstractSearchBuilder<MarcusSearchBuild
                 }
                 //Set index to boost
                 if (getIndexToBoost() != null) {
-                    Map<String, Double> indexToBoost = new HashMap<>();
-                    indexToBoost.put(getIndexToBoost(), 5.0);
-                    searchRequest.indicesBoost(List.of(indexToBoost));
+                    searchRequest.indicesBoost(NamedValue.of(getIndexToBoost(), 5.0));
                 }
 
 
