@@ -4,6 +4,6 @@ RUN mvn clean install && \
 ls -alh && ls -alh target && ls src
 FROM tomcat:11-jre17
 COPY --from=builder target/blackbox-*.war /usr/local/tomcat/webapps/blackbox.war
-RUN chown -R 10001 /usr/local/tomcat/webapps
+RUN mkdir -p /var/log/blackbox/ && chown -R 10001 /usr/local/tomcat/webapps /var/log/blackbox/ 
 USER 10001
  
