@@ -3,7 +3,7 @@ package no.uib.marcus.search;
 import co.elastic.clients.elasticsearch.ElasticsearchClient;
 import no.uib.marcus.common.ServiceName;
 
-import javax.annotation.Nullable;
+import jakarta.annotation.Nullable;
 
 /**
  * A set of static factory methods for creation of {@link SearchBuilder}s.

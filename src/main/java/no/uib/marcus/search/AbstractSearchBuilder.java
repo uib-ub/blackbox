@@ -13,8 +13,8 @@ import java.util.logging.Logger;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 
-import javax.annotation.Nullable;
-import javax.validation.constraints.NotNull;
+import jakarta.annotation.Nullable;
+import jakarta.validation.constraints.NotNull;
 import java.util.List;
 import java.util.Map;
 

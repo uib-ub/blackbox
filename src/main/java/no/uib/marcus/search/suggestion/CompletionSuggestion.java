@@ -10,7 +10,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import no.uib.marcus.client.ElasticsearchClientFactory;
 import co.elastic.clients.elasticsearch.core.SearchRequest.Builder;
 
-import javax.annotation.Nullable;
+import jakarta.annotation.Nullable;
 import java.io.IOException;
 import java.util.logging.Logger;
 import java.util.*;

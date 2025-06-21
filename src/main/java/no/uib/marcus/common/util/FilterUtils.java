@@ -14,8 +14,8 @@ import java.util.logging.Logger;
 
 import java.time.LocalDate;
 
-import javax.annotation.Nullable;
-import javax.validation.constraints.NotNull;
+import jakarta.annotation.Nullable;
+import jakarta.validation.constraints.NotNull;
 import java.util.*;
 
 /**

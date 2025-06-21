@@ -16,7 +16,7 @@ import java.util.logging.Logger;
 
 import no.uib.marcus.common.util.StringUtils;
 
-import javax.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotNull;
 
 
 /**
