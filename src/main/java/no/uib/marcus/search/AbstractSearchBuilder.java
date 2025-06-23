@@ -159,7 +159,7 @@ public abstract class AbstractSearchBuilder<T extends AbstractSearchBuilder<T>> 
      */
     @SuppressWarnings("unchecked")
     public T setIndexToBoost(String indexToBoost) {
-        if(!indexToBoost.isEmpty()) {
+        if(indexToBoost != null && !indexToBoost.isEmpty()) {
             this.indexToBoost = indexToBoost;
         }
         return (T) this;

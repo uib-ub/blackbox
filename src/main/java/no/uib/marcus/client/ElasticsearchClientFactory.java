@@ -9,10 +9,6 @@ import no.uib.marcus.common.loader.JsonFileLoader;
 import no.uib.marcus.common.util.BlackboxUtils;
 import org.apache.http.Header;
 import org.apache.http.HttpHost;
-import org.apache.http.auth.AuthScope;
-import org.apache.http.auth.UsernamePasswordCredentials;
-import org.apache.http.client.CredentialsProvider;
-import org.apache.http.impl.client.BasicCredentialsProvider;
 
 import java.util.HashMap;
 import java.util.logging.Level;
@@ -77,23 +73,16 @@ final public class ElasticsearchClientFactory {
 
 
     /**
-     * Syncronize the call so that different threads do not end up creating multiple instances
-     * Do we still need synchronize after changing to use the java client which uses rest?
+     *  Synchronize the call so that different threads do not end up creating multiple instances
+     * Do we still need to synchronize after changing to use the java client which uses rest?
      */
     public static synchronized ElasticsearchClient getElasticsearchClient() throws IOException {
         if (elasticsearchClient == null) {
             JsonFileLoader loader = new JsonFileLoader();
-            //   "cluster": {
-            //    "name": "ubb-elasticsearch-docker",
-            //    "node_name": "Blackbox",
-            //    "host": "es",
-            //    "port": 9300
-            //  },
-            //  "_comment" : "application will look for these cluster settings when initializing"
-            //}
             Map<String, String> properties;
             if (System.getenv("ELASTICSEARCH_CLUSTER_NAME").isEmpty()) {
                 properties = loader.loadBlackboxConfigFromResource();
+                logger.info("Loaded config template from: " + loader.getPathFromResource(JsonFileLoader.CONFIG_TEMPLATE));
             }
             else {
                 properties = new HashMap<>();
@@ -102,15 +91,16 @@ final public class ElasticsearchClientFactory {
                 properties.put("host", required("ELASTICSEARCH_CLUSTER_HOST"));
                 properties.put("port", required("ELASTICSEARCH_CLUSTER_PORT"));
                 properties.put("api_key", required("ELASTICSEARCH_CLUSTER_API_KEY"));
+                logger.info("configuration loaded from env variables");
             }
 
-            logger.info("Loaded config template from: " + loader.getPathFromResource(JsonFileLoader.CONFIG_TEMPLATE));
+
             elasticsearchClient = createTransportClient(properties);
         }
         return elasticsearchClient;
     }
 
-    //Main method for easy debugging..
+    //Main method for easy debugging
     public static void main(String[] args) throws IOException {
         getElasticsearchClient();
     }
