@@ -20,7 +20,7 @@ import java.util.Map;
 
 /**
  * This class provides a skeletal implementation of {@link SearchBuilder} interface to minimize
- * the effort required to implement the interface when building your own search builder. The idea here is that,
+ * the effort required to implement the interface when building your own search builder. The idea here is that
  * all custom search builders should inherit from this class.
  *
  * @author Hemed Ali Al Ruwehy
@@ -126,7 +126,7 @@ public abstract class AbstractSearchBuilder<T extends AbstractSearchBuilder<T>> 
     }
 
     /**
-     * Get post filter or <tt>null</tt> if not set
+     * Get POST filter or <tt>null</tt> if not set
      */
     public Query.Builder getPostFilter() {
         return postFilter;
@@ -152,10 +152,10 @@ public abstract class AbstractSearchBuilder<T extends AbstractSearchBuilder<T>> 
     }
 
     /**
-     * Set index that need to be boosted
+     * Set the index that needs to be boosted
      *
      * @param indexToBoost an index to boost
-     * @return this builder where index to boost has been set
+     * @return this builder where the index to boost has been set
      */
     @SuppressWarnings("unchecked")
     public T setIndexToBoost(String indexToBoost) {
@@ -189,7 +189,7 @@ public abstract class AbstractSearchBuilder<T extends AbstractSearchBuilder<T>> 
     }
 
     /**
-     * Get Elasticsearch client for this service
+     * Get the Elasticsearch client for this service
      */
     public ElasticsearchClient getClient() {
         return client;
@@ -199,7 +199,7 @@ public abstract class AbstractSearchBuilder<T extends AbstractSearchBuilder<T>> 
      * Set Elasticsearch client
      *
      * @param client Elasticsearch client to communicate with a cluster. Cannot be <code>null</code>
-     * @return this object where client has been set
+     * @return this object where the client has been set
      */
     @SuppressWarnings("unchecked")
     public T setClient(@NotNull ElasticsearchClient client) {
@@ -271,7 +271,7 @@ public abstract class AbstractSearchBuilder<T extends AbstractSearchBuilder<T>> 
     }
 
     /**
-     * Get size of the returned documents, default to 10.
+     * Get the size of the returned documents, default to 10.
      **/
     public int getSize() {
         return size;
@@ -280,7 +280,7 @@ public abstract class AbstractSearchBuilder<T extends AbstractSearchBuilder<T>> 
     /**
      * Set how many documents to be returned, default to 10.
      *
-     * @param size a size of document returned
+     * @param size a size of the document returned
      * @return this object where size has been set
      */
     @SuppressWarnings("unchecked")
@@ -292,7 +292,7 @@ public abstract class AbstractSearchBuilder<T extends AbstractSearchBuilder<T>> 
     }
 
     /**
-     * Get query string for this service
+     * Get the query string for this service
      */
     public String getQueryString() {
         return queryString;
@@ -302,7 +302,7 @@ public abstract class AbstractSearchBuilder<T extends AbstractSearchBuilder<T>> 
      * Set a query string
      *
      * @param queryString a query string
-     * @return this object where query string has been set.
+     * @return this object where the query string has been set.
      */
     @SuppressWarnings("unchecked")
     public T setQueryString(@Nullable String queryString) {
@@ -311,7 +311,7 @@ public abstract class AbstractSearchBuilder<T extends AbstractSearchBuilder<T>> 
     }
 
     /**
-     * Construct search request based on the service settings. Should be implemented by subclasses
+     * Construct the search request based on the service settings. Should be implemented by subclasses
      */
     @Override
     public abstract SearchRequest.Builder constructSearchRequest();
@@ -333,7 +333,7 @@ public abstract class AbstractSearchBuilder<T extends AbstractSearchBuilder<T>> 
             //System.out.println(response.toString());
         } catch (java.io.IOException e) {
             //I've not found a direct way to validate a query string. Therefore, the idea here is to catch any
-            //exception that is related to search execution.
+            //exception related to search execution.
             logger.severe("Could not execute search: " + e.getMessage());
            // throw e;
         }
