@@ -4,10 +4,21 @@ import co.elastic.clients.elasticsearch._types.query_dsl.Operator;
 import co.elastic.clients.elasticsearch._types.query_dsl.QueryStringQuery;
 import co.elastic.clients.elasticsearch._types.query_dsl.SimpleQueryStringQuery;
 import co.elastic.clients.elasticsearch.core.SearchResponse;
+import co.elastic.clients.json.SimpleJsonpMapper;
+import co.elastic.clients.json.jackson.JacksonJsonpGenerator;
+import co.elastic.clients.json.jackson.JacksonJsonpMapper;
+import com.fasterxml.jackson.core.JsonFactory;
+import com.fasterxml.jackson.core.JsonGenerator.Feature;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 
+import jakarta.json.Json;
+import jakarta.json.stream.JsonGenerator;
+import java.io.IOException;
+import java.io.StringWriter;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import static no.uib.marcus.common.util.BlackboxUtils.isNullOrEmpty;
 
@@ -102,15 +113,29 @@ public final class QueryUtils {
      * @param isPretty a boolean value to show whether the JSON string should be pretty printed.
      * @return search hits as a JSON string
      **/
-    public static String toJsonString(final SearchResponse<ObjectNode> response, final boolean isPretty) {
+    public static String toJsonString(final SearchResponse<ObjectNode> response, final boolean isPretty)
+        throws IOException {
         if (response == null) {
-            return "{ \"error\" : \"" + "Could not execute search. See internal server logs" + "\"}";
+            return "{ \"error\" : \"" + "Could not execute search. See internal server logs"
+                + "\"}";
         }
-        if (isPretty) {
-            //@todo
-          return  response.toString();
-        }
-        return response.toString();
 
+        StringWriter writer = new StringWriter();
+        JsonFactory jsonFactory = new JsonFactory();
+        com.fasterxml.jackson.core.JsonGenerator jacksonGenerator = jsonFactory.createGenerator(writer);
+
+        if (isPretty) {
+                //@todo
+                Map<String, Object> config = new HashMap<>();
+                jacksonGenerator.useDefaultPrettyPrinter();
+                JsonGenerator generator = new JacksonJsonpGenerator(jacksonGenerator);
+                response.serialize(generator, new JacksonJsonpMapper());
+               generator.close();
+               return writer.toString();
+            }
+            JsonGenerator generator =  new JacksonJsonpGenerator(jacksonGenerator);
+            response.serialize(generator, new JacksonJsonpMapper());
+            generator.close();
+            return writer.toString();
     }
 }
