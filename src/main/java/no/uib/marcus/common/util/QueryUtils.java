@@ -24,7 +24,7 @@ public final class QueryUtils {
 
     private static final char WILDCARD = '*';
 
-    //Elasticsearch reserved characters (without minus sign)
+    //Elasticsearch reserved characters (without the minus sign)
     private static final char[] RESERVED_CHARS = {
             '*', '"', '\\', '/', '=', '&', '|', '>', '<', '!', '(', ')',
             '{', '}', '[', ']', '^', '~', '?', ':', '/', '/', '!', '[', ']', '{', '}'
@@ -37,7 +37,7 @@ public final class QueryUtils {
      * Build a simple query string
      *
      * @param queryString a query string
-     * @return a builder for simple query string
+     * @return a builder for the simple query string
      */
     public static SimpleQueryStringQuery.Builder buildMarcusSimpleQueryString(String queryString) {
         return new SimpleQueryStringQuery.Builder().query
@@ -65,9 +65,8 @@ public final class QueryUtils {
 
 
     /**
-     * Adds a trailing wildcard to a single term query, if it does not contain reserved characters
-     *
-     * @param queryString a string to add such wildcard
+     * Adds a trailing wildcard to a single-term query if it does not contain reserved characters
+     * @param queryString a string to add such as wildcard
      * @return the given string with a wildcard appended to the end
      */
     public static String appendTrailingWildcardIfSingleTerm(String queryString) {
