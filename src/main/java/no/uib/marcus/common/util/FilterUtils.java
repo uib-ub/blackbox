@@ -46,6 +46,7 @@ public final class FilterUtils {
      * Gets top filter from the given filter map or empty filter if it does not exist
      */
     public static BoolQuery.Builder getTopFilter(@NotNull Map<String, List<String>> selectedFacets, String aggs, DateRange dateRange) {
+
         Map<String, BoolQuery.Builder> filter = FilterUtils.buildBoolFilter(selectedFacets, aggs, dateRange);
         return filter.getOrDefault(TOP_FILTER, QueryBuilders.bool());
     }

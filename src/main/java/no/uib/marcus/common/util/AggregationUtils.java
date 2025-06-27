@@ -145,18 +145,23 @@ public final class AggregationUtils {
                         // EXCEPT for the aggregation in which the selection was performed in.
                         if (selectedFacets.containsKey(facetField)) {
                             //Make a copy of the map
-                            Map<String, List<String>> selectedFacetCopy = new HashMap<>(selectedFacets);
+                            Map<String, List<String>> selectedFacetCopy = new HashMap<>(
+                                selectedFacets);
                             //Remove the facet that aggregation was performed in from the map
                             selectedFacetCopy.remove(facetField);
                             //Build bool_filter for the copy of the selected facets.
                             //We build sub aggregation filter only for "OR" facets
-                            agg = addSubAggregationFilter(aggregations, facet, termsAggs, selectedFacetCopy);
-                            aggregationMap.put(facet.get("field").asText(),agg);
-                        } else {
+                            agg = addSubAggregationFilter(aggregations, facet, termsAggs,
+                                selectedFacetCopy);
+                            aggregationMap.put(facet.get("field").asText(), agg);
+                        }
+                        else {
                             agg = addSubAggregationFilter(aggregations, facet, termsAggs, selectedFacets);
                             aggregationMap.put(facet.get("field").asText(),agg);
                         }
-                    }
+                        }
+
+
                 }
             }
         }
@@ -173,7 +178,6 @@ public final class AggregationUtils {
         BoolQuery.Builder aggsFilter = FilterUtils.getPostFilter(selectedFacets, aggs);
         Map<String, Aggregation> subAggregationMap = new HashMap<>();
         if (aggsFilter.hasClauses()) {
-            aggBuilder = constructTermsAggregation(currentFacet, true);
             subAggregationMap.put(AGGS_FILTER_KEY, new Aggregation.Builder().filter(aggsFilter.build()._toQuery()).build());
             return  new Aggregation.Builder().aggregations(subAggregationMap).filter(aggsFilter.build()._toQuery()).build();
 

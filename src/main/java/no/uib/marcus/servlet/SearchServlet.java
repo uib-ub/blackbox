@@ -63,7 +63,6 @@ public class SearchServlet extends HttpServlet {
             throws ServletException, IOException {
         request.setCharacterEncoding("UTF-8");
         response.setContentType("application/json;charset=UTF-8");
-        logger.info("SearchServlet: doGet called" + request);
 
         //Get parameters from the request
         String queryString = request.getParameter(Params.QUERY_STRING);
@@ -90,25 +89,20 @@ public class SearchServlet extends HttpServlet {
             // Build a facet map based on selected filters.
             // e.g {"subject.exact" = ["Flyfoto" , "Birkeland"], "type" = ["Brev"]}
             Map<String, List<String>> selectedFacets = FilterUtils.buildFilterMap(selectedFilters);
-            logger.info("index: " + indices.length +  indices[0]);
-            logger.info("queryString: " + queryString);
-            logger.info("aggs: " + aggs);
-            logger.info("from: " + _from);
-            logger.info("size: " + _size);
-            logger.info("indextoboost: " + indexToBoost);
+
 
             logger.info("service: " + service);
             //Get and build corresponding search builder based on the "service" parameter
             SearchBuilder<? extends SearchBuilder<?>> builder = SearchBuilderFactory
                     .getSearchBuilder(service, client)
-                    .setIndices("wab")
+                    .setIndices(indices)
                     .setQueryString(queryString)
-                   // .setAggregations(aggs)
+                    .setAggregations(aggs)
                     .setFrom(_from)
-                    .setSize(_size);
-            //        .setSelectedFacets(selectedFacets)
+                    .setSize(_size)
+                    .setSelectedFacets(selectedFacets)
                 // @todo   .setSortBuilder(SortUtils.getSort(sortString))
-                  //  .setIndexToBoost(indexToBoost);
+                    .setIndexToBoost(indexToBoost);
 
             //Add top level filter, for "AND" aggregations
             BoolQuery.Builder topFilter = FilterUtils.getTopFilter(
@@ -124,8 +118,7 @@ public class SearchServlet extends HttpServlet {
             }
             //Send search request to Elasticsearch and execute
             try {
-                logger.info("searchBuilder content" + builder.toString());
-                SearchResponse<ObjectNode> searchResponse = builder.executeSearch();
+                    SearchResponse<ObjectNode> searchResponse = builder.executeSearch();
 
                 //Decide whether to get a pretty JSON output or not
                 String searchResponseString = Boolean.getBoolean(isPretty)

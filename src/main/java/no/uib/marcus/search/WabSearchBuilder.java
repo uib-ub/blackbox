@@ -54,7 +54,8 @@ public class WabSearchBuilder extends AbstractSearchBuilder<WabSearchBuilder> {
                         .defaultOperator(Operator.And)
                         .fields(List.of("label",
                                         "publishedIn",
-                                        "publishedInPart.exact"
+                                        "publishedInPart.exact",
+                                        "all"
                                         )).build()._toQuery();//whitespace analyzed
 
             } else {
@@ -78,6 +79,7 @@ public class WabSearchBuilder extends AbstractSearchBuilder<WabSearchBuilder> {
             }
             //Append aggregations to the request builder
             if (StringUtils.hasText(getAggregations())) {
+                logger.info("adding aggreations");
                 AggregationUtils.addAggregations(searchRequest, getAggregations(), getSelectedFacets());
             }
 

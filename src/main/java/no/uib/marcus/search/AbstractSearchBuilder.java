@@ -183,7 +183,7 @@ public abstract class AbstractSearchBuilder<T extends AbstractSearchBuilder<T>> 
      */
     @SuppressWarnings("unchecked")
     public T setSelectedFacets(Map<String, List<String>> selectedFacets) {
-        if (selectedFacets != null && !selectedFacets.isEmpty()) {
+        if (selectedFacets != null) {
             this.selectedFacets = selectedFacets;
         }
         return (T) this;
@@ -317,7 +317,6 @@ public abstract class AbstractSearchBuilder<T extends AbstractSearchBuilder<T>> 
 
         SearchResponse<ObjectNode> response = null;
         try {
-            logger.info("Executing search request with client:: " + client.toString());
             response = client.search(constructSearchRequest().build(), ObjectNode.class);
             //Show response for debugging purpose
             logger.info(response.toString());
@@ -344,8 +343,8 @@ public abstract class AbstractSearchBuilder<T extends AbstractSearchBuilder<T>> 
 
         jsonObj = jsonObj.put("indices",  getIndices().length == 0   ?  "" : Arrays.toString(getIndices()))
                 .put("from", getFrom())
-                .put("size", getSize());
-              //  .put("aggregations", getAggregations() == null ? "" : getAggregations());
+                .put("size", getSize())
+                .put("aggregations", getAggregations() == null ? "" : getAggregations());
 
         return jsonObj.toString();
 
