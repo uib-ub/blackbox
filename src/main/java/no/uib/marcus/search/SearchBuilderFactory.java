@@ -1,14 +1,17 @@
 package no.uib.marcus.search;
 
 import co.elastic.clients.elasticsearch.ElasticsearchClient;
+import java.util.logging.Logger;
 import no.uib.marcus.common.ServiceName;
 
 import jakarta.annotation.Nullable;
+import no.uib.marcus.servlet.DiscoveryServlet;
 
 /**
  * A set of static factory methods for creation of {@link SearchBuilder}s.
  */
 public class SearchBuilderFactory {
+    private static final Logger logger = Logger.getLogger(DiscoveryServlet.class.getName());
 
     /**
      * Prevents instantiation
@@ -70,6 +73,7 @@ public class SearchBuilderFactory {
             case SKA:
                 return SearchBuilderFactory.skaSearch(client);
             case WAB:
+                logger.info("wab chosen");
                 return SearchBuilderFactory.wabSearch(client);
             case MARCUS:
             case MARCUS_ADMIN:

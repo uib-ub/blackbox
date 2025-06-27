@@ -54,6 +54,7 @@ public abstract class AbstractSearchBuilder<T extends AbstractSearchBuilder<T>> 
         if (client == null) {
             throw new IllegalParameterException("Unable to initialize service. Client cannot be null");
         }
+        logger.info("super initialized" + client.toString());
         this.client = client;
     }
 
@@ -237,17 +238,6 @@ public abstract class AbstractSearchBuilder<T extends AbstractSearchBuilder<T>> 
         return types;
     }
 
-    /**
-     * Set index types to be executed upon, default to all types in the index.
-     *
-     * @param types index types
-     * @return this object where index types are set
-     */
-    @SuppressWarnings("unchecked")
-    public T setTypes(String... types) {
-        this.types = types;
-        return (T) this;
-    }
 
     /**
      * Get documents offset, default to 0.
@@ -327,6 +317,7 @@ public abstract class AbstractSearchBuilder<T extends AbstractSearchBuilder<T>> 
 
         SearchResponse<ObjectNode> response = null;
         try {
+            logger.info("Executing search request with client:: " + client.toString());
             response = client.search(constructSearchRequest().build(), ObjectNode.class);
             //Show response for debugging purpose
             logger.info(response.toString());
@@ -337,6 +328,7 @@ public abstract class AbstractSearchBuilder<T extends AbstractSearchBuilder<T>> 
             logger.severe("Could not execute search: " + e.getMessage());
            // throw e;
         }
+        catch (Exception e) {throw e;}
         return response;
     }
 
@@ -350,11 +342,10 @@ public abstract class AbstractSearchBuilder<T extends AbstractSearchBuilder<T>> 
     public String toString() {
         ObjectNode jsonObj = new ObjectMapper().createObjectNode();
 
-        jsonObj = jsonObj.put("indices",  getIndices().length > 0   ?  "" : Arrays.toString(getIndices()))
-                .put("type", getTypes() == null ? "" : Arrays.toString(getTypes()))
+        jsonObj = jsonObj.put("indices",  getIndices().length == 0   ?  "" : Arrays.toString(getIndices()))
                 .put("from", getFrom())
-                .put("size", getSize())
-                .put("aggregations", getAggregations() == null ? "" : getAggregations());
+                .put("size", getSize());
+              //  .put("aggregations", getAggregations() == null ? "" : getAggregations());
 
         return jsonObj.toString();
 

@@ -56,7 +56,6 @@ public class DiscoveryServlet extends HttpServlet {
         //Build a discovery service
         MarcusDiscoveryBuilder service = SearchBuilderFactory.marcusDiscovery(client)
                 .setIndices(indices)
-                .setTypes(types)
                 .setFrom(_from)
                 .setSize(_size)
                 .setQueryString(queryString);

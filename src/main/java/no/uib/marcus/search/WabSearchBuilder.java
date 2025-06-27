@@ -41,19 +41,21 @@ public class WabSearchBuilder extends AbstractSearchBuilder<WabSearchBuilder> {
         try {
             //Set indices
             if (isNeitherNullNorEmpty(getIndices())) {
+                logger.info("Setting indices to " + Arrays.asList(getIndices()));
                 searchRequest.index(Arrays.asList(getIndices()));
             }
 
 
             //Set query
             if (StringUtils.hasText(getQueryString())) {
+                logger.info("query set for wab");
                 query = QueryBuilders.simpleQueryString()
                         .query(getQueryString())
                         .defaultOperator(Operator.And)
                         .fields(List.of("label",
                                         "publishedIn",
-                                        "publishedInPart.exact",
-                                        "_all")).build()._toQuery();//whitespace analyzed
+                                        "publishedInPart.exact"
+                                        )).build()._toQuery();//whitespace analyzed
 
             } else {
                 query = QueryBuilders.matchAll().build()._toQuery();
@@ -85,6 +87,7 @@ public class WabSearchBuilder extends AbstractSearchBuilder<WabSearchBuilder> {
 
             //Show builder for debugging purpose
             //logger.info(searchRequest.toString());
+            logger.info("end of wab implementation searchrequest builder" + searchRequest.toString());
         }  catch (IllegalStateException e) {
             throw new RuntimeException(e);
         }

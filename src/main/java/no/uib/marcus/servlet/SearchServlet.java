@@ -1,22 +1,21 @@
 package no.uib.marcus.servlet;
 
 import co.elastic.clients.elasticsearch.ElasticsearchClient;
+import co.elastic.clients.elasticsearch._types.ElasticsearchException;
 import co.elastic.clients.elasticsearch._types.query_dsl.BoolQuery;
 import co.elastic.clients.elasticsearch.core.SearchResponse;
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.json.JsonMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import java.util.Arrays;
 import no.uib.marcus.client.ElasticsearchClientFactory;
 import no.uib.marcus.common.Params;
 import no.uib.marcus.common.util.FilterUtils;
 import no.uib.marcus.common.util.LogUtils;
 import no.uib.marcus.common.util.QueryUtils;
-import no.uib.marcus.common.util.SortUtils;
 import no.uib.marcus.range.DateRange;
 import no.uib.marcus.search.SearchBuilder;
 import no.uib.marcus.search.SearchBuilderFactory;
 
-import java.util.HashMap;
 import java.util.logging.Logger;
 
 import no.uib.marcus.common.util.StringUtils;
@@ -64,6 +63,7 @@ public class SearchServlet extends HttpServlet {
             throws ServletException, IOException {
         request.setCharacterEncoding("UTF-8");
         response.setContentType("application/json;charset=UTF-8");
+        logger.info("SearchServlet: doGet called" + request);
 
         //Get parameters from the request
         String queryString = request.getParameter(Params.QUERY_STRING);
@@ -90,19 +90,25 @@ public class SearchServlet extends HttpServlet {
             // Build a facet map based on selected filters.
             // e.g {"subject.exact" = ["Flyfoto" , "Birkeland"], "type" = ["Brev"]}
             Map<String, List<String>> selectedFacets = FilterUtils.buildFilterMap(selectedFilters);
+            logger.info("index: " + indices.length +  indices[0]);
+            logger.info("queryString: " + queryString);
+            logger.info("aggs: " + aggs);
+            logger.info("from: " + _from);
+            logger.info("size: " + _size);
+            logger.info("indextoboost: " + indexToBoost);
 
+            logger.info("service: " + service);
             //Get and build corresponding search builder based on the "service" parameter
             SearchBuilder<? extends SearchBuilder<?>> builder = SearchBuilderFactory
                     .getSearchBuilder(service, client)
-                    .setIndices(indices)
-                    .setTypes(types)
+                    .setIndices("wab")
                     .setQueryString(queryString)
-                    .setAggregations(aggs)
+                   // .setAggregations(aggs)
                     .setFrom(_from)
-                    .setSize(_size)
-                    .setSelectedFacets(selectedFacets)
+                    .setSize(_size);
+            //        .setSelectedFacets(selectedFacets)
                 // @todo   .setSortBuilder(SortUtils.getSort(sortString))
-                    .setIndexToBoost(indexToBoost);
+                  //  .setIndexToBoost(indexToBoost);
 
             //Add top level filter, for "AND" aggregations
             BoolQuery.Builder topFilter = FilterUtils.getTopFilter(
@@ -117,22 +123,37 @@ public class SearchServlet extends HttpServlet {
            // @todo     builder.setPostFilter(postFilter);
             }
             //Send search request to Elasticsearch and execute
-            SearchResponse<ObjectNode> searchResponse = builder.executeSearch();
+            try {
+                logger.info("searchBuilder content" + builder.toString());
+                SearchResponse<ObjectNode> searchResponse = builder.executeSearch();
 
-            //Decide whether to get a pretty JSON output or not
-            String searchResponseString =  Boolean.getBoolean(isPretty)
+                //Decide whether to get a pretty JSON output or not
+                String searchResponseString = Boolean.getBoolean(isPretty)
                     ? QueryUtils.toJsonString(searchResponse, true)
                     : QueryUtils.toJsonString(searchResponse, false);
 
-            //Write response to the client
-            out.write(searchResponseString);
+                //Write response to the client
+                out.write(searchResponseString);
 
-            // Log search response
-            logger.info(LogUtils.createLogMessage(request, searchResponse));
-            // System.out.println("Builder class: " + builder.getClass().getName() + " " +
-            //                 "\nBuilder toString: " + builder  );
+                // Log search response
+                logger.info(LogUtils.createLogMessage(request, searchResponse));
+                // System.out.println("Builder class: " + builder.getClass().getName() + " " +
+                //
+                //                 "\nBuilder toString: " + builder  );
+            } catch (ElasticsearchException e) {
+                logger.info("reason " + e.error().reason());
+                //logger.info("caused by " + e.error().causedBy().reason());
+                logger.info("size of supressed " + e.error().suppressed().size());
+                logger.info("response : " + e.response().toString());
+                throw e;
+            }
+            } catch (Exception e) {
+                logger.info(e.getMessage());
+                throw e;
+            }
         }
-    }
+
+
 
 
     /**

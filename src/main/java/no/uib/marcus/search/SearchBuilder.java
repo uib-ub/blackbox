@@ -33,13 +33,6 @@ public interface SearchBuilder<S> {
     S setIndices(@Nullable String... indices);
 
     /**
-     * Set up index types for the service, default to all types in an index
-     *
-     * @param types one or more index types
-     */
-    S setTypes(@Nullable String... types);
-
-    /**
      * Set up a query string, default to <code>null</code> which means query for everything.
      *
      * @param queryString a nullable query string
