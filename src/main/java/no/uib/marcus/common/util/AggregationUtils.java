@@ -3,6 +3,7 @@ package no.uib.marcus.common.util;
 import co.elastic.clients.elasticsearch._types.SortOrder;
 import co.elastic.clients.elasticsearch._types.Time;
 import co.elastic.clients.elasticsearch._types.aggregations.Aggregation;
+import co.elastic.clients.elasticsearch._types.aggregations.Aggregation.Builder;
 import co.elastic.clients.elasticsearch._types.aggregations.AggregationBuilders;
 import co.elastic.clients.elasticsearch._types.aggregations.DateHistogramAggregation;
 import co.elastic.clients.elasticsearch._types.aggregations.TermsAggregation;
@@ -135,7 +136,7 @@ public final class AggregationUtils {
                     aggregationMap.put(facet.get("field").asText(),
                             AggregationUtils.getDateHistogramAggregation(facet).build()._toAggregation());
                 } else {
-                    Aggregation.Builder termsAggs = constructTermsAggregation(facet);
+                    Builder termsAggs = constructTermsAggregation(facet);
                     Aggregation agg;
                     if (selectedFacets != null && !selectedFacets.isEmpty()) {
                         //Get current field
@@ -260,11 +261,12 @@ public final class AggregationUtils {
      * @param facet                a JSON object
      * @param sortBySubAggregation a flag whether to sort by sub aggregation filter
      * @return a term builder
-     */
-    public static Aggregation.Builder constructTermsAggregation(JsonNode facet, boolean sortBySubAggregation) {
+     * must come last in order to return from terms -> Aggregation
+     * /
+    public static Aggregation.Builder constructTermsAggregation(Aggregation.Builder aggBuilder, JsonNode facet, boolean sortBySubAggregation) {
         String field = facet.get("field").asText();
-        Aggregation.Builder aggBuilder = new Aggregation.Builder();
         TermsAggregation.Builder termsBuilder = new TermsAggregation.Builder();
+        termsBuilder.field(field);
         //Set size
         if (facet.has("size")) {
             int size = facet.get("size").asInt();
@@ -326,7 +328,8 @@ public final class AggregationUtils {
             int minDocCount = facet.get("min_doc_count").asInt();
             termsBuilder.minDocCount(minDocCount);
         }
-        return aggBuilder;
+
+        return new Aggregation.Builder().terms(termsBuilder.build()).build();
     }
 
     /**
