@@ -261,8 +261,8 @@ public final class AggregationUtils {
      * @param facet                a JSON object
      * @param sortBySubAggregation a flag whether to sort by sub aggregation filter
      * @return a term builder
-     * must come last in order to return from terms -> Aggregation
-     * /
+     *
+     **/
     public static Aggregation.Builder constructTermsAggregation(Aggregation.Builder aggBuilder, JsonNode facet, boolean sortBySubAggregation) {
         String field = facet.get("field").asText();
         TermsAggregation.Builder termsBuilder = new TermsAggregation.Builder();
