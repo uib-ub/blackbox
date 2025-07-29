@@ -4,6 +4,7 @@ import co.elastic.clients.elasticsearch._types.SortOrder;
 import co.elastic.clients.elasticsearch._types.Time;
 import co.elastic.clients.elasticsearch._types.aggregations.Aggregation;
 import co.elastic.clients.elasticsearch._types.aggregations.Aggregation.Builder;
+import co.elastic.clients.elasticsearch._types.aggregations.Aggregation.Builder.ContainerBuilder;
 import co.elastic.clients.elasticsearch._types.aggregations.AggregationBuilders;
 import co.elastic.clients.elasticsearch._types.aggregations.DateHistogramAggregation;
 import co.elastic.clients.elasticsearch._types.aggregations.TermsAggregation;
@@ -136,8 +137,9 @@ public final class AggregationUtils {
                     aggregationMap.put(facet.get("field").asText(),
                             AggregationUtils.getDateHistogramAggregation(facet).build()._toAggregation());
                 } else {
-                    Builder termsAggs = constructTermsAggregation(facet);
                     Aggregation agg;
+                    Aggregation.Builder termsAggs = constructTermsAggregation(facet);
+
                     if (selectedFacets != null && !selectedFacets.isEmpty()) {
                         //Get current field
                         String facetField = facet.get("field").asText();
@@ -162,7 +164,6 @@ public final class AggregationUtils {
                         }
                         }
 
-
                 }
             }
         }
@@ -180,7 +181,7 @@ public final class AggregationUtils {
         Map<String, Aggregation> subAggregationMap = new HashMap<>();
         if (aggsFilter.hasClauses()) {
             subAggregationMap.put(AGGS_FILTER_KEY, new Aggregation.Builder().filter(aggsFilter.build()._toQuery()).build());
-            return  new Aggregation.Builder().aggregations(subAggregationMap).filter(aggsFilter.build()._toQuery()).build();
+            return  new Aggregation.Builder().filter(aggsFilter.build()._toQuery()).aggregations(subAggregationMap).build();
 
             // create a sub aggregation to add to an aggregation
             /**
@@ -263,7 +264,7 @@ public final class AggregationUtils {
      * @return a term builder
      *
      **/
-    public static Aggregation.Builder constructTermsAggregation(Aggregation.Builder aggBuilder, JsonNode facet, boolean sortBySubAggregation) {
+    public static Aggregation.Builder constructTermsAggregation(JsonNode facet, boolean sortBySubAggregation) {
         String field = facet.get("field").asText();
         TermsAggregation.Builder termsBuilder = new TermsAggregation.Builder();
         termsBuilder.field(field);
@@ -329,7 +330,7 @@ public final class AggregationUtils {
             termsBuilder.minDocCount(minDocCount);
         }
 
-        return new Aggregation.Builder().terms(termsBuilder.build()).build();
+        return new Aggregation.Builder().aggregations(field,termsBuilder.build()) ;
     }
 
     /**
@@ -339,7 +340,7 @@ public final class AggregationUtils {
      * @return a term builder
      */
     public static Aggregation.Builder constructTermsAggregation(JsonNode facet) {
-        return constructTermsAggregation(facet, false);
+        return constructTermsAggregation(  facet, false);
     }
 
 }
