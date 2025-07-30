@@ -7,6 +7,7 @@ import co.elastic.clients.elasticsearch._types.aggregations.Aggregation;
 import co.elastic.clients.elasticsearch._types.aggregations.Aggregation.Builder;
 import co.elastic.clients.elasticsearch._types.aggregations.Aggregation.Builder.ContainerBuilder;
 import co.elastic.clients.elasticsearch._types.aggregations.AggregationBuilders;
+import co.elastic.clients.elasticsearch._types.aggregations.BucketsBuilders;
 import co.elastic.clients.elasticsearch._types.aggregations.DateHistogramAggregation;
 import co.elastic.clients.elasticsearch._types.aggregations.TermsAggregation;
 import co.elastic.clients.elasticsearch._types.query_dsl.BoolQuery;
@@ -139,10 +140,8 @@ public final class AggregationUtils {
                             AggregationUtils.getDateHistogramAggregation(facet).build()._toAggregation());
                 } else {
                     Aggregation agg;
-                    Aggregation termsAggs = constructTermsAggregation(facet);
+                    ContainerBuilder termsAggs = constructTermsAggregation(facet);
                     logger.info("key for termsAggs: " + facet.get("field").asText());
-                    aggregationMap.put(facet.get("field").asText(), termsAggs);
-
 
                     if (selectedFacets != null && !selectedFacets.isEmpty()) {
                         //Get current field
@@ -158,17 +157,20 @@ public final class AggregationUtils {
                             selectedFacetCopy.remove(facetField);
                             //Build bool_filter for the copy of the selected facets.
                             //We build sub aggregation filter only for "OR" facets
-                    //        agg = addSubAggregationFilter(aggregations, facet, termsAggs,
-                       //         selectedFacetCopy);
+
+                          agg = addSubAggregationFilter(aggregations, facet,
+                              selectedFacetCopy);
+                          termsAggs.aggregations(AGGS_FILTER_KEY, agg);
                         //    aggregationMap.put(facet.get("field").asText(), agg);
 
                         }
                         else {
-                            aggregationMap.put(facet.get("field").asText(), termsAggs);
                        //     agg = addSubAggregationFilter(aggregations, facet, termsAggs, selectedFacets);
                        //     aggregationMap.put(facet.get("field").asText(),agg);
                         }
                         }
+                    aggregationMap.put(facet.get("field").asText(), termsAggs.build());
+
 
                 }
             }
@@ -181,15 +183,13 @@ public final class AggregationUtils {
      * Adds sub aggregation filter with the name "aggs_filter". Sub aggregations are added only to "OR" facets
      */
     private static Aggregation addSubAggregationFilter(String aggs, JsonNode currentFacet,
-                                                              Aggregation aggBuilder,
+
                                                               Map<String, List<String>> selectedFacets)
     {
         BoolQuery.Builder aggsFilter = FilterUtils.getPostFilter(selectedFacets, aggs);
         Map<String, Aggregation> subAggregationMap = new HashMap<>();
         if (aggsFilter.hasClauses()) {
-            subAggregationMap.put(AGGS_FILTER_KEY, new Aggregation.Builder().filter(aggsFilter.build()._toQuery()).build());
-            return  new Aggregation.Builder().filter(aggsFilter.build()._toQuery()).aggregations(subAggregationMap).build();
-
+            return  new Aggregation.Builder().filter(aggsFilter.build()._toQuery()).build();
             // create a sub aggregation to add to an aggregation
             /**
              *  Map<String, Aggregation> map = new HashMap<>();
@@ -214,7 +214,7 @@ public final class AggregationUtils {
              */
          //   aggBuilder.term
    }
-        return aggBuilder;
+        else {throw new RuntimeException("No sub aggregation filter added to aggregation, should not be called");}
     }
 
 
@@ -271,7 +271,7 @@ public final class AggregationUtils {
      * @return a term builder
      *
      **/
-    public static Aggregation constructTermsAggregation(JsonNode facet, boolean sortBySubAggregation) {
+    public static ContainerBuilder constructTermsAggregation(JsonNode facet, boolean sortBySubAggregation) {
         String field = facet.get("field").asText();
 
         Aggregation.Builder termsBuilder = new Aggregation.Builder();
@@ -343,7 +343,7 @@ public final class AggregationUtils {
             termsAggregationBuilder.minDocCount(minDocCount);
         }
 
-        return termsBuilder.terms(termsAggregationBuilder.build()).build() ;
+        return termsBuilder.terms(termsAggregationBuilder.build()) ;
     }
 
     /**
@@ -352,7 +352,7 @@ public final class AggregationUtils {
      * @param facet a JSON object
      * @return a term builder
      */
-    public static Aggregation constructTermsAggregation(JsonNode facet) {
+    public static ContainerBuilder constructTermsAggregation(JsonNode facet) {
         return constructTermsAggregation(  facet, false);
     }
 

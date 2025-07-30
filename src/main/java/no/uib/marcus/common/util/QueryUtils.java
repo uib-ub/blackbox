@@ -128,6 +128,7 @@ public final class QueryUtils {
                 jacksonGenerator.useDefaultPrettyPrinter();
                 JsonGenerator generator = new JacksonJsonpGenerator(jacksonGenerator);
                 response.serialize(generator, new JacksonJsonpMapper());
+
                generator.close();
                return writer.toString();
             }
