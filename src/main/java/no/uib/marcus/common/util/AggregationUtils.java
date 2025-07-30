@@ -157,10 +157,12 @@ public final class AggregationUtils {
                             selectedFacetCopy.remove(facetField);
                             //Build bool_filter for the copy of the selected facets.
                             //We build sub aggregation filter only for "OR" facets
-
-                          agg = addSubAggregationFilter(aggregations, facet,
-                              selectedFacetCopy);
+                            BoolQuery.Builder aggsFilter = FilterUtils.getPostFilter(selectedFacets, aggregations);
+                            if (aggsFilter.hasClauses()){
+                          agg = addSubAggregationFilter(aggsFilter, facet
+                              );
                           termsAggs.aggregations(AGGS_FILTER_KEY, agg);
+                            }
                         //    aggregationMap.put(facet.get("field").asText(), agg);
 
                         }
@@ -182,14 +184,10 @@ public final class AggregationUtils {
     /**
      * Adds sub aggregation filter with the name "aggs_filter". Sub aggregations are added only to "OR" facets
      */
-    private static Aggregation addSubAggregationFilter(String aggs, JsonNode currentFacet,
+    private static Aggregation addSubAggregationFilter(BoolQuery.Builder aggsFilter, JsonNode currentFacet) {
 
-                                                              Map<String, List<String>> selectedFacets)
-    {
-        BoolQuery.Builder aggsFilter = FilterUtils.getPostFilter(selectedFacets, aggs);
-        Map<String, Aggregation> subAggregationMap = new HashMap<>();
-        if (aggsFilter.hasClauses()) {
-            return  new Aggregation.Builder().filter(aggsFilter.build()._toQuery()).build();
+        return new Aggregation.Builder().filter(aggsFilter.build()._toQuery()).build();
+    }
             // create a sub aggregation to add to an aggregation
             /**
              *  Map<String, Aggregation> map = new HashMap<>();
@@ -213,9 +211,6 @@ public final class AggregationUtils {
              *         .build();
              */
          //   aggBuilder.term
-   }
-        else {throw new RuntimeException("No sub aggregation filter added to aggregation, should not be called");}
-    }
 
 
     /**
