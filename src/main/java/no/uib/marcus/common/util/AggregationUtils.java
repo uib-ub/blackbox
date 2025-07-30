@@ -2,6 +2,7 @@ package no.uib.marcus.common.util;
 
 import co.elastic.clients.elasticsearch._types.SortOrder;
 import co.elastic.clients.elasticsearch._types.Time;
+import co.elastic.clients.elasticsearch._types.aggregations.AggregateBuilders;
 import co.elastic.clients.elasticsearch._types.aggregations.Aggregation;
 import co.elastic.clients.elasticsearch._types.aggregations.Aggregation.Builder;
 import co.elastic.clients.elasticsearch._types.aggregations.Aggregation.Builder.ContainerBuilder;
@@ -138,7 +139,10 @@ public final class AggregationUtils {
                             AggregationUtils.getDateHistogramAggregation(facet).build()._toAggregation());
                 } else {
                     Aggregation agg;
-                    Aggregation.Builder termsAggs = constructTermsAggregation(facet);
+                    Aggregation termsAggs = constructTermsAggregation(facet);
+                    logger.info("key for termsAggs: " + facet.get("field").asText());
+                    aggregationMap.put(facet.get("field").asText(), termsAggs);
+
 
                     if (selectedFacets != null && !selectedFacets.isEmpty()) {
                         //Get current field
@@ -154,19 +158,22 @@ public final class AggregationUtils {
                             selectedFacetCopy.remove(facetField);
                             //Build bool_filter for the copy of the selected facets.
                             //We build sub aggregation filter only for "OR" facets
-                            agg = addSubAggregationFilter(aggregations, facet, termsAggs,
-                                selectedFacetCopy);
-                            aggregationMap.put(facet.get("field").asText(), agg);
+                    //        agg = addSubAggregationFilter(aggregations, facet, termsAggs,
+                       //         selectedFacetCopy);
+                        //    aggregationMap.put(facet.get("field").asText(), agg);
+
                         }
                         else {
-                            agg = addSubAggregationFilter(aggregations, facet, termsAggs, selectedFacets);
-                            aggregationMap.put(facet.get("field").asText(),agg);
+                            aggregationMap.put(facet.get("field").asText(), termsAggs);
+                       //     agg = addSubAggregationFilter(aggregations, facet, termsAggs, selectedFacets);
+                       //     aggregationMap.put(facet.get("field").asText(),agg);
                         }
                         }
 
                 }
             }
         }
+        logger.info("Aggregations added to search request: " + aggregationMap.toString());
         return searchRequest.aggregations(aggregationMap);
     }
 
@@ -174,7 +181,7 @@ public final class AggregationUtils {
      * Adds sub aggregation filter with the name "aggs_filter". Sub aggregations are added only to "OR" facets
      */
     private static Aggregation addSubAggregationFilter(String aggs, JsonNode currentFacet,
-                                                              Aggregation.Builder aggBuilder,
+                                                              Aggregation aggBuilder,
                                                               Map<String, List<String>> selectedFacets)
     {
         BoolQuery.Builder aggsFilter = FilterUtils.getPostFilter(selectedFacets, aggs);
@@ -207,7 +214,7 @@ public final class AggregationUtils {
              */
          //   aggBuilder.term
    }
-        return aggBuilder.filter(aggsFilter.build()._toQuery()).build();
+        return aggBuilder;
     }
 
 
@@ -264,14 +271,20 @@ public final class AggregationUtils {
      * @return a term builder
      *
      **/
-    public static Aggregation.Builder constructTermsAggregation(JsonNode facet, boolean sortBySubAggregation) {
+    public static Aggregation constructTermsAggregation(JsonNode facet, boolean sortBySubAggregation) {
         String field = facet.get("field").asText();
-        TermsAggregation.Builder termsBuilder = new TermsAggregation.Builder();
-        termsBuilder.field(field);
+
+        Aggregation.Builder termsBuilder = new Aggregation.Builder();
+        TermsAggregation.Builder termsAggregationBuilder = new TermsAggregation.Builder();
+        logger.info("field for termsAggs2: " + field);
+
+        termsAggregationBuilder.field(field);
+
+       // move down termsBuilder.terms(new TermsAggregation.Builder().field(field));
         //Set size
         if (facet.has("size")) {
             int size = facet.get("size").asInt();
-            termsBuilder.size(size);
+            termsAggregationBuilder.size(size);
         }
         //Set order
         /**
@@ -317,20 +330,20 @@ public final class AggregationUtils {
             if (sortBySubAggregation) {//Sort using sub aggregation
             //    termsBuilder.order(subAggregationOrder);
             } else { //sort normally using top aggregation
-                termsBuilder.order(order);
+                termsAggregationBuilder.order(order);
             }
         } else {//if order is not specified
             if (sortBySubAggregation) { //use sub aggregation order, otherwise let Elasticsearch decides
-                termsBuilder.order(subAggregationOrder);
+                termsAggregationBuilder.order(subAggregationOrder);
             }
         }
         //Set number of minimum documents that should be returned
         if (facet.has("min_doc_count")) {
             int minDocCount = facet.get("min_doc_count").asInt();
-            termsBuilder.minDocCount(minDocCount);
+            termsAggregationBuilder.minDocCount(minDocCount);
         }
 
-        return new Aggregation.Builder().aggregations(field,termsBuilder.build()) ;
+        return termsBuilder.terms(termsAggregationBuilder.build()).build() ;
     }
 
     /**
@@ -339,7 +352,7 @@ public final class AggregationUtils {
      * @param facet a JSON object
      * @return a term builder
      */
-    public static Aggregation.Builder constructTermsAggregation(JsonNode facet) {
+    public static Aggregation constructTermsAggregation(JsonNode facet) {
         return constructTermsAggregation(  facet, false);
     }
 

@@ -14,6 +14,7 @@ import jakarta.json.stream.JsonGenerator;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.util.List;
+import java.util.regex.Pattern;
 
 import static no.uib.marcus.common.util.BlackboxUtils.isNullOrEmpty;
 
@@ -23,6 +24,10 @@ import static no.uib.marcus.common.util.BlackboxUtils.isNullOrEmpty;
 public final class QueryUtils {
 
     private static final char WILDCARD = '*';
+
+    private static final Pattern AGGREGATION_KEY_PATTERN =
+        Pattern.compile("\"(\\w+)#([^\"]+)\":");
+
 
     //Elasticsearch reserved characters (without the minus sign)
     private static final char[] RESERVED_CHARS = {
@@ -128,7 +133,8 @@ public final class QueryUtils {
             }
             JsonGenerator generator =  new JacksonJsonpGenerator(jacksonGenerator);
             response.serialize(generator, new JacksonJsonpMapper());
+
             generator.close();
-            return writer.toString();
+            return AGGREGATION_KEY_PATTERN.matcher(writer.toString()).replaceAll("\"$2\":");
     }
 }
