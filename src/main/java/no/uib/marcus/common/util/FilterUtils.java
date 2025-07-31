@@ -156,13 +156,14 @@ public final class FilterUtils {
             LocalDate toDate = dateRange.getTo();
 
             if (Objects.nonNull(fromDate) || Objects.nonNull(toDate)) {
+                logger.info("Adding date-range between " + fromDate + " and " + toDate);
 
                 //Range within "created" field
                 var created_range = new DateRangeQuery.Builder().field(Params.DateField.CREATED);
-                if (JsonData.of(fromDate) != null) {
+                if (fromDate != null) {
                     created_range.gte(JsonData.of(fromDate).toString());
                 }
-                if (JsonData.of(toDate) != null) {
+                if (toDate != null ) {
                     created_range.lte(JsonData.of(toDate).toString());
                 }
                 boolFilter.should(QueryBuilders.range().date(created_range.build()).build()._toQuery());
@@ -180,10 +181,12 @@ public final class FilterUtils {
                                    madeAfter================================madeBefore
                 */
                 var range = new DateRangeQuery.Builder().field(Params.DateField.MADE_AFTER);
-                if (JsonData.of(fromDate) != null)
-                    range.gte(JsonData.of(fromDate).toString());
-                if (JsonData.of(toDate) != null)
-                     range.lte(JsonData.of(toDate).toString());
+                if (fromDate != null) {
+                    range.gte(JsonData.of(fromDate.toString()).toString());
+                }
+                if (toDate != null) {
+                    range.lte(JsonData.of(toDate.toString()).toString());
+                }
                 boolFilter.should(QueryBuilders.bool()
                         .must(QueryBuilders.range().date(range.build()).build()._toQuery()).build()._toQuery());
 
@@ -196,9 +199,9 @@ public final class FilterUtils {
                                    madeAfter================================|madeBefore
                 */
                 var range_ignore_made_after = new DateRangeQuery.Builder().field(Params.DateField.MADE_BEFORE);
-                if (JsonData.of(fromDate) != null)
+                if (fromDate != null)
                     range_ignore_made_after.gte(JsonData.of(fromDate).toString());
-                if (JsonData.of(toDate) != null)
+                if (toDate != null)
                     range_ignore_made_after.lte(JsonData.of(toDate).toString());
                 boolFilter.should(QueryBuilders.bool()
                         .must(QueryBuilders.range().date(range_ignore_made_after.build()).build()._toQuery()).build()._toQuery());

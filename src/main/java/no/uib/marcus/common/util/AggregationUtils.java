@@ -159,6 +159,7 @@ public final class AggregationUtils {
                             //We build sub aggregation filter only for "OR" facets
                             BoolQuery.Builder aggsFilter = FilterUtils.getPostFilter(selectedFacets, aggregations);
                             if (aggsFilter.hasClauses()){
+                                logger.info("Aggregations aggsfilter added to search request: " + aggsFilter.toString());
                           agg = addSubAggregationFilter(aggsFilter, facet
                               );
                           termsAggs.aggregations(AGGS_FILTER_KEY, agg);
