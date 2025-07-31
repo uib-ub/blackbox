@@ -109,12 +109,12 @@ public class SearchServlet extends HttpServlet {
                     selectedFacets, aggs, DateRange.of(fromDate, toDate)
             );
             if (topFilter.hasClauses()) {
-        // @todo        builder.setFilter(topFilter);
+                builder.setFilter(topFilter);
             }
             //Add post filter for "OR" aggregations if any
             BoolQuery.Builder postFilter = FilterUtils.getPostFilter(selectedFacets, aggs);
             if (postFilter.hasClauses()) {
-           // @todo     builder.setPostFilter(postFilter);
+               builder.setPostFilter(postFilter);
             }
             //Send search request to Elasticsearch and execute
             try {

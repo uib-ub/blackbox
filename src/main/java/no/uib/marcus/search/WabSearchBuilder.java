@@ -65,22 +65,26 @@ public class WabSearchBuilder extends AbstractSearchBuilder<WabSearchBuilder> {
             // @todo find out
             // Set Query, whether with or without filter
             if (getFilter() != null) {
-                searchRequest.query(QueryBuilders.bool().filter(List.of(getFilter().build())).must( query).build()._toQuery());
+                logger.info("setting filter");
+                searchRequest.query(QueryBuilders.bool().must(query).filter(getFilter().build().filter()).build()._toQuery());
             } else {
                 searchRequest.query(query);
             }
             //Set post filter
             if (getPostFilter() != null) {
+                logger.info("setting post filter");
                 searchRequest.postFilter(getPostFilter().build());
             }
             //Set sortBuilder
             if (getSortBuilder() != null) {
+                logger.info("setting sort builder");
                 searchRequest.sort(List.of(getSortBuilder().build()));
             }
             //Append aggregations to the request builder
             if (StringUtils.hasText(getAggregations())) {
                 logger.info("adding aggreations");
-                AggregationUtils.addAggregations(searchRequest, getAggregations(), getSelectedFacets());
+                SearchRequest.Builder aggRequest = AggregationUtils.addAggregations(searchRequest, getAggregations(), getSelectedFacets());
+                searchRequest = aggRequest;
             }
 
             //Set from and size

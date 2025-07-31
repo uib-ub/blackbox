@@ -5,8 +5,6 @@ import co.elastic.clients.elasticsearch._types.query_dsl.BoolQuery;
 import co.elastic.clients.elasticsearch._types.query_dsl.DateRangeQuery;
 import co.elastic.clients.elasticsearch._types.query_dsl.QueryBuilders;
 import co.elastic.clients.elasticsearch._types.query_dsl.TermsQueryField;
-import co.elastic.clients.json.JsonData;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import no.uib.marcus.common.Params;
 import no.uib.marcus.range.DateRange;
 
@@ -148,6 +146,8 @@ public final class FilterUtils {
             throw new NullPointerException("Cannot append date ranges to a null bool_filter");
         }
 
+         BoolQuery.Builder boolBuilderShouldContainer = QueryBuilders.bool();
+
         if (Objects.nonNull(dateRange)) {
             //Get lower boundary for this range
             LocalDate fromDate = dateRange.getFrom();
@@ -161,12 +161,15 @@ public final class FilterUtils {
                 //Range within "created" field
                 var created_range = new DateRangeQuery.Builder().field(Params.DateField.CREATED);
                 if (fromDate != null) {
-                    created_range.gte(JsonData.of(fromDate).toString());
+                    created_range.gte(fromDate.toString());
+                    logger.info("Adding date-range between " + fromDate + " and " + toDate + " to created field");
                 }
                 if (toDate != null ) {
-                    created_range.lte(JsonData.of(toDate).toString());
+                    created_range.lte(toDate.toString());
+                    logger.info("Adding date-range between " + fromDate + " and " + toDate + " to created field");
                 }
-                boolFilter.should(QueryBuilders.range().date(created_range.build()).build()._toQuery());
+                logger.info("adding created_range query");
+                boolBuilderShouldContainer.must(created_range.build()._toRangeQuery());
 
 
                 /*
@@ -182,13 +185,13 @@ public final class FilterUtils {
                 */
                 var range = new DateRangeQuery.Builder().field(Params.DateField.MADE_AFTER);
                 if (fromDate != null) {
-                    range.gte(JsonData.of(fromDate.toString()).toString());
+                    range.gte(fromDate.toString().toString());
                 }
                 if (toDate != null) {
-                    range.lte(JsonData.of(toDate.toString()).toString());
+                    range.lte(toDate.toString().toString());
                 }
-                boolFilter.should(QueryBuilders.bool()
-                        .must(QueryBuilders.range().date(range.build()).build()._toQuery()).build()._toQuery());
+//                boolBuilderShouldContainer.should(QueryBuilders.bool()
+  //                      .must(QueryBuilders.range().date(range.build()).build()._toQuery()).build()._toQuery());
 
                /*
                  Here the condition in which madeBefore >= from_date and madeBefore <= to_date, we don't care
@@ -200,11 +203,11 @@ public final class FilterUtils {
                 */
                 var range_ignore_made_after = new DateRangeQuery.Builder().field(Params.DateField.MADE_BEFORE);
                 if (fromDate != null)
-                    range_ignore_made_after.gte(JsonData.of(fromDate).toString());
+                    range_ignore_made_after.gte(fromDate.toString());
                 if (toDate != null)
-                    range_ignore_made_after.lte(JsonData.of(toDate).toString());
-                boolFilter.should(QueryBuilders.bool()
-                        .must(QueryBuilders.range().date(range_ignore_made_after.build()).build()._toQuery()).build()._toQuery());
+                    range_ignore_made_after.lte(toDate.toString());
+       //         boolBuilderShouldContainer.should(QueryBuilders.bool()
+         //               .must(QueryBuilders.range().date(range_ignore_made_after.build()).build()._toQuery()).build()._toQuery());
                  /*
                   This is a case that fromDate and toDate are within madeAfter and madeBefore range.
                   Precondition:  both fromDate and toDate must have values AND fromDate <= toDate.
@@ -216,19 +219,23 @@ public final class FilterUtils {
                  */
                 if (dateRange.isPositive()) {
                     var range_made_before = new DateRangeQuery.Builder().field(Params.DateField.MADE_BEFORE);
-                    range_made_before.gte(JsonData.of(fromDate).toString());
+                    range_made_before.gte(fromDate.toString());
                     var range_made_after = new DateRangeQuery.Builder().field(Params.DateField.MADE_AFTER);
-                    range_made_after.lte(JsonData.of(toDate).toString());
+                    range_made_after.lte(toDate.toString());
 
-                    boolFilter.should(QueryBuilders.bool()
-                            .must(QueryBuilders.
-                                    range().date(range_made_after.build()).build()._toQuery())
-                            .must(QueryBuilders.
-                                    range().date(range_made_before.build()).build()._toQuery())
-                            .build()._toQuery());
+               //     boolBuilderShouldContainer.should(QueryBuilders.bool()
+                 //           .must(QueryBuilders.
+                   //                 range().date(range_made_after.build()).build()._toQuery())
+                     //       .must(QueryBuilders.
+                       //             range().date(range_made_before.build()).build()._toQuery())
+                         //   .build()._toQuery());
 
                 }
             }
+        }
+        if (boolBuilderShouldContainer.hasClauses()){
+            logger.info("hasClauses: Adding date-range to bool_filter");
+            boolFilter.must(boolBuilderShouldContainer.build());
         }
         return boolFilter;
     }

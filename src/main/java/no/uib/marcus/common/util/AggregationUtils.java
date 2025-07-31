@@ -229,10 +229,12 @@ public final class AggregationUtils {
 
         //Set date format
         if (facet.has("format")) {
+            logger.info("datehistogram has format");
             dateHistBuilder.format(facet.get("format").asText());
         }
         //Set interval
         if (facet.has("interval")) {
+            logger.info("datehistogram has interval");
             dateHistBuilder.fixedInterval(new Time.Builder().time(facet.get("interval").asText()).build());
         }
         //Set number of minimum documents that should be returned
@@ -242,7 +244,6 @@ public final class AggregationUtils {
         //Set order
         if (facet.has("order")) {
             NamedValue<SortOrder> order ;
-            //new NamedValue<>("_count", SortOrder.Asc);
 
             if (facet.get("order").asText().equalsIgnoreCase("count_asc")) {
                 order = new NamedValue<>("_count", SortOrder.Asc);

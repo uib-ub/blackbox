@@ -56,7 +56,7 @@ public class SkaSearchBuilder extends MarcusSearchBuilder {
             }
             //Set query whether with or without filter
             if (getFilter() != null) {
-                searchRequest.query(QueryBuilders.bool().filter(List.of(getFilter().build())).build()._toQuery());
+               //@todo searchRequest.query(QueryBuilders.bool().filter(List.of(getFilter().build())).build()._toQuery());
             } else {
                 searchRequest.query(query);
             }

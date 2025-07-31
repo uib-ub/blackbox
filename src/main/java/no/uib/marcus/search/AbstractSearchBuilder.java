@@ -2,6 +2,7 @@ package no.uib.marcus.search;
 
 import co.elastic.clients.elasticsearch.ElasticsearchClient;
 import co.elastic.clients.elasticsearch._types.SortOptions;
+import co.elastic.clients.elasticsearch._types.query_dsl.BoolQuery;
 import co.elastic.clients.elasticsearch._types.query_dsl.Query;
 import co.elastic.clients.elasticsearch.core.SearchRequest;
 import co.elastic.clients.elasticsearch.core.SearchResponse;
@@ -37,7 +38,7 @@ public abstract class AbstractSearchBuilder<T extends AbstractSearchBuilder<T>> 
     private String[] types;
     @Nullable
     private String queryString;
-    private Query.Builder filter, postFilter;
+    private BoolQuery.Builder filter, postFilter;
     private Map<String, List<String>> selectedFacets;
     private String aggregations;
     private SortOptions.Builder sortBuilder;
@@ -110,7 +111,7 @@ public abstract class AbstractSearchBuilder<T extends AbstractSearchBuilder<T>> 
     /**
      * Get sort builder or <tt>null</tt> if not set
      **/
-    public Query.Builder getFilter() {
+    public BoolQuery.Builder getFilter() {
         return filter;
     }
 
@@ -121,7 +122,7 @@ public abstract class AbstractSearchBuilder<T extends AbstractSearchBuilder<T>> 
      * @return this object where filter has been set
      */
     @SuppressWarnings("unchecked")
-    public T setFilter(Query.Builder filter) {
+    public T setFilter(BoolQuery.Builder filter) {
         this.filter = filter;
         return (T) this;
     }
@@ -129,7 +130,7 @@ public abstract class AbstractSearchBuilder<T extends AbstractSearchBuilder<T>> 
     /**
      * Get POST filter or <tt>null</tt> if not set
      */
-    public Query.Builder getPostFilter() {
+    public BoolQuery.Builder getPostFilter() {
         return postFilter;
     }
 
@@ -141,7 +142,7 @@ public abstract class AbstractSearchBuilder<T extends AbstractSearchBuilder<T>> 
      * @return this object where post_filter has been set
      */
     @SuppressWarnings("unchecked")
-    public T setPostFilter(Query.Builder filter) {
+    public T setPostFilter(BoolQuery.Builder filter) {
         if(filter != null) {
             this.postFilter = filter;
         }
