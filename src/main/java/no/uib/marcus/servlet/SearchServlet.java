@@ -3,15 +3,19 @@ package no.uib.marcus.servlet;
 import co.elastic.clients.elasticsearch.ElasticsearchClient;
 import co.elastic.clients.elasticsearch._types.ElasticsearchException;
 import co.elastic.clients.elasticsearch._types.query_dsl.BoolQuery;
-import co.elastic.clients.elasticsearch.core.SearchResponse;
+import co.elastic.clients.json.jackson.JacksonJsonpGenerator;
+import co.elastic.clients.json.jackson.JacksonJsonpMapper;
+import co.elastic.clients.transport.rest_client.RestClientTransport;
+import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.databind.json.JsonMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import java.util.Arrays;
+import jakarta.json.stream.JsonGenerator;
+import java.io.OutputStream;
+import java.io.Serial;
+import java.io.StringWriter;
 import no.uib.marcus.client.ElasticsearchClientFactory;
 import no.uib.marcus.common.Params;
 import no.uib.marcus.common.util.FilterUtils;
-import no.uib.marcus.common.util.LogUtils;
-import no.uib.marcus.common.util.QueryUtils;
 import no.uib.marcus.range.DateRange;
 import no.uib.marcus.search.SearchBuilder;
 import no.uib.marcus.search.SearchBuilderFactory;
@@ -20,7 +24,6 @@ import java.util.logging.Logger;
 
 import no.uib.marcus.common.util.StringUtils;
 
-import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
@@ -29,6 +32,11 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.List;
 import java.util.Map;
+
+import org.elasticsearch.client.Request;
+import org.elasticsearch.client.RequestOptions;
+import org.elasticsearch.client.Response;
+import org.elasticsearch.client.RestClient;
 
 
 /**
@@ -46,6 +54,7 @@ import java.util.Map;
 
 public class SearchServlet extends HttpServlet {
     private static final Logger logger = Logger.getLogger(SearchServlet.class.getName());
+    @Serial
     private static final long serialVersionUID = 1L;
 
     /**
@@ -53,14 +62,13 @@ public class SearchServlet extends HttpServlet {
      *
      * @param request  HTTP servlet request
      * @param response HTTP servlet response
-     * @throws ServletException if a servlet-specific error occurs
      * @throws IOException      if an I/O error occurs
      *                          <p>
      *                          writes a JSON string of search hits.
      **/
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
+            throws IOException {
         request.setCharacterEncoding("UTF-8");
         response.setContentType("application/json;charset=UTF-8");
 
@@ -68,7 +76,6 @@ public class SearchServlet extends HttpServlet {
         String queryString = request.getParameter(Params.QUERY_STRING);
         String aggs = request.getParameter(Params.AGGREGATIONS);
         String[] indices = request.getParameterValues(Params.INDICES);
-        String[] types = request.getParameterValues(Params.INDEX_TYPES);
         String from = request.getParameter(Params.FROM);
         String size = request.getParameter(Params.SIZE);
         String fromDate = request.getParameter(Params.FROM_DATE);
@@ -79,8 +86,11 @@ public class SearchServlet extends HttpServlet {
         String service = request.getParameter(Params.SERVICE);
         String indexToBoost = request.getParameter(Params.INDEX_BOOST);
 
-        try (PrintWriter out = response.getWriter()) {
+        try ( OutputStream out = response.getOutputStream()) {
             ElasticsearchClient client = ElasticsearchClientFactory.getElasticsearchClient();
+            RestClientTransport restClientTransport = (RestClientTransport) client._transport();
+            RestClient restClient = restClientTransport.restClient();
+
 
             //Assign default values, if needs be
             int _from = StringUtils.hasText(from) ? Integer.parseInt(from) : Params.DEFAULT_FROM;
@@ -116,23 +126,29 @@ public class SearchServlet extends HttpServlet {
             if (postFilter.hasClauses()) {
                builder.setPostFilter(postFilter);
             }
-            //Send search request to Elasticsearch and execute
-            try {
-                    SearchResponse<ObjectNode> searchResponse = builder.executeSearch();
+            //Serialize SearchBuilder request to JSON to skip serialization and deserialization
+            // and properly serialize aggregations without type names in
+            // key, eg not "sterms#related.exact": but "related:exact"
+            try (StringWriter writer = new StringWriter()) {
+                JsonFactory jsonFactory = new JsonFactory();
+                com.fasterxml.jackson.core.JsonGenerator jacksonGenerator = jsonFactory.createGenerator(writer);
+                if (Boolean.getBoolean(isPretty)) {
+                    jacksonGenerator.useDefaultPrettyPrinter();
+                }
+                JsonGenerator generator = new JacksonJsonpGenerator(jacksonGenerator);
+                builder.constructSearchRequest().build().serialize(generator,new JacksonJsonpMapper());
 
-                //Decide whether to get a pretty JSON output or not
-                String searchResponseString = Boolean.getBoolean(isPretty)
-                    ? QueryUtils.toJsonString(searchResponse, true)
-                    : QueryUtils.toJsonString(searchResponse, false);
+                generator.close();
 
-                //Write response to the client
-                out.write(searchResponseString);
+                // Are there things added other than indicies lost between the translation of low level
+                // and the new rest client ?
+                String requestAsJson = writer.toString();
+                Request request1 = new Request("POST", buildEndpoint(indices));
+                request1.setJsonEntity(requestAsJson);
+                request1.setOptions(RequestOptions.DEFAULT.toBuilder());
+                Response response1 = restClient.performRequest(request1);
+                response1.getEntity().writeTo(out);
 
-                // Log search response
-                logger.info(LogUtils.createLogMessage(request, searchResponse));
-                // System.out.println("Builder class: " + builder.getClass().getName() + " " +
-                //
-                //                 "\nBuilder toString: " + builder  );
             } catch (ElasticsearchException e) {
                 logger.info("reason " + e.error().reason());
                 //logger.info("caused by " + e.error().causedBy().reason());
@@ -146,6 +162,12 @@ public class SearchServlet extends HttpServlet {
             }
         }
 
+    private static String buildEndpoint(String[] indices) {
+        if (indices != null && indices.length > 0) {
+            return "/" + String.join(",", indices) + "/_search";
+        }
+        return "/_search";
+    }
 
 
 
@@ -154,12 +176,11 @@ public class SearchServlet extends HttpServlet {
      *
      * @param request  servlet request
      * @param response servlet response
-     * @throws ServletException if a servlet-specific error occurs
      * @throws IOException      if an I/O error occurs
      */
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
+            throws IOException {
 
         ObjectNode objectNode = new JsonMapper().createObjectNode();
         objectNode.put("field", 405);
@@ -170,8 +191,7 @@ public class SearchServlet extends HttpServlet {
         response.setContentType("application/json;charset=UTF-8");
 
         try (PrintWriter out = response.getWriter()) {
-            out.write(objectNode.toPrettyString()
-             );
+            out.write(objectNode.toPrettyString());
         }
     }
 

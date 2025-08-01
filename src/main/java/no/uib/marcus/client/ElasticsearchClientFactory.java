@@ -56,8 +56,8 @@ final public class ElasticsearchClientFactory {
 
             JacksonJsonpMapper jsonMapper = new JacksonJsonpMapper();
             ElasticsearchTransport elasticsearchTransport = new RestClientTransport(restClient, jsonMapper);
-                ElasticsearchClient client = new ElasticsearchClient(elasticsearchTransport);
-                HealthResponse hr = client.cluster().health();
+            ElasticsearchClient client = new ElasticsearchClient(elasticsearchTransport);
+            HealthResponse hr = client.cluster().health();
             logger.log(Level.INFO, "Connected to Elasticsearch cluster: " + hr);
             return client;
         } catch (UnknownHostException e) {
@@ -69,8 +69,6 @@ final public class ElasticsearchClientFactory {
         }
 
     }
-
-
 
     /**
      *  Synchronize the call so that different threads do not end up creating multiple instances
@@ -93,8 +91,6 @@ final public class ElasticsearchClientFactory {
                 properties.put("api_key", required("ELASTICSEARCH_CLUSTER_API_KEY"));
                 logger.info("configuration loaded from env variables");
             }
-
-
             elasticsearchClient = createTransportClient(properties);
         }
         return elasticsearchClient;

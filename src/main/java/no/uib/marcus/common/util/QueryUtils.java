@@ -7,6 +7,10 @@ import co.elastic.clients.elasticsearch.core.SearchResponse;
 import co.elastic.clients.json.jackson.JacksonJsonpGenerator;
 import co.elastic.clients.json.jackson.JacksonJsonpMapper;
 import com.fasterxml.jackson.core.JsonFactory;
+import com.fasterxml.jackson.core.JsonGenerator.Feature;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationConfig;
+import com.fasterxml.jackson.databind.cfg.DatatypeFeature;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 
@@ -129,13 +133,18 @@ public final class QueryUtils {
                 JsonGenerator generator = new JacksonJsonpGenerator(jacksonGenerator);
                 response.serialize(generator, new JacksonJsonpMapper());
 
+                response.aggregations();
+
                generator.close();
                return writer.toString();
             }
             JsonGenerator generator =  new JacksonJsonpGenerator(jacksonGenerator);
             response.serialize(generator, new JacksonJsonpMapper());
-
+     //   ObjectMapper customObjectMapper =  new ObjectMapper().configure(Seria);
             generator.close();
-            return AGGREGATION_KEY_PATTERN.matcher(writer.toString()).replaceAll("\"$2\":");
+            return writer.toString();
+
+                //AGGREGATION_KEY_PATTERN.matcher(writer.toString()writer.toString()
+            //).replaceAll("\"$2\":");
     }
 }
