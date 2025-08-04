@@ -3,7 +3,10 @@ package no.uib.marcus.common.util;
 import co.elastic.clients.elasticsearch._types.FieldValue;
 import co.elastic.clients.elasticsearch._types.query_dsl.BoolQuery;
 import co.elastic.clients.elasticsearch._types.query_dsl.DateRangeQuery;
+import co.elastic.clients.elasticsearch._types.query_dsl.Query;
 import co.elastic.clients.elasticsearch._types.query_dsl.QueryBuilders;
+import co.elastic.clients.elasticsearch._types.query_dsl.RangeQuery;
+import co.elastic.clients.elasticsearch._types.query_dsl.RangeQueryBuilders;
 import co.elastic.clients.elasticsearch._types.query_dsl.TermsQueryField;
 
 import no.uib.marcus.common.Params;
@@ -193,6 +196,8 @@ public final class FilterUtils {
                 if (toDate != null) {
                     range.lte(toDate.toString().toString());
                 }
+                List<Query> from_to_queries = List.of(range.build()._toRangeQuery()._toQuery());
+                boolBuilderShouldContainer.must(from_to_queries);
 //                boolBuilderShouldContainer.should(QueryBuilders.bool()
   //                      .must(QueryBuilders.range().date(range.build()).build()._toQuery()).build()._toQuery());
 
@@ -205,10 +210,19 @@ public final class FilterUtils {
                                    madeAfter================================|madeBefore
                 */
                 var range_ignore_made_after = new DateRangeQuery.Builder().field(Params.DateField.MADE_BEFORE);
-                if (fromDate != null)
+                if (fromDate != null) {
                     range_ignore_made_after.gte(fromDate.toString());
-                if (toDate != null)
+                }
+                if (toDate != null) {
                     range_ignore_made_after.lte(toDate.toString());
+                }
+
+                if (fromDate != null || toDate != null) {
+                    List<Query> ignore_query = List.of(range_ignore_made_after.build()._toRangeQuery()._toQuery());
+                    boolBuilderShouldContainer.must(ignore_query);
+                }
+
+
        //         boolBuilderShouldContainer.should(QueryBuilders.bool()
          //               .must(QueryBuilders.range().date(range_ignore_made_after.build()).build()._toQuery()).build()._toQuery());
                  /*
@@ -222,10 +236,16 @@ public final class FilterUtils {
                  */
                 if (dateRange.isPositive()) {
                     var range_made_before = new DateRangeQuery.Builder().field(Params.DateField.MADE_BEFORE);
-                    range_made_before.gte(fromDate.toString());
+                    range_made_before.gte(Objects.requireNonNull(fromDate.toString()));
                     var range_made_after = new DateRangeQuery.Builder().field(Params.DateField.MADE_AFTER);
-                    range_made_after.lte(toDate.toString());
+                    range_made_after.lte(Objects.requireNonNull(toDate.toString()));
 
+                    List<Query> made_ba_queries = List.of(range_made_after.build()._toRangeQuery()._toQuery(),
+                        range_made_before.build()._toRangeQuery()._toQuery());
+
+                    boolBuilderShouldContainer.must(made_ba_queries);
+
+                    //@todo keep for debugging until madeBefore/madeAfter is ok
                //     boolBuilderShouldContainer.should(QueryBuilders.bool()
                  //           .must(QueryBuilders.
                    //                 range().date(range_made_after.build()).build()._toQuery())
