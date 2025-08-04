@@ -153,6 +153,7 @@ public final class FilterUtils {
         }
 
          BoolQuery.Builder boolBuilderShouldContainer = QueryBuilders.bool();
+        List<Query> queries = new ArrayList<>();
 
         if (Objects.nonNull(dateRange)) {
             //Get lower boundary for this range
@@ -160,7 +161,6 @@ public final class FilterUtils {
 
             //Get upper boundary for this range
             LocalDate toDate = dateRange.getTo();
-
             if (Objects.nonNull(fromDate) || Objects.nonNull(toDate)) {
                 logger.info("Adding date-range between " + fromDate + " and " + toDate);
 
@@ -175,7 +175,8 @@ public final class FilterUtils {
                     logger.info("Adding date-range between " + fromDate + " and " + toDate + " to created field");
                 }
                 logger.info("adding created_range query");
-                boolBuilderShouldContainer.should(created_range.build()._toRangeQuery());
+
+                queries.add(created_range.build()._toRangeQuery()._toQuery());
 
 
                 /*
@@ -196,8 +197,7 @@ public final class FilterUtils {
                 if (toDate != null) {
                     range.lte(toDate.toString().toString());
                 }
-                List<Query> from_to_queries = List.of(range.build()._toRangeQuery()._toQuery());
-                boolBuilderShouldContainer.should(from_to_queries);
+                queries.add(range.build()._toRangeQuery()._toQuery());
 //                boolBuilderShouldContainer.should(QueryBuilders.bool()
   //                      .must(QueryBuilders.range().date(range.build()).build()._toQuery()).build()._toQuery());
 
@@ -218,8 +218,8 @@ public final class FilterUtils {
                 }
 
                 if (fromDate != null || toDate != null) {
-                    List<Query> ignore_query = List.of(range_ignore_made_after.build()._toRangeQuery()._toQuery());
-                    boolBuilderShouldContainer.should(ignore_query);
+                    queries.add(range_ignore_made_after.build()._toRangeQuery()._toQuery());
+
                 }
 
 
@@ -240,10 +240,12 @@ public final class FilterUtils {
                     var range_made_after = new DateRangeQuery.Builder().field(Params.DateField.MADE_AFTER);
                     range_made_after.lte(Objects.requireNonNull(toDate.toString()));
 
-                    List<Query> made_ba_queries = List.of(range_made_after.build()._toRangeQuery()._toQuery(),
-                        range_made_before.build()._toRangeQuery()._toQuery());
 
-                    boolBuilderShouldContainer.should(made_ba_queries);
+                    Query made_before_after = QueryBuilders.bool().must(List.of(range_made_after.build()._toRangeQuery()._toQuery(),
+                        range_made_before.build()._toRangeQuery()._toQuery())).build()._toQuery();
+                    queries.add(made_before_after);
+
+
 
                     //@todo keep for debugging until madeBefore/madeAfter is ok
                //     boolBuilderShouldContainer.should(QueryBuilders.bool()
@@ -258,7 +260,7 @@ public final class FilterUtils {
         }
         if (boolBuilderShouldContainer.hasClauses()){
             logger.info("hasClauses: Adding date-range to bool_filter");
-            boolFilter.must(boolBuilderShouldContainer.build());
+            boolFilter.must(queries);
         }
         return boolFilter;
     }
