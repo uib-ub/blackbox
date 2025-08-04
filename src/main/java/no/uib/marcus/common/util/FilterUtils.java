@@ -266,7 +266,7 @@ public final class FilterUtils {
                 return Collections.emptyMap();
             }
             for (String entry : selectedFilters) {
-                assert entry != null;
+                Objects.requireNonNull(entry);
                 if (entry.lastIndexOf(FILTER_KEY_VALUE_SEPARATOR) != -1) {
                     //Get the index for the last occurrence of a separator
                     int lastIndex = entry.lastIndexOf(FILTER_KEY_VALUE_SEPARATOR);
