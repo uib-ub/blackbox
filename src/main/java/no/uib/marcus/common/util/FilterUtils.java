@@ -258,7 +258,7 @@ public final class FilterUtils {
                 }
             }
         }
-        if (boolBuilderShouldContainer.hasClauses()){
+        if (queries.size() > 0 && boolFilter != null){
             logger.info("hasClauses: Adding date-range to bool_filter");
             boolFilter.must(queries);
         }
