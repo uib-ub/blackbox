@@ -24,16 +24,16 @@ import java.util.Map;
 
 
 /**
- * A singleton that connects to Elasticsearch cluster through HighLevel Request client
- * <p>
- * The Client uses the REST ports (default 9200)
+ * A singleton that connects to Elasticsearch cluster through the elasticsearch-java client
+ * for build request
+ * and then builds a JSON that is used by the Elasticsearch low-level client
+ * for creating the request
+ *
+ *
  */
 final public class ElasticsearchClientFactory {
-
     private static final Logger logger = Logger.getLogger(ElasticsearchClientFactory.class.getName());
     private static ElasticsearchClient elasticsearchClient;
-
-
 
     /**
      * Prevent direct instantiation of this class
@@ -116,8 +116,4 @@ final public class ElasticsearchClientFactory {
     protected Object clone() throws CloneNotSupportedException {
         throw new CloneNotSupportedException("Cloning for this object is not supported");
     }
-
-
 }
-
-

@@ -1,13 +1,15 @@
 package no.uib.marcus.common.util;
 
 import co.elastic.clients.elasticsearch.core.SearchResponse;
-import com.fasterxml.jackson.databind.JsonNode;
+
 import com.fasterxml.jackson.databind.json.JsonMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+
 import no.uib.marcus.common.Params;
 
 import jakarta.servlet.http.HttpServletRequest;
 import java.io.IOException;
+
 import java.util.HashMap;
 import java.util.Map;
 

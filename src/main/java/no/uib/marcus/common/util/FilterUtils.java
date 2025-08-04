@@ -5,6 +5,7 @@ import co.elastic.clients.elasticsearch._types.query_dsl.BoolQuery;
 import co.elastic.clients.elasticsearch._types.query_dsl.DateRangeQuery;
 import co.elastic.clients.elasticsearch._types.query_dsl.QueryBuilders;
 import co.elastic.clients.elasticsearch._types.query_dsl.TermsQueryField;
+
 import no.uib.marcus.common.Params;
 import no.uib.marcus.range.DateRange;
 
@@ -21,6 +22,8 @@ import java.util.*;
  *
  * @author Hemed Ali Al Ruwehy
  * Last modified: 19-08-2017
+ *
+ * @author Øyvind Gjesdal
  */
 
 public final class FilterUtils {

@@ -6,19 +6,16 @@ import co.elastic.clients.elasticsearch._types.query_dsl.SimpleQueryStringQuery;
 import co.elastic.clients.elasticsearch.core.SearchResponse;
 import co.elastic.clients.json.jackson.JacksonJsonpGenerator;
 import co.elastic.clients.json.jackson.JacksonJsonpMapper;
+
 import com.fasterxml.jackson.core.JsonFactory;
-import com.fasterxml.jackson.core.JsonGenerator.Feature;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationConfig;
-import com.fasterxml.jackson.databind.cfg.DatatypeFeature;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
-
 import jakarta.json.stream.JsonGenerator;
+
 import java.io.IOException;
 import java.io.StringWriter;
+
 import java.util.List;
-import java.util.regex.Pattern;
 
 import static no.uib.marcus.common.util.BlackboxUtils.isNullOrEmpty;
 
@@ -28,10 +25,6 @@ import static no.uib.marcus.common.util.BlackboxUtils.isNullOrEmpty;
 public final class QueryUtils {
 
     private static final char WILDCARD = '*';
-
-    private static final Pattern AGGREGATION_KEY_PATTERN =
-        Pattern.compile("\"(\\w+)#([^\"]+)\":");
-
 
     //Elasticsearch reserved characters (without the minus sign)
     private static final char[] RESERVED_CHARS = {
@@ -133,18 +126,12 @@ public final class QueryUtils {
                 JsonGenerator generator = new JacksonJsonpGenerator(jacksonGenerator);
                 response.serialize(generator, new JacksonJsonpMapper());
 
-                response.aggregations();
-
                generator.close();
                return writer.toString();
             }
             JsonGenerator generator =  new JacksonJsonpGenerator(jacksonGenerator);
             response.serialize(generator, new JacksonJsonpMapper());
-     //   ObjectMapper customObjectMapper =  new ObjectMapper().configure(Seria);
             generator.close();
             return writer.toString();
-
-                //AGGREGATION_KEY_PATTERN.matcher(writer.toString()writer.toString()
-            //).replaceAll("\"$2\":");
     }
 }

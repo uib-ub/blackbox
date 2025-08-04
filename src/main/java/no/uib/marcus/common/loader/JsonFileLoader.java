@@ -13,7 +13,7 @@ import java.util.Map;
 /**
  * A class that provides utility methods for loading JSON config file.
  * <p>
- * author Hemed Ali
+ * author: Hemed Ali
  */
 public class JsonFileLoader {
 
@@ -52,7 +52,7 @@ public class JsonFileLoader {
     }
 
     /**
-     * Read JSON file from stream and get file contents as strings
+     * Read JSON file from a path and get file contents as strings
      *
      * @param filePath a file path
      * @return returns a string representation of the file contents.
@@ -71,14 +71,14 @@ public class JsonFileLoader {
     }
 
     /**
-     * Convert a JSON string to Java map
+     * Convert a JSON string to a Java map
      *
-     * @param source a valid JSON string
+     * @param filepath a valid JSON string
      * @return a Java map which is the result of JSON string
-     * @throws IOException
+     * @throws IOException if filepath doesn't exist
      */
-    public Map<String, String> toMap(String source) throws IOException {
-        return loadFromResource(source).get("cluster");
+    public Map<String, String> toMap(String filepath) throws IOException {
+        return loadFromResource(filepath).get("cluster");
     }
 
     /**

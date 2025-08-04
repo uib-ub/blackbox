@@ -2,22 +2,21 @@ package no.uib.marcus.common.util;
 
 import co.elastic.clients.elasticsearch._types.SortOrder;
 import co.elastic.clients.elasticsearch._types.Time;
-import co.elastic.clients.elasticsearch._types.aggregations.AggregateBuilders;
 import co.elastic.clients.elasticsearch._types.aggregations.Aggregation;
-import co.elastic.clients.elasticsearch._types.aggregations.Aggregation.Builder;
 import co.elastic.clients.elasticsearch._types.aggregations.Aggregation.Builder.ContainerBuilder;
-import co.elastic.clients.elasticsearch._types.aggregations.AggregationBuilders;
-import co.elastic.clients.elasticsearch._types.aggregations.BucketsBuilders;
 import co.elastic.clients.elasticsearch._types.aggregations.DateHistogramAggregation;
 import co.elastic.clients.elasticsearch._types.aggregations.TermsAggregation;
 import co.elastic.clients.elasticsearch._types.query_dsl.BoolQuery;
+
 import co.elastic.clients.elasticsearch.core.SearchRequest;
+
 import co.elastic.clients.util.NamedValue;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.json.JsonMapper;
+
 import no.uib.marcus.search.IllegalParameterException;
 
 import java.util.logging.Logger;
@@ -30,7 +29,15 @@ import java.util.Map;
  * Utility class for constructing aggregations.
  *
  * @author Hemed Ali Al Ruwehy
+ *
  * University of Bergen
+ *
+ * @author Øyvind Gjesdal
+ *
+ * University of Bergen
+ *
+ * TODO aggregation logic currently work in progress
+ *
  */
 public final class AggregationUtils {
     private static final Logger logger = Logger.getLogger(AggregationUtils.class.getName());
