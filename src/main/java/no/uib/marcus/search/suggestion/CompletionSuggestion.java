@@ -3,15 +3,12 @@ package no.uib.marcus.search.suggestion;
 import co.elastic.clients.elasticsearch.ElasticsearchClient;
 import co.elastic.clients.elasticsearch.core.SearchResponse;
 import co.elastic.clients.elasticsearch.core.search.*;
-import co.elastic.clients.json.jackson.JacksonJsonpGenerator;
-import co.elastic.clients.json.jackson.JacksonJsonpMapper;
-import com.fasterxml.jackson.core.JsonFactory;
+
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
+
 import com.fasterxml.jackson.databind.json.JsonMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import jakarta.json.stream.JsonGenerator;
-import java.io.StringWriter;
+
 import no.uib.marcus.client.ElasticsearchClientFactory;
 import co.elastic.clients.elasticsearch.core.SearchRequest.Builder;
 
@@ -42,9 +39,7 @@ public class CompletionSuggestion {
         Set<String> suggestValues = new HashSet<>();
         try {
             SearchResponse<ObjectNode> suggestResponse = getSuggestionResponse(text, size, indices);
-            List<Suggestion<ObjectNode>> suggestions = suggestResponse.suggest().get("suggest-test");
-
-            JsonFactory jsonFactory = new JsonFactory();
+            List<Suggestion<ObjectNode>> suggestions = suggestResponse.suggest().get("suggest");
 
             //Add each option(value) to a set to ensure no repetition
             for ( Suggestion<ObjectNode> suggestion : suggestions)
@@ -71,24 +66,22 @@ public class CompletionSuggestion {
      **/
     public static SearchResponse<ObjectNode> getSuggestionResponse(String text, int size, @Nullable String... indices) throws IOException {
         Map<String, FieldSuggester> map = new HashMap<>();
-        map.put("suggest-test",FieldSuggester.of(fs -> fs
+        map.put("suggest",FieldSuggester.of(fs -> fs
             .completion(cs -> cs.skipDuplicates(true)
                 .size(size)
                         .field(SUGGEST_FIELD))));
-        logger.info("getSuggestionResponse: " + map);
+        logger.fine("getSuggestionResponse: " + map);
 
         Suggester suggester = Suggester.of(sf -> sf.suggesters(map).text(text));
-       // Suggester.Builder suggesterBuilder = new Suggester.Builder().completion(new CompletionSuggester.Builder().field(SUGGEST_FIELD).size(size).build()._toFieldSuggester());
         Builder builder = new Builder();
         builder.suggest(suggester);
-       // builder.suggest(suggesterBuilder.suggesters("test", FieldSuggester.of(new FieldSuggester.Builder().)).text(text).build());
         ElasticsearchClient client = ElasticsearchClientFactory.getElasticsearchClient();
         if (indices != null && indices.length > 0) {
             builder.index(List.of(indices));
         }
         builder.size(size);
         SearchResponse<ObjectNode> response = client.search(builder.build(), ObjectNode.class);
-        logger.info("getSuggestionResponse: " + response.suggest().get("suggest-test"));
+        logger.fine("getSuggestionResponse: " + response.suggest().get("suggest"));
         return response;
     }
 
