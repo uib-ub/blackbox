@@ -1,7 +1,5 @@
 package no.uib.marcus.common.util;
 
-import no.uib.marcus.common.util.StringUtils;
-
 import java.util.Locale;
 
 import static no.uib.marcus.common.util.BlackboxUtils.*;
@@ -17,17 +15,17 @@ public class SignatureUtils {
     //List of signature prefixes for the University of Bergen Library (UBB)
     private static final String[] UBB_SIGNATURE_PREFIXES = {"ubb", "ubm", "sab"};
 
-    //List of signature prefixes for Wittgensteins Archives at UiB (WAB)
+    //List of signature prefixes for the Wittgenstein Archives at UiB (WAB)
     private static final String[] WAB_SIGNATURE_PREFIXES = {"ms-", "ts-"};
 
-    //Ensure non-instantiability
+    //Ensure non-instanciability
     private SignatureUtils() {
     }
 
     /**
-     * Appends wildcard if a given input is a valid signature, if it does not contain reserved characters
+     * Appends wildcard if a given input is a valid signature if it does not contain reserved characters
      *
-     * @param value a value string to append such wildcard if it is thought to be a signature
+     * @param value a value string to append, such as wildcard if it is thought to be a signature
      * @return the given string with a wildcard appended to the end
      */
     public static String appendLeadingWildcardIfWABSignature(String value) {
@@ -44,9 +42,9 @@ public class SignatureUtils {
 
 
     /**
-     * Appends wildcard if a given input is a valid signature, if it does not contain reserved characters
+     * Appends wildcard if a given input is a valid signature if it does not contain reserved characters
      *
-     * @param value a value string to append such wildcard if it is thought to be a signature
+     * @param value a value string to append such as wildcard if it is thought to be a signature
      * @return the given string with a wildcard appended to the end
      */
     public static String appendWildcardIfUBBSignature(String value) {
