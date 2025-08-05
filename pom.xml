@@ -33,6 +33,16 @@
                 <role>Software Engineer</role>
             </roles>
         </developer>
+        <developer>
+            <name>Rui Wang</name>
+            <email>rui.wang@uib.no</email>
+            <organization>University of Bergen</organization>
+            <organizationUrl>http://uib.no</organizationUrl>
+            <roles>
+                <role>Software Engineer</role>
+            </roles>
+        </developer>
+
     </developers>
      <!--Dependencies for Blackbox -->
     <dependencies>
