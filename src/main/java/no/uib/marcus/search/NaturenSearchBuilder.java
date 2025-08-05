@@ -40,13 +40,13 @@ public class NaturenSearchBuilder extends MarcusSearchBuilder {
                 //      .add(FilterBuilders.existsFilter("hasThumbnail"), weightFactorFunction(2));
 
                 // Restrict search only on type issues
-                if (getTypes() == null || getTypes().length == 0) {
+              //  if (getTypes() == null || getTypes().length == 0) {
                     // Index types are disabled from ES v6.0, we will therefore need to find
                     // another way to do this restriction
                     //@todo index old type as a field
                     //   searchRequest.setTypes(BoostType.ISSUE);
                 }
-            }
+
             //Set filtered query, whether with or without filter
             if (getFilter() != null) {
               //@todo  searchRequest.query(QueryBuilders.bool().filter(List.of(getFilter().build())).build()._toQuery());

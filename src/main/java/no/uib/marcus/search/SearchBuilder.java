@@ -6,6 +6,7 @@ import co.elastic.clients.elasticsearch.core.SearchResponse;
 import co.elastic.clients.elasticsearch.ElasticsearchClient;
 import co.elastic.clients.elasticsearch._types.SortOptions;
 
+import co.elastic.clients.util.ObjectBuilder;
 import jakarta.annotation.Nullable;
 import jakarta.validation.constraints.NotNull;
 
@@ -77,7 +78,7 @@ public interface SearchBuilder<S> {
     /**
      * Sets sort builder
      */
-    S setSortBuilder(SortOptions.Builder sortBuilder);
+    S setSortBuilder(ObjectBuilder<SortOptions> sortBuilder);
 
 
     /**

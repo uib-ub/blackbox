@@ -16,6 +16,7 @@ import java.io.StringWriter;
 import no.uib.marcus.client.ElasticsearchClientFactory;
 import no.uib.marcus.common.Params;
 import no.uib.marcus.common.util.FilterUtils;
+import no.uib.marcus.common.util.SortUtils;
 import no.uib.marcus.range.DateRange;
 import no.uib.marcus.search.SearchBuilder;
 import no.uib.marcus.search.SearchBuilderFactory;
@@ -40,7 +41,7 @@ import org.elasticsearch.client.RestClient;
 
 
 /**
- * This servlet processes all HTTP requests coming from "/search" endpoint
+ * This servlet processes all HTTP requests coming from the "/search" endpoint
  * and gives back a response in the form of JSON string.
  * <p/>
  *
@@ -96,13 +97,13 @@ public class SearchServlet extends HttpServlet {
             int _from = StringUtils.hasText(from) ? Integer.parseInt(from) : Params.DEFAULT_FROM;
             int _size = StringUtils.hasText(size) ? Integer.parseInt(size) : Params.DEFAULT_SIZE;
 
-            // Build a facet map based on selected filters.
-            // e.g {"subject.exact" = ["Flyfoto" , "Birkeland"], "type" = ["Brev"]}
+            //Build a facet map based on selected filters.
+            //E.g. {"subject.exact" = ["Flyfoto" , "Birkeland"], "type" = ["Brev"]}
             Map<String, List<String>> selectedFacets = FilterUtils.buildFilterMap(selectedFilters);
 
 
             logger.info("service: " + service);
-            //Get and build corresponding search builder based on the "service" parameter
+            //Get and build the corresponding search builder based on the "service" parameter
             SearchBuilder<? extends SearchBuilder<?>> builder = SearchBuilderFactory
                     .getSearchBuilder(service, client)
                     .setIndices(indices)
@@ -111,6 +112,7 @@ public class SearchServlet extends HttpServlet {
                     .setFrom(_from)
                     .setSize(_size)
                     .setSelectedFacets(selectedFacets)
+                .setSortBuilder(SortUtils.getSort(sortString))
                 // @todo   .setSortBuilder(SortUtils.getSort(sortString))
                     .setIndexToBoost(indexToBoost);
 
@@ -121,14 +123,14 @@ public class SearchServlet extends HttpServlet {
             if (topFilter.hasClauses()) {
                 builder.setFilter(topFilter);
             }
-            //Add post filter for "OR" aggregations if any
+            //Add post-filter for "OR" aggregations if any
             BoolQuery.Builder postFilter = FilterUtils.getPostFilter(selectedFacets, aggs);
             if (postFilter.hasClauses()) {
                builder.setPostFilter(postFilter);
             }
             //Serialize SearchBuilder request to JSON to skip serialization and deserialization
             // and properly serialize aggregations without type names in
-            // key, eg not "sterms#related.exact": but "related:exact"
+            // the key e.g., not "sterms#related.exact": but "related:exact"
             try (StringWriter writer = new StringWriter()) {
                 JsonFactory jsonFactory = new JsonFactory();
                 com.fasterxml.jackson.core.JsonGenerator jacksonGenerator = jsonFactory.createGenerator(writer);
@@ -141,7 +143,7 @@ public class SearchServlet extends HttpServlet {
                 generator.close();
 
                 // Are there things added other than indicies lost between the translation of low level
-                // and the new rest client ?
+                // and the new rest client?
                 String requestAsJson = writer.toString();
                 Request request1 = new Request("POST", buildEndpoint(indices));
                 request1.setJsonEntity(requestAsJson);

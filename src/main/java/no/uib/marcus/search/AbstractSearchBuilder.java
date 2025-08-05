@@ -6,6 +6,7 @@ import co.elastic.clients.elasticsearch._types.query_dsl.BoolQuery;
 
 import co.elastic.clients.elasticsearch.core.SearchRequest;
 import co.elastic.clients.elasticsearch.core.SearchResponse;
+import co.elastic.clients.util.ObjectBuilder;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import no.uib.marcus.common.util.AggregationUtils;
 
@@ -40,7 +41,7 @@ public abstract class AbstractSearchBuilder<T extends AbstractSearchBuilder<T>> 
     private BoolQuery.Builder filter, postFilter;
     private Map<String, List<String>> selectedFacets;
     private String aggregations;
-    private SortOptions.Builder sortBuilder;
+    private ObjectBuilder<SortOptions> sortBuilder;
     private String indexToBoost;
     private int from = 0;
     private int size = 10;
@@ -91,7 +92,7 @@ public abstract class AbstractSearchBuilder<T extends AbstractSearchBuilder<T>> 
     /**
      * Get sort builder or <tt>null</tt> if not set
      */
-    public SortOptions.Builder getSortBuilder() {
+    public ObjectBuilder<SortOptions> getSortBuilder() {
         return sortBuilder;
     }
 
@@ -102,7 +103,7 @@ public abstract class AbstractSearchBuilder<T extends AbstractSearchBuilder<T>> 
      * @return this object where sort has been set
      */
     @SuppressWarnings("unchecked")
-    public T setSortBuilder(SortOptions.Builder sortBuilder) {
+    public T setSortBuilder(ObjectBuilder<SortOptions> sortBuilder) {
         this.sortBuilder = sortBuilder;
         return (T) this;
     }

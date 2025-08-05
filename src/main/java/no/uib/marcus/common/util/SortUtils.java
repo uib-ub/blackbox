@@ -1,6 +1,7 @@
 package no.uib.marcus.common.util;
 
 import co.elastic.clients.elasticsearch._types.*;
+import co.elastic.clients.util.ObjectBuilder;
 import co.elastic.clients.util.WithJsonObjectBuilderBase;
 import no.uib.marcus.search.IllegalParameterException;
 import java.util.logging.Logger;
@@ -31,12 +32,13 @@ public final class SortUtils {
      * @param sortString a sort string
      * @return either a score sort, field sort or null if the sort string is empty
      */
-    public static WithJsonObjectBuilderBase<? extends WithJsonObjectBuilderBase<?>> getSort(String sortString) {
+    public static ObjectBuilder<SortOptions> getSort(String sortString) {
         if(!sortString.isEmpty()) {
+            SortOptions.Builder sortOptions = new SortOptions.Builder();
             if (sortString.equals("_score")) {
-                return SortOptionsBuilders.score();
+                return sortOptions.score(SortOptionsBuilders.score().build());
             } else {
-                return new FieldSort.Builder().field(sortString);
+                return sortOptions.field(new FieldSort.Builder().field(sortString).build());
             }
         }
         return null;
