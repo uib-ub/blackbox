@@ -3,6 +3,7 @@ package no.uib.marcus.common.util;
 import co.elastic.clients.elasticsearch._types.*;
 import co.elastic.clients.util.ObjectBuilder;
 import co.elastic.clients.util.WithJsonObjectBuilderBase;
+import jakarta.data.Sort;
 import java.util.Objects;
 import no.uib.marcus.search.IllegalParameterException;
 import java.util.logging.Logger;
@@ -36,13 +37,15 @@ public final class SortUtils {
     public static ObjectBuilder<SortOptions> getSort(String sortString) {
         String sortKey = Objects.requireNonNull(sortString.split(String.valueOf(FIELD_SORT_TYPE_SEPARATOR))[0]);
         String sortOrder = Objects.requireNonNull(sortString.split(String.valueOf(FIELD_SORT_TYPE_SEPARATOR))[1]);
-        SortOrder so = SortOrder.valueOf(sortOrder.toUpperCase());
+        if (!"asc".equals(sortOrder) && !"desc".equals(sortOrder))
+            throw new IllegalParameterException("Sort order must be either 'asc' or 'desc'");
+        SortOrder sort = "asc".equals(sortOrder) ? SortOrder.Asc : SortOrder.Desc;
         if(!sortString.isEmpty()) {
             SortOptions.Builder sortOptions = new SortOptions.Builder();
             if (sortKey.equals("_score")) {
                 return sortOptions.score(SortOptionsBuilders.score().build());
             } else {
-                return sortOptions.field(new FieldSort.Builder().field(sortKey).order(so).build());
+                return sortOptions.field(new FieldSort.Builder().field(sortKey).order(sort).build());
             }
         }
         return null;
