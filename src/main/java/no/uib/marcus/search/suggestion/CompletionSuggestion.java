@@ -47,7 +47,7 @@ public class CompletionSuggestion {
                      {
                          List<CompletionSuggestOption<ObjectNode>> options = suggestion.completion().options();
                          for (CompletionSuggestOption<ObjectNode> option : options) {
-                             logger.info("completion: " + option.text());
+                             logger.fine("completion: " + option.text());
                              suggestValues.add(option.text());
                          }
             }

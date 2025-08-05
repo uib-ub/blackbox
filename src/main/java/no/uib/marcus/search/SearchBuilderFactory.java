@@ -5,13 +5,12 @@ import java.util.logging.Logger;
 import no.uib.marcus.common.ServiceName;
 
 import jakarta.annotation.Nullable;
-import no.uib.marcus.servlet.DiscoveryServlet;
 
 /**
  * A set of static factory methods for creation of {@link SearchBuilder}s.
  */
 public class SearchBuilderFactory {
-    private static final Logger logger = Logger.getLogger(DiscoveryServlet.class.getName());
+    private static final Logger logger = Logger.getLogger(SearchBuilderFactory.class.getName());
 
     /**
      * Prevents instantiation
@@ -59,7 +58,7 @@ public class SearchBuilderFactory {
 
 
     /**
-     * Gets corresponding search builder based on the service parameter
+     * Gets a corresponding search builder based on the service parameter
      *
      * @param serviceString a service parameter. If it is null, it will fall to a default service.
      * @param client        a search client to be used
@@ -69,20 +68,23 @@ public class SearchBuilderFactory {
             @Nullable String serviceString,
             ElasticsearchClient client) {
         ServiceName service = ServiceName.toEnum(serviceString);
-        switch (service) {
-            case SKA:
-                return SearchBuilderFactory.skaSearch(client);
-            case WAB:
-                logger.info("wab chosen");
-                return SearchBuilderFactory.wabSearch(client);
-            case MARCUS:
-            case MARCUS_ADMIN:
-                return SearchBuilderFactory.marcusSearch(client);
-            case NATUREN:
-                return SearchBuilderFactory.naturenSearch(client);
-            default:
-                throw new IllegalParameterException("Unknown service parameter [" + service + "]");
+      switch (service) {
+        case SKA -> {
+          return SearchBuilderFactory.skaSearch(client);
         }
+        case WAB -> {
+          logger.fine("wab chosen");
+          return SearchBuilderFactory.wabSearch(client);
+        }
+        case MARCUS, MARCUS_ADMIN -> {
+          return SearchBuilderFactory.marcusSearch(client);
+        }
+        case NATUREN -> {
+          return SearchBuilderFactory.naturenSearch(client);
+        }
+        default ->
+            throw new IllegalParameterException("Unknown service parameter [" + service + "]");
+      }
     }
 
 }

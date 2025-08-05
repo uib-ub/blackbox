@@ -1,13 +1,14 @@
 package no.uib.marcus.search;
 
 import co.elastic.clients.elasticsearch._types.query_dsl.BoolQuery;
-import co.elastic.clients.elasticsearch._types.query_dsl.Query;
 import co.elastic.clients.elasticsearch.core.SearchRequest;
 import co.elastic.clients.elasticsearch.core.SearchResponse;
 import co.elastic.clients.elasticsearch.ElasticsearchClient;
+import co.elastic.clients.elasticsearch._types.SortOptions;
+
 import jakarta.annotation.Nullable;
 import jakarta.validation.constraints.NotNull;
-import co.elastic.clients.elasticsearch._types.SortOptions;
+
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import java.util.List;
@@ -20,7 +21,7 @@ import java.util.Map;
  */
 public interface SearchBuilder<S> {
     /**
-     * Set Elasticsearch client to the service
+     * Set a Elasticsearch client for the service
      *
      * @param client Elasticsearch client to communicate with a cluster. Cannot be <code>null</code>
      */
@@ -50,7 +51,7 @@ public interface SearchBuilder<S> {
     /**
      * Set how many documents to be returned
      *
-     * @param size a size of document returned
+     * @param size a size of the document returned
      */
     S setSize(int size);
 
@@ -66,10 +67,10 @@ public interface SearchBuilder<S> {
 
 
     /**
-     * Sets selected filer for this search builder.
+     * Sets selected facets for this search builder.
      *
      * @param selectedFacets in the map, keys are "fields" and values are "terms"
-     *                       e.g {"subject.exact" = ["Flyfoto" , "Birkeland"], "type" = ["Brev"]}
+     *                       e.g. {"subject.exact" = ["Flyfoto", "Birkeland"], "type" = ["Brev"]}
      */
     S setSelectedFacets(Map<String, List<String>> selectedFacets);
 
@@ -91,7 +92,7 @@ public interface SearchBuilder<S> {
 
 
     /**
-     * Construct search request based on the service settings
+     * Construct the search request based on the service settings
      */
     SearchRequest.Builder constructSearchRequest();
 

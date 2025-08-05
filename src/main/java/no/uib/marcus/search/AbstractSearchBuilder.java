@@ -3,7 +3,7 @@ package no.uib.marcus.search;
 import co.elastic.clients.elasticsearch.ElasticsearchClient;
 import co.elastic.clients.elasticsearch._types.SortOptions;
 import co.elastic.clients.elasticsearch._types.query_dsl.BoolQuery;
-import co.elastic.clients.elasticsearch._types.query_dsl.Query;
+
 import co.elastic.clients.elasticsearch.core.SearchRequest;
 import co.elastic.clients.elasticsearch.core.SearchResponse;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -18,6 +18,7 @@ import jakarta.annotation.Nullable;
 import jakarta.validation.constraints.NotNull;
 import java.util.List;
 import java.util.Map;
+import no.uib.marcus.common.util.StringUtils;
 
 /**
  * This class provides a skeletal implementation of {@link SearchBuilder} interface to minimize
@@ -34,8 +35,6 @@ public abstract class AbstractSearchBuilder<T extends AbstractSearchBuilder<T>> 
     private ElasticsearchClient client;
     @Nullable
     private String[] indices;
-    @Nullable
-    private String[] types;
     @Nullable
     private String queryString;
     private BoolQuery.Builder filter, postFilter;
@@ -55,7 +54,7 @@ public abstract class AbstractSearchBuilder<T extends AbstractSearchBuilder<T>> 
         if (client == null) {
             throw new IllegalParameterException("Unable to initialize service. Client cannot be null");
         }
-        logger.info("super initialized" + client.toString());
+        logger.info("super initialized" + client);
         this.client = client;
     }
 
@@ -161,7 +160,7 @@ public abstract class AbstractSearchBuilder<T extends AbstractSearchBuilder<T>> 
      */
     @SuppressWarnings("unchecked")
     public T setIndexToBoost(String indexToBoost) {
-        if(indexToBoost != null && !indexToBoost.isEmpty()) {
+        if(StringUtils.hasText(indexToBoost)) {
             this.indexToBoost = indexToBoost;
         }
         return (T) this;
@@ -230,15 +229,6 @@ public abstract class AbstractSearchBuilder<T extends AbstractSearchBuilder<T>> 
         this.indices = indices;
         return (T) this;
     }
-
-    /**
-     * Get index types for this service
-     * Types are removed in elasticsearch 8
-     */
-    public String[] getTypes() {
-        return types;
-    }
-
 
     /**
      * Get documents offset, default to 0.
@@ -320,7 +310,7 @@ public abstract class AbstractSearchBuilder<T extends AbstractSearchBuilder<T>> 
         try {
             response = client.search(constructSearchRequest().build(), ObjectNode.class);
             //Show response for debugging purpose
-            logger.info(response.toString());
+            logger.fine(response.toString());
             //System.out.println(response.toString());
         } catch (java.io.IOException e) {
             //I've not found a direct way to validate a query string. Therefore, the idea here is to catch any
@@ -328,7 +318,9 @@ public abstract class AbstractSearchBuilder<T extends AbstractSearchBuilder<T>> 
             logger.severe("Could not execute search: " + e.getMessage());
            // throw e;
         }
-        catch (Exception e) {throw e;}
+        catch (Exception e) {
+            logger.severe("Could not execute search: " + e.getMessage());
+            throw e;}
         return response;
     }
 
@@ -348,6 +340,5 @@ public abstract class AbstractSearchBuilder<T extends AbstractSearchBuilder<T>> 
                 .put("aggregations", getAggregations() == null ? "" : getAggregations());
 
         return jsonObj.toString();
-
     }
 }

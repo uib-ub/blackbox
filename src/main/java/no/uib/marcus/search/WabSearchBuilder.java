@@ -41,14 +41,14 @@ public class WabSearchBuilder extends AbstractSearchBuilder<WabSearchBuilder> {
         try {
             //Set indices
             if (isNeitherNullNorEmpty(getIndices())) {
-                logger.info("Setting indices to " + Arrays.asList(getIndices()));
+                logger.fine("Setting indices to " + Arrays.asList(getIndices()));
                 searchRequest.index(Arrays.asList(getIndices()));
             }
 
 
             //Set query
             if (StringUtils.hasText(getQueryString())) {
-                logger.info("query set for wab");
+                logger.fine("query set for wab");
                 query = QueryBuilders.simpleQueryString()
                         .query(getQueryString())
                         .defaultOperator(Operator.And)
@@ -61,34 +61,32 @@ public class WabSearchBuilder extends AbstractSearchBuilder<WabSearchBuilder> {
             } else {
                 query = QueryBuilders.matchAll().build()._toQuery();
             }
-            FunctionScoreQuery.Builder functions = new FunctionScoreQuery.Builder() ;
             // @todo find out
             // Set Query, whether with or without filter
             if (getFilter() != null) {
-                logger.info("setting filter");
+                logger.fine("setting filter");
                 BoolQuery filterQuery = getFilter().build();
-                logger.info("compare if filterQuery list is the same as filter() method" + Boolean.toString(filterQuery.filter().equals(List.of(filterQuery._toQuery()))));
-                logger.info("sizes: " + filterQuery.filter().size() + " " + List.of(filterQuery._toQuery()).size());
+                logger.fine("compare if filterQuery list is the same as filter() method" + Boolean.toString(filterQuery.filter().equals(List.of(filterQuery._toQuery()))));
+                logger.fine("sizes: " + filterQuery.filter().size() + " " + List.of(filterQuery._toQuery()).size());
                 searchRequest.query(QueryBuilders.bool().must(query).filter(List.of(filterQuery._toQuery())).build()._toQuery());
             } else {
                 searchRequest.query(query);
             }
-            //Set post filter
+            //Set post-filter
             if (getPostFilter() != null) {
 
-                logger.info("setting post filter" + getPostFilter().hasClauses());
+                logger.fine("setting post filter" + getPostFilter().hasClauses());
                 searchRequest.postFilter(getPostFilter().build());
             }
             //Set sortBuilder
             if (getSortBuilder() != null) {
-                logger.info("setting sort builder");
+                logger.fine("setting sort builder");
                 searchRequest.sort(List.of(getSortBuilder().build()));
             }
             //Append aggregations to the request builder
             if (StringUtils.hasText(getAggregations())) {
-                logger.info("adding aggreations");
-                SearchRequest.Builder aggRequest = AggregationUtils.addAggregations(searchRequest, getAggregations(), getSelectedFacets());
-                searchRequest = aggRequest;
+                logger.fine("adding aggregations");
+                searchRequest = AggregationUtils.addAggregations(searchRequest, getAggregations(), getSelectedFacets());
             }
 
             //Set from and size
@@ -97,7 +95,7 @@ public class WabSearchBuilder extends AbstractSearchBuilder<WabSearchBuilder> {
 
             //Show builder for debugging purpose
             //logger.info(searchRequest.toString());
-            logger.info("end of wab implementation searchrequest builder" + searchRequest.toString());
+            logger.fine("end of wab implementation searchrequest builder" + searchRequest);
         }  catch (IllegalStateException e) {
             throw new RuntimeException(e);
         }
