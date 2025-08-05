@@ -3,6 +3,7 @@ package no.uib.marcus.common.util;
 import co.elastic.clients.elasticsearch._types.*;
 import co.elastic.clients.util.ObjectBuilder;
 import co.elastic.clients.util.WithJsonObjectBuilderBase;
+import java.util.Objects;
 import no.uib.marcus.search.IllegalParameterException;
 import java.util.logging.Logger;
 
@@ -33,12 +34,15 @@ public final class SortUtils {
      * @return either a score sort, field sort or null if the sort string is empty
      */
     public static ObjectBuilder<SortOptions> getSort(String sortString) {
+        String sortKey = Objects.requireNonNull(sortString.split(String.valueOf(FIELD_SORT_TYPE_SEPARATOR))[0]);
+        String sortOrder = Objects.requireNonNull(sortString.split(String.valueOf(FIELD_SORT_TYPE_SEPARATOR))[1]);
+        SortOrder so = SortOrder.valueOf(sortOrder.toUpperCase());
         if(!sortString.isEmpty()) {
             SortOptions.Builder sortOptions = new SortOptions.Builder();
-            if (sortString.equals("_score")) {
+            if (sortKey.equals("_score")) {
                 return sortOptions.score(SortOptionsBuilders.score().build());
             } else {
-                return sortOptions.field(new FieldSort.Builder().field(sortString).build());
+                return sortOptions.field(new FieldSort.Builder().field(sortKey).order(so).build());
             }
         }
         return null;
