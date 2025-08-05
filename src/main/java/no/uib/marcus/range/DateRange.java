@@ -44,11 +44,11 @@ public class DateRange implements Range<LocalDate> {
             .toFormatter();
     private static final Logger logger = Logger.getLogger(String.valueOf(DateRange.class));
 
-    //Null indicates unbounded/infinite value
+    //Null indicates an unbounded/infinite value
     @Nullable
     private LocalDate fromDate;
 
-    //Null indicates unbounded/infinite value
+    //Null indicates an unbounded/infinite value
     @Nullable
     private LocalDate toDate;
 
@@ -107,12 +107,11 @@ public class DateRange implements Range<LocalDate> {
 
 
     /**
-     * From date is handled by default formatter
+     * From date is handled by the default formatter
      */
     public LocalDate parseFromDate(String fromDateString) {
         if (!StringUtils.hasText(fromDateString))
             return null;
-        LocalDate ld = LocalDate.parse(fromDateString , DEFAULT_DATE_FORMATTER);
         return LocalDate.parse(fromDateString , DEFAULT_DATE_FORMATTER);
     }
 
@@ -164,7 +163,7 @@ public class DateRange implements Range<LocalDate> {
 
 
     /**
-     * Check for negative range, a negative range is such that fromDate > toDate for non-null boundaries.
+     * Check for a negative range. A negative range is such that fromDate > toDate for non-null boundaries.
      */
     public boolean isNegative() {
         if (Objects.nonNull(fromDate) && Objects.nonNull(toDate)) {
@@ -213,13 +212,15 @@ public class DateRange implements Range<LocalDate> {
         try {
             int inputYear = Integer.parseInt(yearString);
             /*
-             * Input year should be at most 4 digits number. I had to make sure about this because if input year
+             * Input year should be at most 4 digits number. I had to make sure about this because if an input year
              * is greater than 4 digits, it will be truncated by toXMLFormat() method anyway.
              **/
             if (inputYear > 0 && String.valueOf(inputYear).length() > 4) {
                 return true;
             }
-            //Negative gYear with at most 4 digits is allowed. e.g -0160 for 160BC
+            /*
+            Negative gYear with at most 4 digits is allowed. E.g. -0160 for 160BC
+             */
             if (inputYear < 0 && String.valueOf(inputYear).length() > 5) {
                 return true;
             }
