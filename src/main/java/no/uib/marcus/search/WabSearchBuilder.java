@@ -54,7 +54,6 @@ public class WabSearchBuilder extends AbstractSearchBuilder<WabSearchBuilder> {
                 query = QueryBuilders.simpleQueryString()
                         .query(getQueryString())
                         .defaultOperator(Operator.And)
-
                         .fields(List.of("label",
                                         "publishedIn",
                                         "publishedInPart",

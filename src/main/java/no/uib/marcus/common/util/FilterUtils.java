@@ -7,6 +7,8 @@ import co.elastic.clients.elasticsearch._types.query_dsl.Query;
 import co.elastic.clients.elasticsearch._types.query_dsl.QueryBuilders;
 import co.elastic.clients.elasticsearch._types.query_dsl.RangeQuery;
 import co.elastic.clients.elasticsearch._types.query_dsl.RangeQueryBuilders;
+import co.elastic.clients.elasticsearch._types.query_dsl.TermQuery;
+import co.elastic.clients.elasticsearch._types.query_dsl.TermsQuery;
 import co.elastic.clients.elasticsearch._types.query_dsl.TermsQueryField;
 
 import no.uib.marcus.common.Params;
@@ -87,7 +89,7 @@ public final class FilterUtils {
                 if (entry.getValue() != null && entry.getValue().size() > 0) {
                     TermsQueryField entryTerms = new TermsQueryField.Builder()
                             .value(entry.getValue().stream().map(FieldValue::of).toList())
-                            .build();
+                        .build();
 
                     if (hasOROperator(aggregations, entry.getKey())) {
                         //Building "OR" filter that will be used as post_filter.
@@ -100,9 +102,15 @@ public final class FilterUtils {
                         for (Object value : entry.getValue()) {
                             if (entry.getKey().startsWith(BlackboxUtils.MINUS)) {
                                 //Exclude any filter that begins with minus sign
+                                // @todo
                                 topFilter.mustNot(QueryBuilders.terms().field(entry.getKey().substring(1)).terms(entryTerms).build()._toQuery());
                             } else {//Building "AND" filter
-                                topFilter.must(QueryBuilders.terms().field(entry.getKey()).terms(entryTerms).build()._toQuery());}
+                                // add one must clause per term for And Operator
+                                for (FieldValue fv: entryTerms.value())
+                                {
+                                    topFilter.must(QueryBuilders.term().field(entry.getKey()).value(fv).build()._toQuery());
+                                }
+                            }
                         }
                     }
                 }
