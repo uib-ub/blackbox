@@ -102,7 +102,6 @@ public final class FilterUtils {
                         for (Object value : entry.getValue()) {
                             if (entry.getKey().startsWith(BlackboxUtils.MINUS)) {
                                 //Exclude any filter that begins with minus sign
-                                // @todo
                                 topFilter.mustNot(QueryBuilders.terms().field(entry.getKey().substring(1)).terms(entryTerms).build()._toQuery());
                             } else {//Building "AND" filter
                                 // add one must clause per term for And Operator
