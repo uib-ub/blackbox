@@ -4,6 +4,7 @@ package no.uib.marcus.search;
 import co.elastic.clients.elasticsearch.ElasticsearchClient;
 import co.elastic.clients.elasticsearch._types.query_dsl.*;
 import co.elastic.clients.elasticsearch.core.SearchRequest;
+import co.elastic.clients.elasticsearch.core.search.TrackHits;
 import no.uib.marcus.common.util.AggregationUtils;
 import no.uib.marcus.common.util.SignatureUtils;
 
@@ -18,6 +19,7 @@ import no.uib.marcus.common.util.StringUtils;
  */
 public class WabSearchBuilder extends AbstractSearchBuilder<WabSearchBuilder> {
     private final Logger logger = Logger.getLogger(getClass().getName());
+    private final TrackHits trackHits = new TrackHits.Builder().count(Integer.parseInt("100000")).build();
 
     WabSearchBuilder(ElasticsearchClient client) {
         super(client);
@@ -52,9 +54,10 @@ public class WabSearchBuilder extends AbstractSearchBuilder<WabSearchBuilder> {
                 query = QueryBuilders.simpleQueryString()
                         .query(getQueryString())
                         .defaultOperator(Operator.And)
+
                         .fields(List.of("label",
                                         "publishedIn",
-                                        "publishedInPart.exact",
+                                        "publishedInPart",
                                         "all"
                                         )).build()._toQuery();//whitespace analyzed
 
@@ -68,7 +71,9 @@ public class WabSearchBuilder extends AbstractSearchBuilder<WabSearchBuilder> {
                 BoolQuery filterQuery = getFilter().build();
                 logger.fine("compare if filterQuery list is the same as filter() method" + Boolean.toString(filterQuery.filter().equals(List.of(filterQuery._toQuery()))));
                 logger.fine("sizes: " + filterQuery.filter().size() + " " + List.of(filterQuery._toQuery()).size());
-                searchRequest.query(QueryBuilders.bool().must(query).filter(List.of(filterQuery._toQuery())).build()._toQuery());
+                searchRequest
+                    .query(QueryBuilders.bool().must(query)
+                        .filter(List.of(filterQuery._toQuery())).build()._toQuery());
             } else {
                 searchRequest.query(query);
             }
@@ -92,6 +97,8 @@ public class WabSearchBuilder extends AbstractSearchBuilder<WabSearchBuilder> {
             //Set from and size
             searchRequest.from(getFrom());
             searchRequest.size(getSize());
+
+            searchRequest.trackTotalHits(trackHits);
 
             //Show builder for debugging purpose
             //logger.info(searchRequest.toString());
