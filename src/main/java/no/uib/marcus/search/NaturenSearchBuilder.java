@@ -54,8 +54,8 @@ public class NaturenSearchBuilder extends MarcusSearchBuilder {
                 searchRequest.query(query);
             }
             //Set highlighting option
-            searchRequest.highlight(new Highlight.Builder().fields("textContent", new HighlightField.Builder().preTags("<em class='txt-highlight'>")
-                    .postTags("</em>").build()).build());
+          //  searchRequest.highlight(new Highlight.Builder().fields("textContent", new HighlightField.Builder().preTags("<em class='txt-highlight'>")
+            //        .postTags("</em>").build()).build());
 
 
             //Show builder for debugging purpose

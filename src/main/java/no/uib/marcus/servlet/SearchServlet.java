@@ -93,7 +93,9 @@ public class SearchServlet extends HttpServlet {
             RestClient restClient = restClientTransport.restClient();
 
 
-            //Assign default values, if needs be
+
+
+          //Assign default values, if needs be
             int _from = StringUtils.hasText(from) ? Integer.parseInt(from) : Params.DEFAULT_FROM;
             int _size = StringUtils.hasText(size) ? Integer.parseInt(size) : Params.DEFAULT_SIZE;
 

@@ -69,7 +69,7 @@ public class CompletionSuggestion {
         map.put("suggest",FieldSuggester.of(fs -> fs
             .completion(cs -> cs.skipDuplicates(true)
                 .size(size)
-                        .field(SUGGEST_FIELD))));
+                        .field("suggest").analyzer("keyword"))));
         logger.fine("getSuggestionResponse: " + map);
 
         Suggester suggester = Suggester.of(sf -> sf.suggesters(map).text(text));
