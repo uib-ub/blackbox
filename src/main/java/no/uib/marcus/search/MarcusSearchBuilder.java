@@ -1,6 +1,7 @@
 package no.uib.marcus.search;
 
 import co.elastic.clients.elasticsearch.ElasticsearchClient;
+import co.elastic.clients.elasticsearch._types.query_dsl.BoolQuery;
 import co.elastic.clients.elasticsearch._types.query_dsl.FunctionScore;
 import co.elastic.clients.elasticsearch._types.query_dsl.FunctionScoreQuery;
 import co.elastic.clients.elasticsearch._types.query_dsl.Query;
@@ -90,6 +91,7 @@ public class MarcusSearchBuilder extends AbstractSearchBuilder<MarcusSearchBuild
                     //Use query_string query with AND operator
                     functionScoreQueryBuilder = QueryBuilders.functionScore().query(QueryUtils.buildMarcusQueryString(getQueryString()).build()._toQuery());
 
+
                 } else {
                     //Boost documents inside the "random list" of places because they beautify the front page.
                     //This is just for coolness and it has no effect if the query yields no results
@@ -97,7 +99,8 @@ public class MarcusSearchBuilder extends AbstractSearchBuilder<MarcusSearchBuild
                     functionScoreQueryBuilder = QueryBuilders.functionScore().query(QueryBuilders.matchAll().build()._toQuery()).functions(
                             List.of(new FunctionScore.Builder().filter(QueryBuilders.simpleQueryString().query(randomQueryString).build()._toQuery()).weight(2.0).build()));
                 }
-                //Boost documents of type "Fotografi" for every query performed.
+              query = functionScoreQueryBuilder.build()._toQuery();
+              //Boost documents of type "Fotografi" for every query performed.
                 // @todo ? reimplement boost
                 //  query = functionScoreQueryBuilder.functions(List.of(new FunctionScore.Builder().filter(
                 //          QueryBuilders.terms().field("type").terms(FOTOGRAFI)
@@ -107,12 +110,20 @@ public class MarcusSearchBuilder extends AbstractSearchBuilder<MarcusSearchBuild
 
                 //Set filtered query with top_filter
                 if (getFilter() != null) {
+
+                  logger.fine("setting filter");
+                  BoolQuery filterQuery = getFilter().build();
+                  logger.fine("compare if filterQuery list is the same as filter() method" + Boolean.toString(filterQuery.filter().equals(List.of(filterQuery._toQuery()))));
+                  logger.fine("sizes: " + filterQuery.filter().size() + " " + List.of(filterQuery._toQuery()).size());
+                  searchRequest
+                      .query(QueryBuilders.bool().must(query)
+                          .filter(List.of(filterQuery._toQuery())).build()._toQuery());
                     //Note: Filtered query is deprecated from ES v2.0
                     //in favour of a new filter clause on the bool query
                     //Read https://www.elastic.co/blog/better-query-execution-coming-elasticsearch-2-0
                 //@todo    searchRequest.query(QueryBuilders.bool().filter(List.of(getFilter().build())).build()._toQuery());
                 } else {
-                    searchRequest.query(functionScoreQueryBuilder.build()._toQuery());
+                    searchRequest.query(query);
                 }
                 //Set post filter if available
                 if (getPostFilter() != null) {
