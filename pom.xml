@@ -11,7 +11,7 @@
     <properties>
         <endorsed.dir>${project.build.directory}/endorsed</endorsed.dir>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <elasticsearch.version>9.0.4</elasticsearch.version>
+        <elasticsearch.version>9.1.0</elasticsearch.version>
       </properties>
     
     <developers>
