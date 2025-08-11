@@ -35,6 +35,9 @@ public final class SortUtils {
      * @return either a score sort, field sort or null if the sort string is empty
      */
     public static ObjectBuilder<SortOptions> getSort(String sortString) {
+        if(sortString == null) {
+          return null;
+        }
         String sortKey = Objects.requireNonNull(sortString.split(String.valueOf(FIELD_SORT_TYPE_SEPARATOR))[0]);
         String sortOrder = Objects.requireNonNull(sortString.split(String.valueOf(FIELD_SORT_TYPE_SEPARATOR))[1]);
         if (!"asc".equals(sortOrder) && !"desc".equals(sortOrder))
