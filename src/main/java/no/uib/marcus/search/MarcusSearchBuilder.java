@@ -118,10 +118,6 @@ public class MarcusSearchBuilder extends AbstractSearchBuilder<MarcusSearchBuild
                   searchRequest
                       .query(QueryBuilders.bool().must(query)
                           .filter(List.of(filterQuery._toQuery())).build()._toQuery());
-                    //Note: Filtered query is deprecated from ES v2.0
-                    //in favour of a new filter clause on the bool query
-                    //Read https://www.elastic.co/blog/better-query-execution-coming-elasticsearch-2-0
-                //@todo    searchRequest.query(QueryBuilders.bool().filter(List.of(getFilter().build())).build()._toQuery());
                 } else {
                     searchRequest.query(query);
                 }
