@@ -7,6 +7,7 @@ import co.elastic.clients.elasticsearch._types.query_dsl.FunctionScoreQuery;
 import co.elastic.clients.elasticsearch._types.query_dsl.Query;
 import co.elastic.clients.elasticsearch._types.query_dsl.QueryBuilders;
 import co.elastic.clients.elasticsearch.core.SearchRequest;
+import co.elastic.clients.elasticsearch.core.search.TrackHits;
 import co.elastic.clients.util.NamedValue;
 import no.uib.marcus.common.util.AggregationUtils;
 import no.uib.marcus.common.util.QueryUtils;
@@ -43,7 +44,10 @@ public class MarcusSearchBuilder extends AbstractSearchBuilder<MarcusSearchBuild
             "Nyborg"
     };
 
-    /**
+  private final TrackHits trackHits = new TrackHits.Builder().count(Integer.parseInt("200000")).build();
+
+
+  /**
      * Build Marcus search service
      *
      * @param client Elasticsearch client to communicate with a cluster.
@@ -86,7 +90,10 @@ public class MarcusSearchBuilder extends AbstractSearchBuilder<MarcusSearchBuild
                 searchRequest.from(getFrom());
                 searchRequest.size(getSize());
 
-                //Set query
+              searchRequest.trackTotalHits(trackHits);
+
+
+              //Set query
                 if (StringUtils.hasText(getQueryString())) {
                     //Use query_string query with AND operator
                     functionScoreQueryBuilder = QueryBuilders.functionScore().query(QueryUtils.buildMarcusQueryString(getQueryString()).build()._toQuery());
