@@ -94,7 +94,7 @@ public final class FilterUtils {
                     if (hasOROperator(aggregations, entry.getKey())) {
                         //Building "OR" filter that will be used as post_filter.
                         //post_filter only affects search results but NOT aggregations.
-                        postFilter.must(QueryBuilders.terms().field(entry.getKey()).terms(entryTerms).build()._toQuery());
+                        postFilter.should(QueryBuilders.terms().field(entry.getKey()).terms(entryTerms).build()._toQuery());
                     } else if (entry.getKey().startsWith(BlackboxUtils.MINUS)) {
                         //Exclude any filter that begins with minus sign
                         topFilter.mustNot(QueryBuilders.terms().field(entry.getKey().substring(1)).terms(entryTerms).build()._toQuery());
