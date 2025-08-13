@@ -3,6 +3,7 @@ package no.uib.marcus.servlet;
 import co.elastic.clients.elasticsearch.ElasticsearchClient;
 import co.elastic.clients.elasticsearch._types.ElasticsearchException;
 import co.elastic.clients.elasticsearch._types.query_dsl.BoolQuery;
+import co.elastic.clients.elasticsearch._types.query_dsl.QueryBuilders;
 import co.elastic.clients.json.jackson.JacksonJsonpGenerator;
 import co.elastic.clients.json.jackson.JacksonJsonpMapper;
 import co.elastic.clients.transport.rest_client.RestClientTransport;
@@ -128,7 +129,8 @@ public class SearchServlet extends HttpServlet {
             //Add post-filter for "OR" aggregations if any
             BoolQuery.Builder postFilter = FilterUtils.getPostFilter(selectedFacets, aggs);
             if (postFilter.hasClauses()) {
-               builder.setPostFilter(postFilter);
+              logger.info("postfilter hasClauses in SearchServlet: " + postFilter.hasClauses());
+               builder.setPostFilter(QueryBuilders.bool().should(postFilter.build()));
             }
             //Serialize SearchBuilder request to JSON to skip serialization and deserialization
             // and properly serialize aggregations without type names in
