@@ -129,9 +129,9 @@ public class MarcusSearchBuilder extends AbstractSearchBuilder<MarcusSearchBuild
                     searchRequest.query(query);
                 }
                 //Set post filter if available
-              logger.info("postfilter hasClauses: " + getPostFilter().hasClauses());
                 if (getPostFilter() != null) {
-                    searchRequest.postFilter(getPostFilter().build());
+                  logger.info("postfilter hasClauses: " + getPostFilter().hasClauses());
+                  searchRequest.postFilter(getPostFilter().build());
                 }
                 //Set index to boost
                 if (getIndexToBoost() != null) {
