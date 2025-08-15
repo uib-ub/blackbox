@@ -140,7 +140,9 @@ public final class AggregationUtils {
         Map<String, Aggregation> aggregationMap = new HashMap<>() ;
         for (JsonNode facet : facets) {
             if (facet.has("field")) {
-                //Add DateHistogram aggregations
+              BoolQuery.Builder aggsFilter = FilterUtils.getPostFilter(selectedFacets, aggregations);
+
+              //Add DateHistogram aggregations
                 //@todo add map of Map<String, Aggregation> and send once
                 if (facet.has("type") && facet.get("type").asText().equals("date_histogram")) {
                     aggregationMap.put(facet.get("field").asText(),
@@ -162,21 +164,23 @@ public final class AggregationUtils {
                                 selectedFacets);
                             //Remove the facet that aggregation was performed in from the map
                             selectedFacetCopy.remove(facetField);
+
                             //Build bool_filter for the copy of the selected facets.
                             //We build sub aggregation filter only for "OR" facets
-                            BoolQuery.Builder aggsFilter = FilterUtils.getPostFilter(selectedFacets, aggregations);
                             if (aggsFilter.hasClauses()){
-                                logger.info("Aggregations aggsfilter added to search request: " + aggsFilter.toString());
-                          agg = addSubAggregationFilter(aggsFilter, facet
+
+                              BoolQuery.Builder aggsFilter2 = FilterUtils.getPostFilter(selectedFacetCopy, aggregations);
+
+                              logger.info("Aggregations aggsfilter added to search request: " + aggsFilter2.toString());
+                          agg = addSubAggregationFilter(aggsFilter2, facet
                               );
                           termsAggs.aggregations(AGGS_FILTER_KEY, agg);
+                              aggregationMap.put(facet.get("field").asText(), agg);
                             }
-                        //    aggregationMap.put(facet.get("field").asText(), agg);
-
                         }
                         else {
-                       //     agg = addSubAggregationFilter(aggregations, facet, termsAggs, selectedFacets);
-                       //     aggregationMap.put(facet.get("field").asText(),agg);
+                            agg = addSubAggregationFilter(aggsFilter,facet);
+                            aggregationMap.put(facet.get("field").asText(),agg);
                         }
                         }
                     aggregationMap.put(facet.get("field").asText(), termsAggs.build());
