@@ -48,7 +48,8 @@ public final class SortUtils {
             if (sortKey.equals("_score")) {
                 return sortOptions.score(SortOptionsBuilders.score().build());
             } else {
-                return sortOptions.field(new FieldSort.Builder().field(sortKey).order(sort).build());
+              String missing = sortOrder.equals("asc") ? "_last" : "_first";
+                return sortOptions.field(new FieldSort.Builder().missing(missing).field(sortKey).order(sort).build());
             }
         }
         return null;
