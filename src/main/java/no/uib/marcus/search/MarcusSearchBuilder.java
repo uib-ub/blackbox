@@ -95,6 +95,8 @@ public class MarcusSearchBuilder extends AbstractSearchBuilder<MarcusSearchBuild
 
               searchRequest.trackTotalHits(trackHits);
 
+              FunctionScore.Builder fotoFsBuilder = new FunctionScore.Builder();
+              fotoFsBuilder.filter(QueryBuilders.term().value(BoostType.FOTOGRAFI).field("type").build()._toQuery()).weight(3.0);
 
               //Set query
                 if (StringUtils.hasText(getQueryString())) {
@@ -107,12 +109,10 @@ public class MarcusSearchBuilder extends AbstractSearchBuilder<MarcusSearchBuild
                     //This is just for coolness and it has no effect if the query yields no results
                     String randomQueryString = randomPictures[new Random().nextInt(randomPictures.length)];
                     functionScoreQueryBuilder = QueryBuilders.functionScore().query(QueryBuilders.matchAll().build()._toQuery()).functions(
-                            List.of(new FunctionScore.Builder().filter(QueryBuilders.simpleQueryString().query(randomQueryString).build()._toQuery()).weight(2.0).build()));
+                            List.of(fotoFsBuilder.build(),new FunctionScore.Builder().filter(QueryBuilders.simpleQueryString().query(randomQueryString).build()._toQuery()).weight(2.0).build()));
                 }
 
-                FunctionScore.Builder fotoFsBuilder = new FunctionScore.Builder();
-                fotoFsBuilder.filter(QueryBuilders.term().value(BoostType.FOTOGRAFI).field("type").build()._toQuery()).weight(3.0);
-                query = functionScoreQueryBuilder.functions(List.of(fotoFsBuilder.build())).build()._toQuery();
+                 query = functionScoreQueryBuilder.functions(List.of(fotoFsBuilder.build())).build()._toQuery();
               //Boost documents of type "Fotografi" for every query performed.
                 // @todo ? reimplement boost
                 //  query = functionScoreQueryBuilder.functions(List.of(new FunctionScore.Builder().filter(
