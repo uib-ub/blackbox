@@ -3,7 +3,9 @@ package no.uib.marcus.search;
 import co.elastic.clients.elasticsearch.ElasticsearchClient;
 import co.elastic.clients.elasticsearch._types.query_dsl.BoolQuery;
 import co.elastic.clients.elasticsearch._types.query_dsl.FunctionScore;
+import co.elastic.clients.elasticsearch._types.query_dsl.FunctionScoreBuilders;
 import co.elastic.clients.elasticsearch._types.query_dsl.FunctionScoreQuery;
+import co.elastic.clients.elasticsearch._types.query_dsl.FunctionScoreVariant;
 import co.elastic.clients.elasticsearch._types.query_dsl.Query;
 import co.elastic.clients.elasticsearch._types.query_dsl.QueryBuilders;
 import co.elastic.clients.elasticsearch.core.SearchRequest;
@@ -19,6 +21,7 @@ import java.util.logging.Logger;
 import no.uib.marcus.common.util.StringUtils;
 
 import jakarta.validation.constraints.NotNull;
+import no.uib.marcus.search.SkaSearchBuilder.BoostType;
 
 
 /**
@@ -106,7 +109,10 @@ public class MarcusSearchBuilder extends AbstractSearchBuilder<MarcusSearchBuild
                     functionScoreQueryBuilder = QueryBuilders.functionScore().query(QueryBuilders.matchAll().build()._toQuery()).functions(
                             List.of(new FunctionScore.Builder().filter(QueryBuilders.simpleQueryString().query(randomQueryString).build()._toQuery()).weight(2.0).build()));
                 }
-              query = functionScoreQueryBuilder.build()._toQuery();
+
+                FunctionScore.Builder fotoFsBuilder = new FunctionScore.Builder();
+                fotoFsBuilder.filter(QueryBuilders.term().value(BoostType.FOTOGRAFI).field("type").build()._toQuery()).weight(3.0);
+                query = functionScoreQueryBuilder.functions(List.of(fotoFsBuilder.build())).build()._toQuery();
               //Boost documents of type "Fotografi" for every query performed.
                 // @todo ? reimplement boost
                 //  query = functionScoreQueryBuilder.functions(List.of(new FunctionScore.Builder().filter(
@@ -157,11 +163,13 @@ public class MarcusSearchBuilder extends AbstractSearchBuilder<MarcusSearchBuild
             }
             return searchRequest;
         }
-    //Type to be boosted if nothing is specified
- //   static class BoostType {
-  //      final static String FOTOGRAFI = "fotografi";
-  //      final static String BILDE = "bilde";
-  //  }
+   // Type to be boosted if nothing is specified
+
 }
+  static class BoostType {
+    final static String FOTOGRAFI = "fotografi";
+    final static String BILDE = "bilde";
+}
+
 }
 
