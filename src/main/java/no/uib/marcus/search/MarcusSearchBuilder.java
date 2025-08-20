@@ -95,32 +95,21 @@ public class MarcusSearchBuilder extends AbstractSearchBuilder<MarcusSearchBuild
 
               searchRequest.trackTotalHits(trackHits);
 
-              FunctionScore.Builder fotoFsBuilder = new FunctionScore.Builder();
-              fotoFsBuilder.filter(QueryBuilders.term().value(BoostType.FOTOGRAFI).field("type").build()._toQuery()).weight(3.0);
+
+              FunctionScore fotoFs = new FunctionScore.Builder().filter(QueryBuilders.term().value(BoostType.FOTOGRAFI).field("type").build()._toQuery()).weight(3.0).build();
 
               //Set query
                 if (StringUtils.hasText(getQueryString())) {
                     //Use query_string query with AND operator
                     functionScoreQueryBuilder = QueryBuilders.functionScore().query(QueryUtils.buildMarcusQueryString(getQueryString()).build()._toQuery());
-
-
                 } else {
                     //Boost documents inside the "random list" of places because they beautify the front page.
                     //This is just for coolness and it has no effect if the query yields no results
                     String randomQueryString = randomPictures[new Random().nextInt(randomPictures.length)];
                     functionScoreQueryBuilder = QueryBuilders.functionScore().query(QueryBuilders.matchAll().build()._toQuery()).functions(
-                            List.of(fotoFsBuilder.build(),new FunctionScore.Builder().filter(QueryBuilders.simpleQueryString().query(randomQueryString).build()._toQuery()).weight(2.0).build()));
+                            List.of(fotoFs,new FunctionScore.Builder().filter(QueryBuilders.simpleQueryString().query(randomQueryString).build()._toQuery()).weight(2.0).build()));
                 }
-
-                 query = functionScoreQueryBuilder.functions(List.of(fotoFsBuilder.build())).build()._toQuery();
-              //Boost documents of type "Fotografi" for every query performed.
-                // @todo ? reimplement boost
-                //  query = functionScoreQueryBuilder.functions(List.of(new FunctionScore.Builder().filter(
-                //          QueryBuilders.terms().field("type").terms(FOTOGRAFI)
-                //          )))
-                //          .add(FilterBuilders.termFilter("type", BoostType.FOTOGRAFI), weightFactorFunction(3))
-                //          .add(FilterBuilders.termFilter("type", BoostType.BILDE), weightFactorFunction(3));
-
+                 query = functionScoreQueryBuilder.functions(List.of(fotoFs)).build()._toQuery();
                 //Set filtered query with top_filter
                 if (getFilter() != null) {
 
@@ -136,7 +125,7 @@ public class MarcusSearchBuilder extends AbstractSearchBuilder<MarcusSearchBuild
                 }
                 //Set post filter if available
                 if (getPostFilter() != null) {
-                  logger.info("postfilter hasClauses: " + getPostFilter().hasClauses());
+                  logger.fine("postfilter hasClauses: " + getPostFilter().hasClauses());
                   searchRequest.postFilter(getPostFilter().build());
                 }
                 //Set index to boost
