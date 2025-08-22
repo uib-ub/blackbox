@@ -63,7 +63,6 @@ public class WabSearchBuilder extends AbstractSearchBuilder<WabSearchBuilder> {
             } else {
                 query = QueryBuilders.matchAll().build()._toQuery();
             }
-            // @todo find out
             // Set Query, whether with or without filter
             if (getFilter() != null) {
                 logger.fine("setting filter");
