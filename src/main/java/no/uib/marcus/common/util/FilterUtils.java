@@ -249,6 +249,9 @@ public final class FilterUtils {
         }
         if (queries.size() > 0 && boolFilter != null){
             logger.info("hasClauses: Adding date-range to bool_filter");
+            // logic is that dateFilters should be AND between each other, while the different queries
+            // of dateRanges should be OR between each other.
+           // It is enough that one of the dateFilters matches the dateRange.
             boolFilter.must(new Builder().should(queries).build());
         }
         return boolFilter;
