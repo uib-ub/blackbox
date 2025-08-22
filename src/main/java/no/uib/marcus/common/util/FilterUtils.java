@@ -2,6 +2,7 @@ package no.uib.marcus.common.util;
 
 import co.elastic.clients.elasticsearch._types.FieldValue;
 import co.elastic.clients.elasticsearch._types.query_dsl.BoolQuery;
+import co.elastic.clients.elasticsearch._types.query_dsl.BoolQuery.Builder;
 import co.elastic.clients.elasticsearch._types.query_dsl.DateRangeQuery;
 import co.elastic.clients.elasticsearch._types.query_dsl.Query;
 import co.elastic.clients.elasticsearch._types.query_dsl.QueryBuilders;
@@ -248,7 +249,7 @@ public final class FilterUtils {
         }
         if (queries.size() > 0 && boolFilter != null){
             logger.info("hasClauses: Adding date-range to bool_filter");
-            boolFilter.must(queries);
+            boolFilter.must(new Builder().should(queries).build());
         }
         return boolFilter;
     }
