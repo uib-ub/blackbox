@@ -44,7 +44,6 @@ public final class QueryUtils {
     public static SimpleQueryStringQuery.Builder buildMarcusSimpleQueryString(String queryString) {
         return new SimpleQueryStringQuery.Builder().query
                 (queryString)
-                .analyzer("default")//The custom "default" analyzer is defined in the "_settings".
                 .fields(List.of("identifier","label","all","all.exact"))
                 .defaultOperator(Operator.And);
     }
@@ -58,7 +57,6 @@ public final class QueryUtils {
     public static QueryStringQuery.Builder buildMarcusQueryString(String queryString) {
         QueryStringQuery.Builder builder = new QueryStringQuery.Builder();
         return builder.query(queryString)
-                .analyzer("default")//The custom "default" analyzer is defined in the "_settings".
                 .fields(List.of("identifier" //Not analyzed field
                         , "label",
                     "all",
