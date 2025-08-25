@@ -45,7 +45,7 @@ public final class QueryUtils {
         return new SimpleQueryStringQuery.Builder().query
                 (queryString)
                 .analyzer("default")//The custom "default" analyzer is defined in the "_settings".
-                .fields(List.of("identifier","label","all"))
+                .fields(List.of("identifier","label","all","all_keyword"))
                 .defaultOperator(Operator.And);
     }
 
@@ -61,7 +61,8 @@ public final class QueryUtils {
                 .analyzer("default")//The custom "default" analyzer is defined in the "_settings".
                 .fields(List.of("identifier" //Not analyzed field
                         , "label",
-                    "all"//Not analyzed field.
+                    "all"
+                    ,"all_keyword"
                         ))
                 .defaultOperator(Operator.And);
     }
