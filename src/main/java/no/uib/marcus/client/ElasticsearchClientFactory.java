@@ -121,7 +121,6 @@ final public class ElasticsearchClientFactory {
     if (elasticsearchClient != null) {
       // If you have an ElasticsearchTransport object, close it:
       try {
-        elasticsearchClient._transport().close();
         elasticsearchClient.close();
       } catch (IOException e) {
         logger.log(Level.WARNING, "Error closing Elasticsearch client: " + e.getMessage(), e);
