@@ -15,7 +15,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.apache.http.message.BasicHeader;
-import org.elasticsearch.client.*;
+import org.elasticsearch.client.RestClient;
 
 import java.io.IOException;
 import java.net.InetAddress;
@@ -44,7 +44,7 @@ final public class ElasticsearchClientFactory {
     /**
      * Create a transport client
      */
-    private static ElasticsearchClient createTransportClient(Map<String, String> properties) {
+    private static ElasticsearchClient createElasticsearchClient(Map<String, String> properties) {
         try {
 
             Header[] defaultHeader = new Header[]{new BasicHeader("Authorization",
@@ -78,7 +78,8 @@ final public class ElasticsearchClientFactory {
         if (elasticsearchClient == null) {
             JsonFileLoader loader = new JsonFileLoader();
             Map<String, String> properties;
-            if (System.getenv("ELASTICSEARCH_CLUSTER_NAME").isEmpty()) {
+            String clusterName  = System.getenv("ELASTICSEARCH_CLUSTER_NAME");
+            if (clusterName == null || clusterName.isEmpty()) {
                 properties = loader.loadBlackboxConfigFromResource();
                 logger.info("Loaded config template from: " + loader.getPathFromResource(JsonFileLoader.CONFIG_TEMPLATE));
             }
@@ -91,16 +92,11 @@ final public class ElasticsearchClientFactory {
                 properties.put("api_key", required("ELASTICSEARCH_CLUSTER_API_KEY"));
                 logger.info("configuration loaded from env variables");
             }
-            elasticsearchClient = createTransportClient(properties);
+            elasticsearchClient = createElasticsearchClient(properties);
         }
         return elasticsearchClient;
     }
-
-    //Main method for easy debugging
-    public static void main(String[] args) throws IOException {
-        getElasticsearchClient();
-    }
-
+    
     private static String required(String envVar) {
         String value = System.getenv(envVar);
         if (value == null) {
@@ -117,10 +113,10 @@ final public class ElasticsearchClientFactory {
         throw new CloneNotSupportedException("Cloning for this object is not supported");
     }
 
-  public static void closeClient() {
+    public static synchronized void closeClient() {
     if (elasticsearchClient != null) {
-      // If you have an ElasticsearchTransport object, close it:
       try {
+        elasticsearchClient._transport().close();
         elasticsearchClient.close();
       } catch (IOException e) {
         logger.log(Level.WARNING, "Error closing Elasticsearch client: " + e.getMessage(), e);
