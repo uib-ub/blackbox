@@ -51,7 +51,7 @@ final public class ElasticsearchClientFactory {
                     "ApiKey " + BlackboxUtils.getValueAsString(properties, "api_key"))};
             RestClient restClient = RestClient.builder(
                             new HttpHost(InetAddress.getByName(BlackboxUtils.getValueAsString(properties, "host")), BlackboxUtils.getValueAsInt(properties, "port"), "https")
-                    ).setHttpClientConfigCallback(httpAsyncClientBuilder -> httpAsyncClientBuilder.setSSLHostnameVerifier((s, sslSession) -> true)).setDefaultHeaders(defaultHeader)
+                    ).setDefaultHeaders(defaultHeader)
                     .build();
 
             JacksonJsonpMapper jsonMapper = new JacksonJsonpMapper();
@@ -116,4 +116,18 @@ final public class ElasticsearchClientFactory {
     protected Object clone() throws CloneNotSupportedException {
         throw new CloneNotSupportedException("Cloning for this object is not supported");
     }
+
+  public static void closeClient() {
+    if (elasticsearchClient != null) {
+      // If you have an ElasticsearchTransport object, close it:
+      try {
+        elasticsearchClient._transport().close();
+        elasticsearchClient.close();
+      } catch (IOException e) {
+        logger.log(Level.WARNING, "Error closing Elasticsearch client: " + e.getMessage(), e);
+      } finally {
+        elasticsearchClient = null;
+      }
+    }
+  }
 }
