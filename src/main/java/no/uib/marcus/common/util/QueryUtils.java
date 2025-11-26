@@ -28,9 +28,11 @@ public final class QueryUtils {
 
     //Elasticsearch reserved characters (without the minus sign)
     private static final char[] RESERVED_CHARS = {
-            '*', '"', '\\', '/', '=', '&', '|', '>', '<', '!', '(', ')',
-            '{', '}', '[', ']', '^', '~', '?', ':', '/', '/', '!', '[', ']', '{', '}'
+            '*', '"', '\\', '/', '=', '&', '|', '>', '<', '(', ')',
+            '{', '}', '^', '~', '?', ':', '!', '[', ']'
     };
+
+  private static final JacksonJsonpMapper JSONP_MAPPER = new JacksonJsonpMapper();
 
     private QueryUtils() {
     }
@@ -111,26 +113,23 @@ public final class QueryUtils {
      **/
     public static String toJsonString(final SearchResponse<ObjectNode> response, final boolean isPretty)
         throws IOException {
-        if (response == null) {
-            return "{ \"error\" : \"" + "Could not execute search. See internal server logs"
-                + "\"}";
-        }
+      if (response == null) {
+        return "{ \"error\" : \"" + "Could not execute search. See internal server logs"
+            + "\"}";
+      }
 
-        StringWriter writer = new StringWriter();
-        JsonFactory jsonFactory = new JsonFactory();
-        com.fasterxml.jackson.core.JsonGenerator jacksonGenerator = jsonFactory.createGenerator(writer);
+      JsonFactory jsonFactory = new JsonFactory();
+      try (StringWriter writer = new StringWriter();
+          com.fasterxml.jackson.core.JsonGenerator jacksonGenerator = jsonFactory.createGenerator(
+              writer)) {
 
         if (isPretty) {
-                jacksonGenerator.useDefaultPrettyPrinter();
-                JsonGenerator generator = new JacksonJsonpGenerator(jacksonGenerator);
-                response.serialize(generator, new JacksonJsonpMapper());
-
-               generator.close();
-               return writer.toString();
-            }
-            JsonGenerator generator =  new JacksonJsonpGenerator(jacksonGenerator);
-            response.serialize(generator, new JacksonJsonpMapper());
-            generator.close();
-            return writer.toString();
+          jacksonGenerator.useDefaultPrettyPrinter();
+        }
+        try (JsonGenerator generator = new JacksonJsonpGenerator(jacksonGenerator)) {
+          response.serialize(generator, JSONP_MAPPER);
+          return writer.toString();
+        }
+      }
     }
 }
