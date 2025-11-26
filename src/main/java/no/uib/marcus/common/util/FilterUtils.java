@@ -29,7 +29,7 @@ import java.util.*;
  * @author Øyvind Gjesdal
  */
 
-public final class FilterUtils {
+public final class  FilterUtils {
     private static final Logger logger = Logger.getLogger(FilterUtils.class.getName());
     private static final String TOP_FILTER = "top_filter";
     private static final String POST_FILTER = "post_filter";
@@ -84,7 +84,7 @@ public final class FilterUtils {
         try {
             //Building a filter based on the user selected facets. Starting with AND filter
             for (Map.Entry<String, List<String>> entry : filterMap.entrySet()) {
-                if (entry.getValue() != null && entry.getValue().size() > 0) {
+                if (entry.getValue() != null && !entry.getValue().isEmpty()) {
                     TermsQueryField entryTerms = new TermsQueryField.Builder()
                             .value(entry.getValue().stream().map(FieldValue::of).toList())
                         .build();
@@ -97,13 +97,9 @@ public final class FilterUtils {
                         //Exclude any filter that begins with minus sign
                         topFilter.mustNot(QueryBuilders.terms().field(entry.getKey().substring(1)).terms(entryTerms).build()._toQuery());
                     } else { //default is "AND" filter that will be used as top_filter
-                        for (Object value : entry.getValue()) {
-                            //Building "AND" filter
-                                // add one must clause per term for And Operator
-                                for (FieldValue fv: entryTerms.value())
-                                {
-                                    topFilter.must(QueryBuilders.term().field(entry.getKey()).value(fv).build()._toQuery());
-                                }
+                        //Building "AND" filter - add one must clause per term
+                        for (FieldValue fv : entryTerms.value()) {
+                            topFilter.must(QueryBuilders.term().field(entry.getKey()).value(fv).build()._toQuery());
                         }
                     }
                 }
@@ -153,7 +149,6 @@ public final class FilterUtils {
             throw new NullPointerException("Cannot append date ranges to a null bool_filter");
         }
 
-         BoolQuery.Builder boolBuilderShouldContainer = QueryBuilders.bool();
         List<Query> queries = new ArrayList<>();
 
         if (Objects.nonNull(dateRange)) {
@@ -194,10 +189,10 @@ public final class FilterUtils {
                 */
                 var range = new DateRangeQuery.Builder().field(Params.DateField.MADE_AFTER);
                 if (fromDate != null) {
-                    range.gte(fromDate.toString().toString());
+                    range.gte(fromDate.toString());
                 }
                 if (toDate != null) {
-                    range.lte(toDate.toString().toString());
+                    range.lte(toDate.toString());
                 }
                 queries.add(range.build()._toRangeQuery()._toQuery());
                 /*
@@ -241,7 +236,7 @@ public final class FilterUtils {
                 }
             }
         }
-        if (queries.size() > 0 && boolFilter != null){
+        if (!queries.isEmpty()){
             logger.fine("hasClauses: Adding date-range to bool_filter");
             // logic is that dateFilters should be AND between each other, while the different queries
             // of dateRanges should be OR between each other.
@@ -289,6 +284,7 @@ public final class FilterUtils {
             }
         } catch (Exception ex) {
             logger.severe("Exception occurred while constructing a map from selected filters: " + ex.getMessage());
+            throw ex;
         }
         logger.log(Level.FINE, "returning filters {0} ", filters);
         return filters;
