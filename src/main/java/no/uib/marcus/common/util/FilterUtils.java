@@ -6,12 +6,9 @@ import co.elastic.clients.elasticsearch._types.query_dsl.BoolQuery.Builder;
 import co.elastic.clients.elasticsearch._types.query_dsl.DateRangeQuery;
 import co.elastic.clients.elasticsearch._types.query_dsl.Query;
 import co.elastic.clients.elasticsearch._types.query_dsl.QueryBuilders;
-import co.elastic.clients.elasticsearch._types.query_dsl.RangeQuery;
-import co.elastic.clients.elasticsearch._types.query_dsl.RangeQueryBuilders;
-import co.elastic.clients.elasticsearch._types.query_dsl.TermQuery;
-import co.elastic.clients.elasticsearch._types.query_dsl.TermsQuery;
 import co.elastic.clients.elasticsearch._types.query_dsl.TermsQueryField;
 
+import java.util.logging.Level;
 import no.uib.marcus.common.Params;
 import no.uib.marcus.range.DateRange;
 
@@ -116,7 +113,7 @@ public final class FilterUtils {
                 }
             }
         } catch (Exception ex) {
-            logger.severe("Exception occurred when constructing bool_filter [ " + ex + " ]");
+            logger.log(Level.SEVERE,"Exception occurred when constructing bool_filter [   {0}   ]",ex);
             throw ex;
         }
 
@@ -170,19 +167,20 @@ public final class FilterUtils {
             //Get upper boundary for this range
             LocalDate toDate = dateRange.getTo();
             if (Objects.nonNull(fromDate) || Objects.nonNull(toDate)) {
-                logger.info("Adding date-range between " + fromDate + " and " + toDate);
+
+              logger.fine("Adding date-range between " + fromDate + " and " +toDate);
 
                 //Range within "created" field
                 var created_range = new DateRangeQuery.Builder().field(Params.DateField.CREATED);
                 if (fromDate != null) {
                     created_range.gte(fromDate.toString());
-                    logger.info("Adding date-range between " + fromDate + " and " + toDate + " to created field");
+                    logger.fine("Adding date-range between " + fromDate + " and " + toDate + " to created field");
                 }
                 if (toDate != null ) {
                     created_range.lte(toDate.toString());
-                    logger.info("Adding date-range between " + fromDate + " and " + toDate + " to created field");
+                    logger.fine("Adding date-range between " + fromDate + " and " + toDate + " to created field");
                 }
-                logger.info("adding created_range query");
+                logger.fine("adding created_range query");
 
                 queries.add(created_range.build()._toRangeQuery()._toQuery());
 
@@ -248,7 +246,7 @@ public final class FilterUtils {
             }
         }
         if (queries.size() > 0 && boolFilter != null){
-            logger.info("hasClauses: Adding date-range to bool_filter");
+            logger.fine("hasClauses: Adding date-range to bool_filter");
             // logic is that dateFilters should be AND between each other, while the different queries
             // of dateRanges should be OR between each other.
            // It is enough that one of the dateFilters matches the dateRange.
@@ -296,7 +294,7 @@ public final class FilterUtils {
         } catch (Exception ex) {
             logger.severe("Exception occurred while constructing a map from selected filters: " + ex.getMessage());
         }
-        logger.info("returning filters " + filters.toString());
+        logger.log(Level.FINE, "returning filters {0} ", filters);
         return filters;
     }
 }
