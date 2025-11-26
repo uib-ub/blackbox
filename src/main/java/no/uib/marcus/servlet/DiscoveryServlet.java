@@ -2,8 +2,8 @@ package no.uib.marcus.servlet;
 
 import co.elastic.clients.elasticsearch.ElasticsearchClient;
 import co.elastic.clients.elasticsearch.core.SearchResponse;
-import tools.jackson.databind.ObjectMapper;
-import tools.jackson.databind.node.ObjectNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import java.io.Serial;
 import no.uib.marcus.client.ElasticsearchClientFactory;
 import no.uib.marcus.common.Params;

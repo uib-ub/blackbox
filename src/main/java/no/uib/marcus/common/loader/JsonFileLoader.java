@@ -1,6 +1,6 @@
 package no.uib.marcus.common.loader;
 
-import  tools.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.util.Objects;
 import java.util.logging.Logger;

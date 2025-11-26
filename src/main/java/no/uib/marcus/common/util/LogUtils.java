@@ -2,8 +2,8 @@ package no.uib.marcus.common.util;
 
 import co.elastic.clients.elasticsearch.core.SearchResponse;
 
-import tools.jackson.databind.json.JsonMapper;
-import tools.jackson.databind.node.ObjectNode;
+import com.fasterxml.jackson.databind.json.JsonMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import no.uib.marcus.common.Params;
 

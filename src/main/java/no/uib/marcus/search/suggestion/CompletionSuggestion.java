@@ -4,10 +4,10 @@ import co.elastic.clients.elasticsearch.ElasticsearchClient;
 import co.elastic.clients.elasticsearch.core.SearchResponse;
 import co.elastic.clients.elasticsearch.core.search.*;
 
-import tools.jackson.core.JacksonException;
+import com.fasterxml.jackson.core.JsonProcessingException;
 
-import tools.jackson.databind.json.JsonMapper;
-import tools.jackson.databind.node.ObjectNode;
+import com.fasterxml.jackson.databind.json.JsonMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import no.uib.marcus.client.ElasticsearchClientFactory;
 import co.elastic.clients.elasticsearch.core.SearchRequest.Builder;
@@ -86,7 +86,7 @@ public class CompletionSuggestion {
     }
 
     //Main method for easy debugging
-    public static void main(String[] args) throws JacksonException {
+    public static void main(String[] args) throws JsonProcessingException {
         String jsonString = new JsonMapper().writeValueAsString(
                 CompletionSuggestion
                         .getSuggestions("Ms-114,120v[7]", 10, "wab"));

@@ -12,10 +12,10 @@ import co.elastic.clients.elasticsearch.core.SearchRequest;
 
 import co.elastic.clients.util.NamedValue;
 
-import tools.jackson.core.JacksonException;
-import tools.jackson.databind.JsonNode;
-import tools.jackson.databind.ObjectMapper;
-import tools.jackson.databind.json.JsonMapper;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.json.JsonMapper;
 
 import no.uib.marcus.search.IllegalParameterException;
 
@@ -64,7 +64,7 @@ public final class AggregationUtils {
             throw new IllegalParameterException(
                     "Aggregations must be valid JSON. Expected JSON Array of objects but found : [" + jsonString + "]");
         }
-        } catch (JacksonException e) {
+        } catch (JsonProcessingException e) {
             throw new RuntimeException(e);
         }
     }
@@ -98,7 +98,7 @@ public final class AggregationUtils {
                              return true;
                          }
                      }
-            } catch (JacksonException e) {
+            } catch (JsonProcessingException e) {
                 throw new RuntimeException(e);
             }
         } catch (RuntimeException e) {
@@ -134,7 +134,7 @@ public final class AggregationUtils {
         JsonNode facets ;
         try {
             facets = mapper.readTree(aggregations);
-        } catch (JacksonException e) {
+        } catch (JsonProcessingException e) {
             throw new RuntimeException(e);
         }
         Map<String, Aggregation> aggregationMap = new HashMap<>() ;
