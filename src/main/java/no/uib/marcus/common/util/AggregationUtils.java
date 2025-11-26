@@ -17,6 +17,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.json.JsonMapper;
 
+import java.util.logging.Level;
 import no.uib.marcus.search.IllegalParameterException;
 
 import java.util.logging.Logger;
@@ -150,7 +151,7 @@ public final class AggregationUtils {
                 } else {
                     Aggregation agg;
                     ContainerBuilder termsAggs = constructTermsAggregation(facet);
-                    logger.info("key for termsAggs: " + facet.get("field").asText());
+                    logger.log(Level.FINE, "key for termsAggs: {0}", facet.get("field").asText());
 
                     if (selectedFacets != null && !selectedFacets.isEmpty()) {
                         //Get current field
@@ -171,7 +172,7 @@ public final class AggregationUtils {
 
                               BoolQuery.Builder aggsFilter2 = FilterUtils.getPostFilter(selectedFacetCopy, aggregations);
 
-                              logger.info("Aggregations aggsfilter added to search request: " + aggsFilter2.toString());
+                              logger.log(Level.FINE,"Aggregations aggsfilter added to search request: {0} ", aggsFilter2);
                           agg = addSubAggregationFilter(aggsFilter2, facet
                               );
                           termsAggs.aggregations(AGGS_FILTER_KEY, agg);
@@ -189,7 +190,7 @@ public final class AggregationUtils {
                 }
             }
         }
-        logger.info("Aggregations added to search request: " + aggregationMap.toString());
+        logger.log(Level.FINE, "Aggregations added to search request: {0}", aggregationMap);
         return searchRequest.aggregations(aggregationMap);
     }
 
@@ -240,12 +241,12 @@ public final class AggregationUtils {
 
         //Set date format
         if (facet.has("format")) {
-            logger.info("datehistogram has format");
+            logger.fine("datehistogram has format");
             dateHistBuilder.format(facet.get("format").asText());
         }
         //Set interval
         if (facet.has("interval")) {
-            logger.info("datehistogram has interval");
+            logger.fine("datehistogram has interval");
             dateHistBuilder.fixedInterval(new Time.Builder().time(facet.get("interval").asText()).build());
         }
         //Set number of minimum documents that should be returned
@@ -284,7 +285,7 @@ public final class AggregationUtils {
 
         Aggregation.Builder termsBuilder = new Aggregation.Builder();
         TermsAggregation.Builder termsAggregationBuilder = new TermsAggregation.Builder();
-        logger.info("field for termsAggs2: " + field);
+        logger.log(Level.FINE, "field for termsAggs2: {0}", field);
 
         termsAggregationBuilder.field(field);
 
