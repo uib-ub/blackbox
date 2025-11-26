@@ -98,16 +98,12 @@ public final class FilterUtils {
                         topFilter.mustNot(QueryBuilders.terms().field(entry.getKey().substring(1)).terms(entryTerms).build()._toQuery());
                     } else { //default is "AND" filter that will be used as top_filter
                         for (Object value : entry.getValue()) {
-                            if (entry.getKey().startsWith(BlackboxUtils.MINUS)) {
-                                //Exclude any filter that begins with minus sign
-                                topFilter.mustNot(QueryBuilders.terms().field(entry.getKey().substring(1)).terms(entryTerms).build()._toQuery());
-                            } else {//Building "AND" filter
+                            //Building "AND" filter
                                 // add one must clause per term for And Operator
                                 for (FieldValue fv: entryTerms.value())
                                 {
                                     topFilter.must(QueryBuilders.term().field(entry.getKey()).value(fv).build()._toQuery());
                                 }
-                            }
                         }
                     }
                 }
