@@ -7,8 +7,8 @@ import co.elastic.clients.elasticsearch.core.SearchResponse;
 import co.elastic.clients.json.jackson.JacksonJsonpGenerator;
 import co.elastic.clients.json.jackson.JacksonJsonpMapper;
 
-import com.fasterxml.jackson.core.JsonFactory;
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import tools.jackson.core.json.JsonFactory;
+import tools.jackson.databind.node.ObjectNode;
 
 import jakarta.json.stream.JsonGenerator;
 
@@ -46,6 +46,7 @@ public final class QueryUtils {
                 (queryString)
                 .fields(List.of("identifier","label","all","all.exact"))
                 .defaultOperator(Operator.And);
+
     }
 
     /**
@@ -118,7 +119,7 @@ public final class QueryUtils {
 
         StringWriter writer = new StringWriter();
         JsonFactory jsonFactory = new JsonFactory();
-        com.fasterxml.jackson.core.JsonGenerator jacksonGenerator = jsonFactory.createGenerator(writer);
+        tools.jackson.core.JsonGenerator jacksonGenerator = jsonFactory.createGenerator(writer);
 
         if (isPretty) {
                 jacksonGenerator.useDefaultPrettyPrinter();

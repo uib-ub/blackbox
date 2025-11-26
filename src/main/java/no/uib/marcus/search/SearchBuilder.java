@@ -10,7 +10,7 @@ import co.elastic.clients.util.ObjectBuilder;
 import jakarta.annotation.Nullable;
 import jakarta.validation.constraints.NotNull;
 
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import tools.jackson.databind.node.ObjectNode;
 
 import java.util.List;
 import java.util.Map;

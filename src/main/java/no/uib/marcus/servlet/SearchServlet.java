@@ -7,9 +7,9 @@ import co.elastic.clients.elasticsearch._types.query_dsl.QueryBuilders;
 import co.elastic.clients.json.jackson.JacksonJsonpGenerator;
 import co.elastic.clients.json.jackson.JacksonJsonpMapper;
 import co.elastic.clients.transport.rest_client.RestClientTransport;
-import com.fasterxml.jackson.core.JsonFactory;
-import com.fasterxml.jackson.databind.json.JsonMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import tools.jackson.core.JsonFactory;
+import tools.jackson.databind.json.JsonMapper;
+import tools.jackson.databind.node.ObjectNode;
 import jakarta.json.stream.JsonGenerator;
 import java.io.OutputStream;
 import java.io.Serial;
@@ -137,7 +137,7 @@ public class SearchServlet extends HttpServlet {
             // the key e.g., not "sterms#related.exact": but "related:exact"
             try (StringWriter writer = new StringWriter()) {
                 JsonFactory jsonFactory = new JsonFactory();
-                com.fasterxml.jackson.core.JsonGenerator jacksonGenerator = jsonFactory.createGenerator(writer);
+                tools.jackson.core.JsonGenerator jacksonGenerator = jsonFactory.createGenerator(writer);
                 if (Boolean.getBoolean(isPretty)) {
                     jacksonGenerator.useDefaultPrettyPrinter();
                 }
