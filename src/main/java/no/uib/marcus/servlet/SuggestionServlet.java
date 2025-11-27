@@ -27,6 +27,7 @@ public class SuggestionServlet extends HttpServlet {
 
     private static final long serialVersionUID = 2L;
     private static final int DEFAULT_SIZE = 5;
+    private static final int SUGGESTION_MAX_SIZE = 15;
     private static final JsonMapper jsonMapper = new JsonMapper(); // Reusable, thread-safe
 
 
@@ -37,17 +38,10 @@ public class SuggestionServlet extends HttpServlet {
 
         String suggestText = request.getParameter(Params.QUERY_STRING);
         String[] indices = request.getParameterValues(Params.INDICES);
-        String size = request.getParameter(Params.SIZE);
+        int suggestSize = StringUtils.parseIntWithDefault(request.getParameter(Params.SIZE),DEFAULT_SIZE,1,SUGGESTION_MAX_SIZE);
         String jsonString;
 
         try (PrintWriter out = response.getWriter()) {
-          int suggestSize;
-          try {
-            suggestSize = StringUtils.hasText(size) ? Integer.parseInt(size) : DEFAULT_SIZE;
-          } catch (NumberFormatException e) {
-            // fall back to use DEFAULT_SIZE if an exception is thrown
-            suggestSize = DEFAULT_SIZE;
-          }
           try {
             jsonString = jsonMapper.writeValueAsString(
                 CompletionSuggestion.getSuggestions(suggestText, suggestSize, indices));

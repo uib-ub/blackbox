@@ -55,6 +55,7 @@ public final class StringUtils {
     public static boolean hasLength(CharSequence str) {
         return (str != null && !str.isEmpty());
     }
+
     public static boolean containsWhitespace(CharSequence str) {
         if (!hasLength(str)) {
             return false;
@@ -67,5 +68,26 @@ public final class StringUtils {
         }
         return false;
     }
+
+  /**
+   * Parses a string to an integer with bounds checking and a fallback default value.
+   *
+   * @param value        the string value to parse
+   * @param defaultValue the default value if parsing fails or value is empty
+   * @param min          the minimum allowed value (inclusive)
+   * @param max          the maximum allowed value (inclusive)
+   * @return the parsed integer clamped to [min, max], or defaultValue if parsing fails
+   */
+  public static int parseIntWithDefault(String value, int defaultValue, int min, int max) {
+    if (!hasText(value)) {
+      return defaultValue;
+    }
+    try {
+      int parsed = Integer.parseInt(value.trim());
+      return Math.max(min, Math.min(max, parsed));
+    } catch (NumberFormatException e) {
+      return defaultValue;
+    }
+  }
 }
 

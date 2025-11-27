@@ -21,6 +21,7 @@ public class Params {
     public static final String INDEX_BOOST = "index_boost";
     public static final int DEFAULT_FROM = 0;
     public static final int DEFAULT_SIZE = 10;
+    public static final int MAX_SIZE = 1000;
 
     /**
      * A static inner class for holding date fields to perform date ranges.

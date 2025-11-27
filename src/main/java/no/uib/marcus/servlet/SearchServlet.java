@@ -97,8 +97,8 @@ public class SearchServlet extends HttpServlet {
 
 
           //Assign default values, if needs be
-            int _from = StringUtils.hasText(from) ? Integer.parseInt(from) : Params.DEFAULT_FROM;
-            int _size = StringUtils.hasText(size) ? Integer.parseInt(size) : Params.DEFAULT_SIZE;
+            int _from = StringUtils.parseIntWithDefault(from, Params.DEFAULT_FROM, 0, Integer.MAX_VALUE);
+            int _size = StringUtils.parseIntWithDefault(size, Params.DEFAULT_SIZE, 1, Params.MAX_SIZE);
 
             //Build a facet map based on selected filters.
             //E.g. {"subject.exact" = ["Flyfoto" , "Birkeland"], "type" = ["Brev"]}
@@ -115,8 +115,7 @@ public class SearchServlet extends HttpServlet {
                     .setFrom(_from)
                     .setSize(_size)
                     .setSelectedFacets(selectedFacets)
-                .setSortBuilder(SortUtils.getSort(sortString))
-                // @todo   .setSortBuilder(SortUtils.getSort(sortString))
+                    .setSortBuilder(SortUtils.getSort(sortString))
                     .setIndexToBoost(indexToBoost);
 
             //Add top level filter, for "AND" aggregations
@@ -138,7 +137,7 @@ public class SearchServlet extends HttpServlet {
             try (StringWriter writer = new StringWriter()) {
                 JsonFactory jsonFactory = new JsonFactory();
                 com.fasterxml.jackson.core.JsonGenerator jacksonGenerator = jsonFactory.createGenerator(writer);
-                if (Boolean.getBoolean(isPretty)) {
+                if (Boolean.parseBoolean(isPretty)) {
                     jacksonGenerator.useDefaultPrettyPrinter();
                 }
                 JsonGenerator generator = new JacksonJsonpGenerator(jacksonGenerator);
@@ -170,6 +169,12 @@ public class SearchServlet extends HttpServlet {
 
     private static String buildEndpoint(String[] indices) {
         if (indices != null && indices.length > 0) {
+          for (String index : indices) {
+            if (index == null || index.contains("..") || index.contains("/")
+                || index.startsWith("_") || index.contains("*")) {
+              throw new IllegalArgumentException("Invalid index name: " + index);
+            }
+          }
             return "/" + String.join(",", indices) + "/_search";
         }
         return "/_search";
@@ -195,6 +200,7 @@ public class SearchServlet extends HttpServlet {
 
         request.setCharacterEncoding("UTF-8");
         response.setContentType("application/json;charset=UTF-8");
+        response.setStatus(HttpServletResponse.SC_METHOD_NOT_ALLOWED);
 
         try (PrintWriter out = response.getWriter()) {
             out.write(objectNode.toPrettyString());
