@@ -13,6 +13,8 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * This servlet processes all HTTP requests coming from the "/suggest" endpoint
@@ -24,7 +26,7 @@ import java.io.PrintWriter;
         urlPatterns = {"/suggest"}
 )
 public class SuggestionServlet extends HttpServlet {
-
+    private static final Logger logger = Logger.getLogger(SuggestionServlet.class.getName());
     private static final long serialVersionUID = 2L;
     private static final int DEFAULT_SIZE = 5;
     private static final int SUGGESTION_MAX_SIZE = 15;
@@ -52,7 +54,8 @@ public class SuggestionServlet extends HttpServlet {
             errorNode.put("code", 500);
             errorNode.put("message", "An error occurred while fetching suggestions");
             out.write(errorNode.toString());
-            // Consider logging: logger.log(Level.SEVERE, "Suggestion error", e);
+           logger.log(Level.SEVERE, "Suggestion error", e);
+           throw e;
           }
         }
     }
