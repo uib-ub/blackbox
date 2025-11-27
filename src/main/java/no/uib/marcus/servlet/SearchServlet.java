@@ -166,7 +166,7 @@ public class SearchServlet extends HttpServlet {
                 throw e;
             }
             catch (Exception e) {
-                logger.severe(e.getMessage());
+                logger.log(Level.SEVERE, "Unexpected error processing search request", e);
                 throw e;
             }
             }
