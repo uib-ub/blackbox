@@ -22,6 +22,7 @@ import no.uib.marcus.range.DateRange;
 import no.uib.marcus.search.SearchBuilder;
 import no.uib.marcus.search.SearchBuilderFactory;
 
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import no.uib.marcus.common.util.StringUtils;
@@ -56,6 +57,9 @@ import org.elasticsearch.client.RestClient;
 
 public class SearchServlet extends HttpServlet {
     private static final Logger logger = Logger.getLogger(SearchServlet.class.getName());
+    private static final JsonMapper jsonMapper = new JsonMapper();
+    private static final JacksonJsonpMapper jacksonJsonpMapper = new JacksonJsonpMapper(jsonMapper);
+
     @Serial
     private static final long serialVersionUID = 1L;
 
@@ -105,7 +109,7 @@ public class SearchServlet extends HttpServlet {
             Map<String, List<String>> selectedFacets = FilterUtils.buildFilterMap(selectedFilters);
 
 
-            logger.info("service: " + service);
+            logger.log(Level.FINE, "service: {0}", service);
             //Get and build the corresponding search builder based on the "service" parameter
             SearchBuilder<? extends SearchBuilder<?>> builder = SearchBuilderFactory
                     .getSearchBuilder(service, client)
@@ -128,7 +132,7 @@ public class SearchServlet extends HttpServlet {
             //Add post-filter for "OR" aggregations if any
             BoolQuery.Builder postFilter = FilterUtils.getPostFilter(selectedFacets, aggs);
             if (postFilter.hasClauses()) {
-              logger.info("postfilter hasClauses in SearchServlet: " + postFilter.hasClauses());
+              logger.log(Level.FINE, "postfilter hasClauses in SearchServlet:  {0}", postFilter.hasClauses());
                builder.setPostFilter(QueryBuilders.bool().should(postFilter.build()));
             }
             //Serialize SearchBuilder request to JSON to skip serialization and deserialization
@@ -141,7 +145,7 @@ public class SearchServlet extends HttpServlet {
                     jacksonGenerator.useDefaultPrettyPrinter();
                 }
                 JsonGenerator generator = new JacksonJsonpGenerator(jacksonGenerator);
-                builder.constructSearchRequest().build().serialize(generator,new JacksonJsonpMapper());
+                builder.constructSearchRequest().build().serialize(generator, jacksonJsonpMapper );
 
                 generator.close();
 
@@ -155,15 +159,16 @@ public class SearchServlet extends HttpServlet {
                 response1.getEntity().writeTo(out);
 
             } catch (ElasticsearchException e) {
-                logger.info("reason " + e.error().reason());
+                logger.severe("reason " + e.error().reason());
                 //logger.info("caused by " + e.error().causedBy().reason());
-                logger.info("size of supressed " + e.error().suppressed().size());
-                logger.info("response : " + e.response().toString());
+                logger.severe("size of supressed " + e.error().suppressed().size());
+                logger.severe("response : " + e.response().toString());
                 throw e;
             }
-            } catch (Exception e) {
-                logger.info(e.getMessage());
+            catch (Exception e) {
+                logger.severe(e.getMessage());
                 throw e;
+            }
             }
         }
 
@@ -193,7 +198,7 @@ public class SearchServlet extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws IOException {
 
-        ObjectNode objectNode = new JsonMapper().createObjectNode();
+        ObjectNode objectNode = jsonMapper.createObjectNode();
         objectNode.put("field", 405);
         objectNode.put("message","Method Not Allowed");
 
