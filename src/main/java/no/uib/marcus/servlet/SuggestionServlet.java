@@ -15,7 +15,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 
 /**
- * This servlet processes all HTTP requests coming from "/suggest" endpoint
+ * This servlet processes all HTTP requests coming from the "/suggest" endpoint
  *
  * @author Hemed Ali
  */
@@ -27,8 +27,10 @@ public class SuggestionServlet extends HttpServlet {
 
     private static final long serialVersionUID = 2L;
     private static final int DEFAULT_SIZE = 5;
+    private static final JsonMapper jsonMapper = new JsonMapper(); // Reusable, thread-safe
 
-    private void processRequest(HttpServletRequest request, HttpServletResponse response)
+
+  private void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws IOException {
         request.setCharacterEncoding("UTF-8");
         response.setContentType("application/json;charset=UTF-8");
@@ -39,9 +41,25 @@ public class SuggestionServlet extends HttpServlet {
         String jsonString;
 
         try (PrintWriter out = response.getWriter()) {
-            int suggestSize = StringUtils.hasText(size) ? Integer.parseInt(size) : DEFAULT_SIZE;
-            jsonString = new JsonMapper().writeValueAsString(CompletionSuggestion.getSuggestions(suggestText, suggestSize, indices));
+          int suggestSize;
+          try {
+            suggestSize = StringUtils.hasText(size) ? Integer.parseInt(size) : DEFAULT_SIZE;
+          } catch (NumberFormatException e) {
+            // fall back to use DEFAULT_SIZE if an exception is thrown
+            suggestSize = DEFAULT_SIZE;
+          }
+          try {
+            jsonString = jsonMapper.writeValueAsString(
+                CompletionSuggestion.getSuggestions(suggestText, suggestSize, indices));
             out.write(jsonString);
+          } catch (Exception e) {
+            response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+            ObjectNode errorNode = jsonMapper.createObjectNode();
+            errorNode.put("code", 500);
+            errorNode.put("message", "An error occurred while fetching suggestions");
+            out.write(errorNode.toString());
+            // Consider logging: logger.log(Level.SEVERE, "Suggestion error", e);
+          }
         }
     }
 
@@ -62,13 +80,13 @@ public class SuggestionServlet extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        ObjectNode objectNode = new JsonMapper().createObjectNode();
+        ObjectNode objectNode = jsonMapper.createObjectNode();
         objectNode.put("code", 405);
         objectNode.put("message", "Method Not Allowed");
 
-
-        request.setCharacterEncoding("UTF-8");
         response.setContentType("application/json;charset=UTF-8");
+        response.setStatus(HttpServletResponse.SC_METHOD_NOT_ALLOWED);
+        request.setCharacterEncoding("UTF-8");
 
         try (PrintWriter out = response.getWriter()) {
             out.write(objectNode.toPrettyString()
