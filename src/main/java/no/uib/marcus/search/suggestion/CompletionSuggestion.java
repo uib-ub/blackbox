@@ -9,6 +9,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.json.JsonMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
+import java.util.logging.Level;
 import no.uib.marcus.client.ElasticsearchClientFactory;
 import co.elastic.clients.elasticsearch.core.SearchRequest.Builder;
 
@@ -27,7 +28,11 @@ public class CompletionSuggestion {
 
     private static final Logger logger = Logger.getLogger(CompletionSuggestion.class.getName());
     private static final String SUGGEST_FIELD = "suggest";
-    private static Suggester.Builder suggesterBuilder;
+
+  // Private constructor to prevent instantiation
+   private CompletionSuggestion() {
+    throw new IllegalStateException("Utility class");
+  }
 
     /**A method to get a list of suggestions.
      * @param text input text
@@ -39,17 +44,15 @@ public class CompletionSuggestion {
         Set<String> suggestValues = new HashSet<>();
         try {
             SearchResponse<ObjectNode> suggestResponse = getSuggestionResponse(text, size, indices);
-            List<Suggestion<ObjectNode>> suggestions = suggestResponse.suggest().get("suggest");
+            List<Suggestion<ObjectNode>> suggestions = suggestResponse.suggest().get(SUGGEST_FIELD);
 
             //Add each option(value) to a set to ensure no repetition
-            for ( Suggestion<ObjectNode> suggestion : suggestions)
-
-                     {
-                         List<CompletionSuggestOption<ObjectNode>> options = suggestion.completion().options();
-                         for (CompletionSuggestOption<ObjectNode> option : options) {
-                             logger.fine("completion: " + option.text());
-                             suggestValues.add(option.text());
-                         }
+            for ( Suggestion<ObjectNode> suggestion : suggestions) {
+              List<CompletionSuggestOption<ObjectNode>> options = suggestion.completion().options();
+              for (CompletionSuggestOption<ObjectNode> option : options) {
+                logger.log(Level.FINE,"completion: {0}", option.text());
+                suggestValues.add(option.text());
+              }
             }
         } catch (Exception e) {
             logger.severe("Unable to perform suggestion for text: [" + text + "]. Message: " + e.getLocalizedMessage()) ;
@@ -66,11 +69,12 @@ public class CompletionSuggestion {
      **/
     public static SearchResponse<ObjectNode> getSuggestionResponse(String text, int size, @Nullable String... indices) throws IOException {
         Map<String, FieldSuggester> map = new HashMap<>();
-        map.put("suggest",FieldSuggester.of(fs -> fs
+        map.put(SUGGEST_FIELD,FieldSuggester.of(fs -> fs
             .completion(cs -> cs.skipDuplicates(true)
                 .size(size)
-                        .field("suggest").analyzer("keyword"))));
-        logger.fine("getSuggestionResponse: " + map);
+                .field(SUGGEST_FIELD)
+                .analyzer("keyword"))));
+        logger.log(Level.FINE, "getSuggestionResponse: {0}", map);
 
         Suggester suggester = Suggester.of(sf -> sf.suggesters(map).text(text));
         Builder builder = new Builder();
@@ -79,9 +83,9 @@ public class CompletionSuggestion {
         if (indices != null && indices.length > 0) {
             builder.index(List.of(indices));
         }
-        builder.size(size);
+        builder.size(0);
         SearchResponse<ObjectNode> response = client.search(builder.build(), ObjectNode.class);
-        logger.fine("getSuggestionResponse: " + response.suggest().get("suggest"));
+        logger.log(Level.FINE, "getSuggestionResponse: {0}", response.suggest().get(SUGGEST_FIELD));
         return response;
     }
 
@@ -91,7 +95,7 @@ public class CompletionSuggestion {
                 CompletionSuggestion
                         .getSuggestions("Ms-114,120v[7]", 10, "wab"));
 
-        logger.info(jsonString);
+        logger.log(Level.INFO,"{0}",jsonString);
     }
 
 }
