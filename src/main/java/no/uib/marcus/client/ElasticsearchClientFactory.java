@@ -33,7 +33,7 @@ import java.util.Map;
  */
 final public class ElasticsearchClientFactory {
     private static final Logger logger = Logger.getLogger(ElasticsearchClientFactory.class.getName());
-    private static ElasticsearchClient elasticsearchClient;
+    private static volatile ElasticsearchClient elasticsearchClient;
 
     /**
      * Prevent direct instantiation of this class
@@ -50,7 +50,10 @@ final public class ElasticsearchClientFactory {
             Header[] defaultHeader = new Header[]{new BasicHeader("Authorization",
                     "ApiKey " + BlackboxUtils.getValueAsString(properties, "api_key"))};
             RestClient restClient = RestClient.builder(
-                            new HttpHost(InetAddress.getByName(BlackboxUtils.getValueAsString(properties, "host")), BlackboxUtils.getValueAsInt(properties, "port"), "https")
+                            new HttpHost(
+                                BlackboxUtils.getValueAsString(properties, "host"),
+                                BlackboxUtils.getValueAsInt(properties, "port"),
+                                "https")
                     ).setDefaultHeaders(defaultHeader)
                     .build();
 
@@ -74,16 +77,18 @@ final public class ElasticsearchClientFactory {
      *  Synchronize the call so that different threads do not end up creating multiple instances
      * Do we still need to synchronize after changing to use the java client which uses rest?
      */
-    public static synchronized ElasticsearchClient getElasticsearchClient() throws IOException {
+    public static ElasticsearchClient getElasticsearchClient() throws IOException {
         if (elasticsearchClient == null) {
-            JsonFileLoader loader = new JsonFileLoader();
-            Map<String, String> properties;
-            String clusterName  = System.getenv("ELASTICSEARCH_CLUSTER_NAME");
-            if (clusterName == null || clusterName.isEmpty()) {
+          synchronized (ElasticsearchClientFactory.class) {
+            if (elasticsearchClient == null) {
+              JsonFileLoader loader = new JsonFileLoader();
+              Map<String, String> properties;
+              String clusterName = System.getenv("ELASTICSEARCH_CLUSTER_NAME");
+              if (clusterName == null || clusterName.isEmpty()) {
                 properties = loader.loadBlackboxConfigFromResource();
-                logger.info("Loaded config template from: " + loader.getPathFromResource(JsonFileLoader.CONFIG_TEMPLATE));
-            }
-            else {
+                logger.info("Loaded config template from: " + loader.getPathFromResource(
+                    JsonFileLoader.CONFIG_TEMPLATE));
+              } else {
                 properties = new HashMap<>();
                 properties.put("name", required("ELASTICSEARCH_CLUSTER_NAME"));
                 properties.put("node_name", required("ELASTICSEARCH_CLUSTER_NODE_NAME"));
@@ -91,8 +96,10 @@ final public class ElasticsearchClientFactory {
                 properties.put("port", required("ELASTICSEARCH_CLUSTER_PORT"));
                 properties.put("api_key", required("ELASTICSEARCH_CLUSTER_API_KEY"));
                 logger.info("configuration loaded from env variables");
+              }
+              elasticsearchClient = createElasticsearchClient(properties);
             }
-            elasticsearchClient = createElasticsearchClient(properties);
+          }
         }
         return elasticsearchClient;
     }
