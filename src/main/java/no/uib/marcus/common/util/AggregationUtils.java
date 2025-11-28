@@ -43,7 +43,8 @@ import java.util.Map;
 public final class AggregationUtils {
     private static final Logger logger = Logger.getLogger(AggregationUtils.class.getName());
     private static final String AGGS_FILTER_KEY = "aggs_filter";
-    private static final ObjectMapper MAPPER = new ObjectMapper();
+    private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
+    private static final JsonMapper JSON_MAPPER = new JsonMapper();
 
     //Enforce non-instatiability
     private AggregationUtils() {
@@ -54,13 +55,13 @@ public final class AggregationUtils {
      * Validate aggregations
      *
      * @param jsonString aggregations as JSON string
-     * @ expects input to be valid json. Throws an exception if the string is not parseable as a json array
+     * @ expects input to be valid JSON. Throws an exception if the string is not parseable as a JSON array
      * @throws IllegalParameterException if string is not JSON array
      **/
     public static void validateAggregations(String jsonString) {
         // rewrite from AI assistant using Jackson
         try {
-        JsonNode node = MAPPER.readTree(jsonString);
+        JsonNode node = OBJECT_MAPPER.readTree(jsonString);
         if (!node.isArray()){
             throw new IllegalParameterException(
                     "Aggregations must be valid JSON. Expected JSON Array of objects but found : [" + jsonString + "]");
@@ -73,22 +74,22 @@ public final class AggregationUtils {
     /**
      * The method checks if the facets/aggregations contain a key that has a specified value.
      * Note that the facets must be valid JSON array. For example [
-     * {"field": "status", "size": 15, "operator" : "AND", "order":
-     * "term_asc"}, {"field" :"assigned_to" , "order" : "term_asc"}]
+     * {"field": "status", "size": 15, "operator": "AND", "order":
+     * "term_asc"}, {"field": "assigned_to", "order": "term_asc"}]
      *
      * @param aggregations aggregations as JSON string
      * @param field        field in which key-value exists
      * @param key          a facet key
-     * @param value        a value of specified key
+     * @param value        a value of the specified key
      * @return <code>true</code> if the key, in that field, has a specified value
      */
     public static boolean contains(String aggregations, String field, String key, String value) {
-      //If there is no aggregations, no need to continue.
+      //If there are no aggregations, no need to continue.
       if (!StringUtils.hasText(aggregations)) {
         return false;
       }
       try {
-        JsonNode facets = MAPPER.readTree(aggregations);
+        JsonNode facets = OBJECT_MAPPER.readTree(aggregations);
         for (JsonNode facet : facets)
           if (facet.has("field") && facet.has(key)) {
             String currentField = facet.get("field").asText();
@@ -127,18 +128,16 @@ public final class AggregationUtils {
     public static SearchRequest.Builder addAggregations(SearchRequest.Builder searchRequest,
                                                         String aggregations,
                                                         Map<String, List<String>> selectedFacets) {
-        JsonMapper mapper = new JsonMapper();
         JsonNode facets ;
         try {
-            facets = mapper.readTree(aggregations);
+            facets = JSON_MAPPER.readTree(aggregations);
         } catch (JsonProcessingException e) {
             throw new RuntimeException(e);
         }
         Map<String, Aggregation> aggregationMap = new HashMap<>() ;
+        BoolQuery.Builder aggsFilter = FilterUtils.getPostFilter(selectedFacets, aggregations);
         for (JsonNode facet : facets) {
             if (facet.has("field")) {
-              BoolQuery.Builder aggsFilter = FilterUtils.getPostFilter(selectedFacets, aggregations);
-
               //Add DateHistogram aggregations
                 //@todo add map of Map<String, Aggregation> and send once
                 if (facet.has("type") && facet.get("type").asText().equals("date_histogram")) {
@@ -150,10 +149,10 @@ public final class AggregationUtils {
                     logger.log(Level.FINE, "key for termsAggs: {0}", facet.get("field").asText());
 
                     if (selectedFacets != null && !selectedFacets.isEmpty()) {
-                        //Get current field
+                        //Get the current field
                         String facetField = facet.get("field").asText();
-                        // Logic: Whenever a user selects value from an "OR" aggregation,
-                        // you add a corresponding filter (here aggs_filter) to all aggregations as sub aggregation
+                        // Logic: Whenever a user selects the value from an "OR" aggregation,
+                        // you add a corresponding filter (here aggs_filter) to all aggregations as subaggregation
                         // EXCEPT for the aggregation in which the selection was performed in.
                         if (selectedFacets.containsKey(facetField)) {
                             //Make a copy of the map
@@ -163,7 +162,7 @@ public final class AggregationUtils {
                             selectedFacetCopy.remove(facetField);
 
                             //Build bool_filter for the copy of the selected facets.
-                            //We build sub aggregation filter only for "OR" facets
+                            //We build the subaggregation filter only for "OR" facets
                             if (aggsFilter.hasClauses()){
 
                               BoolQuery.Builder aggsFilter2 = FilterUtils.getPostFilter(selectedFacetCopy, aggregations);
@@ -191,7 +190,7 @@ public final class AggregationUtils {
     }
 
     /**
-     * Adds sub aggregation filter with the name "aggs_filter". Sub aggregations are added only to "OR" facets
+     * Adds the subaggregation filter with the name "aggs_filter". Sub aggregations are added only to "OR" facets
      */
     private static Aggregation addSubAggregationFilter(BoolQuery.Builder aggsFilter, JsonNode currentFacet) {
 
@@ -200,17 +199,14 @@ public final class AggregationUtils {
             // create a sub aggregation to add to an aggregation
             /**
              *  Map<String, Aggregation> map = new HashMap<>();
-             *
              *     Aggregation subAggregation = new Aggregation.Builder()
              *         .avg(new AverageAggregation.Builder().field("revenue").build())
              *         .build();
-             *
              *     Aggregation aggregation = new Aggregation.Builder()
              *         .terms(new TermsAggregation.Builder().field("director.keyword").build())
              *         .aggregations(new HashMap<>() {{
              *           put("avg_renevue", subAggregation);
              *         }}).build();
-             *
              *     map.put("agg_director", aggregation);
              *
              *     SearchRequest searchRequest = new SearchRequest.Builder()
@@ -230,7 +226,7 @@ public final class AggregationUtils {
      */
     public static DateHistogramAggregation.Builder getDateHistogramAggregation(JsonNode facet) {
         String field = facet.get("field").asText();
-        //Create date histogram
+        //Create the date histogram
         DateHistogramAggregation.Builder dateHistBuilder = new DateHistogramAggregation.Builder();
 
          dateHistBuilder.field(field);
@@ -245,7 +241,7 @@ public final class AggregationUtils {
             logger.fine("datehistogram has interval");
             dateHistBuilder.fixedInterval(new Time.Builder().time(facet.get("interval").asText()).build());
         }
-        //Set number of minimum documents that should be returned
+        //Set the number of minimum documents that should be returned
         if (facet.has("min_doc_count")) {
             dateHistBuilder.minDocCount(facet.get("min_doc_count").asInt());
         }
@@ -337,12 +333,12 @@ public final class AggregationUtils {
             } else { //sort normally using top aggregation
                 termsAggregationBuilder.order(order);
             }
-        } else {//if order is not specified
+        } else {//if the order is not specified
             if (sortBySubAggregation) { //use sub aggregation order, otherwise let Elasticsearch decides
                 termsAggregationBuilder.order(subAggregationOrder);
             }
         }
-        //Set number of minimum documents that should be returned
+        //Set the number of minimum documents that should be returned
         if (facet.has("min_doc_count")) {
             int minDocCount = facet.get("min_doc_count").asInt();
             termsAggregationBuilder.minDocCount(minDocCount);
