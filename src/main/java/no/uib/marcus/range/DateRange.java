@@ -3,17 +3,11 @@ package no.uib.marcus.range;
 import no.uib.marcus.common.util.StringUtils;
 
 import jakarta.annotation.Nullable;
-import jakarta.validation.constraints.NotNull;
-import javax.xml.datatype.DatatypeConfigurationException;
-import javax.xml.datatype.DatatypeConstants;
-import javax.xml.datatype.DatatypeFactory;
-import javax.xml.datatype.XMLGregorianCalendar;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeFormatterBuilder;
 import java.time.temporal.ChronoField;
 import java.util.Objects;
-import java.util.logging.Logger;
 
 /**
  * DateRange class that manipulates ranges for Local Dates.
@@ -25,8 +19,6 @@ import java.util.logging.Logger;
 
 public class DateRange implements Range<LocalDate> {
     //Default date format, any one of these is OK
-    public static final String DEFAULT_DATE_FORMAT = "yyyy-MM-dd||yyyy-MM||yyyy";
-
     // default values set for from date
     public static final  DateTimeFormatter DEFAULT_DATE_FORMATTER = new DateTimeFormatterBuilder()
             .appendPattern("[yyyy-MM-dd]")
@@ -42,7 +34,6 @@ public class DateRange implements Range<LocalDate> {
             .parseDefaulting(ChronoField.MONTH_OF_YEAR, 12)
             .parseDefaulting(ChronoField.DAY_OF_MONTH, 31)
             .toFormatter();
-    private static final Logger logger = Logger.getLogger(String.valueOf(DateRange.class));
 
     //Null indicates an unbounded/infinite value
     @Nullable
@@ -52,28 +43,13 @@ public class DateRange implements Range<LocalDate> {
     @Nullable
     private LocalDate toDate;
 
-    //Specified date format
-    @NotNull
-    private String dateFormat;
-
-    public DateRange(String format) {
-        this.dateFormat = Objects.requireNonNull(format, "Date format cannot be null");
-    }
-
-    public DateRange(@Nullable String from, @Nullable String to) {
-        this(from, to, DEFAULT_DATE_FORMAT);
-    }
-
-    public DateRange(String from, String to, String format) {
-        this(format);
+    public DateRange(String from, String to) {
         this.fromDate = parseFromDate(from);
         this.toDate = parseToDate(to);
 
     }
 
-    public static DateRange of(@Nullable String from, @Nullable String to) {
-        return new DateRange(from, to);
-    }
+
 
     @Override
     public LocalDate getFrom() {
@@ -116,26 +92,6 @@ public class DateRange implements Range<LocalDate> {
     }
 
     /**
-     * Get a date format or default format if not specified.
-     * The default format is "yyyy-MM-dd||yyyy-MM||yyyy"
-     */
-    public String getDateFormat() {
-        if (Objects.nonNull(dateFormat)) {
-            return dateFormat;
-        }
-        return DEFAULT_DATE_FORMAT;
-    }
-
-    /**
-     * Apply a date format to this range
-     *
-     * @param dateFormat a non-null date format string
-     */
-    public void setDateFormat(String dateFormat) {
-        this.dateFormat = Objects.requireNonNull(dateFormat, "Date format cannot be null");
-    }
-
-    /**
      * Parse a string to a local date
      *
      * @param input date string to parse
@@ -144,13 +100,18 @@ public class DateRange implements Range<LocalDate> {
     @Override
     public LocalDate parse(String input) {
         if (StringUtils.hasText(input)) {
-            return LocalDate.parse(input, DateTimeFormatter.ofPattern(getDateFormat()));
+            return LocalDate.parse(input, DEFAULT_DATE_FORMATTER);
         }
         return null;
     }
 
+  public static DateRange of(@Nullable String from, @Nullable String to) {
+            return new DateRange(from, to);
+    }
 
-    /**
+
+
+  /**
      * Check whether a range is positive, a positive range is the one such that
      * fromDate <= toDate for non-null boundaries.
      */
@@ -188,7 +149,6 @@ public class DateRange implements Range<LocalDate> {
     public int hashCode() {
         int result = fromDate != null ? fromDate.hashCode() : 0;
         result = 31 * result + (toDate != null ? toDate.hashCode() : 0);
-        result = 31 * result + dateFormat.hashCode();
         return result;
     }
 
@@ -197,51 +157,9 @@ public class DateRange implements Range<LocalDate> {
         final StringBuilder sb = new StringBuilder("DateRange{");
         sb.append("fromDate=").append(fromDate);
         sb.append(", toDate=").append(toDate);
-        sb.append(", dateFormat='").append(dateFormat).append('\'');
         sb.append('}');
         return sb.toString();
     }
 
-    /**
-     * Checks if a provided string is valid xsd:gYear
-     *
-     * @param yearString a gYear string to parse
-     * @return {@code empty string} true if it is valid gYear, otherwise false
-     */
-    public static boolean isXSDgYear(String yearString) {
-        try {
-            int inputYear = Integer.parseInt(yearString);
-            /*
-             * Input year should be at most 4 digits number. I had to make sure about this because if an input year
-             * is greater than 4 digits, it will be truncated by toXMLFormat() method anyway.
-             **/
-            if (inputYear > 0 && String.valueOf(inputYear).length() > 4) {
-                return true;
-            }
-            /*
-            Negative gYear with at most 4 digits is allowed. E.g. -0160 for 160BC
-             */
-            if (inputYear < 0 && String.valueOf(inputYear).length() > 5) {
-                return true;
-            }
-
-            XMLGregorianCalendar gCalendar = DatatypeFactory
-                    .newInstance()
-                    .newXMLGregorianCalendarDate(
-                            inputYear,
-                            DatatypeConstants.FIELD_UNDEFINED,
-                            DatatypeConstants.FIELD_UNDEFINED,
-                            DatatypeConstants.FIELD_UNDEFINED
-                    );
-            gCalendar.toXMLFormat();
-        } catch (NumberFormatException nfe) {
-            logger.warning("gYear must be a number: " + nfe.getLocalizedMessage());
-            return false;
-        } catch (DatatypeConfigurationException | IllegalArgumentException ex) {
-            logger.warning(ex.getLocalizedMessage());
-            return false;
-        }
-        return true;
-    }
 
 }
