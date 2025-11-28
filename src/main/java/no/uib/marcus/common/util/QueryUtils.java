@@ -33,8 +33,10 @@ public final class QueryUtils {
     };
 
   private static final JacksonJsonpMapper JSONP_MAPPER = new JacksonJsonpMapper();
+  private static final JsonFactory JSON_FACTORY = new JsonFactory();
+  private static final List<String> SEARCH_FIELDS = List.of("identifier", "label", "all", "all.exact");
 
-    private QueryUtils() {
+  private QueryUtils() {
     }
 
     /**
@@ -44,10 +46,10 @@ public final class QueryUtils {
      * @return a builder for the simple query string
      */
     public static SimpleQueryStringQuery.Builder buildMarcusSimpleQueryString(String queryString) {
-        return new SimpleQueryStringQuery.Builder().query
-                (queryString)
-                .fields(List.of("identifier","label","all","all.exact"))
-                .defaultOperator(Operator.And);
+        return new SimpleQueryStringQuery.Builder()
+            .query(queryString)
+            .fields(SEARCH_FIELDS)
+            .defaultOperator(Operator.And);
     }
 
     /**
@@ -59,11 +61,7 @@ public final class QueryUtils {
     public static QueryStringQuery.Builder buildMarcusQueryString(String queryString) {
         QueryStringQuery.Builder builder = new QueryStringQuery.Builder();
         return builder.query(queryString)
-                .fields(List.of("identifier" //Not analyzed field
-                        , "label",
-                    "all",
-                    "all.exact"//Not analyzed field.
-                        ))
+                .fields(SEARCH_FIELDS)
                 .defaultOperator(Operator.And);
     }
 
@@ -89,7 +87,7 @@ public final class QueryUtils {
      * Checks if a given string contains Elasticsearch reserved characters
      *
      * @param s a given string
-     * @return <tt>true</tt> if a given string contains a reserved character, otherwise <tt>false</tt>
+     * @return {@code true} if a given string contains a reserved character, otherwise {@code false}
      */
     public static boolean containsReservedChars(String s) {
         if (isNullOrEmpty(s)) {
@@ -114,13 +112,13 @@ public final class QueryUtils {
     public static String toJsonString(final SearchResponse<ObjectNode> response, final boolean isPretty)
         throws IOException {
       if (response == null) {
+        // @todo: replace with jackson building and adding to ObjectNode
         return "{ \"error\" : \"" + "Could not execute search. See internal server logs"
             + "\"}";
       }
 
-      JsonFactory jsonFactory = new JsonFactory();
       try (StringWriter writer = new StringWriter();
-          com.fasterxml.jackson.core.JsonGenerator jacksonGenerator = jsonFactory.createGenerator(
+          com.fasterxml.jackson.core.JsonGenerator jacksonGenerator = JSON_FACTORY.createGenerator(
               writer)) {
 
         if (isPretty) {

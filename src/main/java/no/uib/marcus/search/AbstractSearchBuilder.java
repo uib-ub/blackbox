@@ -68,7 +68,7 @@ public abstract class AbstractSearchBuilder<T extends AbstractSearchBuilder<T>> 
     }
 
     /**
-     * Get aggregations or <tt>null</tt> if not set
+     * Get aggregations or {@code null} if not set
      */
     public String getAggregations() {
         return aggregations;
@@ -90,7 +90,7 @@ public abstract class AbstractSearchBuilder<T extends AbstractSearchBuilder<T>> 
     }
 
     /**
-     * Get sort builder or <tt>null</tt> if not set
+     * Get sort builder or {@code null} if not set
      */
     public ObjectBuilder<SortOptions> getSortBuilder() {
         return sortBuilder;
@@ -109,7 +109,7 @@ public abstract class AbstractSearchBuilder<T extends AbstractSearchBuilder<T>> 
     }
 
     /**
-     * Get sort builder or <tt>null</tt> if not set
+     * Get sort builder or {@code null} if not set
      **/
     public BoolQuery.Builder getFilter() {
         return filter;
@@ -128,7 +128,7 @@ public abstract class AbstractSearchBuilder<T extends AbstractSearchBuilder<T>> 
     }
 
     /**
-     * Get POST filter or <tt>null</tt> if not set
+     * Get POST filter or {@code null} if not set
      */
     public BoolQuery.Builder getPostFilter() {
         return postFilter;
@@ -168,7 +168,7 @@ public abstract class AbstractSearchBuilder<T extends AbstractSearchBuilder<T>> 
     }
 
     /**
-     * Get selected filters or <tt>null</tt> if not set
+     * Get selected filters or {@code null} if not set
      *
      * @return a map containing selected filters
      */
