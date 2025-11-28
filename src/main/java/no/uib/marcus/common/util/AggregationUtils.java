@@ -43,6 +43,7 @@ import java.util.Map;
 public final class AggregationUtils {
     private static final Logger logger = Logger.getLogger(AggregationUtils.class.getName());
     private static final String AGGS_FILTER_KEY = "aggs_filter";
+    private static final ObjectMapper MAPPER = new ObjectMapper();
 
     //Enforce non-instatiability
     private AggregationUtils() {
@@ -58,9 +59,8 @@ public final class AggregationUtils {
      **/
     public static void validateAggregations(String jsonString) {
         // rewrite from AI assistant using Jackson
-        ObjectMapper mapper = new ObjectMapper();
         try {
-        JsonNode node = mapper.readTree(jsonString);
+        JsonNode node = MAPPER.readTree(jsonString);
         if (!node.isArray()){
             throw new IllegalParameterException(
                     "Aggregations must be valid JSON. Expected JSON Array of objects but found : [" + jsonString + "]");
@@ -83,30 +83,26 @@ public final class AggregationUtils {
      * @return <code>true</code> if the key, in that field, has a specified value
      */
     public static boolean contains(String aggregations, String field, String key, String value) {
-        try {
-            //If there is no aggregations, no need to continue.
-            if (!StringUtils.hasText(aggregations)) {
-                return false;
-            }
-            ObjectMapper mapper = new ObjectMapper();
-            try {
-                JsonNode facets = mapper.readTree(aggregations);
-                for (JsonNode facet : facets)
-                    if (facet.has("field") && facet.has(key)) {
-                         String currentField = facet.get("field").asText();
-                         String currentValue = facet.get(key).asText();
-                         if (currentField.equals(field) && currentValue.equalsIgnoreCase(value)) {
-                             return true;
-                         }
-                     }
-            } catch (JsonProcessingException e) {
-                throw new RuntimeException(e);
-            }
-        } catch (RuntimeException e) {
-            throw new RuntimeException(e);
-        }
+      //If there is no aggregations, no need to continue.
+      if (!StringUtils.hasText(aggregations)) {
         return false;
+      }
+      try {
+        JsonNode facets = MAPPER.readTree(aggregations);
+        for (JsonNode facet : facets)
+          if (facet.has("field") && facet.has(key)) {
+            String currentField = facet.get("field").asText();
+            String currentValue = facet.get(key).asText();
+            if (currentField.equals(field) && currentValue.equalsIgnoreCase(value)) {
+              return true;
+            }
+          }
+      } catch (JsonProcessingException e) {
+        throw new RuntimeException(e);
+      }
+    return false;
     }
+
 
         /**
      * A method to append aggregations to the search request builder.
