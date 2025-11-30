@@ -105,8 +105,7 @@ public final class  FilterUtils {
                 }
             }
         } catch (Exception ex) {
-            logger.log(Level.SEVERE,"Exception occurred when constructing bool_filter [   {0}   ]",ex);
-            throw ex;
+            logger.log(Level.SEVERE,"Exception occurred when constructing bool_filter [   {0}   ]", ex.getMessage());
         }
 
         if (Objects.nonNull(dateRange)) { //append date range filter on top_filter
@@ -159,21 +158,22 @@ public final class  FilterUtils {
             LocalDate toDate = dateRange.getTo();
             if (Objects.nonNull(fromDate) || Objects.nonNull(toDate)) {
 
-              logger.fine("Adding date-range between " + fromDate + " and " +toDate);
+              logger.log(Level.FINE, "Adding date-range from {0} ",  fromDate);
+              logger.log(Level.FINE,"Adding date-range to {0}",toDate);
 
                 //Range within "created" field
-                var created_range = new DateRangeQuery.Builder().field(Params.DateField.CREATED);
+                var createdRange = new DateRangeQuery.Builder().field(Params.DateField.CREATED);
                 if (fromDate != null) {
-                    created_range.gte(fromDate.toString());
-                    logger.fine("Adding date-range between " + fromDate + " and " + toDate + " to created field");
+                    createdRange.gte(fromDate.toString());
+                    logger.log(Level.FINE, "Adding date-range from: {0} to created field", fromDate);
                 }
                 if (toDate != null ) {
-                    created_range.lte(toDate.toString());
-                    logger.fine("Adding date-range between " + fromDate + " and " + toDate + " to created field");
+                    createdRange.lte(toDate.toString());
+                    logger.log(Level.FINE, "Adding date-range to: {0} to created field", toDate);
                 }
-                logger.fine("adding created_range query");
+                logger.fine("adding createdRange query");
 
-                queries.add(created_range.build()._toRangeQuery()._toQuery());
+                queries.add(createdRange.build()._toRangeQuery()._toQuery());
 
 
                 /*
@@ -203,16 +203,16 @@ public final class  FilterUtils {
                                                             from_date|------|to_date
                                    madeAfter================================|madeBefore
                 */
-                var range_ignore_made_after = new DateRangeQuery.Builder().field(Params.DateField.MADE_BEFORE);
+                var rangeIgnoreMadeAfter = new DateRangeQuery.Builder().field(Params.DateField.MADE_BEFORE);
                 if (fromDate != null) {
-                    range_ignore_made_after.gte(fromDate.toString());
+                    rangeIgnoreMadeAfter.gte(fromDate.toString());
                 }
                 if (toDate != null) {
-                    range_ignore_made_after.lte(toDate.toString());
+                    rangeIgnoreMadeAfter.lte(toDate.toString());
                 }
 
-                if (fromDate != null || toDate != null) {
-                    queries.add(range_ignore_made_after.build()._toRangeQuery()._toQuery());
+                if (fromDate != null) {
+                    queries.add(rangeIgnoreMadeAfter.build()._toRangeQuery()._toQuery());
                 }
                 /*
                   This is a case that fromDate and toDate are within madeAfter and madeBefore range.
@@ -224,15 +224,15 @@ public final class  FilterUtils {
                      made_after|---------------------------------------------------|made_before
                  */
                 if (dateRange.isPositive()) {
-                    var range_made_before = new DateRangeQuery.Builder().field(Params.DateField.MADE_BEFORE);
-                    range_made_before.gte(Objects.requireNonNull(fromDate.toString()));
-                    var range_made_after = new DateRangeQuery.Builder().field(Params.DateField.MADE_AFTER);
-                    range_made_after.lte(Objects.requireNonNull(toDate.toString()));
+                    var rangeMadeBefore = new DateRangeQuery.Builder().field(Params.DateField.MADE_BEFORE);
+                    rangeMadeBefore.gte(Objects.requireNonNull(fromDate.toString()));
+                    var rangeMadeAfter = new DateRangeQuery.Builder().field(Params.DateField.MADE_AFTER);
+                    rangeMadeAfter.lte(Objects.requireNonNull(toDate.toString()));
 
-                    Query made_before_after = QueryBuilders.bool().must(List.of(range_made_after.build()._toRangeQuery()._toQuery(),
-                        range_made_before.build()._toRangeQuery()._toQuery())).build()._toQuery();
+                    Query madeBeforeAfter = QueryBuilders.bool().must(List.of(rangeMadeAfter.build()._toRangeQuery()._toQuery(),
+                        rangeMadeBefore.build()._toRangeQuery()._toQuery())).build()._toQuery();
                     // adding both conditions (before/after) to one query
-                    queries.add(made_before_after);
+                    queries.add(madeBeforeAfter);
                 }
             }
         }
@@ -284,7 +284,6 @@ public final class  FilterUtils {
             }
         } catch (Exception ex) {
             logger.severe("Exception occurred while constructing a map from selected filters: " + ex.getMessage());
-            throw ex;
         }
         logger.log(Level.FINE, "returning filters {0} ", filters);
         return filters;
