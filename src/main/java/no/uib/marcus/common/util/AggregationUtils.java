@@ -148,7 +148,8 @@ public final class AggregationUtils {
               //Add DateHistogram aggregations
                 //@todo add map of Map<String, Aggregation> and send once
                 if (facet.has("type") && facet.path("type").asText().equals("date_histogram")) {
-                    aggregationMap.put(facet.path(FIELD).asText(),
+
+                  aggregationMap.put(facet.path(FIELD).asText(),
                             AggregationUtils.getDateHistogramAggregation(facet).build()._toAggregation());
                 } else {
                     Aggregation agg;
@@ -180,8 +181,7 @@ public final class AggregationUtils {
                             }
                         }
                         }
-                    aggregationMap.put(facet.path(FIELD).asText(), termsAggs.build());
-
+                 aggregationMap.put(facet.path(FIELD).asText(), termsAggs.build());
 
                 }
             }
