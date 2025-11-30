@@ -3,14 +3,13 @@ package no.uib.marcus.search;
 import co.elastic.clients.elasticsearch.ElasticsearchClient;
 import co.elastic.clients.elasticsearch._types.query_dsl.BoolQuery;
 import co.elastic.clients.elasticsearch._types.query_dsl.FunctionScore;
-import co.elastic.clients.elasticsearch._types.query_dsl.FunctionScoreBuilders;
 import co.elastic.clients.elasticsearch._types.query_dsl.FunctionScoreQuery;
-import co.elastic.clients.elasticsearch._types.query_dsl.FunctionScoreVariant;
 import co.elastic.clients.elasticsearch._types.query_dsl.Query;
 import co.elastic.clients.elasticsearch._types.query_dsl.QueryBuilders;
 import co.elastic.clients.elasticsearch.core.SearchRequest;
 import co.elastic.clients.elasticsearch.core.search.TrackHits;
 import co.elastic.clients.util.NamedValue;
+import java.util.logging.Level;
 import no.uib.marcus.common.util.AggregationUtils;
 import no.uib.marcus.common.util.QueryUtils;
 import no.uib.marcus.common.util.SignatureUtils;
@@ -21,7 +20,6 @@ import java.util.logging.Logger;
 import no.uib.marcus.common.util.StringUtils;
 
 import jakarta.validation.constraints.NotNull;
-import no.uib.marcus.search.SkaSearchBuilder.BoostType;
 
 
 /**
@@ -34,6 +32,7 @@ import no.uib.marcus.search.SkaSearchBuilder.BoostType;
 public class MarcusSearchBuilder extends AbstractSearchBuilder<MarcusSearchBuilder> {
 
     private final Logger logger = Logger.getLogger(getClass().getName());
+    private static final Random RANDOM = new Random();
 
     //A list of images that will be randomly
     // loaded at the front page on page load, if nothing is specified
@@ -72,7 +71,6 @@ public class MarcusSearchBuilder extends AbstractSearchBuilder<MarcusSearchBuild
      */
     @Override
     public SearchRequest.Builder constructSearchRequest() {
-        {
             Query query;
             FunctionScoreQuery.Builder functionScoreQueryBuilder;
             SearchRequest.Builder searchRequest = new SearchRequest.Builder();
@@ -82,12 +80,6 @@ public class MarcusSearchBuilder extends AbstractSearchBuilder<MarcusSearchBuild
                 if (isNeitherNullNorEmpty(getIndices())) {
                     searchRequest.index(List.of(getIndices()));
                 }
-
-                //Set types
-                // removed in ES 2.X
-                //    if (isNeitherNullNorEmpty(getTypes())) {
-                //         searchRequest.setTypes(getTypes());
-                //     }
 
                 //Set from and size
                 searchRequest.from(getFrom());
@@ -105,7 +97,7 @@ public class MarcusSearchBuilder extends AbstractSearchBuilder<MarcusSearchBuild
                 } else {
                     //Boost documents inside the "random list" of places because they beautify the front page.
                     //This is just for coolness and it has no effect if the query yields no results
-                    String randomQueryString = randomPictures[new Random().nextInt(randomPictures.length)];
+                    String randomQueryString = randomPictures[RANDOM.nextInt(randomPictures.length)];
                     functionScoreQueryBuilder = QueryBuilders.functionScore().query(QueryBuilders.matchAll().build()._toQuery()).functions(
                             List.of(fotoFs,new FunctionScore.Builder().filter(QueryBuilders.simpleQueryString().query(randomQueryString).build()._toQuery()).weight(2.0).build()));
                 }
@@ -115,8 +107,8 @@ public class MarcusSearchBuilder extends AbstractSearchBuilder<MarcusSearchBuild
 
                   logger.fine("setting filter");
                   BoolQuery filterQuery = getFilter().build();
-                  logger.fine("compare if filterQuery list is the same as filter() method" + Boolean.toString(filterQuery.filter().equals(List.of(filterQuery._toQuery()))));
-                  logger.fine("sizes: " + filterQuery.filter().size() + " " + List.of(filterQuery._toQuery()).size());
+                  logger.log(Level.FINE,"compare if filterQuery list is the same as filter() method {0}", Boolean.toString(filterQuery.filter().equals(List.of(filterQuery._toQuery()))));
+                  logger.log(Level.FINE, "sizes: {0}", filterQuery.filter().size() + " " + List.of(filterQuery._toQuery()).size());
                   searchRequest
                       .query(QueryBuilders.bool().must(query)
                           .filter(List.of(filterQuery._toQuery())).build()._toQuery());
@@ -125,7 +117,7 @@ public class MarcusSearchBuilder extends AbstractSearchBuilder<MarcusSearchBuild
                 }
                 //Set post filter if available
                 if (getPostFilter() != null) {
-                  logger.fine("postfilter hasClauses: " + getPostFilter().hasClauses());
+                  logger.log(Level.FINE, "postfilter hasClauses: {0}", getPostFilter().hasClauses());
                   searchRequest.postFilter(getPostFilter().build());
                 }
                 //Set index to boost
@@ -143,22 +135,20 @@ public class MarcusSearchBuilder extends AbstractSearchBuilder<MarcusSearchBuild
                     AggregationUtils.addAggregations(searchRequest, getAggregations(), getSelectedFacets());
                 }
 
-                //Show builder for debugging purpose
-                //logger.info(searchRequest.toString());
-                //System.out.println(searchRequest.toString());
+
 
             } catch (Exception e) {
-                throw new RuntimeException(e);
+                throw new RuntimeException("Marcus search query builder exception:", e);
             }
             return searchRequest;
-        }
+
    // Type to be boosted if nothing is specified
 
 }
   static class BoostType {
-    final static String FOTOGRAFI = "fotografi";
-    final static String BILDE = "bilde";
-}
+      static final String BILDE = "bilde";
+    static final String FOTOGRAFI = "fotografi";
 
+  }
 }
 
