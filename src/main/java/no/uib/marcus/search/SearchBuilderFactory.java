@@ -48,16 +48,6 @@ public class SearchBuilderFactory {
     }
 
     /**
-     * Create a new discovery service for Marcus data set.
-     * It is a subset of search service with minimal capabilities.
-     * For search, @see SearchBuilderFactory#marcusSearch(Client)
-     **/
-    public static MarcusDiscoveryBuilder marcusDiscovery(ElasticsearchClient client) {
-        return new MarcusDiscoveryBuilder(client);
-    }
-
-
-    /**
      * Gets a corresponding search builder based on the service parameter
      *
      * @param serviceString a service parameter. If it is null, it will fall to a default service.

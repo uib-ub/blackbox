@@ -4,10 +4,10 @@ import co.elastic.clients.elasticsearch.ElasticsearchClient;
 import co.elastic.clients.elasticsearch._types.SortOptions;
 import co.elastic.clients.elasticsearch._types.query_dsl.BoolQuery;
 
-import co.elastic.clients.elasticsearch.core.SearchRequest;
 import co.elastic.clients.elasticsearch.core.SearchResponse;
 import co.elastic.clients.util.ObjectBuilder;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import java.util.logging.Level;
 import no.uib.marcus.common.util.AggregationUtils;
 
 import java.util.Arrays;
@@ -16,7 +16,6 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 
 
 import jakarta.annotation.Nullable;
-import jakarta.validation.constraints.NotNull;
 import java.util.List;
 import java.util.Map;
 import no.uib.marcus.common.util.StringUtils;
@@ -38,7 +37,8 @@ public abstract class AbstractSearchBuilder<T extends AbstractSearchBuilder<T>> 
     private String[] indices;
     @Nullable
     private String queryString;
-    private BoolQuery.Builder filter, postFilter;
+    private BoolQuery.Builder filter;
+  private BoolQuery.Builder postFilter;
     private Map<String, List<String>> selectedFacets;
     private String aggregations;
     private ObjectBuilder<SortOptions> sortBuilder;
@@ -46,16 +46,18 @@ public abstract class AbstractSearchBuilder<T extends AbstractSearchBuilder<T>> 
     private int from = 0;
     private int size = 10;
 
+    private static final ObjectMapper objectMapper =  new ObjectMapper();
+
     /**
      * Sole constructor. (For invocation by subclass constructors, typically implicit.)
      *
      * @param client a non-null Elasticsearch client to communicate with a cluster.
      */
-    protected AbstractSearchBuilder(@NotNull ElasticsearchClient client) {
+    protected AbstractSearchBuilder(ElasticsearchClient client) {
         if (client == null) {
-            throw new IllegalParameterException("Unable to initialize service. Client cannot be null");
+            throw new IllegalArgumentException("Unable to initialize service. Client cannot be null");
         }
-        logger.info("super initialized" + client);
+        logger.log(Level.FINE, "super initialized {0}", client);
         this.client = client;
     }
 
@@ -64,7 +66,11 @@ public abstract class AbstractSearchBuilder<T extends AbstractSearchBuilder<T>> 
      * Ensure this string or array of string is neither null nor empty
      */
     public static boolean isNeitherNullNorEmpty(String... s) {
-        return s != null && s.length > 0;
+      if (s == null || s.length == 0) return false;
+      for (String str : s) {
+        if (str == null || str.isEmpty()) return false;
+      }
+      return true;
     }
 
     /**
@@ -204,7 +210,7 @@ public abstract class AbstractSearchBuilder<T extends AbstractSearchBuilder<T>> 
      * @return this object where the client has been set
      */
     @SuppressWarnings("unchecked")
-    public T setClient(@NotNull ElasticsearchClient client) {
+    public T setClient(ElasticsearchClient client) {
         if (client == null) {
             throw new IllegalParameterException("Unable to initialize service. Client cannot be null");
         }
@@ -293,12 +299,6 @@ public abstract class AbstractSearchBuilder<T extends AbstractSearchBuilder<T>> 
     }
 
     /**
-     * Construct the search request based on the service settings. Should be implemented by subclasses
-     */
-    @Override
-    public abstract SearchRequest.Builder constructSearchRequest();
-
-    /**
      * Get all documents based on the service settings.
      *
      * @return a SearchResponse, can be <code>null</code>, which means search was not successfully executed.
@@ -311,17 +311,12 @@ public abstract class AbstractSearchBuilder<T extends AbstractSearchBuilder<T>> 
         try {
             response = client.search(constructSearchRequest().build(), ObjectNode.class);
             //Show response for debugging purpose
-            logger.fine(response.toString());
-            //System.out.println(response.toString());
+            logger.log(Level.FINE, "response: {0}", response);
         } catch (java.io.IOException e) {
-            //I've not found a direct way to validate a query string. Therefore, the idea here is to catch any
-            //exception related to search execution.
-            logger.severe("Could not execute search: " + e.getMessage());
-           // throw e;
+          //I've not found a direct way to validate a query string. Therefore, the idea here is to catch any
+          //exception related to search execution.
+          throw new RuntimeException("Could not execute search", e);
         }
-        catch (Exception e) {
-            logger.severe("Could not execute search: " + e.getMessage());
-            throw e;}
         return response;
     }
 
@@ -333,7 +328,7 @@ public abstract class AbstractSearchBuilder<T extends AbstractSearchBuilder<T>> 
      */
     @Override
     public String toString() {
-        ObjectNode jsonObj = new ObjectMapper().createObjectNode();
+        ObjectNode jsonObj = objectMapper.createObjectNode();
 
         jsonObj = jsonObj.put("indices",  getIndices().length == 0   ?  "" : Arrays.toString(getIndices()))
                 .put("from", getFrom())
