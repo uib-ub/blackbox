@@ -14,7 +14,6 @@ import co.elastic.clients.util.NamedValue;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.json.JsonMapper;
 
 import java.util.logging.Level;
@@ -43,8 +42,15 @@ import java.util.Map;
 public final class AggregationUtils {
     private static final Logger logger = Logger.getLogger(AggregationUtils.class.getName());
     private static final String AGGS_FILTER_KEY = "aggs_filter";
-    private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
     private static final JsonMapper JSON_MAPPER = new JsonMapper();
+
+  // Sorting Constants
+  private static final String ORDER_COUNT_ASC = "count_asc";
+  private static final String ORDER_COUNT_DESC = "count_desc";
+  private static final String ORDER_TERM_ASC = "term_asc"; // replaced with key in newer ES, but input params are still term_ prefix
+  private static final String ORDER_TERM_DESC = "term_desc";
+  private static final String KEY_COUNT = "_count";
+  private static final String KEY_TERM = "_key"; // Elastic 8+ uses _key instead of _term
 
     //Enforce non-instatiability
     private AggregationUtils() {
@@ -61,7 +67,7 @@ public final class AggregationUtils {
     public static void validateAggregations(String jsonString) {
         // rewrite from AI assistant using Jackson
         try {
-        JsonNode node = OBJECT_MAPPER.readTree(jsonString);
+        JsonNode node = JSON_MAPPER.readTree(jsonString);
         if (!node.isArray()){
             throw new IllegalParameterException(
                     "Aggregations must be valid JSON. Expected JSON Array of objects but found : [" + jsonString + "]");
@@ -89,11 +95,11 @@ public final class AggregationUtils {
         return false;
       }
       try {
-        JsonNode facets = OBJECT_MAPPER.readTree(aggregations);
+        JsonNode facets = JSON_MAPPER.readTree(aggregations);
         for (JsonNode facet : facets)
           if (facet.has("field") && facet.has(key)) {
-            String currentField = facet.get("field").asText();
-            String currentValue = facet.get(key).asText();
+            String currentField = facet.path("field").asText();
+            String currentValue = facet.path(key).asText();
             if (currentField.equals(field) && currentValue.equalsIgnoreCase(value)) {
               return true;
             }
@@ -103,7 +109,6 @@ public final class AggregationUtils {
       }
     return false;
     }
-
 
         /**
      * A method to append aggregations to the search request builder.
@@ -140,17 +145,17 @@ public final class AggregationUtils {
             if (facet.has("field")) {
               //Add DateHistogram aggregations
                 //@todo add map of Map<String, Aggregation> and send once
-                if (facet.has("type") && facet.get("type").asText().equals("date_histogram")) {
-                    aggregationMap.put(facet.get("field").asText(),
+                if (facet.has("type") && facet.path("type").asText().equals("date_histogram")) {
+                    aggregationMap.put(facet.path("field").asText(),
                             AggregationUtils.getDateHistogramAggregation(facet).build()._toAggregation());
                 } else {
                     Aggregation agg;
                     ContainerBuilder termsAggs = constructTermsAggregation(facet);
-                    logger.log(Level.FINE, "key for termsAggs: {0}", facet.get("field").asText());
+                    logger.log(Level.FINE, "key for termsAggs: {0}", facet.path("field").asText());
 
                     if (selectedFacets != null && !selectedFacets.isEmpty()) {
                         //Get the current field
-                        String facetField = facet.get("field").asText();
+                        String facetField = facet.path("field").asText();
                         // Logic: Whenever a user selects the value from an "OR" aggregation,
                         // you add a corresponding filter (here aggs_filter) to all aggregations as subaggregation
                         // EXCEPT for the aggregation in which the selection was performed in.
@@ -171,15 +176,15 @@ public final class AggregationUtils {
                           agg = addSubAggregationFilter(aggsFilter2, facet
                               );
                           termsAggs.aggregations(AGGS_FILTER_KEY, agg);
-                              aggregationMap.put(facet.get("field").asText(), agg);
+                              aggregationMap.put(facet.path("field").asText(), agg);
                             }
                         }
                         else {
                             agg = addSubAggregationFilter(aggsFilter,facet);
-                            aggregationMap.put(facet.get("field").asText(),agg);
+                            aggregationMap.put(facet.path("field").asText(),agg);
                         }
                         }
-                    aggregationMap.put(facet.get("field").asText(), termsAggs.build());
+                    aggregationMap.put(facet.path("field").asText(), termsAggs.build());
 
 
                 }
@@ -196,27 +201,6 @@ public final class AggregationUtils {
 
         return new Aggregation.Builder().filter(aggsFilter.build()._toQuery()).build();
     }
-            // create a sub aggregation to add to an aggregation
-            /**
-             *  Map<String, Aggregation> map = new HashMap<>();
-             *     Aggregation subAggregation = new Aggregation.Builder()
-             *         .avg(new AverageAggregation.Builder().field("revenue").build())
-             *         .build();
-             *     Aggregation aggregation = new Aggregation.Builder()
-             *         .terms(new TermsAggregation.Builder().field("director.keyword").build())
-             *         .aggregations(new HashMap<>() {{
-             *           put("avg_renevue", subAggregation);
-             *         }}).build();
-             *     map.put("agg_director", aggregation);
-             *
-             *     SearchRequest searchRequest = new SearchRequest.Builder()
-             *         .index("idx_name")
-             *         .size(0)
-             *         .aggregations(map)
-             *         .build();
-             */
-         //   aggBuilder.term
-
 
     /**
      * A method to build a date histogram aggregation
@@ -225,7 +209,7 @@ public final class AggregationUtils {
      * @return a date histogram builder
      */
     public static DateHistogramAggregation.Builder getDateHistogramAggregation(JsonNode facet) {
-        String field = facet.get("field").asText();
+        String field = facet.path("field").asText();
         //Create the date histogram
         DateHistogramAggregation.Builder dateHistBuilder = new DateHistogramAggregation.Builder();
 
@@ -234,30 +218,30 @@ public final class AggregationUtils {
         //Set date format
         if (facet.has("format")) {
             logger.fine("datehistogram has format");
-            dateHistBuilder.format(facet.get("format").asText());
+            dateHistBuilder.format(facet.path("format").asText());
         }
         //Set interval
         if (facet.has("interval")) {
             logger.fine("datehistogram has interval");
-            dateHistBuilder.fixedInterval(new Time.Builder().time(facet.get("interval").asText()).build());
+            dateHistBuilder.fixedInterval(new Time.Builder().time(facet.path("interval").asText()).build());
         }
         //Set the number of minimum documents that should be returned
         if (facet.has("min_doc_count")) {
-            dateHistBuilder.minDocCount(facet.get("min_doc_count").asInt());
+            dateHistBuilder.minDocCount(facet.path("min_doc_count").asInt());
         }
         //Set order
         if (facet.has("order")) {
             NamedValue<SortOrder> order ;
 
-            if (facet.get("order").asText().equalsIgnoreCase("count_asc")) {
-                order = new NamedValue<>("_count", SortOrder.Asc);
-            } else if (facet.get("order").asText().equalsIgnoreCase("count_desc")) {
-                order = new NamedValue<>("_count", SortOrder.Desc);
-            } else if (facet.get("order").asText().equalsIgnoreCase("key_desc")) {
-                order = new NamedValue<>("_key", SortOrder.Desc);
+            if (facet.path("order").asText().equalsIgnoreCase(ORDER_COUNT_ASC)) {
+                order = new NamedValue<>(KEY_COUNT, SortOrder.Asc);
+            } else if (facet.path("order").asText().equalsIgnoreCase(ORDER_COUNT_DESC)) {
+                order = new NamedValue<>(KEY_COUNT, SortOrder.Desc);
+            } else if (facet.path("order").asText().equalsIgnoreCase(ORDER_TERM_DESC)) {
+                order = new NamedValue<>(KEY_TERM, SortOrder.Desc);
             }
             else {
-                order = new NamedValue<>("_key", SortOrder.Asc);
+                order = new NamedValue<>(KEY_TERM, SortOrder.Asc);
             }
             dateHistBuilder.order(List.of(order));
         }
@@ -273,7 +257,7 @@ public final class AggregationUtils {
      *
      **/
     public static ContainerBuilder constructTermsAggregation(JsonNode facet, boolean sortBySubAggregation) {
-        String field = facet.get("field").asText();
+        String field = facet.path("field").asText();
 
         Aggregation.Builder termsBuilder = new Aggregation.Builder();
         TermsAggregation.Builder termsAggregationBuilder = new TermsAggregation.Builder();
@@ -281,66 +265,38 @@ public final class AggregationUtils {
 
         termsAggregationBuilder.field(field);
 
-       // move down termsBuilder.terms(new TermsAggregation.Builder().field(field));
         //Set size
         if (facet.has("size")) {
-            int size = facet.get("size").asInt();
+            int size = facet.path("size").asInt();
             termsAggregationBuilder.size(size);
         }
         //Set order
-        /**
-         *  Map<String, Aggregation> map = new HashMap<>();
-         *
-         *     Aggregation subAggregation = new Aggregation.Builder()
-         *         .avg(new AverageAggregation.Builder().field("revenue").build())
-         *         .build();
-         *
-         *     Aggregation aggregation = new Aggregation.Builder()
-         *         .terms(new TermsAggregation.Builder().field("director.keyword").build())
-         *         .aggregations(new HashMap<>() {{
-         *           put("avg_renevue", subAggregation);
-         *         }}).build();
-         *
-         *     map.put("agg_director", aggregation);
-         *
-         *     SearchRequest searchRequest = new SearchRequest.Builder()
-         *         .index("idx_name")
-         *         .size(0)
-         *         .aggregations(map)
-         *         .build();
-         */
 
-        NamedValue<SortOrder> subAggregationOrder = new NamedValue<>("_count", SortOrder.Asc);
-      //  termsBuilder.order();
+        NamedValue<SortOrder> subAggregationOrder = new NamedValue<>(KEY_COUNT, SortOrder.Asc);
+       if (facet.has("order")) {
 
-      //  Terms.Order subAggregationOrder = Terms.Order.aggregation(AGGS_FILTER_KEY, false);
-        if (facet.has("order")) {
-
-            NamedValue<SortOrder> order = new NamedValue<>("_count",SortOrder.Desc);//default order (count descending)
-            if (facet.get("order").asText().equalsIgnoreCase("count_asc")) {
-                order = new NamedValue<>("_count",SortOrder.Asc);
-             //   subAggregationOrder = Terms.Order.aggregation(AGGS_FILTER_KEY, true);
-            } else if (facet.get("order").asText().equalsIgnoreCase("term_asc")) {
-
-            //    order = Terms.Order.term(true);
-            //    subAggregationOrder = order; // for term_asc, sort by parent aggregation
-            } else if (facet.get("order").asText().equalsIgnoreCase("term_desc")) {
-           //     order = Terms.Order.term(false);
-           //     subAggregationOrder = order; // for term_desc, sort by parent aggregation
+            NamedValue<SortOrder> order = new NamedValue<>(KEY_COUNT,SortOrder.Desc);//default order (count descending)
+            if (facet.path("order").asText().equalsIgnoreCase(ORDER_COUNT_ASC)) {
+                order = new NamedValue<>(KEY_COUNT,SortOrder.Asc);
+            } else if (facet.path("order").asText().equalsIgnoreCase(ORDER_TERM_ASC)) {
+                order = new NamedValue<>(KEY_TERM,SortOrder.Asc);
+            } else if (facet.path("order").asText().equalsIgnoreCase(ORDER_TERM_DESC)) {
+                order = new NamedValue<>(KEY_TERM,SortOrder.Desc);
             }
             if (sortBySubAggregation) {//Sort using sub aggregation
-            //    termsBuilder.order(subAggregationOrder);
+              //@this is also applied below, if order is not specified.
+            termsAggregationBuilder.order(subAggregationOrder);
             } else { //sort normally using top aggregation
                 termsAggregationBuilder.order(order);
             }
         } else {//if the order is not specified
-            if (sortBySubAggregation) { //use sub aggregation order, otherwise let Elasticsearch decides
+            if (sortBySubAggregation) { //use sub aggregation order, otherwise use Elasticsearch default
                 termsAggregationBuilder.order(subAggregationOrder);
             }
         }
         //Set the number of minimum documents that should be returned
         if (facet.has("min_doc_count")) {
-            int minDocCount = facet.get("min_doc_count").asInt();
+            int minDocCount = facet.path("min_doc_count").asInt();
             termsAggregationBuilder.minDocCount(minDocCount);
         }
 
@@ -354,7 +310,7 @@ public final class AggregationUtils {
      * @return a term builder
      */
     public static ContainerBuilder constructTermsAggregation(JsonNode facet) {
-        return constructTermsAggregation(  facet, false);
+        return constructTermsAggregation(facet, false);
     }
 
 }
