@@ -36,7 +36,7 @@ import java.util.Map;
  *
  * University of Bergen
  *
- * TODO aggregation logic currently work in progress
+ *
  *
  */
 public final class AggregationUtils {
@@ -51,8 +51,10 @@ public final class AggregationUtils {
   private static final String ORDER_TERM_DESC = "term_desc";
   private static final String KEY_COUNT = "_count";
   private static final String KEY_TERM = "_key"; // Elastic 8+ uses _key instead of _term
-
-    //Enforce non-instatiability
+  private static final String FIELD = "field"; // Elastic 8+ uses _key instead of _term
+  private static final String MIN_DOC_COUNT = "min_doc_count";
+  private static final String ORDER = "order";
+  //Enforce non-instatiability
     private AggregationUtils() {
     }
 
@@ -97,8 +99,8 @@ public final class AggregationUtils {
       try {
         JsonNode facets = JSON_MAPPER.readTree(aggregations);
         for (JsonNode facet : facets)
-          if (facet.has("field") && facet.has(key)) {
-            String currentField = facet.path("field").asText();
+          if (facet.has(FIELD) && facet.has(key)) {
+            String currentField = facet.path(FIELD).asText();
             String currentValue = facet.path(key).asText();
             if (currentField.equals(field) && currentValue.equalsIgnoreCase(value)) {
               return true;
@@ -142,20 +144,20 @@ public final class AggregationUtils {
         Map<String, Aggregation> aggregationMap = new HashMap<>() ;
         BoolQuery.Builder aggsFilter = FilterUtils.getPostFilter(selectedFacets, aggregations);
         for (JsonNode facet : facets) {
-            if (facet.has("field")) {
+            if (facet.has(FIELD)) {
               //Add DateHistogram aggregations
                 //@todo add map of Map<String, Aggregation> and send once
                 if (facet.has("type") && facet.path("type").asText().equals("date_histogram")) {
-                    aggregationMap.put(facet.path("field").asText(),
+                    aggregationMap.put(facet.path(FIELD).asText(),
                             AggregationUtils.getDateHistogramAggregation(facet).build()._toAggregation());
                 } else {
                     Aggregation agg;
                     ContainerBuilder termsAggs = constructTermsAggregation(facet);
-                    logger.log(Level.FINE, "key for termsAggs: {0}", facet.path("field").asText());
+                    logger.log(Level.FINE, "key for termsAggs: {0}", facet.path(FIELD).asText());
 
                     if (selectedFacets != null && !selectedFacets.isEmpty()) {
                         //Get the current field
-                        String facetField = facet.path("field").asText();
+                        String facetField = facet.path(FIELD).asText();
                         // Logic: Whenever a user selects the value from an "OR" aggregation,
                         // you add a corresponding filter (here aggs_filter) to all aggregations as subaggregation
                         // EXCEPT for the aggregation in which the selection was performed in.
@@ -173,18 +175,12 @@ public final class AggregationUtils {
                               BoolQuery.Builder aggsFilter2 = FilterUtils.getPostFilter(selectedFacetCopy, aggregations);
 
                               logger.log(Level.FINE,"Aggregations aggsfilter added to search request: {0} ", aggsFilter2);
-                          agg = addSubAggregationFilter(aggsFilter2, facet
-                              );
+                          agg = addSubAggregationFilter(aggsFilter2);
                           termsAggs.aggregations(AGGS_FILTER_KEY, agg);
-                              aggregationMap.put(facet.path("field").asText(), agg);
                             }
                         }
-                        else {
-                            agg = addSubAggregationFilter(aggsFilter,facet);
-                            aggregationMap.put(facet.path("field").asText(),agg);
                         }
-                        }
-                    aggregationMap.put(facet.path("field").asText(), termsAggs.build());
+                    aggregationMap.put(facet.path(FIELD).asText(), termsAggs.build());
 
 
                 }
@@ -197,7 +193,7 @@ public final class AggregationUtils {
     /**
      * Adds the subaggregation filter with the name "aggs_filter". Sub aggregations are added only to "OR" facets
      */
-    private static Aggregation addSubAggregationFilter(BoolQuery.Builder aggsFilter, JsonNode currentFacet) {
+    private static Aggregation addSubAggregationFilter(BoolQuery.Builder aggsFilter) {
 
         return new Aggregation.Builder().filter(aggsFilter.build()._toQuery()).build();
     }
@@ -209,7 +205,7 @@ public final class AggregationUtils {
      * @return a date histogram builder
      */
     public static DateHistogramAggregation.Builder getDateHistogramAggregation(JsonNode facet) {
-        String field = facet.path("field").asText();
+        String field = facet.path(FIELD).asText();
         //Create the date histogram
         DateHistogramAggregation.Builder dateHistBuilder = new DateHistogramAggregation.Builder();
 
@@ -226,18 +222,18 @@ public final class AggregationUtils {
             dateHistBuilder.fixedInterval(new Time.Builder().time(facet.path("interval").asText()).build());
         }
         //Set the number of minimum documents that should be returned
-        if (facet.has("min_doc_count")) {
-            dateHistBuilder.minDocCount(facet.path("min_doc_count").asInt());
+        if (facet.has(MIN_DOC_COUNT)) {
+            dateHistBuilder.minDocCount(facet.path(MIN_DOC_COUNT).asInt());
         }
         //Set order
-        if (facet.has("order")) {
+        if (facet.has(ORDER)) {
             NamedValue<SortOrder> order ;
 
-            if (facet.path("order").asText().equalsIgnoreCase(ORDER_COUNT_ASC)) {
+            if (facet.path(ORDER).asText().equalsIgnoreCase(ORDER_COUNT_ASC)) {
                 order = new NamedValue<>(KEY_COUNT, SortOrder.Asc);
-            } else if (facet.path("order").asText().equalsIgnoreCase(ORDER_COUNT_DESC)) {
+            } else if (facet.path(ORDER).asText().equalsIgnoreCase(ORDER_COUNT_DESC)) {
                 order = new NamedValue<>(KEY_COUNT, SortOrder.Desc);
-            } else if (facet.path("order").asText().equalsIgnoreCase(ORDER_TERM_DESC)) {
+            } else if (facet.path(ORDER).asText().equalsIgnoreCase(ORDER_TERM_DESC)) {
                 order = new NamedValue<>(KEY_TERM, SortOrder.Desc);
             }
             else {
@@ -257,7 +253,7 @@ public final class AggregationUtils {
      *
      **/
     public static ContainerBuilder constructTermsAggregation(JsonNode facet, boolean sortBySubAggregation) {
-        String field = facet.path("field").asText();
+        String field = facet.path(FIELD).asText();
 
         Aggregation.Builder termsBuilder = new Aggregation.Builder();
         TermsAggregation.Builder termsAggregationBuilder = new TermsAggregation.Builder();
@@ -273,14 +269,14 @@ public final class AggregationUtils {
         //Set order
 
         NamedValue<SortOrder> subAggregationOrder = new NamedValue<>(KEY_COUNT, SortOrder.Asc);
-       if (facet.has("order")) {
+       if (facet.has(ORDER)) {
 
             NamedValue<SortOrder> order = new NamedValue<>(KEY_COUNT,SortOrder.Desc);//default order (count descending)
-            if (facet.path("order").asText().equalsIgnoreCase(ORDER_COUNT_ASC)) {
+            if (facet.path(ORDER).asText().equalsIgnoreCase(ORDER_COUNT_ASC)) {
                 order = new NamedValue<>(KEY_COUNT,SortOrder.Asc);
-            } else if (facet.path("order").asText().equalsIgnoreCase(ORDER_TERM_ASC)) {
+            } else if (facet.path(ORDER).asText().equalsIgnoreCase(ORDER_TERM_ASC)) {
                 order = new NamedValue<>(KEY_TERM,SortOrder.Asc);
-            } else if (facet.path("order").asText().equalsIgnoreCase(ORDER_TERM_DESC)) {
+            } else if (facet.path(ORDER).asText().equalsIgnoreCase(ORDER_TERM_DESC)) {
                 order = new NamedValue<>(KEY_TERM,SortOrder.Desc);
             }
             if (sortBySubAggregation) {//Sort using sub aggregation
@@ -295,8 +291,8 @@ public final class AggregationUtils {
             }
         }
         //Set the number of minimum documents that should be returned
-        if (facet.has("min_doc_count")) {
-            int minDocCount = facet.path("min_doc_count").asInt();
+        if (facet.has(MIN_DOC_COUNT)) {
+            int minDocCount = facet.path(MIN_DOC_COUNT).asInt();
             termsAggregationBuilder.minDocCount(minDocCount);
         }
 
