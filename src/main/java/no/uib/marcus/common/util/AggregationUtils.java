@@ -174,10 +174,8 @@ public final class AggregationUtils {
               //Build bool_filter for the copy of the selected facets.
               //We build the subaggregation filter only for "OR" facets
               if (aggsFilter.hasClauses()) {
-
                 BoolQuery.Builder aggsFilter2 = FilterUtils.getPostFilter(selectedFacetCopy,
                     aggregations);
-
                 logger.log(Level.FINE, "Aggregations aggsfilter added to search request: {0} ",
                     aggsFilter2);
                 agg = addSubAggregationFilter(aggsFilter2);
@@ -186,7 +184,6 @@ public final class AggregationUtils {
             }
           }
           aggregationMap.put(facet.path(FIELD).asText(), termsAggs.build());
-
         }
       }
     }
