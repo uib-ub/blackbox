@@ -307,7 +307,7 @@ public abstract class AbstractSearchBuilder<T extends AbstractSearchBuilder<T>> 
     @Nullable
     public SearchResponse<ObjectNode> executeSearch() {
 
-        SearchResponse<ObjectNode> response = null;
+        SearchResponse<ObjectNode> response;
         try {
             response = client.search(constructSearchRequest().build(), ObjectNode.class);
             //Show response for debugging purpose
