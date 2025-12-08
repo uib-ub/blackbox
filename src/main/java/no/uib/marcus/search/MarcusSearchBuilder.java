@@ -148,6 +148,8 @@ public class MarcusSearchBuilder extends AbstractSearchBuilder<MarcusSearchBuild
 }
   static class BoostType {
     static final String FOTOGRAFI = "fotografi";
+    // why english, should it use "nummer" instead?
+    static final String ISSUE = "issue";
 
     private BoostType() {
     }
