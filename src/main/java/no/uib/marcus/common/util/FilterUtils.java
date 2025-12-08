@@ -223,11 +223,11 @@ public final class  FilterUtils {
                                   from_date|-----------------------|to_date
                      made_after|---------------------------------------------------|made_before
                  */
-                if (dateRange.isPositive()) {
+                if (dateRange.isPositive() && fromDate != null && toDate != null) {
                     var rangeMadeBefore = new DateRangeQuery.Builder().field(Params.DateField.MADE_BEFORE);
-                    rangeMadeBefore.gte(Objects.requireNonNull(fromDate.toString()));
+                    rangeMadeBefore.gte(fromDate.toString());
                     var rangeMadeAfter = new DateRangeQuery.Builder().field(Params.DateField.MADE_AFTER);
-                    rangeMadeAfter.lte(Objects.requireNonNull(toDate.toString()));
+                    rangeMadeAfter.lte(toDate.toString());
 
                     Query madeBeforeAfter = QueryBuilders.bool().must(List.of(rangeMadeAfter.build()._toRangeQuery()._toQuery(),
                         rangeMadeBefore.build()._toRangeQuery()._toQuery())).build()._toQuery();
