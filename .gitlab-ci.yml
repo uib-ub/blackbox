@@ -25,15 +25,6 @@ build:
     - .build_container_image
   tags:
   - spes
-build_sbom:
-  stage: build
-  image: maven:3.9.9-eclipse-temurin-21
-  script:
-  - mvn org.apache.maven.plugins:maven-dependency-plugin:3.8.1:tree -DoutputType=json -DoutputFile=maven.graph.json
-  artifacts:
-    paths:
-    - "**/maven.graph.json"
-
 
 .security_scan:
   image:
