@@ -75,4 +75,5 @@ stages:
   - test
 
 include:
-  - template: Jobs/Dependency-Scanning.gitlab-ci.yml
+  - template: Jobs/Dependency-Scanning.v2.gitlab-ci.yml
+
