@@ -63,3 +63,6 @@ security_scan:
 stages:
   - build
   - scan
+
+include:
+  - template: Jobs/Dependency-Scanning.gitlab-ci.yml
