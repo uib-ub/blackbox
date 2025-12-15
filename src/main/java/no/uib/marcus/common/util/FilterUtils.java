@@ -2,7 +2,6 @@ package no.uib.marcus.common.util;
 
 import co.elastic.clients.elasticsearch._types.FieldValue;
 import co.elastic.clients.elasticsearch._types.query_dsl.BoolQuery;
-import co.elastic.clients.elasticsearch._types.query_dsl.BoolQuery.Builder;
 import co.elastic.clients.elasticsearch._types.query_dsl.DateRangeQuery;
 import co.elastic.clients.elasticsearch._types.query_dsl.Query;
 import co.elastic.clients.elasticsearch._types.query_dsl.QueryBuilders;
@@ -29,7 +28,7 @@ import java.util.*;
  * @author Øyvind Gjesdal
  */
 
-public final class  FilterUtils {
+public final class FilterUtils {
     private static final Logger logger = Logger.getLogger(FilterUtils.class.getName());
     private static final String TOP_FILTER = "top_filter";
     private static final String POST_FILTER = "post_filter";
@@ -47,7 +46,7 @@ public final class  FilterUtils {
     }
 
     /**
-     * Gets top filter from the given filter map or empty filter if it does not exist
+     * Gets the top filter from the given filter map or empty filter if it does not exist
      */
     public static BoolQuery.Builder getTopFilter(@NotNull Map<String, List<String>> selectedFacets, String aggs, DateRange dateRange) {
 
@@ -56,7 +55,7 @@ public final class  FilterUtils {
     }
 
     /**
-     * Gets post filter from the given filter map or empty filter if it does not exist
+     * Gets post-filter from the given filter map or empty filter if it does not exist
      */
     public static BoolQuery.Builder getPostFilter(@NotNull Map<String, List<String>> selectedFacets, String aggs) {
         Map<String, BoolQuery.Builder> filter = FilterUtils.buildBoolFilter(selectedFacets, aggs);
@@ -82,7 +81,7 @@ public final class  FilterUtils {
         BoolQuery.Builder postFilter = QueryBuilders.bool();
 
         try {
-            //Building a filter based on the user selected facets. Starting with AND filter
+            //Building a filter based on the user-selected facets. Starting with AND filter
             for (Map.Entry<String, List<String>> entry : filterMap.entrySet()) {
                 if (entry.getValue() != null && !entry.getValue().isEmpty()) {
                     TermsQueryField entryTerms = new TermsQueryField.Builder()
@@ -94,7 +93,7 @@ public final class  FilterUtils {
                         //post_filter only affects search results but NOT aggregations.
                         postFilter.should(QueryBuilders.terms().field(entry.getKey()).terms(entryTerms).build()._toQuery());
                     } else if (entry.getKey().startsWith(BlackboxUtils.MINUS)) {
-                        //Exclude any filter that begins with minus sign
+                        //Exclude any filter that begins with the minus sign
                         topFilter.mustNot(QueryBuilders.terms().field(entry.getKey().substring(1)).terms(entryTerms).build()._toQuery());
                     } else { //default is "AND" filter that will be used as top_filter
                         //Building "AND" filter - add one must clause per term
@@ -105,7 +104,7 @@ public final class  FilterUtils {
                 }
             }
         } catch (Exception ex) {
-            logger.log(Level.SEVERE,"Exception occurred when constructing bool_filter [   {0}   ]", ex.getMessage());
+            logger.log(Level.SEVERE,"Exception occurred when constructing bool_filter", ex);
         }
 
         if (Objects.nonNull(dateRange)) { //append date range filter on top_filter
@@ -121,9 +120,9 @@ public final class  FilterUtils {
     /**
      * Appends date range filter to a bool_filter based on the University Library's logic for a date range.
      * <p>
-     * Logic: Given a date range, fromDate to toDate, find any resource in which this range or it's subset
+     * Logic: Given a date range, fromDate to toDate, find any resource in which this range, or it's subset
      * lies within it.
-     * In other words, any resource that fulfill the following conditions:-
+     * In other words, any resources that fulfill the following conditions:
      * <p>
      * from_date|----------|to_date
      * from_date|-----------------|to_date        from_date|------------------|to_date
@@ -134,8 +133,8 @@ public final class  FilterUtils {
      * madeAfter|================================|madeBefore (resource)
      * <p>
      * Note that, our assumption is {@code madeAfter <= madeBefore}, and this algorithm will provide
-     * unexpected result if that is not the case. Checking the integrity of these fields maybe be done using
-     * Elasticsearch Script Filters but it is a heavy process and we would have to expose Elasticsearch cluster
+     * an unexpected result if that is not the case. Checking the integrity of these fields maybe be done using
+     * Elasticsearch Script Filters, but it is a heavy process, and we would have to expose Elasticsearch cluster
      * to script injection in which we don't want to do it.
      * Therefore, if it happens, we are leaving the blame to the data, and we are assuming the condition always holds.
      *
@@ -151,24 +150,26 @@ public final class  FilterUtils {
         List<Query> queries = new ArrayList<>();
 
         if (Objects.nonNull(dateRange)) {
-            //Get lower boundary for this range
+            //Get the lower boundary for this range
             LocalDate fromDate = dateRange.getFrom();
+            String fromDateString = fromDate.toString();
 
-            //Get upper boundary for this range
+            //Get the upper boundary for this range
             LocalDate toDate = dateRange.getTo();
+            String toDateString = toDate.toString();
             if (Objects.nonNull(fromDate) || Objects.nonNull(toDate)) {
 
               logger.log(Level.FINE, "Adding date-range from {0} ",  fromDate);
               logger.log(Level.FINE,"Adding date-range to {0}",toDate);
 
-                //Range within "created" field
+                //Range within the "created" field
                 var createdRange = new DateRangeQuery.Builder().field(Params.DateField.CREATED);
                 if (fromDate != null) {
-                    createdRange.gte(fromDate.toString());
+                    createdRange.gte(fromDateString);
                     logger.log(Level.FINE, "Adding date-range from: {0} to created field", fromDate);
                 }
                 if (toDate != null ) {
-                    createdRange.lte(toDate.toString());
+                    createdRange.lte(toDateString);
                     logger.log(Level.FINE, "Adding date-range to: {0} to created field", toDate);
                 }
                 logger.fine("adding createdRange query");
@@ -177,9 +178,9 @@ public final class  FilterUtils {
 
 
                 /*
-                  Here, the condition in which madeAfter >= from_date and madeAfter <= to_date is taken care and
-                  we don't care about madeBefore. But our assumptions is always madeBefore >= madeAfter
-                  See drawing below:-
+                  Here, the condition in which madeAfter >= from_date and madeAfter <= to_date is taken care of, and
+                  we don't care about madeBefore. But our assumption is always madeBefore >= madeAfter
+                  See the drawing below:-
 
                      from_date-----------------to_date
                      from_date---------------------------------------------------------------------to_date
@@ -189,10 +190,10 @@ public final class  FilterUtils {
                 */
                 var range = new DateRangeQuery.Builder().field(Params.DateField.MADE_AFTER);
                 if (fromDate != null) {
-                    range.gte(fromDate.toString());
+                    range.gte(fromDateString);
                 }
                 if (toDate != null) {
-                    range.lte(toDate.toString());
+                    range.lte(toDateString);
                 }
                 queries.add(range.build()._toRangeQuery()._toQuery());
                 /*
@@ -205,19 +206,19 @@ public final class  FilterUtils {
                 */
                 var rangeIgnoreMadeAfter = new DateRangeQuery.Builder().field(Params.DateField.MADE_BEFORE);
                 if (fromDate != null) {
-                    rangeIgnoreMadeAfter.gte(fromDate.toString());
+                    rangeIgnoreMadeAfter.gte(fromDateString);
                 }
                 if (toDate != null) {
-                    rangeIgnoreMadeAfter.lte(toDate.toString());
+                    rangeIgnoreMadeAfter.lte(toDateString);
                 }
 
                 if (fromDate != null) {
                     queries.add(rangeIgnoreMadeAfter.build()._toRangeQuery()._toQuery());
                 }
                 /*
-                  This is a case that fromDate and toDate are within madeAfter and madeBefore range.
+                  This is a case that fromDate and toDate are within the madeAfter and madeBefore range.
                   Precondition:  both fromDate and toDate must have values AND fromDate <= toDate.
-                  In other words, we must have positive range for this condition to satisfy.
+                  In other words, we must have the positive range for this condition to satisfy.
 
                       from_date|---------------------------------------------------|to_date
                                   from_date|-----------------------|to_date
@@ -225,9 +226,9 @@ public final class  FilterUtils {
                  */
                 if (dateRange.isPositive() && fromDate != null && toDate != null) {
                     var rangeMadeBefore = new DateRangeQuery.Builder().field(Params.DateField.MADE_BEFORE);
-                    rangeMadeBefore.gte(fromDate.toString());
+                    rangeMadeBefore.gte(fromDateString);
                     var rangeMadeAfter = new DateRangeQuery.Builder().field(Params.DateField.MADE_AFTER);
-                    rangeMadeAfter.lte(toDate.toString());
+                    rangeMadeAfter.lte(toDateString);
 
                     Query madeBeforeAfter = QueryBuilders.bool().must(List.of(rangeMadeAfter.build()._toRangeQuery()._toQuery(),
                         rangeMadeBefore.build()._toRangeQuery()._toQuery())).build()._toQuery();
@@ -238,16 +239,16 @@ public final class  FilterUtils {
         }
         if (!queries.isEmpty()){
             logger.fine("hasClauses: Adding date-range to bool_filter");
-            // logic is that dateFilters should be AND between each other, while the different queries
+            // the logic is that dateFilters should be AND between each other, while the different queries
             // of dateRanges should be OR between each other.
            // It is enough that one of the dateFilters matches the dateRange.
-            boolFilter.must(new Builder().should(queries).build());
+            boolFilter.must(QueryBuilders.bool().should(queries).build());
         }
         return boolFilter;
     }
 
     /**
-     * Checks if an aggregation key has OR operator
+     * Checks if an aggregation key has the OR operator
      */
     private static boolean hasOROperator(String aggregations, String key) {
         return AggregationUtils.contains(aggregations, key, "operator", "OR");
@@ -275,17 +276,15 @@ public final class  FilterUtils {
                     int lastIndex = entry.lastIndexOf(FILTER_KEY_VALUE_SEPARATOR);
                     String key = entry.substring(0, lastIndex).trim();
                     String value = entry.substring(lastIndex + 1).trim();
-                    if (!filters.containsKey(key)) {
-                        filters.put(key, new ArrayList<>(List.of(value)));
-                    } else {
-                        filters.get(key).add(value);
-                    }
+                  filters.computeIfAbsent(key, k -> new ArrayList<>()).add(value);
                 }
             }
         } catch (Exception ex) {
-            logger.severe("Exception occurred while constructing a map from selected filters: " + ex.getMessage());
+            logger.log(Level.SEVERE, "Exception occurred while constructing a map from selected filters: " + ex);
         }
+      if (logger.isLoggable(Level.FINE)) {
         logger.log(Level.FINE, "returning filters {0} ", filters);
+      }
         return filters;
     }
 }
