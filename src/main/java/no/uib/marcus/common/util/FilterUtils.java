@@ -152,11 +152,9 @@ public final class FilterUtils {
         if (Objects.nonNull(dateRange)) {
             //Get the lower boundary for this range
             LocalDate fromDate = dateRange.getFrom();
-            String fromDateString = fromDate.toString();
 
             //Get the upper boundary for this range
             LocalDate toDate = dateRange.getTo();
-            String toDateString = toDate.toString();
             if (Objects.nonNull(fromDate) || Objects.nonNull(toDate)) {
 
               logger.log(Level.FINE, "Adding date-range from {0} ",  fromDate);
@@ -165,11 +163,11 @@ public final class FilterUtils {
                 //Range within the "created" field
                 var createdRange = new DateRangeQuery.Builder().field(Params.DateField.CREATED);
                 if (fromDate != null) {
-                    createdRange.gte(fromDateString);
+                    createdRange.gte(fromDate.toString());
                     logger.log(Level.FINE, "Adding date-range from: {0} to created field", fromDate);
                 }
                 if (toDate != null ) {
-                    createdRange.lte(toDateString);
+                    createdRange.lte(toDate.toString());
                     logger.log(Level.FINE, "Adding date-range to: {0} to created field", toDate);
                 }
                 logger.fine("adding createdRange query");
@@ -190,10 +188,10 @@ public final class FilterUtils {
                 */
                 var range = new DateRangeQuery.Builder().field(Params.DateField.MADE_AFTER);
                 if (fromDate != null) {
-                    range.gte(fromDateString);
+                    range.gte(fromDate.toString());
                 }
                 if (toDate != null) {
-                    range.lte(toDateString);
+                    range.lte(toDate.toString());
                 }
                 queries.add(range.build()._toRangeQuery()._toQuery());
                 /*
@@ -206,10 +204,10 @@ public final class FilterUtils {
                 */
                 var rangeIgnoreMadeAfter = new DateRangeQuery.Builder().field(Params.DateField.MADE_BEFORE);
                 if (fromDate != null) {
-                    rangeIgnoreMadeAfter.gte(fromDateString);
+                    rangeIgnoreMadeAfter.gte(fromDate.toString());
                 }
                 if (toDate != null) {
-                    rangeIgnoreMadeAfter.lte(toDateString);
+                    rangeIgnoreMadeAfter.lte(toDate.toString());
                 }
 
                 if (fromDate != null) {
@@ -226,9 +224,9 @@ public final class FilterUtils {
                  */
                 if (dateRange.isPositive() && fromDate != null && toDate != null) {
                     var rangeMadeBefore = new DateRangeQuery.Builder().field(Params.DateField.MADE_BEFORE);
-                    rangeMadeBefore.gte(fromDateString);
+                    rangeMadeBefore.gte(fromDate.toString());
                     var rangeMadeAfter = new DateRangeQuery.Builder().field(Params.DateField.MADE_AFTER);
-                    rangeMadeAfter.lte(toDateString);
+                    rangeMadeAfter.lte(toDate.toString());
 
                     Query madeBeforeAfter = QueryBuilders.bool().must(List.of(rangeMadeAfter.build()._toRangeQuery()._toQuery(),
                         rangeMadeBefore.build()._toRangeQuery()._toQuery())).build()._toQuery();
