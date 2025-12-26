@@ -133,7 +133,7 @@ public class SearchServlet extends HttpServlet {
             BoolQuery.Builder postFilter = FilterUtils.getPostFilter(selectedFacets, aggs);
             if (postFilter.hasClauses()) {
               logger.log(Level.FINE, "postfilter hasClauses in SearchServlet:  {0}", postFilter.hasClauses());
-               builder.setPostFilter(QueryBuilders.bool().should(postFilter.build()));
+               builder.setPostFilter(QueryBuilders.bool().must(postFilter.build()));
             }
             //Serialize SearchBuilder request to JSON to skip serialization and deserialization
             // and properly serialize aggregations without type names in
