@@ -47,6 +47,7 @@ public class NaturenSearchBuilder extends MarcusSearchBuilder {
                                 .build()
                                 ._toQuery()))
                             .build())
+                        .weight(2.0)
                         .build()))
                     .build()
                     ._toQuery();
