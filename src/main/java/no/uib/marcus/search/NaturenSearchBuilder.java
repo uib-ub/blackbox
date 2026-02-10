@@ -21,6 +21,7 @@ public class NaturenSearchBuilder extends MarcusSearchBuilder {
             new HighlightField.Builder()
                 .postTags("</em>")
                 .preTags("<em class='txt-highlight'>")
+                .requireFieldMatch(false)
                 .build()
             ))
         .build();
