@@ -28,7 +28,7 @@ build:
 
 .security_scan:
   image:
-    name: aquasec/trivy:0.69.3
+    name: aquasec/trivy:v0.69.3
     entrypoint: [""]
   script:
     - apk add --no-cache curl docker-cli
