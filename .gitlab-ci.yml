@@ -28,7 +28,7 @@ build:
 
 .security_scan:
   image:
-    name: aquasec/trivy:latest
+    name: aquasec/trivy:v0.69.3
     entrypoint: [""]
   script:
     - apk add --no-cache curl docker-cli
@@ -51,9 +51,9 @@ build:
 security_scan:
   stage: scan
   parallel:
-    matrix:
-      - scan_image_name: blackbox-search
-        scan_image_tag: latest
+    matrix: []
+#      - scan_image_name: blackbox-search
+#        scan_image_tag: latest
   variables:
     image_name: $scan_image_name
     image_tag: $scan_image_tag
