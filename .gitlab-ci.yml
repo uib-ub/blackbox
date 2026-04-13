@@ -8,7 +8,7 @@ image: docker:cli
     - *docker_login
     - cd $dir
     - docker pull $CI_REGISTRY_IMAGE/$image_name:latest || true
-    - docker build --file ./$dockerfile --cache-from $CI_REGISTRY_IMAGE/$image_name:latest $docker_build_extra_args
+    - docker build --file ./$dockerfile $docker_build_extra_args
       --tag $CI_REGISTRY_IMAGE/$image_name:$CI_COMMIT_SHORT_SHA
       --tag $CI_REGISTRY_IMAGE/$image_name:latest
       .
