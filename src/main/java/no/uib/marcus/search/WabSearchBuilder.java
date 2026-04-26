@@ -57,7 +57,8 @@ public class WabSearchBuilder extends AbstractSearchBuilder<WabSearchBuilder> {
                         .fields(List.of("label",
                                         "publishedIn",
                                         "publishedInPart",
-                                        "all"
+                                        "all",
+                                        "all_keyword"
                                         )).build()._toQuery();//whitespace analyzed
 
             } else {
