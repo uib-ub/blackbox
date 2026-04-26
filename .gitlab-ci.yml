@@ -24,7 +24,7 @@ build:
   extends:
     - .build_container_image
   tags:
-  - spes
+  - saxonee
 
 .security_scan:
   image:
