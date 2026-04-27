@@ -35,6 +35,7 @@ public final class QueryUtils {
   private static final JacksonJsonpMapper JSONP_MAPPER = new JacksonJsonpMapper();
   private static final JsonFactory JSON_FACTORY = new JsonFactory();
   private static final List<String> SEARCH_FIELDS = List.of("identifier", "label", "all", "all.exact");
+  private static final List<String> WAB_SEARCH_FIELDS = List.of("label", "publishedIn", "publishedInPart", "all", "all_keyword");
 
   private QueryUtils() {
     }
@@ -62,6 +63,19 @@ public final class QueryUtils {
         QueryStringQuery.Builder builder = new QueryStringQuery.Builder();
         return builder.query(queryString)
                 .fields(SEARCH_FIELDS)
+                .defaultOperator(Operator.And);
+    }
+
+    /**
+     * Build a query string query for WAB
+     *
+     * @param queryString a query string
+     * @return a builder for query string
+     */
+    public static QueryStringQuery.Builder buildWabQueryString(String queryString) {
+        return new QueryStringQuery.Builder()
+                .query(queryString)
+                .fields(WAB_SEARCH_FIELDS)
                 .defaultOperator(Operator.And);
     }
 

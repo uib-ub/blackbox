@@ -6,6 +6,7 @@ import co.elastic.clients.elasticsearch._types.query_dsl.*;
 import co.elastic.clients.elasticsearch.core.SearchRequest;
 import co.elastic.clients.elasticsearch.core.search.TrackHits;
 import no.uib.marcus.common.util.AggregationUtils;
+import no.uib.marcus.common.util.QueryUtils;
 import no.uib.marcus.common.util.SignatureUtils;
 
 import java.util.Arrays;
@@ -25,12 +26,9 @@ public class WabSearchBuilder extends AbstractSearchBuilder<WabSearchBuilder> {
         super(client);
     }
 
-    /**
-     * Appends leading wildcard if query string is WAB signature
-     */
     @Override
     public String getQueryString() {
-        return SignatureUtils.appendLeadingWildcardIfWABSignature(super.getQueryString());
+        return SignatureUtils.appendWildcardIfWABSignature(super.getQueryString());
     }
 
     /**
@@ -51,16 +49,7 @@ public class WabSearchBuilder extends AbstractSearchBuilder<WabSearchBuilder> {
             //Set query
             if (StringUtils.hasText(getQueryString())) {
                 logger.fine("query set for wab");
-                query = QueryBuilders.simpleQueryString()
-                        .query(getQueryString())
-                        .defaultOperator(Operator.And)
-                        .fields(List.of("label",
-                                        "publishedIn",
-                                        "publishedInPart",
-                                        "all",
-                                        "all_keyword"
-                                        )).build()._toQuery();//whitespace analyzed
-
+                query = QueryUtils.buildWabQueryString(getQueryString()).build()._toQuery();
             } else {
                 query = QueryBuilders.matchAll().build()._toQuery();
             }

@@ -23,17 +23,24 @@ public class SignatureUtils {
     }
 
     /**
-     * Appends wildcard if a given input is a valid signature if it does not contain reserved characters
+     * Appends wildcard to a WAB signature or any hyphenated single token.
+     * WAB signatures (ms-*, ts-*) get a trailing wildcard; other hyphenated
+     * single tokens are wrapped (*token*) to allow partial matching.
      *
-     * @param value a value string to append, such as wildcard if it is thought to be a signature
-     * @return the given string with a wildcard appended to the end
+     * @param value a value string
+     * @return the string with wildcards applied, or unchanged if not applicable
      */
-    public static String appendLeadingWildcardIfWABSignature(String value) {
+    public static String appendWildcardIfWABSignature(String value) {
         if (isNeitherNullNorEmpty(value)) {
             value = value.trim();
-            if (!StringUtils.containsWhitespace(value) && value.indexOf(WILDCARD) == -1) {
+            if (Character.isLetter(value.charAt(0))
+                    && !StringUtils.containsWhitespace(value)
+                    && !containsReservedChars(value)) {
                 if (isWABSignature(value)) {
-                    return value + WILDCARD; //"ms-101" should be transformed to "ms-101*"
+                    return value + WILDCARD; // "ms-101" → "ms-101*"
+                }
+                if (containsChar(value, SPECIAL_SIGNATURE_CHAR)) {
+                    return WILDCARD + value + WILDCARD; // "some-ref" → "*some-ref*"
                 }
             }
         }
