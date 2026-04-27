@@ -2,7 +2,7 @@ package no.uib.marcus.common.util;
 
 import org.junit.Test;
 
-import static no.uib.marcus.common.util.SignatureUtils.appendLeadingWildcardIfWABSignature;
+import static no.uib.marcus.common.util.SignatureUtils.appendWildcardIfWABSignature;
 import static no.uib.marcus.common.util.SignatureUtils.appendWildcardIfUBBSignature;
 import static org.junit.Assert.*;
 
@@ -52,19 +52,19 @@ public class SignatureUtilsTest {
 
 
     @Test
-    public void appendLeadingWildcarForAllWABSignatures() {
-        assertEquals("", appendLeadingWildcardIfWABSignature(""));
-        assertEquals(null, appendLeadingWildcardIfWABSignature(null));
-        assertEquals("ubb", appendLeadingWildcardIfWABSignature("ubb"));
-        assertEquals("ms-0123-*", appendLeadingWildcardIfWABSignature("ms-0123-"));
-        assertEquals("ms-101,11*", appendLeadingWildcardIfWABSignature(" ms-101,11"));
-        assertEquals("ts-101,11*", appendLeadingWildcardIfWABSignature(" ts-101,11*"));
-        assertEquals("*ts-101", appendLeadingWildcardIfWABSignature("*ts-101"));
-        //It is not a single word
-        assertEquals("ts bros-0123", appendLeadingWildcardIfWABSignature("ts bros-0123"));
+    public void appendWildcardForAllWABSignatures() {
+        assertEquals("", appendWildcardIfWABSignature(""));
+        assertEquals(null, appendWildcardIfWABSignature(null));
+        assertEquals("ubb", appendWildcardIfWABSignature("ubb"));
+        assertEquals("ms-0123-*", appendWildcardIfWABSignature("ms-0123-"));
+        assertEquals("ms-101,11*", appendWildcardIfWABSignature(" ms-101,11"));
+        assertEquals("ts-101,11*", appendWildcardIfWABSignature(" ts-101,11*"));
+        assertEquals("*ts-101", appendWildcardIfWABSignature("*ts-101"));
+        // non-WAB hyphenated single token gets wrapped
+        assertEquals("*some-ref*", appendWildcardIfWABSignature("some-ref"));
+        // multi-word: unchanged
+        assertEquals("ts bros-0123", appendWildcardIfWABSignature("ts bros-0123"));
         assertEquals("-ms", appendWildcardIfUBBSignature("-ms"));
-
-
     }
 
 
