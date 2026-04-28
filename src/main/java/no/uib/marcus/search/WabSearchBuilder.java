@@ -28,7 +28,19 @@ public class WabSearchBuilder extends AbstractSearchBuilder<WabSearchBuilder> {
 
     @Override
     public String getQueryString() {
-        return SignatureUtils.appendWildcardIfWABSignature(super.getQueryString());
+        String query = super.getQueryString();
+        if (!StringUtils.containsWhitespace(query)) {
+            return SignatureUtils.appendWildcardIfWABSignature(query);
+        }
+        // Multi-word: apply per token so signatures get wildcards in the same
+        // way as single-word queries (e.g. "Ms-132 Modell" → "Ms-132* Modell").
+        StringBuilder result = new StringBuilder();
+        String[] tokens = query.trim().split("\\s+");
+        for (int i = 0; i < tokens.length; i++) {
+            if (i > 0) result.append(' ');
+            result.append(SignatureUtils.appendWildcardIfWABSignature(tokens[i]));
+        }
+        return result.toString();
     }
 
     /**
