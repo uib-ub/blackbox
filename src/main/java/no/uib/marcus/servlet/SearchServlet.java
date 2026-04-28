@@ -1,7 +1,6 @@
 package no.uib.marcus.servlet;
 
 import co.elastic.clients.elasticsearch.ElasticsearchClient;
-import co.elastic.clients.elasticsearch._types.ElasticsearchException;
 import co.elastic.clients.elasticsearch._types.query_dsl.BoolQuery;
 import co.elastic.clients.elasticsearch._types.query_dsl.QueryBuilders;
 import co.elastic.clients.json.jackson.JacksonJsonpGenerator;
@@ -39,6 +38,7 @@ import java.util.Map;
 import org.elasticsearch.client.Request;
 import org.elasticsearch.client.RequestOptions;
 import org.elasticsearch.client.Response;
+import org.elasticsearch.client.ResponseException;
 import org.elasticsearch.client.RestClient;
 
 
@@ -158,14 +158,18 @@ public class SearchServlet extends HttpServlet {
                 Response response1 = restClient.performRequest(request1);
                 response1.getEntity().writeTo(out);
 
-            } catch (ElasticsearchException e) {
-                logger.severe("reason " + e.error().reason());
-                //logger.info("caused by " + e.error().causedBy().reason());
-                logger.severe("size of supressed " + e.error().suppressed().size());
-                logger.severe("response : " + e.response().toString());
-                throw e;
-            }
-            catch (Exception e) {
+            } catch (ResponseException e) {
+                int status = e.getResponse().getStatusLine().getStatusCode();
+                logger.warning("ES returned " + status + " for query [" + queryString + "]: " + e.getMessage());
+                response.setStatus(status);
+                e.getResponse().getEntity().writeTo(out);
+            } catch (IllegalArgumentException e) {
+                logger.warning("Bad request: " + e.getMessage());
+                response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+                ObjectNode error = jsonMapper.createObjectNode();
+                error.put("error", e.getMessage());
+                out.write(jsonMapper.writeValueAsBytes(error));
+            } catch (Exception e) {
                 logger.log(Level.SEVERE, "Unexpected error processing search request", e);
                 throw e;
             }
