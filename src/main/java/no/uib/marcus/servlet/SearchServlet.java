@@ -169,6 +169,14 @@ public class SearchServlet extends HttpServlet {
                 ObjectNode error = jsonMapper.createObjectNode();
                 error.put("error", e.getMessage());
                 out.write(jsonMapper.writeValueAsBytes(error));
+            } catch (IOException e) {
+                if (e.getMessage() != null && e.getMessage().contains("Broken pipe")
+                        || e.getCause() instanceof IOException c && c.getMessage() != null && c.getMessage().contains("Broken pipe")) {
+                    logger.log(Level.INFO, "Client disconnected before response was complete");
+                } else {
+                    logger.log(Level.SEVERE, "Unexpected error processing search request", e);
+                    throw e;
+                }
             } catch (Exception e) {
                 logger.log(Level.SEVERE, "Unexpected error processing search request", e);
                 throw e;
