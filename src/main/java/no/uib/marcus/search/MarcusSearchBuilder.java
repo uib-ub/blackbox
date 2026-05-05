@@ -108,7 +108,7 @@ public class MarcusSearchBuilder extends AbstractSearchBuilder<MarcusSearchBuild
                 if (getFilter() != null) {
 
                   logger.fine("setting filter");
-                  BoolQuery filterQuery = getFilter().build();
+                  BoolQuery filterQuery = getFilter();
                   logger.log(Level.FINE, "sizes: {0}", filterQuery.filter().size());
                   searchRequest
                       .query(QueryBuilders.bool().must(query)
@@ -119,7 +119,7 @@ public class MarcusSearchBuilder extends AbstractSearchBuilder<MarcusSearchBuild
                 //Set post filter if available
                 if (getPostFilter() != null) {
                   logger.log(Level.FINE, "postfilter hasClauses: {0}", getPostFilter().hasClauses());
-                  searchRequest.postFilter(getPostFilter().build());
+                  searchRequest.postFilter(getPostFilter());
                 }
                 //Set index to boost
                 if (getIndexToBoost() != null) {

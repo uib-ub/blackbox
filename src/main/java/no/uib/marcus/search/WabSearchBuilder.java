@@ -68,9 +68,7 @@ public class WabSearchBuilder extends AbstractSearchBuilder<WabSearchBuilder> {
             // Set Query, whether with or without filter
             if (getFilter() != null) {
                 logger.fine("setting filter");
-                BoolQuery filterQuery = getFilter().build();
-                logger.fine("compare if filterQuery list is the same as filter() method" + Boolean.toString(filterQuery.filter().equals(List.of(filterQuery._toQuery()))));
-                logger.fine("sizes: " + filterQuery.filter().size() + " " + List.of(filterQuery._toQuery()).size());
+                BoolQuery filterQuery = getFilter();
                 searchRequest
                     .query(QueryBuilders.bool().must(query)
                         .filter(List.of(filterQuery._toQuery())).build()._toQuery());
@@ -79,9 +77,8 @@ public class WabSearchBuilder extends AbstractSearchBuilder<WabSearchBuilder> {
             }
             //Set post-filter
             if (getPostFilter() != null) {
-
                 logger.fine("setting post filter" + getPostFilter().hasClauses());
-                searchRequest.postFilter(getPostFilter().build());
+                searchRequest.postFilter(getPostFilter());
             }
             //Set sortBuilder
             if (getSortBuilder() != null) {

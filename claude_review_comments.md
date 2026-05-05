@@ -1,4 +1,11 @@
-# Code Review — blackbox (ES 1.7 → 9.x migration)
+/# Code Review — blackbox (ES 1.7 → 9.x migration)
+
+## Resolved on `blackbox-elasticsearch-upgrade`
+
+- **Naturen filter crash** (not in original review) — `NaturenSearchBuilder.constructSearchRequest()` triggered `IllegalStateException: Object builders can only be used once` because the parent (`MarcusSearchBuilder`) consumed the `BoolQuery.Builder` from `getFilter()`, then Naturen built it again. Fixed by changing `AbstractSearchBuilder` to store filter/postFilter as built `BoolQuery` instead of `BoolQuery.Builder` (immutable, reusable). Servlet pre-builds before passing to the builder.
+- **Items 1, 10, 12, 16** — `SkaSearchBuilder`, `ServiceName.SKA`, and `SearchBuilderFactory.skaSearch()` deleted. Confirmed unreachable: both legacy and new SKA frontends omit the `service=` parameter (verified with live URL on `ska-katalog.bgo1.test.rail.uib.no`), so requests fall through to `MarcusSearchBuilder`.
+
+---
 
 ## Bug — `SkaSearchBuilder` filter is silently ignored
 

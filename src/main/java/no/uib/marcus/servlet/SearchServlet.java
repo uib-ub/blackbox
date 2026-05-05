@@ -127,13 +127,13 @@ public class SearchServlet extends HttpServlet {
                     selectedFacets, aggs, DateRange.of(fromDate, toDate)
             );
             if (topFilter.hasClauses()) {
-                builder.setFilter(topFilter);
+                builder.setFilter(topFilter.build());
             }
             //Add post-filter for "OR" aggregations if any
             BoolQuery.Builder postFilter = FilterUtils.getPostFilter(selectedFacets, aggs);
             if (postFilter.hasClauses()) {
               logger.log(Level.FINE, "postfilter hasClauses in SearchServlet:  {0}", postFilter.hasClauses());
-               builder.setPostFilter(QueryBuilders.bool().must(postFilter.build()));
+              builder.setPostFilter(QueryBuilders.bool().must(postFilter.build()._toQuery()).build());
             }
             //Serialize SearchBuilder request to JSON to skip serialization and deserialization
             // and properly serialize aggregations without type names in

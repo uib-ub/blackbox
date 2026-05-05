@@ -15,11 +15,6 @@ public enum ServiceName {
     MARCUS,
 
     /**
-     * Skeivt Arkiv service name
-     */
-    SKA,
-
-    /**
      * Wittgenstein Archives service name
      */
     WAB,

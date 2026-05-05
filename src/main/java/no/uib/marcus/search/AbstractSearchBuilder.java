@@ -37,8 +37,8 @@ public abstract class AbstractSearchBuilder<T extends AbstractSearchBuilder<T>> 
     private String[] indices;
     @Nullable
     private String queryString;
-    private BoolQuery.Builder filter;
-  private BoolQuery.Builder postFilter;
+    private BoolQuery filter;
+  private BoolQuery postFilter;
     private Map<String, List<String>> selectedFacets;
     private String aggregations;
     private ObjectBuilder<SortOptions> sortBuilder;
@@ -115,9 +115,9 @@ public abstract class AbstractSearchBuilder<T extends AbstractSearchBuilder<T>> 
     }
 
     /**
-     * Get sort builder or {@code null} if not set
+     * Get top-level filter or {@code null} if not set
      **/
-    public BoolQuery.Builder getFilter() {
+    public BoolQuery getFilter() {
         return filter;
     }
 
@@ -128,7 +128,7 @@ public abstract class AbstractSearchBuilder<T extends AbstractSearchBuilder<T>> 
      * @return this object where filter has been set
      */
     @SuppressWarnings("unchecked")
-    public T setFilter(BoolQuery.Builder filter) {
+    public T setFilter(BoolQuery filter) {
         this.filter = filter;
         return (T) this;
     }
@@ -136,7 +136,7 @@ public abstract class AbstractSearchBuilder<T extends AbstractSearchBuilder<T>> 
     /**
      * Get POST filter or {@code null} if not set
      */
-    public BoolQuery.Builder getPostFilter() {
+    public BoolQuery getPostFilter() {
         return postFilter;
     }
 
@@ -148,7 +148,7 @@ public abstract class AbstractSearchBuilder<T extends AbstractSearchBuilder<T>> 
      * @return this object where post_filter has been set
      */
     @SuppressWarnings("unchecked")
-    public T setPostFilter(BoolQuery.Builder filter) {
+    public T setPostFilter(BoolQuery filter) {
         if(filter != null) {
             this.postFilter = filter;
         }

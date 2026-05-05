@@ -84,12 +84,12 @@ public interface SearchBuilder<S> {
     /**
      * Sets post filter
      */
-    S setPostFilter(BoolQuery.Builder postFilter);
+    S setPostFilter(BoolQuery postFilter);
 
     /**
      * Sets filter (filtered_query)
      */
-    S setFilter(BoolQuery.Builder postFilter);
+    S setFilter(BoolQuery filter);
 
 
     /**

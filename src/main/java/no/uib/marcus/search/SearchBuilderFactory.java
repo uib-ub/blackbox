@@ -27,13 +27,6 @@ public class SearchBuilderFactory {
 
 
     /**
-     * Create a Skeivtarkiv(SkA) search builder
-     */
-    public static SkaSearchBuilder skaSearch(ElasticsearchClient client) {
-        return new SkaSearchBuilder(client);
-    }
-
-    /**
      * Create a Wittgenstein Archives search builder
      **/
     public static WabSearchBuilder wabSearch(ElasticsearchClient client) {
@@ -41,7 +34,7 @@ public class SearchBuilderFactory {
     }
 
     /**
-     * Create a Skeivtarkiv(SkA) search builder
+     * Create a Naturen search builder
      */
     public static NaturenSearchBuilder naturenSearch(ElasticsearchClient client) {
         return new NaturenSearchBuilder(client);
@@ -59,9 +52,6 @@ public class SearchBuilderFactory {
             ElasticsearchClient client) {
         ServiceName service = ServiceName.toEnum(serviceString);
       switch (service) {
-        case SKA -> {
-          return SearchBuilderFactory.skaSearch(client);
-        }
         case WAB -> {
           logger.fine("wab chosen");
           return SearchBuilderFactory.wabSearch(client);
