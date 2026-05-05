@@ -56,10 +56,9 @@ public class NaturenSearchBuilder extends MarcusSearchBuilder {
             //Set filtered query, whether with or without filter
             if (getFilter() != null) {
 
-              BoolQuery filterQuery = getFilter().build();
               searchRequest
                   .query(QueryBuilders.bool().must(query)
-                      .filter(List.of(filterQuery._toQuery())).build()._toQuery());            } else {
+                      .build()._toQuery());            } else {
               searchRequest.query(query);
             }
             searchRequest.highlight(HIGHLIGHT);
