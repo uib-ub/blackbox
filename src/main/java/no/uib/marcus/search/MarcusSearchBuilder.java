@@ -46,7 +46,7 @@ public class MarcusSearchBuilder extends AbstractSearchBuilder<MarcusSearchBuild
             "Nyborg"
     };
     private static final String TYPE = "type";
-    private static final int TRACK_HINT_SIZE = 200000;
+    private static final int TRACK_HINT_SIZE = 500000;
 
   private final TrackHits trackHits = new TrackHits.Builder().count(TRACK_HINT_SIZE).build();
 
