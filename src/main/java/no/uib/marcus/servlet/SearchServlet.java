@@ -95,6 +95,16 @@ public class SearchServlet extends HttpServlet {
         String indexToBoost = request.getParameter(Params.INDEX_BOOST);
 
         try ( OutputStream out = response.getOutputStream()) {
+            //Reject over-length query strings up front (H1)
+            if (queryString != null && queryString.length() > Params.MAX_QUERY_LENGTH) {
+                logger.warning("Rejected over-length q (" + queryString.length() + " chars)");
+                response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+                ObjectNode error = jsonMapper.createObjectNode();
+                error.put("error", "Query parameter 'q' exceeds the maximum length of "
+                        + Params.MAX_QUERY_LENGTH + " characters");
+                out.write(jsonMapper.writeValueAsBytes(error));
+                return;
+            }
             //Reject malformed aggregations early with a 400 JSON body instead of a later 500/HTML
             if (StringUtils.hasText(aggs)) {
                 try {
@@ -177,9 +187,15 @@ public class SearchServlet extends HttpServlet {
 
             } catch (ResponseException e) {
                 int status = e.getResponse().getStatusLine().getStatusCode();
+                //Log the full ES error server-side, but return a generic body so ES internals
+                //(mappings, field names, stack traces) are not leaked to the client (H2 / item 3)
                 logger.warning("ES returned " + status + " for query [" + queryString + "]: " + e.getMessage());
                 response.setStatus(status);
-                e.getResponse().getEntity().writeTo(out);
+                ObjectNode error = jsonMapper.createObjectNode();
+                error.put("error", status == HttpServletResponse.SC_BAD_REQUEST
+                        ? "Invalid search request" : "Search request failed");
+                error.put("status", status);
+                out.write(jsonMapper.writeValueAsBytes(error));
             } catch (IllegalArgumentException e) {
                 logger.warning("Bad request: " + e.getMessage());
                 response.setStatus(HttpServletResponse.SC_BAD_REQUEST);

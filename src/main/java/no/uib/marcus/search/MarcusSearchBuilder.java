@@ -11,6 +11,7 @@ import co.elastic.clients.elasticsearch.core.search.TrackHits;
 import co.elastic.clients.util.NamedValue;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.logging.Level;
+import no.uib.marcus.common.Params;
 import no.uib.marcus.common.util.AggregationUtils;
 import no.uib.marcus.common.util.QueryUtils;
 import no.uib.marcus.common.util.SignatureUtils;
@@ -88,6 +89,10 @@ public class MarcusSearchBuilder extends AbstractSearchBuilder<MarcusSearchBuild
                 searchRequest.size(getSize());
 
               searchRequest.trackTotalHits(trackHits);
+              //Bound query execution time and per-shard collection so a single slow/expensive
+              //query can't tie up a shard (H1)
+              searchRequest.timeout(Params.SEARCH_TIMEOUT);
+              searchRequest.terminateAfter(Params.TERMINATE_AFTER);
 
 
               FunctionScore fotoFs = new FunctionScore.Builder().filter(QueryBuilders.term().value(BoostType.FOTOGRAFI).field(TYPE).build()._toQuery()).weight(3.0).build();

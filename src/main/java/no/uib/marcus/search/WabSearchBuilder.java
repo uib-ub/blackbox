@@ -5,6 +5,7 @@ import co.elastic.clients.elasticsearch.ElasticsearchClient;
 import co.elastic.clients.elasticsearch._types.query_dsl.*;
 import co.elastic.clients.elasticsearch.core.SearchRequest;
 import co.elastic.clients.elasticsearch.core.search.TrackHits;
+import no.uib.marcus.common.Params;
 import no.uib.marcus.common.util.AggregationUtils;
 import no.uib.marcus.common.util.QueryUtils;
 import no.uib.marcus.common.util.SignatureUtils;
@@ -94,6 +95,10 @@ public class WabSearchBuilder extends AbstractSearchBuilder<WabSearchBuilder> {
             searchRequest.size(getSize());
 
             searchRequest.trackTotalHits(trackHits);
+            //Bound query execution time and per-shard collection so a single slow/expensive
+            //query can't tie up a shard (H1)
+            searchRequest.timeout(Params.SEARCH_TIMEOUT);
+            searchRequest.terminateAfter(Params.TERMINATE_AFTER);
 
         }  catch (IllegalStateException e) {
             throw new RuntimeException(e);

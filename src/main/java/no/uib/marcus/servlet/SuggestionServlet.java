@@ -44,6 +44,15 @@ public class SuggestionServlet extends HttpServlet {
         String jsonString;
 
         try (PrintWriter out = response.getWriter()) {
+          //Reject over-length query strings up front (H1)
+          if (suggestText != null && suggestText.length() > Params.MAX_QUERY_LENGTH) {
+            response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+            ObjectNode error = jsonMapper.createObjectNode();
+            error.put("error", "Query parameter 'q' exceeds the maximum length of "
+                + Params.MAX_QUERY_LENGTH + " characters");
+            out.write(error.toString());
+            return;
+          }
           try {
             jsonString = jsonMapper.writeValueAsString(
                 CompletionSuggestion.getSuggestions(suggestText, suggestSize, indices));
