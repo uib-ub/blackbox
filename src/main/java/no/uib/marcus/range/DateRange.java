@@ -1,16 +1,12 @@
 package no.uib.marcus.range;
 
-import org.apache.log4j.Logger;
-import org.elasticsearch.common.Nullable;
-import org.elasticsearch.common.Strings;
-import org.elasticsearch.common.joda.Joda;
-import org.elasticsearch.common.joda.time.LocalDate;
+import no.uib.marcus.common.util.StringUtils;
 
-import javax.validation.constraints.NotNull;
-import javax.xml.datatype.DatatypeConfigurationException;
-import javax.xml.datatype.DatatypeConstants;
-import javax.xml.datatype.DatatypeFactory;
-import javax.xml.datatype.XMLGregorianCalendar;
+import jakarta.annotation.Nullable;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeFormatterBuilder;
+import java.time.temporal.ChronoField;
 import java.util.Objects;
 
 /**
@@ -23,38 +19,37 @@ import java.util.Objects;
 
 public class DateRange implements Range<LocalDate> {
     //Default date format, any one of these is OK
-    public static final String DEFAULT_DATE_FORMAT = "yyyy-MM-dd||yyyy-MM||yyyy";
-    private static final Logger logger = Logger.getLogger(DateRange.class);
+    // default values set for from date
+    public static final  DateTimeFormatter DEFAULT_DATE_FORMATTER = new DateTimeFormatterBuilder()
+            .appendPattern("[yyyy-MM-dd]")
+            .appendPattern("[yyyy-MM]")
+            .appendPattern("[yyyy]")
+            .parseDefaulting(ChronoField.MONTH_OF_YEAR, 1)
+            .parseDefaulting(ChronoField.DAY_OF_MONTH, 1)
+            .toFormatter();
+    public static final  DateTimeFormatter DEFAULT_TO_DATE_FORMATTER = new DateTimeFormatterBuilder()
+            .appendPattern("[yyyy-MM-dd]")
+            .appendPattern("[yyyy-MM]")
+            .appendPattern("[yyyy]")
+            .parseDefaulting(ChronoField.MONTH_OF_YEAR, 12)
+            .parseDefaulting(ChronoField.DAY_OF_MONTH, 31)
+            .toFormatter();
 
-    //Null indicates unbounded/infinite value
+    //Null indicates an unbounded/infinite value
     @Nullable
     private LocalDate fromDate;
 
-    //Null indicates unbounded/infinite value
+    //Null indicates an unbounded/infinite value
     @Nullable
     private LocalDate toDate;
 
-    //Specified date format
-    @NotNull
-    private String dateFormat;
-
-    public DateRange(String format) {
-        this.dateFormat = Objects.requireNonNull(format, "Date format cannot be null");
-    }
-
-    public DateRange(@Nullable String from, @Nullable String to) {
-        this(from, to, DEFAULT_DATE_FORMAT);
-    }
-
-    public DateRange(String from, String to, String format) {
-        this(format);
+    public DateRange(String from, String to) {
         this.fromDate = parseFromDate(from);
         this.toDate = parseToDate(to);
+
     }
 
-    public static DateRange of(@Nullable String from, @Nullable String to) {
-        return new DateRange(from, to);
-    }
+
 
     @Override
     public LocalDate getFrom() {
@@ -78,43 +73,22 @@ public class DateRange implements Range<LocalDate> {
     }
 
     /**
-     * When only year is specified as "to_date", Joda Time parser assumes that it is 1st of January. This makes
-     * sense for "from_date" but not for "to_date". Therefore, this method tries to modify day and month of "to_date"
-     * to 31st of December.
+     * Logic for getting last date
      */
     public LocalDate parseToDate(String toDateString) {
-        LocalDate toDate = parse(toDateString);
-        if (toDate != null && isXSDgYear(toDateString)) {// when only year is specified
-            return new LocalDate(toDate.getYear(), 12, 31);
-        }
-        return toDate;
+        if (!StringUtils.hasText(toDateString))
+            return null;
+        return   LocalDate.parse(toDateString , DEFAULT_TO_DATE_FORMATTER);
     }
 
+
     /**
-     * Joda Time parses from_date correctly
+     * From date is handled by the default formatter
      */
     public LocalDate parseFromDate(String fromDateString) {
-        return parse(fromDateString);
-    }
-
-    /**
-     * Get a date format or default format if not specified.
-     * The default format is "yyyy-MM-dd||yyyy-MM||yyyy"
-     */
-    public String getDateFormat() {
-        if (Objects.nonNull(dateFormat)) {
-            return dateFormat;
-        }
-        return DEFAULT_DATE_FORMAT;
-    }
-
-    /**
-     * Apply a date format to this range
-     *
-     * @param dateFormat a non-null date format string
-     */
-    public void setDateFormat(String dateFormat) {
-        this.dateFormat = Objects.requireNonNull(dateFormat, "Date format cannot be null");
+        if (!StringUtils.hasText(fromDateString))
+            return null;
+        return LocalDate.parse(fromDateString , DEFAULT_DATE_FORMATTER);
     }
 
     /**
@@ -125,14 +99,19 @@ public class DateRange implements Range<LocalDate> {
      */
     @Override
     public LocalDate parse(String input) {
-        if (Strings.hasText(input)) {
-            return Joda.forPattern(getDateFormat()).parser().parseLocalDate(input);
+        if (StringUtils.hasText(input)) {
+            return LocalDate.parse(input, DEFAULT_DATE_FORMATTER);
         }
         return null;
     }
 
+  public static DateRange of(@Nullable String from, @Nullable String to) {
+            return new DateRange(from, to);
+    }
 
-    /**
+
+
+  /**
      * Check whether a range is positive, a positive range is the one such that
      * fromDate <= toDate for non-null boundaries.
      */
@@ -145,7 +124,7 @@ public class DateRange implements Range<LocalDate> {
 
 
     /**
-     * Check for negative range, a negative range is such that fromDate > toDate for non-null boundaries.
+     * Check for a negative range. A negative range is such that fromDate > toDate for non-null boundaries.
      */
     public boolean isNegative() {
         if (Objects.nonNull(fromDate) && Objects.nonNull(toDate)) {
@@ -170,7 +149,6 @@ public class DateRange implements Range<LocalDate> {
     public int hashCode() {
         int result = fromDate != null ? fromDate.hashCode() : 0;
         result = 31 * result + (toDate != null ? toDate.hashCode() : 0);
-        result = 31 * result + dateFormat.hashCode();
         return result;
     }
 
@@ -179,49 +157,9 @@ public class DateRange implements Range<LocalDate> {
         final StringBuilder sb = new StringBuilder("DateRange{");
         sb.append("fromDate=").append(fromDate);
         sb.append(", toDate=").append(toDate);
-        sb.append(", dateFormat='").append(dateFormat).append('\'');
         sb.append('}');
         return sb.toString();
     }
 
-    /**
-     * Checks if a provided string is valid xsd:gYear
-     *
-     * @param yearString a gYear string to parse
-     * @return {@code empty string} true if it is valid gYear, otherwise false
-     */
-    public static boolean isXSDgYear(String yearString) {
-        try {
-            int inputYear = Integer.parseInt(yearString);
-            /*
-             * Input year should be at most 4 digits number. I had to make sure about this because if input year
-             * is greater than 4 digits, it will be truncated by toXMLFormat() method anyway.
-             **/
-            if (inputYear > 0 && String.valueOf(inputYear).length() > 4) {
-                return true;
-            }
-            //Negative gYear with at most 4 digits is allowed. e.g -0160 for 160BC
-            if (inputYear < 0 && String.valueOf(inputYear).length() > 5) {
-                return true;
-            }
-
-            XMLGregorianCalendar gCalendar = DatatypeFactory
-                    .newInstance()
-                    .newXMLGregorianCalendarDate(
-                            inputYear,
-                            DatatypeConstants.FIELD_UNDEFINED,
-                            DatatypeConstants.FIELD_UNDEFINED,
-                            DatatypeConstants.FIELD_UNDEFINED
-                    );
-            gCalendar.toXMLFormat();
-        } catch (NumberFormatException nfe) {
-            logger.warn("gYear must be a number: " + nfe.getLocalizedMessage());
-            return false;
-        } catch (DatatypeConfigurationException | IllegalArgumentException ex) {
-            logger.warn(ex.getLocalizedMessage());
-            return false;
-        }
-        return true;
-    }
 
 }

@@ -1,7 +1,7 @@
 package no.uib.marcus.common;
 
-import org.apache.log4j.Logger;
-import org.elasticsearch.common.Strings;
+import java.util.logging.Logger;
+import no.uib.marcus.common.util.StringUtils;
 
 import java.util.Arrays;
 
@@ -13,11 +13,6 @@ public enum ServiceName {
      * Marcus service name
      */
     MARCUS,
-
-    /**
-     * Skeivtarkiv service name
-     */
-    SKA,
 
     /**
      * Wittgenstein Archives service name
@@ -38,25 +33,25 @@ public enum ServiceName {
     /**
      * Logger
      */
-    private static final Logger logger = Logger.getLogger(ServiceName.class);
+    private static final Logger logger = Logger.getLogger(ServiceName.class.getName());
 
     /**
-     * Get corresponding enum from it's string representation
-     * @param serviceString a service parameter passed by user
+     * Get the corresponding enum from its string representation
+     * @param serviceString a service parameter passed by the user
      *
      * @return enum which is the result of a string representation
      */
     public static ServiceName toEnum(String serviceString) {
         ServiceName service;
         try {
-            if(!Strings.hasText(serviceString)) {//Use default service, if nothing is specified
+            if(!StringUtils.hasText(serviceString)) {//Use the default service if nothing is specified
                 return ServiceName.MARCUS;
             }
             service = ServiceName.valueOf(serviceString.toUpperCase());
         }
         catch (IllegalArgumentException e){
-            logger.error("Service parameter is not recognized. Found [" + serviceString + "]" +
-                    " but expected one of " + Arrays.asList(ServiceName.values()).toString());
+            logger.severe("Service parameter is not recognized. Found [" + serviceString + "]" +
+                    " but expected one of " + Arrays.asList(ServiceName.values()));
             /*Fail and do not continue*/
             throw e;
         }

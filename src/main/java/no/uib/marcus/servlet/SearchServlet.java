@@ -1,35 +1,51 @@
 package no.uib.marcus.servlet;
 
-import no.uib.marcus.client.ClientFactory;
+import co.elastic.clients.elasticsearch.ElasticsearchClient;
+import co.elastic.clients.elasticsearch._types.query_dsl.BoolQuery;
+import co.elastic.clients.elasticsearch._types.query_dsl.QueryBuilders;
+import co.elastic.clients.json.jackson.JacksonJsonpGenerator;
+import co.elastic.clients.json.jackson.JacksonJsonpMapper;
+import co.elastic.clients.transport.rest_client.RestClientTransport;
+import com.fasterxml.jackson.core.JsonFactory;
+import com.fasterxml.jackson.databind.json.JsonMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import jakarta.json.stream.JsonGenerator;
+import java.io.OutputStream;
+import java.io.Serial;
+import java.io.StringWriter;
+import no.uib.marcus.client.ElasticsearchClientFactory;
 import no.uib.marcus.common.Params;
+import no.uib.marcus.common.util.AggregationUtils;
 import no.uib.marcus.common.util.FilterUtils;
-import no.uib.marcus.common.util.LogUtils;
-import no.uib.marcus.common.util.QueryUtils;
 import no.uib.marcus.common.util.SortUtils;
 import no.uib.marcus.range.DateRange;
+import no.uib.marcus.search.IllegalParameterException;
 import no.uib.marcus.search.SearchBuilder;
 import no.uib.marcus.search.SearchBuilderFactory;
-import org.apache.log4j.Logger;
-import org.elasticsearch.action.search.SearchResponse;
-import org.elasticsearch.client.Client;
-import org.elasticsearch.common.Booleans;
-import org.elasticsearch.common.Strings;
-import org.elasticsearch.common.xcontent.XContentFactory;
-import org.elasticsearch.index.query.BoolFilterBuilder;
 
-import javax.servlet.ServletException;
-import javax.servlet.annotation.WebServlet;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+import no.uib.marcus.common.util.StringUtils;
+
+import jakarta.servlet.annotation.WebServlet;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.List;
 import java.util.Map;
 
+import org.elasticsearch.client.Request;
+import org.elasticsearch.client.RequestOptions;
+import org.elasticsearch.client.Response;
+import org.elasticsearch.client.ResponseException;
+import org.elasticsearch.client.RestClient;
+
 
 /**
- * This servlet processes all HTTP requests coming from "/search" endpoint
+ * This servlet processes all HTTP requests coming from the "/search" endpoint
  * and gives back a response in the form of JSON string.
  * <p/>
  *
@@ -42,7 +58,11 @@ import java.util.Map;
         description = "Servlet for handling search requests")
 
 public class SearchServlet extends HttpServlet {
-    private static final Logger logger = Logger.getLogger(SearchServlet.class);
+    private static final Logger logger = Logger.getLogger(SearchServlet.class.getName());
+    private static final JsonMapper jsonMapper = new JsonMapper();
+    private static final JacksonJsonpMapper jacksonJsonpMapper = new JacksonJsonpMapper(jsonMapper);
+
+    @Serial
     private static final long serialVersionUID = 1L;
 
     /**
@@ -50,14 +70,13 @@ public class SearchServlet extends HttpServlet {
      *
      * @param request  HTTP servlet request
      * @param response HTTP servlet response
-     * @throws ServletException if a servlet-specific error occurs
      * @throws IOException      if an I/O error occurs
      *                          <p>
      *                          writes a JSON string of search hits.
      **/
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
+            throws IOException {
         request.setCharacterEncoding("UTF-8");
         response.setContentType("application/json;charset=UTF-8");
 
@@ -65,7 +84,6 @@ public class SearchServlet extends HttpServlet {
         String queryString = request.getParameter(Params.QUERY_STRING);
         String aggs = request.getParameter(Params.AGGREGATIONS);
         String[] indices = request.getParameterValues(Params.INDICES);
-        String[] types = request.getParameterValues(Params.INDEX_TYPES);
         String from = request.getParameter(Params.FROM);
         String size = request.getParameter(Params.SIZE);
         String fromDate = request.getParameter(Params.FROM_DATE);
@@ -76,22 +94,51 @@ public class SearchServlet extends HttpServlet {
         String service = request.getParameter(Params.SERVICE);
         String indexToBoost = request.getParameter(Params.INDEX_BOOST);
 
-        try (PrintWriter out = response.getWriter()) {
-            Client client = ClientFactory.getTransportClient();
+        try ( OutputStream out = response.getOutputStream()) {
+            //Reject over-length query strings up front (H1)
+            if (queryString != null && queryString.length() > Params.MAX_QUERY_LENGTH) {
+                logger.warning("Rejected over-length q (" + queryString.length() + " chars)");
+                response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+                ObjectNode error = jsonMapper.createObjectNode();
+                error.put("error", "Query parameter 'q' exceeds the maximum length of "
+                        + Params.MAX_QUERY_LENGTH + " characters");
+                out.write(jsonMapper.writeValueAsBytes(error));
+                return;
+            }
+            //Reject malformed aggregations early with a 400 JSON body instead of a later 500/HTML
+            if (StringUtils.hasText(aggs)) {
+                try {
+                    AggregationUtils.validateAggregations(aggs);
+                } catch (IllegalParameterException e) {
+                    logger.warning("Invalid aggregations parameter: " + e.getMessage());
+                    response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+                    ObjectNode error = jsonMapper.createObjectNode();
+                    error.put("error", e.getMessage());
+                    out.write(jsonMapper.writeValueAsBytes(error));
+                    return;
+                }
+            }
+            ElasticsearchClient client = ElasticsearchClientFactory.getElasticsearchClient();
+            RestClientTransport restClientTransport = (RestClientTransport) client._transport();
+            RestClient restClient = restClientTransport.restClient();
 
-            //Assign default values, if needs be
-            int _from = Strings.hasText(from) ? Integer.parseInt(from) : Params.DEFAULT_FROM;
-            int _size = Strings.hasText(size) ? Integer.parseInt(size) : Params.DEFAULT_SIZE;
 
-            // Build a facet map based on selected filters.
-            // e.g {"subject.exact" = ["Flyfoto" , "Birkeland"], "type" = ["Brev"]}
+
+
+          //Assign default values, if needs be
+            int _from = StringUtils.parseIntWithDefault(from, Params.DEFAULT_FROM, 0, Integer.MAX_VALUE);
+            int _size = StringUtils.parseIntWithDefault(size, Params.DEFAULT_SIZE, 1, Params.MAX_SIZE);
+
+            //Build a facet map based on selected filters.
+            //E.g. {"subject.exact" = ["Flyfoto" , "Birkeland"], "type" = ["Brev"]}
             Map<String, List<String>> selectedFacets = FilterUtils.buildFilterMap(selectedFilters);
 
-            //Get and build corresponding search builder based on the "service" parameter
+
+            logger.log(Level.FINE, "service: {0}", service);
+            //Get and build the corresponding search builder based on the "service" parameter
             SearchBuilder<? extends SearchBuilder<?>> builder = SearchBuilderFactory
                     .getSearchBuilder(service, client)
                     .setIndices(indices)
-                    .setTypes(types)
                     .setQueryString(queryString)
                     .setAggregations(aggs)
                     .setFrom(_from)
@@ -101,34 +148,88 @@ public class SearchServlet extends HttpServlet {
                     .setIndexToBoost(indexToBoost);
 
             //Add top level filter, for "AND" aggregations
-            BoolFilterBuilder topFilter = FilterUtils.getTopFilter(
+            BoolQuery.Builder topFilter = FilterUtils.getTopFilter(
                     selectedFacets, aggs, DateRange.of(fromDate, toDate)
             );
             if (topFilter.hasClauses()) {
-                builder.setFilter(topFilter);
+                builder.setFilter(topFilter.build());
             }
-            //Add post filter for "OR" aggregations if any
-            BoolFilterBuilder postFilter = FilterUtils.getPostFilter(selectedFacets, aggs);
+            //Add post-filter for "OR" aggregations if any
+            BoolQuery.Builder postFilter = FilterUtils.getPostFilter(selectedFacets, aggs);
             if (postFilter.hasClauses()) {
-                builder.setPostFilter(postFilter);
+              logger.log(Level.FINE, "postfilter hasClauses in SearchServlet:  {0}", postFilter.hasClauses());
+              builder.setPostFilter(QueryBuilders.bool().must(postFilter.build()._toQuery()).build());
             }
-            //Send search request to Elasticsearch and execute
-            SearchResponse searchResponse = builder.executeSearch();
+            //Serialize SearchBuilder request to JSON to skip serialization and deserialization
+            // and properly serialize aggregations without type names in
+            // the key e.g., not "sterms#related.exact": but "related:exact"
+            try (StringWriter writer = new StringWriter()) {
+                JsonFactory jsonFactory = new JsonFactory();
+                com.fasterxml.jackson.core.JsonGenerator jacksonGenerator = jsonFactory.createGenerator(writer);
+                if (Boolean.parseBoolean(isPretty)) {
+                    jacksonGenerator.useDefaultPrettyPrinter();
+                }
+                JsonGenerator generator = new JacksonJsonpGenerator(jacksonGenerator);
+                builder.constructSearchRequest().build().serialize(generator, jacksonJsonpMapper );
 
-            //Decide whether to get a pretty JSON output or not
-            String searchResponseString = Booleans.isExplicitTrue(isPretty)
-                    ? QueryUtils.toJsonString(searchResponse, true)
-                    : QueryUtils.toJsonString(searchResponse, false);
+                generator.close();
 
-            //Write response to the client
-            out.write(searchResponseString);
+                // Execute the request built by the high-level client via the low-level REST client,
+                // so aggregation keys are serialized without ES type-name prefixes (e.g. "related.exact"
+                // rather than "sterms#related.exact").
+                // also avoids packing/unpacking
+                String requestAsJson = writer.toString();
+                Request request1 = new Request("POST", buildEndpoint(indices));
+                request1.setJsonEntity(requestAsJson);
+                request1.setOptions(RequestOptions.DEFAULT.toBuilder());
+                Response response1 = restClient.performRequest(request1);
+                response1.getEntity().writeTo(out);
 
-            // Log search response
-            logger.info(LogUtils.createLogMessage(request, searchResponse));
-            // System.out.println("Builder class: " + builder.getClass().getName() + " " +
-            //                 "\nBuilder toString: " + builder  );
+            } catch (ResponseException e) {
+                int status = e.getResponse().getStatusLine().getStatusCode();
+                //Log the full ES error server-side, but return a generic body so ES internals
+                //(mappings, field names, stack traces) are not leaked to the client (H2 / item 3)
+                logger.warning("ES returned " + status + " for query [" + queryString + "]: " + e.getMessage());
+                response.setStatus(status);
+                ObjectNode error = jsonMapper.createObjectNode();
+                error.put("error", status == HttpServletResponse.SC_BAD_REQUEST
+                        ? "Invalid search request" : "Search request failed");
+                error.put("status", status);
+                out.write(jsonMapper.writeValueAsBytes(error));
+            } catch (IllegalArgumentException e) {
+                logger.warning("Bad request: " + e.getMessage());
+                response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+                ObjectNode error = jsonMapper.createObjectNode();
+                error.put("error", e.getMessage());
+                out.write(jsonMapper.writeValueAsBytes(error));
+            } catch (IOException e) {
+                if (e.getMessage() != null && e.getMessage().contains("Broken pipe")
+                        || e.getCause() instanceof IOException c && c.getMessage() != null && c.getMessage().contains("Broken pipe")) {
+                    logger.log(Level.INFO, "Client disconnected before response was complete");
+                } else {
+                    logger.log(Level.SEVERE, "Unexpected error processing search request", e);
+                    throw e;
+                }
+            } catch (Exception e) {
+                logger.log(Level.SEVERE, "Unexpected error processing search request", e);
+                throw e;
+            }
+            }
         }
+
+    private static String buildEndpoint(String[] indices) {
+        if (indices != null && indices.length > 0) {
+          for (String index : indices) {
+            if (index == null || index.contains("..") || index.contains("/")
+                || index.startsWith("_") || index.contains("*")) {
+              throw new IllegalArgumentException("Invalid index name: " + index);
+            }
+          }
+            return "/" + String.join(",", indices) + "/_search";
+        }
+        return "/_search";
     }
+
 
 
     /**
@@ -136,24 +237,23 @@ public class SearchServlet extends HttpServlet {
      *
      * @param request  servlet request
      * @param response servlet response
-     * @throws ServletException if a servlet-specific error occurs
      * @throws IOException      if an I/O error occurs
      */
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
+            throws IOException {
+
+        ObjectNode objectNode = jsonMapper.createObjectNode();
+        objectNode.put("field", 405);
+        objectNode.put("message","Method Not Allowed");
+
 
         request.setCharacterEncoding("UTF-8");
         response.setContentType("application/json;charset=UTF-8");
+        response.setStatus(HttpServletResponse.SC_METHOD_NOT_ALLOWED);
 
         try (PrintWriter out = response.getWriter()) {
-            out.write(XContentFactory.jsonBuilder()
-                    .startObject()
-                    .field("code", 405)
-                    .field("message", "Method Not Allowed")
-                    .endObject()
-                    .string()
-             );
+            out.write(objectNode.toPrettyString());
         }
     }
 

@@ -21,7 +21,14 @@ public class Params {
     public static final String INDEX_BOOST = "index_boost";
     public static final int DEFAULT_FROM = 0;
     public static final int DEFAULT_SIZE = 10;
-
+    public static final int MAX_SIZE = 1000;
+    //Reject long query strings up front (cheap guard against boolean/clause explosion) (H1)
+    public static final int MAX_QUERY_LENGTH = 512;
+    //Per-shard, best-effort search time budget to bound slow/expensive queries (H1)
+    public static final String SEARCH_TIMEOUT = "3s";
+    //Per-shard document-collection cap; an upper guard set to match the trackTotalHits ceiling
+    //so it does not change count/facet accuracy within the tracked range (H1)
+    public static final long TERMINATE_AFTER = 500_000L;
     /**
      * A static inner class for holding date fields to perform date ranges.
      **/

@@ -1,26 +1,28 @@
 package no.uib.marcus.search;
 
-import no.uib.marcus.common.util.AggregationUtils;
-import org.apache.log4j.Logger;
-import org.elasticsearch.action.search.SearchPhaseExecutionException;
-import org.elasticsearch.action.search.SearchRequestBuilder;
-import org.elasticsearch.action.search.SearchResponse;
-import org.elasticsearch.client.Client;
-import org.elasticsearch.common.Nullable;
-import org.elasticsearch.common.Strings;
-import org.elasticsearch.common.xcontent.XContentBuilder;
-import org.elasticsearch.common.xcontent.XContentFactory;
-import org.elasticsearch.index.query.FilterBuilder;
-import org.elasticsearch.search.sort.SortBuilder;
+import co.elastic.clients.elasticsearch.ElasticsearchClient;
+import co.elastic.clients.elasticsearch._types.SortOptions;
+import co.elastic.clients.elasticsearch._types.query_dsl.BoolQuery;
 
-import javax.validation.constraints.NotNull;
-import java.io.IOException;
+import co.elastic.clients.elasticsearch.core.SearchResponse;
+import co.elastic.clients.util.ObjectBuilder;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import java.util.logging.Level;
+import no.uib.marcus.common.util.AggregationUtils;
+
+import java.util.Arrays;
+import java.util.logging.Logger;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+
+
+import jakarta.annotation.Nullable;
 import java.util.List;
 import java.util.Map;
+import no.uib.marcus.common.util.StringUtils;
 
 /**
  * This class provides a skeletal implementation of {@link SearchBuilder} interface to minimize
- * the effort required to implement the interface when building your own search builder. The idea here is that,
+ * the effort required to implement the interface when building your own search builder. The idea here is that
  * all custom search builders should inherit from this class.
  *
  * @author Hemed Ali Al Ruwehy
@@ -30,48 +32,49 @@ import java.util.Map;
  */
 public abstract class AbstractSearchBuilder<T extends AbstractSearchBuilder<T>> implements SearchBuilder<T> {
     private final Logger logger = Logger.getLogger(getClass().getName());
-    private Client client;
+    private ElasticsearchClient client;
     @Nullable
     private String[] indices;
     @Nullable
-    private String[] types;
-    @Nullable
     private String queryString;
-    private FilterBuilder filter, postFilter;
+    private BoolQuery filter;
+  private BoolQuery postFilter;
     private Map<String, List<String>> selectedFacets;
     private String aggregations;
-    private SortBuilder sortBuilder;
+    private ObjectBuilder<SortOptions> sortBuilder;
     private String indexToBoost;
     private int from = 0;
     private int size = 10;
+
+    private static final ObjectMapper objectMapper =  new ObjectMapper();
 
     /**
      * Sole constructor. (For invocation by subclass constructors, typically implicit.)
      *
      * @param client a non-null Elasticsearch client to communicate with a cluster.
      */
-    protected AbstractSearchBuilder(@NotNull Client client) {
+    protected AbstractSearchBuilder(ElasticsearchClient client) {
         if (client == null) {
-            throw new IllegalParameterException("Unable to initialize service. Client cannot be null");
+            throw new IllegalArgumentException("Unable to initialize service. Client cannot be null");
         }
+        logger.log(Level.FINE, "super initialized {0}", client);
         this.client = client;
     }
 
-    /**
-     * A "getThis" trick is a way to recover the type of the this object in the class hierarchies.
-     * It avoids the "unchecked warnings" from the compiler.
-     */
-    //protected abstract T getThis();
 
     /**
      * Ensure this string or array of string is neither null nor empty
      */
     public static boolean isNeitherNullNorEmpty(String... s) {
-        return s != null && s.length > 0;
+      if (s == null || s.length == 0) return false;
+      for (String str : s) {
+        if (str == null || str.isEmpty()) return false;
+      }
+      return true;
     }
 
     /**
-     * Get aggregations or <tt>null</tt> if not set
+     * Get aggregations or {@code null} if not set
      */
     public String getAggregations() {
         return aggregations;
@@ -93,9 +96,9 @@ public abstract class AbstractSearchBuilder<T extends AbstractSearchBuilder<T>> 
     }
 
     /**
-     * Get sort builder or <tt>null</tt> if not set
+     * Get sort builder or {@code null} if not set
      */
-    public SortBuilder getSortBuilder() {
+    public ObjectBuilder<SortOptions> getSortBuilder() {
         return sortBuilder;
     }
 
@@ -106,15 +109,15 @@ public abstract class AbstractSearchBuilder<T extends AbstractSearchBuilder<T>> 
      * @return this object where sort has been set
      */
     @SuppressWarnings("unchecked")
-    public T setSortBuilder(SortBuilder sortBuilder) {
+    public T setSortBuilder(ObjectBuilder<SortOptions> sortBuilder) {
         this.sortBuilder = sortBuilder;
         return (T) this;
     }
 
     /**
-     * Get sort builder or <tt>null</tt> if not set
+     * Get top-level filter or {@code null} if not set
      **/
-    public FilterBuilder getFilter() {
+    public BoolQuery getFilter() {
         return filter;
     }
 
@@ -125,15 +128,15 @@ public abstract class AbstractSearchBuilder<T extends AbstractSearchBuilder<T>> 
      * @return this object where filter has been set
      */
     @SuppressWarnings("unchecked")
-    public T setFilter(FilterBuilder filter) {
+    public T setFilter(BoolQuery filter) {
         this.filter = filter;
         return (T) this;
     }
 
     /**
-     * Get post filter or <tt>null</tt> if not set
+     * Get POST filter or {@code null} if not set
      */
-    public FilterBuilder getPostFilter() {
+    public BoolQuery getPostFilter() {
         return postFilter;
     }
 
@@ -145,7 +148,7 @@ public abstract class AbstractSearchBuilder<T extends AbstractSearchBuilder<T>> 
      * @return this object where post_filter has been set
      */
     @SuppressWarnings("unchecked")
-    public T setPostFilter(FilterBuilder filter) {
+    public T setPostFilter(BoolQuery filter) {
         if(filter != null) {
             this.postFilter = filter;
         }
@@ -157,21 +160,21 @@ public abstract class AbstractSearchBuilder<T extends AbstractSearchBuilder<T>> 
     }
 
     /**
-     * Set index that need to be boosted
+     * Set the index that needs to be boosted
      *
      * @param indexToBoost an index to boost
-     * @return this builder where index to boost has been set
+     * @return this builder where the index to boost has been set
      */
     @SuppressWarnings("unchecked")
     public T setIndexToBoost(String indexToBoost) {
-        if(Strings.hasText(indexToBoost)) {
+        if(StringUtils.hasText(indexToBoost)) {
             this.indexToBoost = indexToBoost;
         }
         return (T) this;
     }
 
     /**
-     * Get selected filters or <tt>null</tt> if not set
+     * Get selected filters or {@code null} if not set
      *
      * @return a map containing selected filters
      */
@@ -187,16 +190,16 @@ public abstract class AbstractSearchBuilder<T extends AbstractSearchBuilder<T>> 
      */
     @SuppressWarnings("unchecked")
     public T setSelectedFacets(Map<String, List<String>> selectedFacets) {
-        if (selectedFacets != null && !selectedFacets.isEmpty()) {
+        if (selectedFacets != null) {
             this.selectedFacets = selectedFacets;
         }
         return (T) this;
     }
 
     /**
-     * Get Elasticsearch client for this service
+     * Get the Elasticsearch client for this service
      */
-    public Client getClient() {
+    public ElasticsearchClient getClient() {
         return client;
     }
 
@@ -204,10 +207,10 @@ public abstract class AbstractSearchBuilder<T extends AbstractSearchBuilder<T>> 
      * Set Elasticsearch client
      *
      * @param client Elasticsearch client to communicate with a cluster. Cannot be <code>null</code>
-     * @return this object where client has been set
+     * @return this object where the client has been set
      */
     @SuppressWarnings("unchecked")
-    public T setClient(@NotNull Client client) {
+    public T setClient(ElasticsearchClient client) {
         if (client == null) {
             throw new IllegalParameterException("Unable to initialize service. Client cannot be null");
         }
@@ -235,25 +238,6 @@ public abstract class AbstractSearchBuilder<T extends AbstractSearchBuilder<T>> 
     }
 
     /**
-     * Get index types for this service
-     */
-    public String[] getTypes() {
-        return types;
-    }
-
-    /**
-     * Set index types to be executed upon, default to all types in the index.
-     *
-     * @param types index types
-     * @return this object where index types are set
-     */
-    @SuppressWarnings("unchecked")
-    public T setTypes(String... types) {
-        this.types = types;
-        return (T) this;
-    }
-
-    /**
      * Get documents offset, default to 0.
      */
     public int getFrom() {
@@ -275,7 +259,7 @@ public abstract class AbstractSearchBuilder<T extends AbstractSearchBuilder<T>> 
     }
 
     /**
-     * Get size of the returned documents, default to 10.
+     * Get the size of the returned documents, default to 10.
      **/
     public int getSize() {
         return size;
@@ -284,7 +268,7 @@ public abstract class AbstractSearchBuilder<T extends AbstractSearchBuilder<T>> 
     /**
      * Set how many documents to be returned, default to 10.
      *
-     * @param size a size of document returned
+     * @param size a size of the document returned
      * @return this object where size has been set
      */
     @SuppressWarnings("unchecked")
@@ -296,7 +280,7 @@ public abstract class AbstractSearchBuilder<T extends AbstractSearchBuilder<T>> 
     }
 
     /**
-     * Get query string for this service
+     * Get the query string for this service
      */
     public String getQueryString() {
         return queryString;
@@ -306,7 +290,7 @@ public abstract class AbstractSearchBuilder<T extends AbstractSearchBuilder<T>> 
      * Set a query string
      *
      * @param queryString a query string
-     * @return this object where query string has been set.
+     * @return this object where the query string has been set.
      */
     @SuppressWarnings("unchecked")
     public T setQueryString(@Nullable String queryString) {
@@ -315,30 +299,23 @@ public abstract class AbstractSearchBuilder<T extends AbstractSearchBuilder<T>> 
     }
 
     /**
-     * Construct search request based on the service settings. Should be implemented by subclasses
-     */
-    @Override
-    public abstract SearchRequestBuilder constructSearchRequest();
-
-    /**
      * Get all documents based on the service settings.
      *
      * @return a SearchResponse, can be <code>null</code>, which means search was not successfully executed.
      */
     @Override
     @Nullable
-    public SearchResponse executeSearch() {
-        SearchResponse response = null;
+    public SearchResponse<ObjectNode> executeSearch() {
+
+        SearchResponse<ObjectNode> response;
         try {
-            response = constructSearchRequest().execute().actionGet();
+            response = client.search(constructSearchRequest().build(), ObjectNode.class);
             //Show response for debugging purpose
-            //logger.info(response.toString());
-            //System.out.println(response.toString());
-        } catch (SearchPhaseExecutionException e) {
-            //I've not found a direct way to validate a query string. Therefore, the idea here is to catch any
-            //exception that is related to search execution.
-            //logger.error("Could not execute search: " + e.getDetailedMessage());
-            throw e;
+            logger.log(Level.FINE, "response: {0}", response);
+        } catch (java.io.IOException e) {
+          //I've not found a direct way to validate a query string. Therefore, the idea here is to catch any
+          //exception related to search execution.
+          throw new RuntimeException("Could not execute search", e);
         }
         return response;
     }
@@ -351,18 +328,13 @@ public abstract class AbstractSearchBuilder<T extends AbstractSearchBuilder<T>> 
      */
     @Override
     public String toString() {
-        try {
-            XContentBuilder jsonObj = XContentFactory.jsonBuilder().prettyPrint()
-                    .startObject()
-                    .field("indices", getIndices() == null ? Strings.EMPTY_ARRAY : getIndices())
-                    .field("type", getTypes() == null ? Strings.EMPTY_ARRAY : getTypes())
-                    .field("from", getFrom())
-                    .field("size", getSize())
-                    .field("aggregations", getAggregations() == null ? Strings.EMPTY_ARRAY : getAggregations())
-                    .endObject();
-            return jsonObj.string();
-        } catch (IOException e) {
-            return "{ \"error\" : \"" + e.getMessage() + "\"}";
-        }
+        ObjectNode jsonObj = objectMapper.createObjectNode();
+
+        jsonObj = jsonObj.put("indices",  getIndices() == null || getIndices().length == 0   ?  "" : Arrays.toString(getIndices()))
+                .put("from", getFrom())
+                .put("size", getSize())
+                .put("aggregations", getAggregations() == null ? "" : getAggregations());
+
+        return jsonObj.toString();
     }
 }

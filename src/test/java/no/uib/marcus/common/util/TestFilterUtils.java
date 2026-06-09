@@ -3,6 +3,8 @@ package no.uib.marcus.common.util;
 import com.carrotsearch.randomizedtesting.RandomizedTest;
 import no.uib.marcus.range.DateRange;
 import org.junit.Test;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.assertFalse;
 
 import java.text.ParseException;
 

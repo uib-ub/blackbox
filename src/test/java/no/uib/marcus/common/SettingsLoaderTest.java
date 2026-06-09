@@ -3,11 +3,13 @@ package no.uib.marcus.common;
 import com.carrotsearch.randomizedtesting.RandomizedTest;
 import no.uib.marcus.common.loader.JsonFileLoader;
 import no.uib.marcus.common.loader.UnavailableResourceException;
-import org.apache.log4j.Logger;
+import java.util.logging.Logger;
 import org.junit.Test;
 
 import java.io.IOException;
 import java.util.Map;
+
+import static org.junit.Assert.*;
 
 public class SettingsLoaderTest extends RandomizedTest {
     private final Logger logger = Logger.getLogger(getClass().getName());
@@ -17,21 +19,11 @@ public class SettingsLoaderTest extends RandomizedTest {
      */
     @Test
     public void testReadingJsonFileProperties() throws Exception {
-        String properties = "{\n" +
-                "  \"ubbcluster\": {\n" +
-                "    \"name\": \"elasticsearch\",\n" +
-                "    \"node_name\": \"Blackbox\",\n" +
-                "    \"host\": \"uib.no/ub\",\n" +
-                "    \"transport_port\": 80\n" +
-                "  }\n" +
-                "}";
-
-        Map<String, String> settings = new JsonFileLoader().toMap(properties);
-        //logger.info("Testing if cluster properties file exist: " + !settings.isEmpty());
-        assertTrue(!settings.isEmpty());
-        assertEquals("elasticsearch", settings.get("ubbcluster.name"));
-        assertEquals("Blackbox", settings.get("ubbcluster.node_name"));
-        assertEquals("uib.no/ub", settings.get("ubbcluster.host"));
+        Map<String, String> settings = new JsonFileLoader().toMap("settings-loader-test.json");
+        assertFalse(settings.isEmpty());
+        assertEquals("elasticsearch", settings.get("name"));
+        assertEquals("Blackbox", settings.get("node_name"));
+        assertEquals("uib.no/ub", settings.get("host"));
     }
 
 
@@ -39,7 +31,7 @@ public class SettingsLoaderTest extends RandomizedTest {
      * Testing loading non-existing file from resource
      */
     @Test(expected = UnavailableResourceException.class)
-    public void testFileUnavailableFileFromResource() {
+    public void testFileUnavailableFileFromResource() throws IOException {
         new JsonFileLoader().loadFromResource("hakuna-matata.json");
     }
 
@@ -52,23 +44,20 @@ public class SettingsLoaderTest extends RandomizedTest {
         //We use this for testing..
         String fileName = "config.template.example.json";
         JsonFileLoader loader = new JsonFileLoader();
-        String jsonString;
+        Map<String, String> settings;
         try {
-            jsonString = loader.loadFromResource(fileName);
+            settings = loader.toMap(fileName);
         } catch (UnavailableResourceException ex) {
-            //Load from resource
-            fileName = "config.template.json";
-            jsonString = loader.loadFromResource(fileName);
+            fileName = "settings-loader-test.json";
+            settings = loader.toMap(fileName);
         }
 
         logger.info("Validating config file from: " + loader.getPathFromResource(fileName));
-        Map<String, String> settings = loader.toMap(jsonString);
-        assertNotNull(jsonString);
         assertNotNull(settings);
-        assertTrue(!jsonString.isEmpty());
-        assertTrue("Does cluster name exist? : ", !settings.get("cluster.name").isEmpty());
-        assertTrue("Does host name exist? : ", !settings.get("cluster.host").isEmpty());
-        assertTrue("Does port exist? : ", !settings.get("cluster.port").isEmpty());
+        assertFalse(settings.isEmpty());
+        assertFalse("Does cluster name exist? : ", settings.get("name").isEmpty());
+        assertFalse("Does host name exist? : ", settings.get("host").isEmpty());
+        assertFalse("Does port exist? : ", settings.get("port").isEmpty());
     }
 
 

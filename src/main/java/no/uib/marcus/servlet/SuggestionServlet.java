@@ -1,21 +1,23 @@
 package no.uib.marcus.servlet;
 
-import com.google.gson.Gson;
+import com.fasterxml.jackson.databind.json.JsonMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import no.uib.marcus.common.Params;
+import no.uib.marcus.common.util.StringUtils;
 import no.uib.marcus.search.suggestion.CompletionSuggestion;
-import org.elasticsearch.common.Strings;
-import org.elasticsearch.common.xcontent.XContentFactory;
 
-import javax.servlet.ServletException;
-import javax.servlet.annotation.WebServlet;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.annotation.WebServlet;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
- * This servlet processes all HTTP requests coming from "/suggest" endpoint
+ * This servlet processes all HTTP requests coming from the "/suggest" endpoint
  *
  * @author Hemed Ali
  */
@@ -24,25 +26,46 @@ import java.io.PrintWriter;
         urlPatterns = {"/suggest"}
 )
 public class SuggestionServlet extends HttpServlet {
-
+    private static final Logger logger = Logger.getLogger(SuggestionServlet.class.getName());
     private static final long serialVersionUID = 2L;
     private static final int DEFAULT_SIZE = 5;
+    private static final int SUGGESTION_MAX_SIZE = 15;
+    private static final JsonMapper jsonMapper = new JsonMapper(); // Reusable, thread-safe
 
-    private void processRequest(HttpServletRequest request, HttpServletResponse response)
+
+  private void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws IOException {
         request.setCharacterEncoding("UTF-8");
         response.setContentType("application/json;charset=UTF-8");
 
         String suggestText = request.getParameter(Params.QUERY_STRING);
         String[] indices = request.getParameterValues(Params.INDICES);
-        String size = request.getParameter(Params.SIZE);
+        int suggestSize = StringUtils.parseIntWithDefault(request.getParameter(Params.SIZE),DEFAULT_SIZE,1,SUGGESTION_MAX_SIZE);
         String jsonString;
 
         try (PrintWriter out = response.getWriter()) {
-            int suggestSize = Strings.hasText(size) ? Integer.parseInt(size) : DEFAULT_SIZE;
-            jsonString = new Gson()
-                    .toJson(CompletionSuggestion.getSuggestions(suggestText, suggestSize, indices));
+          //Reject over-length query strings up front (H1)
+          if (suggestText != null && suggestText.length() > Params.MAX_QUERY_LENGTH) {
+            response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+            ObjectNode error = jsonMapper.createObjectNode();
+            error.put("error", "Query parameter 'q' exceeds the maximum length of "
+                + Params.MAX_QUERY_LENGTH + " characters");
+            out.write(error.toString());
+            return;
+          }
+          try {
+            jsonString = jsonMapper.writeValueAsString(
+                CompletionSuggestion.getSuggestions(suggestText, suggestSize, indices));
             out.write(jsonString);
+          } catch (Exception e) {
+            response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+            ObjectNode errorNode = jsonMapper.createObjectNode();
+            errorNode.put("code", 500);
+            errorNode.put("message", "An error occurred while fetching suggestions");
+            out.write(errorNode.toString());
+           logger.log(Level.SEVERE, "Suggestion error", e);
+           throw e;
+          }
         }
     }
 
@@ -63,17 +86,16 @@ public class SuggestionServlet extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+        ObjectNode objectNode = jsonMapper.createObjectNode();
+        objectNode.put("code", 405);
+        objectNode.put("message", "Method Not Allowed");
 
-        request.setCharacterEncoding("UTF-8");
         response.setContentType("application/json;charset=UTF-8");
+        response.setStatus(HttpServletResponse.SC_METHOD_NOT_ALLOWED);
+        request.setCharacterEncoding("UTF-8");
 
         try (PrintWriter out = response.getWriter()) {
-            out.write(XContentFactory.jsonBuilder()
-                    .startObject()
-                    .field("code", 405)
-                    .field("message", "Method Not Allowed")
-                    .endObject()
-                    .string()
+            out.write(objectNode.toPrettyString()
             );
         }
     }

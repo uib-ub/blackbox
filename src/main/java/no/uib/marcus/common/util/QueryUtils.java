@@ -1,15 +1,21 @@
 package no.uib.marcus.common.util;
 
-import org.elasticsearch.action.search.SearchResponse;
-import org.elasticsearch.common.Strings;
-import org.elasticsearch.common.xcontent.ToXContent;
-import org.elasticsearch.common.xcontent.XContentBuilder;
-import org.elasticsearch.common.xcontent.XContentFactory;
-import org.elasticsearch.index.query.QueryBuilders;
-import org.elasticsearch.index.query.QueryStringQueryBuilder;
-import org.elasticsearch.index.query.SimpleQueryStringBuilder;
+import co.elastic.clients.elasticsearch._types.query_dsl.Operator;
+import co.elastic.clients.elasticsearch._types.query_dsl.QueryStringQuery;
+import co.elastic.clients.elasticsearch._types.query_dsl.SimpleQueryStringQuery;
+import co.elastic.clients.elasticsearch.core.SearchResponse;
+import co.elastic.clients.json.jackson.JacksonJsonpGenerator;
+import co.elastic.clients.json.jackson.JacksonJsonpMapper;
+
+import com.fasterxml.jackson.core.JsonFactory;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+
+import jakarta.json.stream.JsonGenerator;
 
 import java.io.IOException;
+import java.io.StringWriter;
+
+import java.util.List;
 
 import static no.uib.marcus.common.util.BlackboxUtils.isNullOrEmpty;
 
@@ -20,28 +26,31 @@ public final class QueryUtils {
 
     private static final char WILDCARD = '*';
 
-    //Elasticsearch reserved characters (without minus sign)
+    //Elasticsearch reserved characters (without the minus sign)
     private static final char[] RESERVED_CHARS = {
-            '*', '"', '\\', '/', '=', '&', '|', '>', '<', '!', '(', ')',
-            '{', '}', '[', ']', '^', '~', '?', ':', '/', '/', '!', '[', ']', '{', '}'
+            '*', '"', '\\', '/', '=', '&', '|', '>', '<', '(', ')',
+            '{', '}', '^', '~', '?', ':', '!', '[', ']'
     };
 
-    private QueryUtils() {
+  private static final JacksonJsonpMapper JSONP_MAPPER = new JacksonJsonpMapper();
+  private static final JsonFactory JSON_FACTORY = new JsonFactory();
+  private static final List<String> SEARCH_FIELDS = List.of("identifier", "label", "all", "all.exact");
+  private static final List<String> WAB_SEARCH_FIELDS = List.of("label", "publishedIn", "publishedInPart", "all", "all_keyword");
+
+  private QueryUtils() {
     }
 
     /**
      * Build a simple query string
      *
      * @param queryString a query string
-     * @return a builder for simple query string
+     * @return a builder for the simple query string
      */
-    public static SimpleQueryStringBuilder buildMarcusSimpleQueryString(String queryString) {
-        return QueryBuilders.simpleQueryStringQuery(queryString)
-                .analyzer("default")//The custom "default" analyzer is defined in the "_settings".
-                .field("identifier")//Not analyzed field
-                .field("label", 3)//Not analyzed field.
-                .field("_all")
-                .defaultOperator(SimpleQueryStringBuilder.Operator.AND);
+    public static SimpleQueryStringQuery.Builder buildMarcusSimpleQueryString(String queryString) {
+        return new SimpleQueryStringQuery.Builder()
+            .query(queryString)
+            .fields(SEARCH_FIELDS)
+            .defaultOperator(Operator.And);
     }
 
     /**
@@ -50,26 +59,36 @@ public final class QueryUtils {
      * @param queryString a query string
      * @return a builder for query string
      */
-    public static QueryStringQueryBuilder buildMarcusQueryString(String queryString) {
-        return QueryBuilders.queryStringQuery(queryString)
-                .analyzer("default")//The custom "default" analyzer is defined in the "_settings".
-                .field("identifier")//Not analyzed field
-                .field("label", 3)//Not analyzed field.
-                .field("_all")
-                .defaultOperator(QueryStringQueryBuilder.Operator.AND);
+    public static QueryStringQuery.Builder buildMarcusQueryString(String queryString) {
+        QueryStringQuery.Builder builder = new QueryStringQuery.Builder();
+        return builder.query(queryString)
+                .fields(SEARCH_FIELDS)
+                .defaultOperator(Operator.And);
+    }
+
+    /**
+     * Build a query string query for WAB
+     *
+     * @param queryString a query string
+     * @return a builder for query string
+     */
+    public static QueryStringQuery.Builder buildWabQueryString(String queryString) {
+        return new QueryStringQuery.Builder()
+                .query(queryString)
+                .fields(WAB_SEARCH_FIELDS)
+                .defaultOperator(Operator.And);
     }
 
 
     /**
-     * Adds a trailing wildcard to a single term query, if it does not contain reserved characters
-     *
-     * @param queryString a string to add such wildcard
+     * Adds a trailing wildcard to a single-term query if it does not contain reserved characters
+     * @param queryString a string to add such as wildcard
      * @return the given string with a wildcard appended to the end
      */
     public static String appendTrailingWildcardIfSingleTerm(String queryString) {
         if (!isNullOrEmpty(queryString)
                 && Character.isLetter(queryString.charAt(0))
-                && !Strings.containsWhitespace(queryString)
+                && !StringUtils.containsWhitespace(queryString)
                 && !containsReservedChars(queryString)) {
 
             return queryString + WILDCARD;
@@ -78,12 +97,11 @@ public final class QueryUtils {
     }
 
 
-
     /**
      * Checks if a given string contains Elasticsearch reserved characters
      *
      * @param s a given string
-     * @return <tt>true</tt> if a given string contains a reserved character, otherwise <tt>false</tt>
+     * @return {@code true} if a given string contains a reserved character, otherwise {@code false}
      */
     public static boolean containsReservedChars(String s) {
         if (isNullOrEmpty(s)) {
@@ -105,21 +123,25 @@ public final class QueryUtils {
      * @param isPretty a boolean value to show whether the JSON string should be pretty printed.
      * @return search hits as a JSON string
      **/
-    public static String toJsonString(final SearchResponse response, final boolean isPretty) {
-        try {
-            if (response == null) {
-                return "{ \"error\" : \"" + "Could not execute search. See internal server logs" + "\"}";
-            }
-            XContentBuilder builder = XContentFactory.jsonBuilder();
-            if (isPretty) {
-                builder.prettyPrint();
-            }
-            builder.startObject();
-            response.toXContent(builder, ToXContent.EMPTY_PARAMS);
-            builder.endObject();
-            return builder.string();
-        } catch (IOException e) {
-            return "{ \"error\" : \"" + e.getMessage() + "\"}";
+    public static String toJsonString(final SearchResponse<ObjectNode> response, final boolean isPretty)
+        throws IOException {
+      if (response == null) {
+        // @todo: replace with jackson building and adding to ObjectNode
+        return "{ \"error\" : \"" + "Could not execute search. See internal server logs"
+            + "\"}";
+      }
+
+      try (StringWriter writer = new StringWriter();
+          com.fasterxml.jackson.core.JsonGenerator jacksonGenerator = JSON_FACTORY.createGenerator(
+              writer)) {
+
+        if (isPretty) {
+          jacksonGenerator.useDefaultPrettyPrinter();
         }
+        try (JsonGenerator generator = new JacksonJsonpGenerator(jacksonGenerator)) {
+          response.serialize(generator, JSONP_MAPPER);
+          return writer.toString();
+        }
+      }
     }
 }

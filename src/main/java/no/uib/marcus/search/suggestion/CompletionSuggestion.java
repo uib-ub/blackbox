@@ -1,15 +1,18 @@
 package no.uib.marcus.search.suggestion;
 
-import com.google.gson.Gson;
-import no.uib.marcus.client.ClientFactory;
-import org.apache.log4j.Logger;
-import org.elasticsearch.action.suggest.SuggestRequestBuilder;
-import org.elasticsearch.action.suggest.SuggestResponse;
-import org.elasticsearch.common.Nullable;
-import org.elasticsearch.search.suggest.Suggest;
-import org.elasticsearch.search.suggest.SuggestBuilder.SuggestionBuilder;
-import org.elasticsearch.search.suggest.completion.CompletionSuggestionBuilder;
+import co.elastic.clients.elasticsearch.ElasticsearchClient;
+import co.elastic.clients.elasticsearch.core.SearchResponse;
+import co.elastic.clients.elasticsearch.core.search.*;
 
+import com.fasterxml.jackson.databind.node.ObjectNode;
+
+import java.util.logging.Level;
+import no.uib.marcus.client.ElasticsearchClientFactory;
+import co.elastic.clients.elasticsearch.core.SearchRequest.Builder;
+
+import jakarta.annotation.Nullable;
+import java.io.IOException;
+import java.util.logging.Logger;
 import java.util.*;
 
 /**
@@ -20,8 +23,13 @@ import java.util.*;
  */
 public class CompletionSuggestion {
 
-    private static final Logger logger = Logger.getLogger(CompletionSuggestion.class);
+    private static final Logger logger = Logger.getLogger(CompletionSuggestion.class.getName());
     private static final String SUGGEST_FIELD = "suggest";
+
+  // Private constructor to prevent instantiation
+   private CompletionSuggestion() {
+    throw new IllegalStateException("Utility class");
+  }
 
     /**A method to get a list of suggestions.
      * @param text input text
@@ -32,21 +40,19 @@ public class CompletionSuggestion {
     public static Set<String> getSuggestions(String text, int size, @Nullable String... indices) {
         Set<String> suggestValues = new HashSet<>();
         try {
-            SuggestResponse suggestResponse = getSuggestionResponse(text, size, indices);
+            SearchResponse<ObjectNode> suggestResponse = getSuggestionResponse(text, size, indices);
+            List<Suggestion<ObjectNode>> suggestions = suggestResponse.suggest().get(SUGGEST_FIELD);
 
             //Add each option(value) to a set to ensure no repetition
-            for (Suggest.Suggestion.Entry.Option option : suggestResponse
-                    .getSuggest()
-                    .getSuggestion("completion_suggestion")
-                    .iterator()
-                    .next()
-                    .getOptions()) {
-                // Lowecasing is done via ubb-rdf-river
-                // suggestValues.add(option.getText().string().toLowerCase());
-                suggestValues.add(option.getText().string());
+            for ( Suggestion<ObjectNode> suggestion : suggestions) {
+              List<CompletionSuggestOption<ObjectNode>> options = suggestion.completion().options();
+              for (CompletionSuggestOption<ObjectNode> option : options) {
+                logger.log(Level.FINE,"completion: {0}", option.text());
+                suggestValues.add(option.text());
+              }
             }
         } catch (Exception e) {
-            logger.error("Unable to perform suggestion for text: [" + text + "]. Message: " + e.getLocalizedMessage()) ;
+            logger.severe("Unable to perform suggestion for text: [" + text + "]. Message: " + e.getLocalizedMessage()) ;
         }
         //We want suggestion values to be sorted, hence we put them in a tree set
         return new TreeSet<>(suggestValues);
@@ -58,40 +64,26 @@ public class CompletionSuggestion {
      * @param indices array of one or more setIndices, can be <code>null</code>
      * @return a suggestion response.
      **/
-    public static SuggestResponse getSuggestionResponse(String text, int size, @Nullable String... indices) {
-        SuggestionBuilder suggestionsBuilder = new CompletionSuggestionBuilder("completion_suggestion");
-        SuggestResponse suggestResponse = null;
-        SuggestRequestBuilder suggestRequest;
+    public static SearchResponse<ObjectNode> getSuggestionResponse(String text, int size, @Nullable String... indices) throws IOException {
+        Map<String, FieldSuggester> map = new HashMap<>();
+        map.put(SUGGEST_FIELD,FieldSuggester.of(fs -> fs
+            .completion(cs -> cs.skipDuplicates(true)
+                .size(size)
+                .field(SUGGEST_FIELD)
+                .analyzer("keyword"))));
+        logger.log(Level.FINE, "getSuggestionResponse: {0}", map);
 
-        try {
-            suggestionsBuilder.field(SUGGEST_FIELD);
-            suggestionsBuilder.text(text);
-            suggestionsBuilder.size(size);
-
-            suggestRequest = ClientFactory.getTransportClient().prepareSuggest();
-            suggestRequest.addSuggestion(suggestionsBuilder);
-
-            if (indices != null && indices.length > 0) {
-                suggestRequest.setIndices(indices);
-            }
-
-            //Execute suggestions
-            suggestResponse = suggestRequest.execute().actionGet();
-
-        } catch (Exception e) {
-           logger.error("Exception " +  e.getLocalizedMessage());
+        Suggester suggester = Suggester.of(sf -> sf.suggesters(map).text(text));
+        Builder builder = new Builder();
+        builder.suggest(suggester);
+        ElasticsearchClient client = ElasticsearchClientFactory.getElasticsearchClient();
+        if (indices != null && indices.length > 0) {
+            builder.index(List.of(indices));
         }
-        return suggestResponse;
-    }
-
-    //Main method for easy debugging
-    public static void main(String[] args) {
-        Gson gson = new Gson();
-        String jsonString = gson.toJson(
-                CompletionSuggestion
-                        .getSuggestions("Ms-114,120v[7]", 10, "wab"));
-
-        logger.info(jsonString);
+        builder.size(0);
+        SearchResponse<ObjectNode> response = client.search(builder.build(), ObjectNode.class);
+        logger.log(Level.FINE, "getSuggestionResponse: {0}", response.suggest().get(SUGGEST_FIELD));
+        return response;
     }
 
 }

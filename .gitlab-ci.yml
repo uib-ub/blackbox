@@ -1,0 +1,102 @@
+image: docker:cli
+# Anchors
+.docker_login: &docker_login
+    - echo -n $CI_JOB_TOKEN | docker login -u gitlab-ci-token --password-stdin $CI_REGISTRY
+
+.build_container_image:
+  script:
+    - *docker_login
+    - cd $dir
+    - export TIMESTAMP=$(date +%Y-%m-%dT%H%M)
+    - export TIMESTAMP_TAG=test-$TIMESTAMP
+    # Persist the timestamp so the promote job can reuse the exact same datetag
+    - echo "TIMESTAMP=$TIMESTAMP" >> $CI_PROJECT_DIR/build.env
+    - docker pull $CI_REGISTRY_IMAGE/$image_name:latest || true
+    - docker build --progress=plain -f ./$dockerfile --cache-from $CI_REGISTRY_IMAGE/$image_name:latest
+      --tag $CI_REGISTRY_IMAGE/$image_name:$TIMESTAMP_TAG
+      --tag $CI_REGISTRY_IMAGE/$image_name:$CI_COMMIT_SHORT_SHA
+      --tag $CI_REGISTRY_IMAGE/$image_name:latest
+      .
+    - docker push $CI_REGISTRY_IMAGE/$image_name:$TIMESTAMP_TAG
+    - docker push $CI_REGISTRY_IMAGE/$image_name:$CI_COMMIT_SHORT_SHA
+    - docker push $CI_REGISTRY_IMAGE/$image_name:latest
+  artifacts:
+    reports:
+      dotenv: build.env
+
+.promote:
+  script:
+    - *docker_login
+    - docker pull $CI_REGISTRY_IMAGE/$image_name:$existing_tag
+    - docker tag $CI_REGISTRY_IMAGE/$image_name:$existing_tag $CI_REGISTRY_IMAGE/$image_name:$new_tag
+    - docker push $CI_REGISTRY_IMAGE/$image_name:$new_tag
+
+.security_scan:
+  image:
+    name: aquasec/trivy:v0.69.3
+    entrypoint: [""]
+  script:
+    - apk add --no-cache curl docker-cli
+    - curl -sSL -o /tmp/trivy-gitlab.tpl https://github.com/aquasecurity/trivy/raw/main/contrib/gitlab.tpl
+    - *docker_login
+    - echo "disable-rules:" > trivy-secret.yaml
+    - echo "  - gitlab-pat" >> trivy-secret.yaml
+    - docker pull $CI_REGISTRY_IMAGE/$image_name:$image_tag
+    - trivy image --exit-code 0 --no-progress --severity "UNKNOWN,HIGH,CRITICAL" --format template --template "@/tmp/trivy-gitlab.tpl" -o gl-container-scanning-report.json $CI_REGISTRY_IMAGE/$image_name:$image_tag
+    - trivy image --exit-code 0 --no-progress --severity "UNKNOWN,HIGH,CRITICAL" -o gl-container-scanning-report.txt $CI_REGISTRY_IMAGE/$image_name:$image_tag
+    - trivy image --exit-code 0 --no-progress --severity "UNKNOWN,HIGH,CRITICAL" $CI_REGISTRY_IMAGE/$image_name:$image_tag
+    - trivy --quiet image --exit-code 1 --no-progress --severity CRITICAL $CI_REGISTRY_IMAGE/$image_name:$image_tag >/dev/null
+  artifacts:
+    paths:
+      - gl-container-scanning-report.json
+      - gl-container-scanning-report.txt
+  allow_failure: true
+
+# Stages
+stages:
+  - build
+  - scan
+  - deploy
+
+build:
+  stage: build
+  variables:
+    image_name: blackbox-search
+    dockerfile: docker/Dockerfile
+    dir: .
+  extends:
+    - .build_container_image
+  tags:
+    - saxonee
+
+## Scans
+security_scan:
+  stage: scan
+  parallel:
+    matrix: []
+#      - scan_image_name: blackbox-search
+#        scan_image_tag: latest
+  variables:
+    image_name: $scan_image_name
+    image_tag: $scan_image_tag
+  extends:
+    - .security_scan
+
+# Manual promotion of the test image to prod, reusing the same datetag
+# produced by the build job (test-<TIMESTAMP> -> prod-<TIMESTAMP>).
+promote_prod:
+  stage: deploy
+  variables:
+    image_name: blackbox-search
+    existing_tag: test-$TIMESTAMP
+    new_tag: prod-$TIMESTAMP
+  extends:
+    - .promote
+  needs:
+    - job: build
+      artifacts: true
+  tags:
+    - saxonee
+  rules:
+    - if: '$CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH'
+      when: manual

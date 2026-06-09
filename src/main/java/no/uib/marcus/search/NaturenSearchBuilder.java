@@ -1,81 +1,70 @@
 package no.uib.marcus.search;
 
-import no.uib.marcus.common.Params;
+import co.elastic.clients.elasticsearch.ElasticsearchClient;
+import co.elastic.clients.elasticsearch._types.query_dsl.*;
+import co.elastic.clients.elasticsearch.core.SearchRequest;
+import co.elastic.clients.elasticsearch.core.search.Highlight;
+import co.elastic.clients.elasticsearch.core.search.HighlightField;
+import co.elastic.clients.util.NamedValue;
 import no.uib.marcus.common.util.QueryUtils;
-import org.apache.log4j.Logger;
-import org.elasticsearch.action.search.SearchRequestBuilder;
-import org.elasticsearch.client.Client;
-import org.elasticsearch.common.Strings;
-import org.elasticsearch.index.query.FilterBuilders;
-import org.elasticsearch.index.query.QueryBuilder;
-import org.elasticsearch.index.query.QueryBuilders;
-import org.elasticsearch.search.builder.SearchSourceBuilderException;
 
-import java.time.LocalDate;
-
-import static org.elasticsearch.index.query.functionscore.ScoreFunctionBuilders.weightFactorFunction;
-
+import java.util.List;
+import no.uib.marcus.common.util.StringUtils;
 /***
  * A search builder for naturen
  * @author Hemed Al Ruwehy
  */
 public class NaturenSearchBuilder extends MarcusSearchBuilder {
-
-    private final Logger logger = Logger.getLogger(getClass().getName());
-
-    NaturenSearchBuilder(Client client) {
+    private static final Highlight HIGHLIGHT =
+        new Highlight.Builder()
+        .fields(new NamedValue<>("textContent",
+            new HighlightField.Builder()
+                .postTags("</em>")
+                .preTags("<em class='txt-highlight'>")
+                .requireFieldMatch(false)
+                .build()
+            ))
+        .build();
+    NaturenSearchBuilder(ElasticsearchClient client) {
         super(client);
     }
 
     @Override
-    public SearchRequestBuilder constructSearchRequest() {
-        QueryBuilder query;
-        SearchRequestBuilder searchRequest = super.constructSearchRequest();
+    public SearchRequest.Builder constructSearchRequest() {
+        Query query;
+        SearchRequest.Builder searchRequest = super.constructSearchRequest();
 
-        try {
             //Set query
-            if (Strings.hasText(getQueryString())) {
-                query = QueryUtils.buildMarcusQueryString(getQueryString());
+            if (StringUtils.hasText(getQueryString())) {
+                query = QueryUtils.buildMarcusQueryString(getQueryString()).build()._toQuery();
             } else {
-                query = QueryBuilders.functionScoreQuery(QueryBuilders.matchAllQuery())
-                        .add(FilterBuilders.rangeFilter(Params.DateField.AVAILABLE)
-                                .from(LocalDate.now().minusDays(1)), weightFactorFunction(2))
-                        .add(FilterBuilders.existsFilter("hasThumbnail"), weightFactorFunction(2));
-
-                // Restrict search only on type issues
-                if (getTypes() == null || getTypes().length == 0) {
-                    // Index types are disabled from ES v6.0, we will therefore need to find
-                    // another way to do this restriction
-                    searchRequest.setTypes(BoostType.ISSUE);
+                query = QueryBuilders.functionScore().functions(List.of(
+                    new FunctionScore.Builder()
+                        .filter( new BoolQuery.Builder()
+                            .filter(List.of(QueryBuilders.term()
+                                .value(BoostType.ISSUE).field("type")
+                                .build()._toQuery(),QueryBuilders.exists()
+                                .field("hasThumbnail")
+                                .build()
+                                ._toQuery()))
+                            .build())
+                        .weight(2.0)
+                        .build()))
+                    .build()
+                    ._toQuery();
                 }
-            }
             //Set filtered query, whether with or without filter
             if (getFilter() != null) {
-                searchRequest.setQuery(QueryBuilders.filteredQuery(query, getFilter()));
+              searchRequest
+                  .query(QueryBuilders.bool().must(query)
+                      .filter(List.of(getFilter()._toQuery()))
+                      .build()._toQuery());
             } else {
-                searchRequest.setQuery(query);
+              searchRequest.query(query);
             }
-            //Set highlighting option
-            searchRequest.addHighlightedField("textContent")
-                    // .setHighlighterNoMatchSize(0) // if no match, return these characters, 0 means return all
-                    // .setHighlighterFragmentSize(500) //default 100
-                    // .setHighlighterNumOfFragments(0) //fragments to return. 0 means return everything
-                    .setHighlighterPreTags("<em class='txt-highlight'>")
-                    .setHighlighterPostTags("</em>");
+            searchRequest.highlight(HIGHLIGHT);
 
-            //Show builder for debugging purpose
-            //logger.info(searchRequest.toString());
-            //System.out.println(searchRequest.toString());
-        } catch (SearchSourceBuilderException e) {
-            logger.error("Exception occurred when building search request: " + e.getMostSpecificCause());
-        }
         return searchRequest;
     }
-
-    //Type to be boosted if nothing is specified
-    static class BoostType {
-        final static String ISSUE = "issue";
-    }
-
-
 }
+

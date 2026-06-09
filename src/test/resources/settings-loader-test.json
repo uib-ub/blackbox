@@ -1,0 +1,8 @@
+{
+  "cluster": {
+    "name": "elasticsearch",
+    "node_name": "Blackbox",
+    "host": "uib.no/ub",
+    "port": "80"
+  }
+}

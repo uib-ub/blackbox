@@ -1,13 +1,17 @@
 package no.uib.marcus.search;
 
-import org.elasticsearch.action.search.SearchRequestBuilder;
-import org.elasticsearch.action.search.SearchResponse;
-import org.elasticsearch.client.Client;
-import org.elasticsearch.common.Nullable;
-import org.elasticsearch.index.query.FilterBuilder;
-import org.elasticsearch.search.sort.SortBuilder;
+import co.elastic.clients.elasticsearch._types.query_dsl.BoolQuery;
+import co.elastic.clients.elasticsearch.core.SearchRequest;
+import co.elastic.clients.elasticsearch.core.SearchResponse;
+import co.elastic.clients.elasticsearch.ElasticsearchClient;
+import co.elastic.clients.elasticsearch._types.SortOptions;
 
-import javax.validation.constraints.NotNull;
+import co.elastic.clients.util.ObjectBuilder;
+import jakarta.annotation.Nullable;
+import jakarta.validation.constraints.NotNull;
+
+import com.fasterxml.jackson.databind.node.ObjectNode;
+
 import java.util.List;
 import java.util.Map;
 
@@ -18,11 +22,11 @@ import java.util.Map;
  */
 public interface SearchBuilder<S> {
     /**
-     * Set Elasticsearch client to the service
+     * Set a Elasticsearch client for the service
      *
      * @param client Elasticsearch client to communicate with a cluster. Cannot be <code>null</code>
      */
-    S setClient(@NotNull Client client);
+    S setClient(@NotNull ElasticsearchClient client);
 
     /**
      * Set up indices for the service, default to all indices in the cluster
@@ -30,13 +34,6 @@ public interface SearchBuilder<S> {
      * @param indices one or more indices
      */
     S setIndices(@Nullable String... indices);
-
-    /**
-     * Set up index types for the service, default to all types in an index
-     *
-     * @param types one or more index types
-     */
-    S setTypes(@Nullable String... types);
 
     /**
      * Set up a query string, default to <code>null</code> which means query for everything.
@@ -55,7 +52,7 @@ public interface SearchBuilder<S> {
     /**
      * Set how many documents to be returned
      *
-     * @param size a size of document returned
+     * @param size a size of the document returned
      */
     S setSize(int size);
 
@@ -71,38 +68,38 @@ public interface SearchBuilder<S> {
 
 
     /**
-     * Sets selected filer for this search builder.
+     * Sets selected facets for this search builder.
      *
      * @param selectedFacets in the map, keys are "fields" and values are "terms"
-     *                       e.g {"subject.exact" = ["Flyfoto" , "Birkeland"], "type" = ["Brev"]}
+     *                       e.g. {"subject.exact" = ["Flyfoto", "Birkeland"], "type" = ["Brev"]}
      */
     S setSelectedFacets(Map<String, List<String>> selectedFacets);
 
     /**
      * Sets sort builder
      */
-    S setSortBuilder(SortBuilder sortBuilder);
+    S setSortBuilder(ObjectBuilder<SortOptions> sortBuilder);
 
 
     /**
      * Sets post filter
      */
-    S setPostFilter(FilterBuilder postFilter);
+    S setPostFilter(BoolQuery postFilter);
 
     /**
      * Sets filter (filtered_query)
      */
-    S setFilter(FilterBuilder postFilter);
+    S setFilter(BoolQuery filter);
 
 
     /**
-     * Construct search request based on the service settings
+     * Construct the search request based on the service settings
      */
-    SearchRequestBuilder constructSearchRequest();
+    SearchRequest.Builder constructSearchRequest();
 
     /**
      * Get documents based on the service settings.
      */
-    SearchResponse executeSearch();
+    SearchResponse<ObjectNode> executeSearch();
 
 }

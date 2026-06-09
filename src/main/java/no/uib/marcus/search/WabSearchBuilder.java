@@ -1,92 +1,107 @@
 package no.uib.marcus.search;
 
 
+import co.elastic.clients.elasticsearch.ElasticsearchClient;
+import co.elastic.clients.elasticsearch._types.query_dsl.*;
+import co.elastic.clients.elasticsearch.core.SearchRequest;
+import co.elastic.clients.elasticsearch.core.search.TrackHits;
+import no.uib.marcus.common.Params;
 import no.uib.marcus.common.util.AggregationUtils;
+import no.uib.marcus.common.util.QueryUtils;
 import no.uib.marcus.common.util.SignatureUtils;
-import org.apache.log4j.Logger;
-import org.elasticsearch.action.search.SearchRequestBuilder;
-import org.elasticsearch.client.Client;
-import org.elasticsearch.common.Strings;
-import org.elasticsearch.index.query.QueryBuilder;
-import org.elasticsearch.index.query.QueryBuilders;
-import org.elasticsearch.index.query.SimpleQueryStringBuilder;
-import org.elasticsearch.search.builder.SearchSourceBuilderException;
+
+import java.util.Arrays;
+import java.util.List;
+import java.util.logging.Logger;
+
+import no.uib.marcus.common.util.StringUtils;
 
 /**
  * A custom search builder for WAB
  */
 public class WabSearchBuilder extends AbstractSearchBuilder<WabSearchBuilder> {
     private final Logger logger = Logger.getLogger(getClass().getName());
+    private final TrackHits trackHits = new TrackHits.Builder().count(100_000).build();
 
-    WabSearchBuilder(Client client) {
+    WabSearchBuilder(ElasticsearchClient client) {
         super(client);
     }
 
-    /**
-     * Appends leading wildcard if query string is WAB signature
-     */
     @Override
     public String getQueryString() {
-        return SignatureUtils.appendLeadingWildcardIfWABSignature(super.getQueryString());
+        String query = super.getQueryString();
+        if (!StringUtils.containsWhitespace(query)) {
+            return SignatureUtils.appendWildcardIfWABSignature(query);
+        }
+        // Multi-word: apply per token so signatures get wildcards in the same
+        // way as single-word queries (e.g. "Ms-132 Modell" → "Ms-132* Modell").
+        StringBuilder result = new StringBuilder();
+        String[] tokens = query.trim().split("\\s+");
+        for (int i = 0; i < tokens.length; i++) {
+            if (i > 0) result.append(' ');
+            result.append(SignatureUtils.appendWildcardIfWABSignature(tokens[i]));
+        }
+        return result.toString();
     }
 
     /**
      * Builds query for WAB
      */
     @Override
-    public SearchRequestBuilder constructSearchRequest() {
-        QueryBuilder query;
-        SearchRequestBuilder searchRequest = getClient().prepareSearch();
+    public SearchRequest.Builder constructSearchRequest() {
+        Query query;
+        SearchRequest.Builder searchRequest = new SearchRequest.Builder();
         try {
             //Set indices
             if (isNeitherNullNorEmpty(getIndices())) {
-                searchRequest.setIndices(getIndices());
-            }
-            //Set types
-            if (isNeitherNullNorEmpty(getTypes())) {
-                searchRequest.setTypes(getTypes());
+                searchRequest.index(Arrays.asList(getIndices()));
             }
 
+
             //Set query
-            if (Strings.hasText(getQueryString())) {
-                query = QueryBuilders.simpleQueryStringQuery(getQueryString())
-                        .field("label")//whitespace analyzed
-                        .field("publishedIn")//whitespace analyzed
-                        .field("publishedInPart.exact")//not_analyzed
-                        //.field("hasPart")
-                        //.field("refersTo")
-                        .field("_all")
-                        .defaultOperator(SimpleQueryStringBuilder.Operator.AND);
+            if (StringUtils.hasText(getQueryString())) {
+                logger.fine("query set for wab");
+                query = QueryUtils.buildWabQueryString(getQueryString()).build()._toQuery();
             } else {
-                query = QueryBuilders.matchAllQuery();
+                query = QueryBuilders.matchAll().build()._toQuery();
             }
-            //Set Query, whether with or without filter
+            // Set Query, whether with or without filter
             if (getFilter() != null) {
-                searchRequest.setQuery(QueryBuilders.filteredQuery(query, getFilter()));
+                logger.fine("setting filter");
+                BoolQuery filterQuery = getFilter();
+                searchRequest
+                    .query(QueryBuilders.bool().must(query)
+                        .filter(List.of(filterQuery._toQuery())).build()._toQuery());
             } else {
-                searchRequest.setQuery(query);
+                searchRequest.query(query);
             }
-            //Set post filter
+            //Set post-filter
             if (getPostFilter() != null) {
-                searchRequest.setPostFilter(getPostFilter());
+                searchRequest.postFilter(getPostFilter());
             }
             //Set sortBuilder
             if (getSortBuilder() != null) {
-                searchRequest.addSort(getSortBuilder());
+                logger.fine("setting sort builder");
+                searchRequest.sort(List.of(getSortBuilder().build()));
             }
             //Append aggregations to the request builder
-            if (Strings.hasText(getAggregations())) {
-                AggregationUtils.addAggregations(searchRequest, getAggregations(), getSelectedFacets());
+            if (StringUtils.hasText(getAggregations())) {
+                logger.fine("adding aggregations");
+                searchRequest = AggregationUtils.addAggregations(searchRequest, getAggregations(), getSelectedFacets());
             }
 
             //Set from and size
-            searchRequest.setFrom(getFrom());
-            searchRequest.setSize(getSize());
+            searchRequest.from(getFrom());
+            searchRequest.size(getSize());
 
-            //Show builder for debugging purpose
-            //logger.info(searchRequest.toString());
-        } catch (SearchSourceBuilderException e) {
-            logger.error("Exception occurred when building search request: " + e.getDetailedMessage());
+            searchRequest.trackTotalHits(trackHits);
+            //Bound query execution time and per-shard collection so a single slow/expensive
+            //query can't tie up a shard (H1)
+            searchRequest.timeout(Params.SEARCH_TIMEOUT);
+            searchRequest.terminateAfter(Params.TERMINATE_AFTER);
+
+        }  catch (IllegalStateException e) {
+            throw new RuntimeException(e);
         }
         return searchRequest;
     }
