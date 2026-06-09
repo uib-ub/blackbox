@@ -330,7 +330,7 @@ public abstract class AbstractSearchBuilder<T extends AbstractSearchBuilder<T>> 
     public String toString() {
         ObjectNode jsonObj = objectMapper.createObjectNode();
 
-        jsonObj = jsonObj.put("indices",  getIndices().length == 0   ?  "" : Arrays.toString(getIndices()))
+        jsonObj = jsonObj.put("indices",  getIndices() == null || getIndices().length == 0   ?  "" : Arrays.toString(getIndices()))
                 .put("from", getFrom())
                 .put("size", getSize())
                 .put("aggregations", getAggregations() == null ? "" : getAggregations());

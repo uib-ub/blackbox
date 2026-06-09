@@ -15,9 +15,11 @@ import java.io.Serial;
 import java.io.StringWriter;
 import no.uib.marcus.client.ElasticsearchClientFactory;
 import no.uib.marcus.common.Params;
+import no.uib.marcus.common.util.AggregationUtils;
 import no.uib.marcus.common.util.FilterUtils;
 import no.uib.marcus.common.util.SortUtils;
 import no.uib.marcus.range.DateRange;
+import no.uib.marcus.search.IllegalParameterException;
 import no.uib.marcus.search.SearchBuilder;
 import no.uib.marcus.search.SearchBuilderFactory;
 
@@ -93,6 +95,19 @@ public class SearchServlet extends HttpServlet {
         String indexToBoost = request.getParameter(Params.INDEX_BOOST);
 
         try ( OutputStream out = response.getOutputStream()) {
+            //Reject malformed aggregations early with a 400 JSON body instead of a later 500/HTML
+            if (StringUtils.hasText(aggs)) {
+                try {
+                    AggregationUtils.validateAggregations(aggs);
+                } catch (IllegalParameterException e) {
+                    logger.warning("Invalid aggregations parameter: " + e.getMessage());
+                    response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+                    ObjectNode error = jsonMapper.createObjectNode();
+                    error.put("error", e.getMessage());
+                    out.write(jsonMapper.writeValueAsBytes(error));
+                    return;
+                }
+            }
             ElasticsearchClient client = ElasticsearchClientFactory.getElasticsearchClient();
             RestClientTransport restClientTransport = (RestClientTransport) client._transport();
             RestClient restClient = restClientTransport.restClient();
@@ -149,8 +164,10 @@ public class SearchServlet extends HttpServlet {
 
                 generator.close();
 
-                // Are there things added other than indicies lost between the translation of low level
-                // and the new rest client?
+                // Execute the request built by the high-level client via the low-level REST client,
+                // so aggregation keys are serialized without ES type-name prefixes (e.g. "related.exact"
+                // rather than "sterms#related.exact").
+                // also avoids packing/unpacking
                 String requestAsJson = writer.toString();
                 Request request1 = new Request("POST", buildEndpoint(indices));
                 request1.setJsonEntity(requestAsJson);

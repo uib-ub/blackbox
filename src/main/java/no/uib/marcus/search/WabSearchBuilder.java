@@ -20,7 +20,7 @@ import no.uib.marcus.common.util.StringUtils;
  */
 public class WabSearchBuilder extends AbstractSearchBuilder<WabSearchBuilder> {
     private final Logger logger = Logger.getLogger(getClass().getName());
-    private final TrackHits trackHits = new TrackHits.Builder().count(Integer.parseInt("100000")).build();
+    private final TrackHits trackHits = new TrackHits.Builder().count(100_000).build();
 
     WabSearchBuilder(ElasticsearchClient client) {
         super(client);
@@ -53,7 +53,6 @@ public class WabSearchBuilder extends AbstractSearchBuilder<WabSearchBuilder> {
         try {
             //Set indices
             if (isNeitherNullNorEmpty(getIndices())) {
-                logger.fine("Setting indices to " + Arrays.asList(getIndices()));
                 searchRequest.index(Arrays.asList(getIndices()));
             }
 
@@ -77,7 +76,6 @@ public class WabSearchBuilder extends AbstractSearchBuilder<WabSearchBuilder> {
             }
             //Set post-filter
             if (getPostFilter() != null) {
-                logger.fine("setting post filter" + getPostFilter().hasClauses());
                 searchRequest.postFilter(getPostFilter());
             }
             //Set sortBuilder
@@ -97,9 +95,6 @@ public class WabSearchBuilder extends AbstractSearchBuilder<WabSearchBuilder> {
 
             searchRequest.trackTotalHits(trackHits);
 
-            //Show builder for debugging purpose
-            //logger.info(searchRequest.toString());
-            logger.fine("end of wab implementation searchrequest builder" + searchRequest);
         }  catch (IllegalStateException e) {
             throw new RuntimeException(e);
         }

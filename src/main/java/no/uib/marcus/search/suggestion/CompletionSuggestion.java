@@ -4,9 +4,6 @@ import co.elastic.clients.elasticsearch.ElasticsearchClient;
 import co.elastic.clients.elasticsearch.core.SearchResponse;
 import co.elastic.clients.elasticsearch.core.search.*;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-
-import com.fasterxml.jackson.databind.json.JsonMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import java.util.logging.Level;
@@ -87,15 +84,6 @@ public class CompletionSuggestion {
         SearchResponse<ObjectNode> response = client.search(builder.build(), ObjectNode.class);
         logger.log(Level.FINE, "getSuggestionResponse: {0}", response.suggest().get(SUGGEST_FIELD));
         return response;
-    }
-
-    //Main method for easy debugging
-    public static void main(String[] args) throws JsonProcessingException {
-        String jsonString = new JsonMapper().writeValueAsString(
-                CompletionSuggestion
-                        .getSuggestions("Ms-114,120v[7]", 10, "wab"));
-
-        logger.log(Level.INFO,"{0}",jsonString);
     }
 
 }

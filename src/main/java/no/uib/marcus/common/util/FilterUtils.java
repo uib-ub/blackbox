@@ -104,7 +104,9 @@ public final class FilterUtils {
                 }
             }
         } catch (Exception ex) {
+            //Do not swallow: a half-built filter would silently return unfiltered results
             logger.log(Level.SEVERE,"Exception occurred when constructing bool_filter", ex);
+            throw ex;
         }
 
         if (Objects.nonNull(dateRange)) { //append date range filter on top_filter

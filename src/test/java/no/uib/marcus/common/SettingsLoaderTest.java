@@ -19,18 +19,8 @@ public class SettingsLoaderTest extends RandomizedTest {
      */
     @Test
     public void testReadingJsonFileProperties() throws Exception {
-        String properties = "{\n" +
-                "  \"ubbcluster\": {\n" +
-                "    \"name\": \"elasticsearch\",\n" +
-                "    \"node_name\": \"Blackbox\",\n" +
-                "    \"host\": \"uib.no/ub\",\n" +
-                "    \"transport_port\": 80\n" +
-                "  }\n" +
-                "}";
-
-        Map<String, String> settings = new  JsonFileLoader().toMap("settings-loader-test.json");
-        //logger.info("Testing if cluster properties file exist: " + !settings.isEmpty());
-        assertTrue(!settings.isEmpty());
+        Map<String, String> settings = new JsonFileLoader().toMap("settings-loader-test.json");
+        assertFalse(settings.isEmpty());
         assertEquals("elasticsearch", settings.get("name"));
         assertEquals("Blackbox", settings.get("node_name"));
         assertEquals("uib.no/ub", settings.get("host"));
@@ -54,31 +44,20 @@ public class SettingsLoaderTest extends RandomizedTest {
         //We use this for testing..
         String fileName = "config.template.example.json";
         JsonFileLoader loader = new JsonFileLoader();
-        // String jsonString;
-        Map<String, Map> jsonStringMap;
+        Map<String, String> settings;
         try {
-            // jsonString = loader.loadFromResource(fileName);
-            jsonStringMap = loader.loadFromResource(fileName);
+            settings = loader.toMap(fileName);
         } catch (UnavailableResourceException ex) {
-            //Load from resource
             fileName = "settings-loader-test.json";
-            // jsonString = loader.loadFromResource(fileName);
-            jsonStringMap = loader.loadFromResource(fileName);
+            settings = loader.toMap(fileName);
         }
 
         logger.info("Validating config file from: " + loader.getPathFromResource(fileName));
-        // TODO: Simply try to convert Map to String to fix error here - Rui
-        String jsonString = jsonStringMap.toString();
-        Map<String,String> settings = new  JsonFileLoader().toMap(fileName);
-        //Map<String, String> settings = loader.loadFromResource(fileName);
-        assertNotNull(jsonString);
         assertNotNull(settings);
-        assertTrue(!jsonString.isEmpty());
-        logger.info("settings: " + settings.toString());
-
-        assertTrue("Does cluster name exist? : ", !settings.get("name").isEmpty());
-        assertTrue("Does host name exist? : ", !settings.get("host").isEmpty());
-        assertTrue("Does port exist? : ", !settings.get("port").isEmpty());
+        assertFalse(settings.isEmpty());
+        assertFalse("Does cluster name exist? : ", settings.get("name").isEmpty());
+        assertFalse("Does host name exist? : ", settings.get("host").isEmpty());
+        assertFalse("Does port exist? : ", settings.get("port").isEmpty());
     }
 
 

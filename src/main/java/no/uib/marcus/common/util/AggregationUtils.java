@@ -20,6 +20,7 @@ import java.util.logging.Level;
 import no.uib.marcus.search.IllegalParameterException;
 
 import java.util.logging.Logger;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -78,7 +79,8 @@ public final class AggregationUtils {
                 + jsonString + "]");
       }
     } catch (JsonProcessingException e) {
-      throw new RuntimeException(e);
+      throw new IllegalParameterException(
+          "Aggregations must be valid JSON. Could not parse: [" + jsonString + "]", e);
     }
   }
 
@@ -137,11 +139,16 @@ public final class AggregationUtils {
   public static SearchRequest.Builder addAggregations(SearchRequest.Builder searchRequest,
       String aggregations,
       Map<String, List<String>> selectedFacets) {
+    //Guard the single-arg overload (and any caller) that passes null
+    if (selectedFacets == null) {
+      selectedFacets = Collections.emptyMap();
+    }
     JsonNode facets;
     try {
       facets = JSON_MAPPER.readTree(aggregations);
     } catch (JsonProcessingException e) {
-      throw new RuntimeException(e);
+      throw new IllegalParameterException(
+          "Aggregations must be valid JSON. Could not parse: [" + aggregations + "]", e);
     }
     Map<String, Aggregation> aggregationMap = new HashMap<>();
     BoolQuery.Builder aggsFilter = FilterUtils.getPostFilter(selectedFacets, aggregations);

@@ -30,7 +30,7 @@ POST returns 405 JSON on both. CORS is open (`*`) via `web.xml`.
 |---|---|
 | `q` | Query string |
 | `index` | One or more ES index names (repeatable) |
-| `service` | Selects search builder: `MARCUS` (default), `WAB`, `NATUREN`, `SKA` (see Services) |
+| `service` | Selects search builder: `MARCUS` (default), `WAB`, `NATUREN` (see Services) |
 | `from` | Offset, default 0 |
 | `size` | Page size, default 10, max 1000 |
 | `from_date` / `to_date` | Date range in `yyyy`, `yyyy-MM`, or `yyyy-MM-dd` format |
@@ -48,10 +48,9 @@ POST returns 405 JSON on both. CORS is open (`*`) via `web.xml`.
 MARCUS / MARCUS_ADMIN → MarcusSearchBuilder   (default when no service param is given)
 WAB                   → WabSearchBuilder
 NATUREN               → NaturenSearchBuilder  (extends MarcusSearchBuilder)
-SKA                   → SkaSearchBuilder      (extends MarcusSearchBuilder)
 ```
 
-`WAB` is known to be actively passed by its frontend. Whether `NATUREN` and `SKA` are still passed by their respective frontends is not confirmed — `SKA` in particular was not present in any verified URL at time of writing.
+`WAB` is known to be actively passed by its frontend. Whether `NATUREN` is still passed by its frontend is not confirmed. A former `SKA` service was removed during the ES upgrade: the Skeivt Arkiv frontend never passed `service=SKA`, so its requests already fell through to the default `MarcusSearchBuilder`.
 
 ### MarcusSearchBuilder
 Default service. Uses `query_string` query with AND operator across `identifier`, `label`, `all`, `all.exact`. Boosts `type=fotografi` documents (weight 3×). On empty query, applies a random `function_score` boost from a curated picture list. Appends wildcard to UBB signatures (`ubb-*`, `ubm-*`, `sab-*`) and to tokens containing a hyphen.
@@ -61,9 +60,6 @@ For Wittgenstein Archives. Uses `simple_query_string` with AND operator across `
 
 ### NaturenSearchBuilder
 Extends `MarcusSearchBuilder`. Calls `super.constructSearchRequest()` for infrastructure (indices, pagination, aggregations, sort), then overrides the query to add text highlighting on `textContent`. Boosts issues that have a thumbnail on empty queries.
-
-### SkaSearchBuilder
-Extends `MarcusSearchBuilder`. Has a known bug: when a `topFilter` is set (AND-type facets or date range active), the query is also not applied, resulting in a match-all response. Status of frontend usage is unconfirmed.
 
 ## Aggregations
 
@@ -151,7 +147,6 @@ src/main/java/no/uib/marcus/
     MarcusSearchBuilder.java          — default query builder
     WabSearchBuilder.java
     NaturenSearchBuilder.java
-    SkaSearchBuilder.java             — has a filter bug; frontend usage unconfirmed
     SearchBuilderFactory.java         — factory
   servlet/
     SearchServlet.java                — /search endpoint

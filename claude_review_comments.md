@@ -7,6 +7,30 @@
 
 ---
 
+## Round 2 review (second pass over the full branch diff)
+
+### Fixed in this pass
+
+- **`FilterUtils.buildBoolFilter` no longer swallows exceptions** — the migration had dropped the `throw`, so a half-built filter would silently return *unfiltered* results. Restored the rethrow.
+- **Malformed `aggs` now returns 400 JSON** — `SearchServlet` validates `aggs` up front (`AggregationUtils.validateAggregations`) and writes a `{"error": ...}` 400 body. Previously a bad `aggs` was handled inconsistently (swallowed in the filter path, 500 + HTML in the agg path). `validateAggregations`/`addAggregations` now throw `IllegalParameterException` (not a raw `RuntimeException`) on parse failure. `contains()` is unchanged (still throws), so `AggregationUtilsTest.testContains04` stays valid — malformed input is now rejected before any filter/agg path runs.
+- **`AggregationUtils.addAggregations(req, aggs)` null-guard** — the single-arg overload passed `null` selectedFacets straight into `getPostFilter(@NotNull ...)` → NPE. Now defaults to `Collections.emptyMap()`.
+- **CLAUDE.md SKA mismatch** — the committed CLAUDE.md still documented a `SKA` service / `SkaSearchBuilder` that this branch deletes. Removed those references (service table, routing block, builder section, key-files list) and added a one-line note that SKA always fell through to `MarcusSearchBuilder`.
+- **Minor cleanups** — `JsonFileLoader.loadFromStream` now uses try-with-resources + a shared `ObjectMapper` (was leaking the reader and newing a mapper per call); `AbstractSearchBuilder.toString()` null-safe on `getIndices()`; `WabSearchBuilder` `count(100_000)` instead of `Integer.parseInt("100000")` and dropped the expensive string-concat `logger.fine` artifacts; removed `CompletionSuggestion.main()` debug entry point and its now-unused imports; replaced the dangling WIP comment in `SearchServlet`; moved the `settings-loader-test.json` fixture to `src/test/resources` and tidied `SettingsLoaderTest`; added trailing newlines to `Dockerfile`, `CLAUDE.md`, `ElasticsearchClientFactory.java`, `ApplicationShutdownListener.java`, `config.template.example.json`.
+  - Deleted by user: `src/main/resources/settings-loader-test.json` and stray copy.
+
+### Reviewed and deliberately left unchanged
+
+- **Random-picture boost override (`MarcusSearchBuilder`)** — the trailing `.functions(List.of(fotoFs))` still overwrites the empty-query branch's `[fotoFs, randomFs]`. **Left as-is by decision:** the frontend behaves correctly (a random photo is returned and changes between refreshes), so the empty-query boost is working in practice. No change.
+- **OR sub-aggregation filter only applied to selected facets** — the `else` branch that applied `aggs_filter` to *unselected* OR facets was dropped, and sort-by-sub-aggregation is no longer used. Counts for unselected OR-facet values won't account for sibling OR selections. **Skipped by decision.**
+- **`date_histogram` always uses `fixedInterval`** — calendar units (`year`/`month`/`quarter`/`week`) would be rejected by ES. **Left:** date aggregations are currently correct in the live frontends, so no calendar intervals are in use.
+- **`SortUtils`** — bare `sort=_score` (no colon) now returns `null` (no sort) instead of a score sort, and an invalid order throws `IllegalParameterException` during builder construction (before the servlet's JSON error handling), surfacing as a 500/HTML rather than 400. **Skipped.**
+- **`closeClient()` double-closes the transport** (`_transport().close()` then `client.close()`). Harmless (second close is caught). **Skipped.**
+- **Required-but-unused env vars** — `ELASTICSEARCH_CLUSTER_NAME`/`NODE_NAME` are mandatory but unused by `createElasticsearchClient` (only host/port/api_key used); REST scheme is hardcoded `https`. **Skipped.**
+- **File-based config crashes at startup** — `config.template.example.json` has no `api_key` and uses port `9300`; `getValueAsString(properties,"api_key")` NPEs in file mode. **Skipped** (file mode is slated for removal).
+- **`addDateRangeFilter` semantics** — the rewrite now wraps the date sub-queries in a nested `bool.should(...)` added as a `must`, making the date range *required* (previously, mixed with facet `must` clauses, the `should` date clauses were effectively optional). Likely a fix; dates verified OK in the frontend. No change — noted for awareness.
+
+---
+
 ## Bug — `SkaSearchBuilder` filter is silently ignored
 
 **Note: `SkaSearchBuilder` appears to be dormant in production.** The SKA frontend no longer passes `service=ska`, so requests fall through to the default `MarcusSearchBuilder` which handles filters correctly. Verified against live URLs — no `service=` parameter is present. The bug is still latent code and should be fixed or the class removed.

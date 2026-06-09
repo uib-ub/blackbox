@@ -21,6 +21,7 @@ public class JsonFileLoader {
     * Use builder
     *  */
     public final static String CONFIG_TEMPLATE = "config.template.json";
+    private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
     private final Logger logger = Logger.getLogger(JsonFileLoader.class.getName());
 
     /**
@@ -59,10 +60,8 @@ public class JsonFileLoader {
      */
     @SuppressWarnings("unchecked")
     public Map<String,Map>  loadFromStream(String filePath) throws IOException {
-        BufferedReader reader;
-        try {
-            reader = new BufferedReader(new FileReader(filePath));
-            return new ObjectMapper().readValue(reader, Map.class);
+        try (BufferedReader reader = new BufferedReader(new FileReader(filePath))) {
+            return OBJECT_MAPPER.readValue(reader, Map.class);
         } catch (FileNotFoundException e) {
             logger.severe("File path does not exist for " + filePath);
             throw new UnavailableResourceException("Unavailable file for blackbox settings. " +
