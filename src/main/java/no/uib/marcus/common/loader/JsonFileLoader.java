@@ -20,7 +20,7 @@ public class JsonFileLoader {
     /* https://www.javadoc.io/doc/org.elasticsearch/elasticsearch/latest/org.elasticsearch.server/org/elasticsearch/common/settings/Settings.Builder.html
     * Use builder
     *  */
-    public final static String CONFIG_TEMPLATE = "config.template.json";
+    public static final String CONFIG_TEMPLATE = "config.template.json";
     private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
     private final Logger logger = Logger.getLogger(JsonFileLoader.class.getName());
 
@@ -43,7 +43,7 @@ public class JsonFileLoader {
     }
 
     /**
-     * Load file from resource folder
+     * Load file from the resource folder
      *
      * @param fileName path to file
      * @return returns a string representation of file contents
@@ -73,8 +73,8 @@ public class JsonFileLoader {
      * Convert a JSON string to a Java map
      *
      * @param filepath a valid JSON string
-     * @return a Java map which is the result of JSON string
-     * @throws IOException if filepath doesn't exist
+     * @return a Java map that is the result of the JSON string
+     * @throws IOException if the filepath doesn't exist
      */
     public Map<String, String> toMap(String filepath) throws IOException {
         return loadFromResource(filepath).get("cluster");
@@ -83,7 +83,7 @@ public class JsonFileLoader {
     /**
      * A wrapper for loading config file from resource
      *
-     * @return a file converted to Java map
+     * @return a file converted to a Java map
      */
     public Map<String, String> loadBlackboxConfigFromResource() throws IOException {
         return loadFromResource(CONFIG_TEMPLATE).get("cluster");

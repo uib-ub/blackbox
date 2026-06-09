@@ -18,7 +18,6 @@ import org.apache.http.message.BasicHeader;
 import org.elasticsearch.client.RestClient;
 
 import java.io.IOException;
-import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.Map;
 
@@ -31,7 +30,7 @@ import java.util.Map;
  *
  *
  */
-final public class ElasticsearchClientFactory {
+public final class ElasticsearchClientFactory {
     private static final Logger logger = Logger.getLogger(ElasticsearchClientFactory.class.getName());
     private static volatile ElasticsearchClient elasticsearchClient;
 

@@ -56,7 +56,7 @@ public final class AggregationUtils {
   private static final String MIN_DOC_COUNT = "min_doc_count";
   private static final String ORDER = "order";
 
-  //Enforce non-instatiability
+  //Enforce non-instability
   private AggregationUtils() {
   }
 
@@ -65,7 +65,7 @@ public final class AggregationUtils {
    * Validate aggregations
    *
    * @param jsonString aggregations as JSON string
-   * @throws IllegalParameterException if string is not JSON array
+   * @throws IllegalParameterException if the string is not a JSON-array
    * @ expects input to be valid JSON. Throws an exception if the string is not parseable as a JSON
    * array
    **/
@@ -119,12 +119,12 @@ public final class AggregationUtils {
 
   /**
    * A method to append aggregations to the search request builder.
-   *
+   * @deprecated Use {@link #addAggregations(SearchRequest.Builder, String, Map)} instead.
    * @param searchRequest a search request builder
    * @param aggregations  aggregations as JSON array string
    * @return the same search request where aggregations have been added to it.
    */
-  public static SearchRequest.Builder addAggregations(SearchRequest.Builder searchRequest,
+  @Deprecated(forRemoval = true) public static SearchRequest.Builder addAggregations(SearchRequest.Builder searchRequest,
       String aggregations) {
     return addAggregations(searchRequest, aggregations, null);
   }
@@ -169,7 +169,7 @@ public final class AggregationUtils {
             //Get the current field
             String facetField = facet.path(FIELD).asText();
             // Logic: Whenever a user selects the value from an "OR" aggregation,
-            // you add a corresponding filter (here aggs_filter) to all aggregations as subaggregation
+            // you add a corresponding filter (here aggs_filter) to all aggregations as sub aggregation
             // EXCEPT for the aggregation in which the selection was performed in.
             if (selectedFacets.containsKey(facetField)) {
               //Make a copy of the map
@@ -291,7 +291,7 @@ public final class AggregationUtils {
         order = new NamedValue<>(KEY_TERM, SortOrder.Desc);
       }
       if (sortBySubAggregation) {//Sort using sub aggregation
-        //@this is also applied below, if order is not specified.
+        //@this is also applied below if order is not specified.
         termsAggregationBuilder.order(subAggregationOrder);
       } else { //sort normally using top aggregation
         termsAggregationBuilder.order(order);
