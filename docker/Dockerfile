@@ -1,4 +1,4 @@
-FROM maven:3-eclipse-temurin-21 AS builder
+FROM maven:3-eclipse-temurin-25 AS builder
 COPY . .
 RUN mvn clean install
 FROM tomcat:11.0.22-jre25-temurin
