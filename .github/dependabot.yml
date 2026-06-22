@@ -18,4 +18,11 @@ updates:
       # Keep the build image on the Temurin 25 LTS line; don't bump to 26+.
       - dependency-name: "maven"
         update-types: ["version-update:semver-major"]
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+    cooldown:
+      default-days: 10
 
