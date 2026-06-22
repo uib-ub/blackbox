@@ -14,4 +14,8 @@ updates:
       day: "monday"
     cooldown:
       default-days: 10
+    ignore:
+      # Keep the build image on the Temurin 25 LTS line; don't bump to 26+.
+      - dependency-name: "maven"
+        update-types: ["version-update:semver-major"]
 
