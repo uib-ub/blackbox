@@ -20,7 +20,7 @@ jobs:
       # Builds the image using docker/Dockerfile. The builder stage runs
       # `mvn clean install`, so this also compiles and runs the test suite.
       - name: Build image (compiles + runs tests)
-        uses: docker/build-push-action@v6
+        uses: docker/build-push-action@v7
         with:
           context: .
           file: docker/Dockerfile
