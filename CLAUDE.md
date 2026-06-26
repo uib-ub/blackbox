@@ -56,7 +56,7 @@ NATUREN               → NaturenSearchBuilder  (extends MarcusSearchBuilder)
 Default service. Uses `query_string` query with AND operator across `identifier`, `label`, `all`, `all.exact`. Boosts `type=fotografi` documents (weight 3×). On empty query, applies a random `function_score` boost from a curated picture list. Appends wildcard to UBB signatures (`ubb-*`, `ubm-*`, `sab-*`) and to tokens containing a hyphen.
 
 ### WabSearchBuilder
-For Wittgenstein Archives. Uses `simple_query_string` with AND operator across `label`, `publishedIn`, `publishedInPart`, `all`. Appends trailing wildcard to WAB signatures (`ms-*`, `ts-*`).
+For Wittgenstein Archives. Uses `query_string` with AND operator across `label`, `publishedIn`, `publishedInPart`, `all`, `all_keyword`. Appends trailing wildcard to WAB signatures (`ms-*`, `ts-*`).
 
 ### NaturenSearchBuilder
 Extends `MarcusSearchBuilder`. Calls `super.constructSearchRequest()` for infrastructure (indices, pagination, aggregations, sort), then overrides the query to add text highlighting on `textContent`. Boosts issues that have a thumbnail on empty queries.

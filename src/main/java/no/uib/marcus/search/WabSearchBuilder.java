@@ -58,10 +58,13 @@ public class WabSearchBuilder extends AbstractSearchBuilder<WabSearchBuilder> {
             }
 
 
-            //Set query
-            if (StringUtils.hasText(getQueryString())) {
+            //Set query. Escape structural Lucene chars (unless the user typed a
+            //balanced quoted phrase) so autocomplete-selected titles with parens,
+            //colons or slashes match literally instead of breaking the parser.
+            String queryString = QueryUtils.escapeStructural(getQueryString());
+            if (StringUtils.hasText(queryString)) {
                 logger.fine("query set for wab");
-                query = QueryUtils.buildWabQueryString(getQueryString()).build()._toQuery();
+                query = QueryUtils.buildWabQueryString(queryString).build()._toQuery();
             } else {
                 query = QueryBuilders.matchAll().build()._toQuery();
             }

@@ -32,6 +32,15 @@ public final class QueryUtils {
             '{', '}', '^', '~', '?', ':', '!', '[', ']'
     };
 
+    //Structural Lucene characters escaped for free-text in "literal" mode.
+    //These are grouping/range/phrase/field/regex delimiters that either throw
+    //(unbalanced parens, stray quote) or reroute parsing (':' field selector,
+    //'/' regex). Wildcards and term operators (* ? ~ ^ + -) are deliberately
+    //NOT here, so they stay usable and injected signature wildcards survive.
+    private static final char[] STRUCTURAL_ESCAPE_CHARS = {
+            '\\', '"', '(', ')', '[', ']', '{', '}', ':', '/'
+    };
+
   private static final JacksonJsonpMapper JSONP_MAPPER = new JacksonJsonpMapper();
   private static final JsonFactory JSON_FACTORY = new JsonFactory();
   private static final List<String> SEARCH_FIELDS = List.of("identifier", "label", "all", "all.exact","all_keyword");
@@ -113,6 +122,60 @@ public final class QueryUtils {
             }
         }
         return false;
+    }
+
+
+    /**
+     * Escapes structural Lucene characters so free-text input is matched
+     * literally, unless the query carries a balanced pair of quotes. Balanced
+     * quotes are treated as an explicit opt-in to phrase / Lucene syntax: the
+     * string is then passed through untouched and the caller trusts the user's
+     * query. Without that signal the input is assumed to be a literal value
+     * (e.g. a title selected from autocomplete, where parens, colons and
+     * slashes are part of the text), so {@link #STRUCTURAL_ESCAPE_CHARS} are
+     * backslash-escaped. Wildcards and term operators ({@code * ? ~ ^ + -})
+     * always pass through, so signature wildcards added upstream survive.
+     *
+     * @param s the (already wildcard-injected) query string
+     * @return the string with structural characters escaped, or {@code s}
+     *         unchanged when it is empty or contains balanced quotes
+     */
+    public static String escapeStructural(String s) {
+        if (isNullOrEmpty(s) || hasBalancedQuotes(s)) {
+            return s;
+        }
+        StringBuilder sb = new StringBuilder(s.length() + 8);
+        for (int i = 0; i < s.length(); i++) {
+            char c = s.charAt(i);
+            for (char r : STRUCTURAL_ESCAPE_CHARS) {
+                if (c == r) {
+                    sb.append('\\');
+                    break;
+                }
+            }
+            sb.append(c);
+        }
+        return sb.toString();
+    }
+
+    /**
+     * Checks whether a string contains at least one quote and an even number of
+     * them, i.e. a balanced phrase the user typed deliberately.
+     *
+     * @param s a given string
+     * @return {@code true} if the quote count is non-zero and even
+     */
+    static boolean hasBalancedQuotes(String s) {
+        if (isNullOrEmpty(s)) {
+            return false;
+        }
+        int count = 0;
+        for (int i = 0; i < s.length(); i++) {
+            if (s.charAt(i) == '"') {
+                count++;
+            }
+        }
+        return count > 0 && count % 2 == 0;
     }
 
 
