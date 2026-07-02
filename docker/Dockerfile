@@ -1,7 +1,7 @@
 FROM maven:3-eclipse-temurin-25 AS builder
 COPY . .
 RUN mvn clean install
-FROM tomcat:11.0.22-jre25-temurin
+FROM tomcat:11.0.23-jre25-temurin
 COPY --from=builder target/blackbox-*.war /usr/local/tomcat/webapps/blackbox.war
 RUN useradd -u 10001 tomcat \
     && rm -rf /usr/local/tomcat/webapps.dist \
