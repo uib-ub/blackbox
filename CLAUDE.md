@@ -153,7 +153,7 @@ src/main/java/no/uib/marcus/
     SuggestionServlet.java            — /suggest endpoint
     ApplicationShutdownListener.java  — closes ES client on shutdown
 src/main/resources/
-  config.template.json                — local connection config (not committed with real credentials)
-  config.template.example.json       — safe example to copy from
   logging.properties                  — JUL config; application logs at INFO by default
 ```
+
+Ignore config.json files which are left from previous implementation, configuration happens from env vars.
