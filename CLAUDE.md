@@ -8,13 +8,13 @@ Deployed at `jambo.uib.no/blackbox` (production) and on a test instance at `bgo1
 
 ## Tech stack
 
-- **Java 21**, compiled and packaged with Maven as a WAR
+- **Java 25**, compiled and packaged with Maven as a WAR
 - **Tomcat 11** (Jakarta EE 11 / Servlet 6.1)
 - **Elasticsearch 9.x** via the official `co.elastic.clients:elasticsearch-java` high-level client and `org.elasticsearch.client:elasticsearch-rest-client` low-level REST client (both used together — see Architecture notes)
 - **Jackson** (`jackson-databind`) for JSON parsing; replaced Gson from ES 1.7 era
 - `java.util.logging` throughout (replaces the old Log4j dependency); configured via `src/main/resources/logging.properties`
-- Docker image: `maven:3-eclipse-temurin-21` builder → `tomcat:11-jre21` runtime; CI via `.gitlab-ci.yml`
-
+- Docker image: `maven:3-eclipse-temurin-25` builder → `tomcat:11-jre25` runtime; CI via `.gitlab-ci.yml`
+java
 ## Endpoints
 
 | URL pattern | Servlet | Purpose |
@@ -153,7 +153,7 @@ src/main/java/no/uib/marcus/
     SuggestionServlet.java            — /suggest endpoint
     ApplicationShutdownListener.java  — closes ES client on shutdown
 src/main/resources/
-  config.template.json                — local connection config (not committed with real credentials)
-  config.template.example.json       — safe example to copy from
   logging.properties                  — JUL config; application logs at INFO by default
 ```
+
+Ignore config.json files which are left from previous implementation, configuration happens from env vars.
