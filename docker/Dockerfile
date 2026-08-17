@@ -3,7 +3,10 @@ COPY . .
 RUN mvn clean install
 FROM tomcat:11.0.24-jre25-temurin
 COPY --from=builder target/blackbox-*.war /usr/local/tomcat/webapps/blackbox.war
-RUN useradd -u 10001 tomcat \
+RUN apt-get update \
+    && apt-get upgrade -y \
+    && rm -rf /var/lib/apt/lists/* \
+    && useradd -u 10001 tomcat \
     && rm -rf /usr/local/tomcat/webapps.dist \
     && if find /usr/local/tomcat -type d \
             \( -name docs -o -name examples -o -name host-manager \
